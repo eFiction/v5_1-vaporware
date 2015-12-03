@@ -1,0 +1,21 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ops="http://www.idpf.org/2007/ops"
+      xml:lang="de">
+  <head>
+    <title>Inhaltsverzeichnis</title>
+  </head>
+  <body>
+   <nav ops:type="toc">
+ 
+    <h1>Inhaltsverzeichnis</h1>
+ 
+    <ol>
+		<li><a href="content/title.xhtml">Title page</a></li> 
+		<repeat group="{{ @pages }}" value="{{ @page }}">
+			<li><a href="content/chapter{{ @page['number'] }}.xhtml">[{{ @page['number'] }}]: {{ @page['title'] }}</a></li> 
+		</repeat>
+    </ol>
+ 
+  </nav>
+ </body>
+</html>

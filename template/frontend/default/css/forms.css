@@ -1,0 +1,276 @@
+/*----------------- MISC STORY EDIT -----------------*/
+
+#chapter-sort li {
+	list-style-type: none;
+	list-style-position: inside;
+}
+
+/* LOGIN/REGISTER */
+
+.form-wrapper {
+	width: 50%;
+}
+
+#login {
+	margin: 0;
+	padding: 0;
+	width: 300px;
+}
+#register {
+	margin: 0;
+	padding: 0;
+	width: 300px;
+}
+
+label {
+	width: 60px;
+	float: left;
+	padding: 8px 0;
+	line-height: 14px;
+	margin-top: 0;
+}
+
+.field {
+	position: relative;
+	width: 100%;
+	clear: both;
+	float: right;
+	margin: 0;
+	font-family: inherit;
+}
+.field span.icon {
+	position: relative;
+	top: 43px;
+	margin-top: -42px;
+	float: left;
+	color: #4d4d4d;
+	background: #efefef;
+	font-size: 14pt;
+	line-height: 38px;
+	text-align: center;
+	width: 40px;
+	border-width: 1px 1px 1px 1px;
+	border-style: solid;
+	border-color: #dcdcdc;	
+	-webkit-border-radius: 5px 0 0 5px;
+  -moz-border-radius: 5px 0 0 5px;
+  border-radius: 5px 0 0 5px;
+	z-index: 1;
+}
+.field input {
+	-webkit-border-radius: 5px 5px;
+  -moz-border-radius: 5px 5px;
+  border-radius: 5px 5px;
+}
+.field input,
+.field textarea,
+.field select {
+	padding: 10px 20px 10px 50px;
+	width: 100%;
+	float: left;
+	color: #141516;
+	font-size: 10pt;
+	font-family: inherit;
+	border-width: 1px 1px 1px 1px;
+	border-style: solid;
+	border-color: #dcdcdc;
+	background-color: #fafafa;
+	margin: 1px;
+}
+.field textarea {
+	padding: 10px;
+}
+
+
+/*-----------------  FORMS  -----------------*/
+
+input.text-input-story {
+	margin: 0;
+	width: 100%;
+	float: right;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	border: 1px solid #dcdcdc;
+	background-color: #fafafa;
+	color: #141516;
+	padding: 6px;
+	font-family: inherit;
+	font-size: 10pt;
+}
+input.text-input {
+	margin: 0;
+	width: 100%;
+	float: right;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	border: 1px solid #dcdcdc;
+	background-color: #fafafa;
+	color: #141516;
+	padding: 6px;
+	font-family: inherit;
+	font-size: 10pt;
+}
+
+input.button, a.button {
+	vertical-align: baseline;
+	display: inline-block;
+	zoom: 1;
+	line-height: normal;
+	white-space: nowrap;
+	vertical-align: baseline;
+	text-align: center;
+	-webkit-user-drag: none;
+	-webkit-user-select: none;
+	-webkit-box-shadow: inset 0px 1px 0px 0px #fff;
+	-moz-box-shadow: inset 0px 1px 0px 0px #fff;
+	box-shadow: inset 0px 1px 0px 0px #fff;
+	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #ededed), color-stop(1, #dfdfdf)); /* Chrome,Safari4+ */
+	background:-moz-linear-gradient(top, #ededed 5%, #dfdfdf 100%); /* FF3.6+ */
+	background:-webkit-linear-gradient(top, #ededed 5%, #dfdfdf 100%); /* Chrome10+,Safari5.1+ */
+	background:-o-linear-gradient(top, #ededed 5%, #dfdfdf 100%); /* Opera 11.10+ */
+	background:-ms-linear-gradient(top, #ededed 5%, #dfdfdf 100%); /* IE10+ */
+	background:linear-gradient(to bottom, #ededed 5%, #dfdfdf 100%); /* W3C */
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#dfdfdf',GradientType=0); /* IE6-9 */
+	border: 1px solid #dcdcdc;
+	padding: 6px;
+	margin: 2px;
+	font-family: 'Open Sans', sans-serif;
+	color: #777777;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	text-shadow: 1px 1px 0 #fafafa;
+	cursor: pointer;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	font-size: 10pt;
+}
+input.button:hover, a.button:hover {
+	background: #dfdfdf;
+	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #dfdfdf), color-stop(1, #ededed)); /* Chrome,Safari4+ */
+	background:-moz-linear-gradient(top, #dfdfdf 5%, #ededed 100%); /* FF3.6+ */
+	background:-webkit-linear-gradient(top, #dfdfdf 5%, #ededed 100%); /* Chrome10+,Safari5.1+ */
+	background:-o-linear-gradient(top, #dfdfdf 5%, #ededed 100%); /* Opera 11.10+ */
+	background:-ms-linear-gradient(top, #dfdfdf 5%, #ededed 100%); /* IE10+ */
+	background:linear-gradient(to bottom, #dfdfdf 5%, #ededed 100%); /* W3C */
+	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#dfdfdf', endColorstr='#ededed',GradientType=0); /* IE6-9 */
+	border: 1px solid #dcdcdc;
+	color: #777777;
+}
+
+a.button, a.button:visited {
+	font-family: 'Open Sans', sans-serif;
+	color: #777777;
+	text-shadow: 1px 1px 0 #fafafa;
+	cursor: pointer;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	font-size: 10pt;
+}
+.delete {
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	padding: 6px;
+	margin: 2px;
+	background: #cd2323;
+	border: 1px solid #bd2027;
+}
+a.delete{
+	color: #fafafa;
+	text-shadow: 1px 1px 0 #333;
+}
+a.delete:hover {
+	background: #bd2027;
+	color: #ef9f9f;
+}
+
+select, option {
+	width: auto;
+	border: 1px solid #dcdcdc;
+	background-color: #fafafa;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	margin: 1px 1px;
+	padding: 4px;
+	vertical-align:  middle;
+	font-family: inherit;
+	color: #141516;
+}
+textarea {
+	width: 100%;
+	height: 150px;
+	border: 1px solid #dcdcdc;
+	background-color: #fafafa;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	margin: 1px;
+	padding: 2px;
+	vertical-align: middle;
+	font-family: inherit;
+	color: #141516;
+}
+
+/* Lists with settings use these a lot.
+------------------------------------------------------- */
+
+dl.settings {
+	width: 100%;
+	float:left;
+	margin: 0 0 10px 0;
+	padding: 0;
+}
+
+dl.settings dt {
+	float:left;
+	width: 30%;
+	clear:both;
+	margin: 5px 0 3px 10px;
+	padding: 5px;
+}
+dl.settings dd {
+	width: 66%;
+	float: left;
+	margin: 0 0 3px 0;
+	padding: 5px;
+}
+
+dl.settings dt.note {
+	width: 96%;
+	float: left;
+	margin: 0 0 10px 0;
+	padding: 5px 0 5px 20px;
+	clear: both;
+}
+
+dl.settings dt.settings_title {
+	width: 100%;
+	float: none;
+	font-weight: bold;
+	clear: both;
+}
+
+/*
+dl.settings dt.windowbg
+{
+	width: 98%;
+	float: left;
+	margin: 0 0 3px 0;
+	padding: 0 0 5px 0;
+	clear: both;
+}
+dl.settings img
+{
+	margin: 0 10px 0 0;
+}
+*/
+/* help icons */
+dl.settings dt a img
+{
+	position: relative;
+	top: 2px;
+}

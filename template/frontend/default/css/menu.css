@@ -1,0 +1,142 @@
+/*-----------------  MAIN MENU  -----------------*/
+.menu {
+	text-align: right;
+	z-index: 1;
+	}
+.menu ul {
+	margin: 0;
+	padding: 0;
+	}
+.menu li {
+	list-style-type: none;
+	display: inline;
+	white-space: nowrap;
+	padding: 5px 5px;
+	margin: 0;
+	}
+.menu li:hover {
+	background-color: transparent;
+	}
+.menu a, .menu a:active, .menu a:visited {
+	font-family: 'Open Sans Condensed', sans-serif;
+	font-size: 18pt;
+	color: #fafafa;
+	text-transform: uppercase;
+	text-decoration: none;
+	text-shadow: 0 0 2px #fafafa;
+}
+.menu a:hover {
+	color: #e5ba0c;
+	text-shadow: 0 0 2px #292929;
+	}
+/*-----------------  SUB MENU  -----------------*/
+
+.submenu {
+  position: relative;
+  top: 0;
+  left: 0;
+  padding: 5px 0;  
+	margin: 0;
+	}  
+.submenu ul {  
+  margin: 0;  
+  padding: 0;  
+  z-index: 1;  
+	}  
+.submenu li {  
+ 	white-space: nowrap;
+	padding: 5px 5px;
+	margin: 1px 0;
+  list-style: none;  
+  text-align: left;
+  display: inline;
+   }
+.submenu li:hover {  
+  }  
+.submenu a {  
+  color: #fafafa;
+  font-family: 'Open Sans Condensed',arial,sans-serif;
+  font-size: 11pt;
+  text-transform: uppercase;
+}
+.submenu a:hover {
+	color: #e5ba0c;
+	text-shadow: 0 0 2px #292929;
+}
+
+/*-----------------  UCP/ACP MENU  -----------------*/
+
+.cp-menu-wrapper { 
+	background-color: #f4f4f4;
+	border: 1px solid #dcdcdc;
+	padding: 6px;
+	}
+
+.tinyicon {
+	padding: 10px;
+	vertical-align: middle;
+	color: #141516;
+}
+.cp-main-menu li {
+	padding: 6px;
+	margin: 2px 0;
+	border-bottom: 1px solid #dcdcdc;
+	text-align: left;
+	text-transform: uppercase;
+	list-style: none;
+	list-style-position: inside !important;
+}
+.cp-main-menu li:last-child {
+	padding: 6px;
+	margin: 2px 0;
+	border-bottom: 0;
+	text-align: left;
+	text-transform: uppercase;
+	list-style: none;
+	list-style-position: inside;
+}
+.cp-main-menu li a {
+	color: #141516;
+}	
+.cp-sub-menu li {
+	background-color: #efefef;
+	padding: 4px 4px 4px 30px;
+	margin: 2px 0;
+	text-align: left;
+	text-transform: uppercase;
+	list-style: none;
+	list-style-position: inside;
+}
+.cp-sub-menu li:last-child {
+	background-color: #efefef;
+	padding: 4px 4px 4px 30px;
+	margin: 2px 0;
+	text-align: left;
+	text-transform: uppercase;
+	list-style: none;
+	list-style-position: inside;
+}
+
+/*-----------------  UCP/ACP SUBMENU  -----------------*/
+
+.ucp-submenu {
+	background-color: #efefef;
+	border: 1px solid #dcdcdc;
+	font-family: 'Open Sans Condensed', sans-serif;
+	font-size: 14pt;
+	text-align: center;
+	padding: 3px;
+	margin: 10px 0;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+}
+.list-box {
+	background-color: #fafafa;
+	border: 0px solid #dcdcdc;	
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	margin: 10px 0;
+	padding: 5px;
+}

@@ -1,0 +1,31 @@
+<div class="grid-wrapper">
+	<check if="{{ isset(@login.error) }}"><div class="gb-full"><div class="note alert-box error">{{@login.error}}</div></div></check>
+	<check if="{{ isset(@login.info) }}"><div class="gb-full"><div class="note alert-box info">{{@login.info}}</div></div></check>
+	<div class="gb-half">
+		<div id="login">
+			<fieldset>
+				<legend>__Login</legend>
+				<form method="post" action="{{ @BASE }}/login">
+				<div class="field"><span class="icon">{ICON:member}</span><input class="field input" placeholder="login" type="text" name="login"></div>
+				<div class="field"><span class="icon">{ICON:key}</span><input class="field input" placeholder="password" type="password" name="password"></div>
+				<input class="button" type="submit"><input type="hidden" name="returnpath" value="{{ @returnpath }}">
+				</form>
+			</fieldset>
+		</div>
+		</div>
+		<div class="gb-half">
+		<div id="forgotpw">
+			<fieldset>
+				<legend>__ForgotPW?</legend>
+				<form method="post" action="{{ @BASE }}/forgotpw">
+				<div class="field"><span class="icon">{ICON:member}</span><input class="field input" placeholder="username" type="text" name="username"></div>
+				<div class="field"><span class="icon">{ICON:mail}</span><input class="field input" placeholder="email"  type="text" name="email"></div>
+				<input class="button" type="submit" value="__ResetPW"><input type="hidden" name="returnpath" value="action={{ @returnpath }}">
+				</form>
+			</fieldset>
+		</div>
+	</div>
+	<check if="{{ @allow_registration }}">
+	<div class="gb-full"><a href="{{ @BASE }}/register">__RegisterNow</a></div>
+	</check>
+</div>

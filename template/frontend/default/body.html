@@ -1,0 +1,63 @@
+	<div id="top-navbar"><include href="main/navbar.html" /></div>
+	<div class="grid-wrapper" id="container">
+	<div class="grid-wrapper header">
+		<div class="gb-1qrt screen-micro">
+			<a href="__baseURL"><div class="header_img"></div></a>
+		</div>
+		<div class="gb-3qrt">
+			{BLOCK:home.menu}
+		</div>
+	</div><!-- end header -->
+
+	<check if="{{ @@systempage }}">
+	<!-- layout for system pages (admin panel, error pages, ...) -->
+		<true>
+			<div class="gb-20 screen-micro">
+				<div class="cp-menu-wrapper">{LEFT}</div>
+			</div>
+			<div class="gb-80" id="content">
+		</true>
+
+	<!-- regular pages -->
+		<false>
+			<div class="gb-20 screen-micro">
+				<div class="sidebar">{BLOCK:story.tagcloud}{BLOCK:news.calendar}{BLOCK:home.shoutbox}</div>
+				{{@LEFT}}
+			</div>
+			<!-- select width for main section -->
+			<check if="{{ isset(@bigscreen) }}">
+				<true>
+					<div class="gb-80" id="content">
+				</true>
+				<false>
+					<div class="gb-60" id="content">
+				</false>
+			</check>
+		</false>
+	</check>
+
+	<check if="{{ isset(@title_h1) }}">
+		<h1>{{ @title_h1 }}</h1>
+	</check>
+		
+	<check if="{{ isset(@title_h3) }}">
+		<h3>{{ @title_h3 }}</h3>
+	</check>
+
+		{{@BODY | raw }}
+		</div>
+
+		<!-- drop right bar for system  -->
+		<check if="{{ empty(@bigscreen) and empty(@systempage) }}">
+	  		<div class="gb-20">
+				{{@RIGHT}}
+			</div>
+		</check>
+
+		<div class="grid-wrapper footer">
+			<div class="gb-full">
+				<p class="stats">{{ \Base::instance()->format('eFiction v{0}, using {1}, page rendered in {2} msecs / Memory usage {3} KB',@APP_VERSION,@CONFIG->ACTIVE_DB,round(1e3*(microtime(TRUE)-$TIME),2),round(memory_get_usage(TRUE)/1e3,1)) }}</p>
+				  {BLOCK:home.footer}
+			</div>
+		</div> <!-- end footer -->
+	</div> <!-- end container -->

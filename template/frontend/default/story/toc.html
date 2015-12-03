@@ -1,0 +1,13 @@
+<div class="columnize">
+<repeat group="{{ @tocs }}" value="{{ @toc }}">
+  <div class="toc-wrapper dontsplit">
+		[{{ @toc.chapter }}] <a href="{{@BASE}}/story/read/{{@story}},{{ @toc.chapter }}">{{ @toc.title }}</a> <check if="{{ @toc['last'] }}==1" >{ICON:visible}</check>
+		<div class="story-info2">
+			{{ @toc.wordcount }} __Words
+			<check if="{{ @toc['reviews'] }}>0" >  &bull;  <a href="{{@BASE}}/story/read/{{@story}},reviews">{{ @toc['reviews'] }} <check if="{{ @toc['reviews'] }}>1"><true>__Reviews</true><false>__Review</false></check></a>
+			</check>
+			<check if="{{ @toc.notes>'' }}"><br>{{@toc['notes']}}</check>
+		</div>
+  </div>
+  </repeat>
+</div>

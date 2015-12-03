@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <base href="{{@SCHEME.'://'.@HOST.@BASE.'/'}}"/>
+		<meta http-equiv="content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="author" content="">
+		<meta name="keywords" content="{KEYWORDS}">
+		<meta name="description" content="">
+		<meta name="robots" content="INDEX,FOLLOW">
+		<link rel="shortcut icon" href="http://treknation.net/webpics/favicon.ico" type="image/x-icon" />
+		<title>{{@CONFIG.page_title}}{TITLE}</title>
+		<link rel='stylesheet' type='text/css' href="{{@UI}}css/styles.css" />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+		<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+		<script src="{{ @BASE }}/app/inc/jquery.tokeninput.js"></script>
+<!--		<script src="{{ @BASE }}/app/inc/jquery.ba-hashchange.js"></script> -->
+		<check if="{{ isset(@JS_HEAD)}}">{{ @JS_HEAD | raw }}</check>
+	</head>
+<body>
+	{{ @BODY | raw }}
+	<check if="{{ isset(@JS_BODY)}}">{{ @JS_BODY | raw }}</check>
+	<check if="{{ @CONFIG->debug > 0 OR isset(@DEBUGLOG) }}"><div><textarea cols=120 rows=30>{{ @DEBUGLOG }}</textarea></div></check>
+</body>
+</html>

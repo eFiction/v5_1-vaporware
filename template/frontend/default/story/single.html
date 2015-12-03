@@ -1,0 +1,20 @@
+<!-- single -->
+	<div id="story-container">
+		<div class="story-date">__Published: {{@story.published}} <check if="{{ @story.published != @story.modified}}"> / __Updated: {{@story.modified}}</check></div>
+		<div class="story-info1"><span class="fa fa-bookmark"></span> {ICON:favourite} <span class="fa fa-print"></span> <span class="fa fa-flag"></span> <span class="fa fa-download"></span> <a href="{{@BASE}}/story/print/{{@story.sid}},epub">epub</a> <check if="{{ @groups & 64 }}"><a href="__baseURL?action=controlpanel,admin&amp;module=stories,edit&amp;story={SID}">{ICON:edit}</a></check></div>
+		<div class="story-titleauthor"><h2>{{@story.title}}<br /> by <repeat group="{{@story.authorblock}}" value="{{@author}}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check><a href="{{@BASE}}/member/profile/{{@author[0]}}">{{@author[1]}}</a></repeat></h2></div>
+		<check if="{{ @dropdown }}">
+			<div class="story-chapter">
+			<select id='chap_change' onchange="changeChapter();">
+				<repeat group="{{ @dropdown }}" value="{{ @item }}"><option <check if="{{ @item[0] }}">selected="selected" </check> value="{{ @item[1] }}"><check if="{{ @item[2] }}">{{ @item[2] }}) </check>{{ @item[3] }}</option></repeat>
+			</select>
+			</div>
+		</check>
+		<div class="story-text">
+			{{@content | raw }}
+			<a name="rev"></a>
+			{REVIEWS}
+			{REVIEW_FORM}
+		</div>
+	</div>
+<!-- !single -->

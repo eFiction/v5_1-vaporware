@@ -1,0 +1,8 @@
+		<div class="story-info2"><b>__Rating:</b> {{@story.rating_name}}</div>
+		<div class="story-info2"><b>__Grouping:</b> <repeat group="{{ @story['categoryblock'] }}" value="{{ @group }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check><a href="__baseURL?action=story,browse&amp;categories={{ @group[0] }}">{{ @group[1] }}</a></repeat></div>
+		<div class="story-info2"><b>__Status:</b> <check if="{{@story.completed==1}}"><true>__storyCompleted</true><false>__storyWIP</false></check></div>
+		<div class="story-info2"><b>__Reviews:</b> <check if="{{ @story['reviews'] }}>0" ><true><a href="{{@BASE}}/story/view/{SID}.reviews">{{ @story['reviews'] }} <check if="{{ @story['reviews'] }}>1"><true>__Reviews</true><false>__Review</false></check></a></true><false>__none</false></check></div>
+		<div class="story-info2"><b>__Tags:</b> <repeat group="{{ @story['tagblock'] }}" value="{{ @tag }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check><a href="__baseURL?action=story,browse&amp;tags={{ @tag[0] }}">{{ @tag[1] }}</a></repeat></div>
+		<div class="story-info2"><b>__Notes:</b> {NOTES}</div>
+		<div class="story-info2"><b>__Summary</b>: {{@story.summary}}</div>
+		<hr />

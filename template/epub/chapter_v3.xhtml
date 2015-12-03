@@ -1,0 +1,15 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ops="http://www.idpf.org/2007/ops"
+      xml:lang="{{@LANGUAGE}}">
+  <head>
+  	<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=utf-8" />
+    <title>{{@CHAPTER_TITLE}}</title>
+    <link rel="stylesheet" href="../Styles/styles.css" type="text/css" />
+  </head>
+  <body>
+    <section ops:type="chapter">
+	    <h2>{{@CHAPTER_TITLE}}</h2>
+      {{@CONTENT | raw}}
+    </section>
+  </body>
+</html>

@@ -1,0 +1,33 @@
+<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1" xml:lang="{LANG}">
+	<head>
+  	<!-- UUID must match OPF-file: -->
+		<meta name="dtb:uid" content="{{@ebook.uuid}}"/>
+	</head>
+	<docTitle>
+		<text>{{@ebook.title}}</text>
+	</docTitle>
+	<docAuthor>   
+		<text>{{@ebook.authors}}</text>
+	</docAuthor>
+
+	<navMap>
+
+		<navPoint id="title" playOrder="0">
+			<navLabel>
+				<text>Title page</text>
+			</navLabel>
+			<content src="content/title.xhtml"/>
+		</navPoint>
+	
+		<repeat group="{{ @pages }}" value="{{ @page }}">
+		<navPoint id="id{{ @page['number'] }}" playOrder="{{ @page['number'] }}">
+			<navLabel>
+				<text>{{ @page['title'] }}</text>
+			</navLabel>
+			<content src="content/chapter{{ @page['number'] }}.xhtml"/>
+		</navPoint>
+		</repeat>
+
+	</navMap>
+
+</ncx>

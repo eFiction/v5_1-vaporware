@@ -1,0 +1,20 @@
+<check if="{{isset(@lines)}}">
+<repeat group="{{ @lines }}" value="{{ @line }}">
+			<div class="sboxMSG">
+				<div class="sboxUser">
+					<check if="{{ @line['uid']==0 }}"><true>{{ @line['name'] }}</true><false><a href="{{ @BASE }}/member/profile/{{ @line['uid'] }}">{{ @line['name'] }}</a></false></check></div><div class="sboxDate"> @ {{ date( \Base::instance()->get('CONFIG')['date_format_long'], @line['date']) }}</div>
+					<div class="clearfix"></div><div class="sboxText">{{ @line['message'] }}</div>
+			</div>
+</repeat>
+</check>
+<check if="{{isset(@formMember)}}">
+			<div id="sBoxEmoticons">%emoticons%</div>
+				<check if="{{ @form1['uid']==0 }}"><div class="field"><span class="fa fa-user icon"></span><input type="text" name="name" placeholder="your name" value="{NAME}"></div></check>
+				<div class="field"><span class="fa fa-keyboard-o icon"></span><textarea id="shout" rows="10" cols="29" name="message" placeholder="__yourTextHere">{MESSAGE}</textarea></div>
+</check>
+<check if="{{isset(@formGuest)}}">
+			<img id="captcha" src="{{@BASE}}?ajax=blocks&amp;shoutbox=captcha" alt="CAPTCHA Image" /><br>
+			<input type="text" name="captcha" placeholder="captcha"><br>
+			<input type="hidden" name="name" value="{NAME}">
+			<input type="hidden" name="message" value="{MESSAGE}">
+</check>
