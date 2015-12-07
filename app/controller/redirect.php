@@ -11,7 +11,15 @@ class Redirect extends Base
 	
 	public function filter (\Base $fw, $params)
 	{
-		if ( empty($params['a']) )  $fw->reroute("/redirect/{$params['b']}/{$params['c']}", false);
+		if ( empty($params['a']) )
+		{
+			if ( isset($COOKIE['redirect_seen'] )
+			{
+				$params['a'] = $params['b'];
+				$params['b'] = $params['c'];
+			}
+			else $fw->reroute("/redirect/{$params['b']}/{$params['c']}", false);
+		}
 
 		$query = explode ( "&", $params['b'] );
 		foreach ( $query as $q )
@@ -30,8 +38,9 @@ class Redirect extends Base
 			}
 			else $redirect = "/";
 		}
-
-		$fw->reroute($redirect, false);
+		
+		if ( isset($COOKIE['redirect_seen'] ) $fw->reroute($redirect, false);
+		else \View\Redirect::inform($redirect);
 	}
 
 }
