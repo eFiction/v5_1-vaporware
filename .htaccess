@@ -14,6 +14,12 @@ RewriteRule ^ %1%3%{REQUEST_URI} [R=301,L]
 
 RewriteRule ^(dict|ns|cfg|tmp)\/|\.ini$ - [R=404]
 
+RewriteCond %{REQUEST_URI}~%{QUERY_STRING} ^(.*?\/*)?(modules/challenges/)?(viewpage|viewuser|viewstory|viewseries|reviews|challenges|news)\.php~?(.+)$ [NC]
+RewriteRule ^(.+).php$ /special-rewrite-here?/redirect/$1/%4 [B]
+RewriteCond %{REQUEST_URI}~%{QUERY_STRING} ^(.*?\/*)?(modules/challenges/)?(viewpage|viewuser|viewstory|viewseries|reviews|challenges|news)\.php~?(.+)$ [NC]
+RewriteRule ^/.+$ %1 [L,R=301]
+
+
 RewriteCond %{REQUEST_FILENAME} !-l
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
