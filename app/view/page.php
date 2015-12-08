@@ -7,7 +7,8 @@ class Page extends Base
 	public static function load($page)
 	{
 		if($page = \Model\Page::instance()->load($page))
-			return $page['content'];
+			return $page[0]['content'];
+		else return NULL;
 	}
 
 	public static function shoutboxLines($data)

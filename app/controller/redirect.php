@@ -13,7 +13,7 @@ class Redirect extends Base
 	{
 		if ( empty($params['a']) )
 		{
-			if ( isset($COOKIE['redirect_seen'] )
+			if ( isset($COOKIE['redirect_seen']) )
 			{
 				$params['a'] = $params['b'];
 				$params['b'] = $params['c'];
@@ -28,6 +28,9 @@ class Redirect extends Base
 			$old_data[$item[0]] = $item[1];
 		}
 
+		// default: redirect to main page
+		$redirect = "/";
+		
 		if ( $params['a']=="viewstory" )
 		{
 			if ( isset($old_data['sid']) && is_numeric($old_data['sid']) )
@@ -36,11 +39,10 @@ class Redirect extends Base
 				if ( isset($old_data['chapter']) && is_numeric($old_data['chapter']) )
 					$redirect .= ",".$old_data['chapter'];
 			}
-			else $redirect = "/";
 		}
 		
-		if ( isset($COOKIE['redirect_seen'] ) $fw->reroute($redirect, false);
-		else \View\Redirect::inform($redirect);
+		if ( isset($COOKIE['redirect_seen'] ) ) $fw->reroute($redirect, false);
+		else $this->buffer( \View\Redirect::inform($redirect) );
 	}
 
 }
