@@ -40,6 +40,11 @@ class Redirect extends Base
 					$redirect .= ",".$old_data['chapter'];
 			}
 		}
+		elseif ( $params['a']=="viewuser" )
+		{
+			if ( isset($old_data['uid']) && is_numeric($old_data['uid']) )
+				$redirect = "/authors/".$old_data['uid'];
+		}
 		
 		if ( isset($COOKIE['redirect_seen'] ) ) $fw->reroute($redirect, false);
 		else $this->buffer( \View\Redirect::inform($redirect) );

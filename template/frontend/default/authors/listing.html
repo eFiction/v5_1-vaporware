@@ -1,0 +1,32 @@
+<check if="{{ isset(@construct)}}">
+<true>
+<div class="columnize">
+	<!-- BLOCK:CELL -->
+	<repeat group="{{ @construct }}" key="{{@letter}}" value="{{ @authors }}">
+	<div class="author-grid-wrapper">
+		<div class="author-grid-letter"><a href="{{@BASE}}/authors/{{@letter}}">{{@letter}}</a></div>
+		<ul class="author-grid">
+			<repeat group="{{ @authors }}" value="{{ @author }}">
+			<!-- BLOCK:NAMES -->
+				<li>({{ @author.stories }}) <a href="{{@BASE}}/authors/{{ @author.id }}">{{ @author.name }}</a></li>
+			<!-- END:NAMES -->
+			</repeat>
+		</ul>
+	</div>
+	</repeat>	
+	<!-- END:CELL -->
+</div>
+</true>
+<false>
+<h2>{{@letter}}</h2>
+<div class="gb-full screen-micro">
+	<div class="columnize">
+		<ul class="alphabetical">
+		<repeat group="{{ @authors }}" value="{{ @author }}">
+			<li><i class="fa fa-user"></i> <a href="{{@BASE}}/authors/{{ @author.id }}">{{ @author.name }}</a> ({{ @author.stories }})</li>
+		</repeat>
+		</ul>
+	</div>
+</div>
+</false>
+</check>

@@ -23,19 +23,18 @@ else {
 $fw->set('CONFIG', $cfg);
 
 if (\Controller\Auth::isLoggedIn()) {
-//	$fw->route('GET|POST /login', 'Controller\Page->getMain');
-//	$fw->route('GET /logout/*', 'Controller\Auth->logout');
-	
+	// Add member-routes
 	$fw->config('data/routes.member.ini');
 	if ( $_SESSION['groups'] & 64 )
+		// Add mod/admin-routes
 		$fw->config('data/routes.admin.ini');
 }
 else
 {
-//	$fw->route('GET|POST /login', 'Controller\Auth->login');
-//	$fw->route('GET /logout/*', 'Controller\Page->getMain');
-
+	// Add guest-routes
 	$fw->config('data/routes.guest.ini');
 }
 //$fw->set('DEBUG', 1);
+
 $fw->run();
+// S.D.G.

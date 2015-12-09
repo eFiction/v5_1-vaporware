@@ -1,0 +1,11 @@
+<h1>{{ @header }}</h1>
+	
+<div class="pagination">
+<ul>
+<repeat group="{{ @letters }}" value="{{ @letter }}"><li><check if="{{ @letter.href }}"><true><a href="{{@BASE}}/authors{{ @letter.href.0 }}" title="{{ @letter.href.0 }}">{{ @letter.label }}</a></true><false>{{ @letter.label }}</false></check></li></repeat>
+</ul>
+</div>
+    	
+<!-- BLOCK:CONTENT -->
+{{ @content | raw }}
+<!-- END:CONTENT -->
