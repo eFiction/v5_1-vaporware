@@ -3,6 +3,46 @@ namespace View;
 
 class Story extends Base
 {
+	public static function showIntro($data)
+	{
+		while ( list($key, $value) = each($data) )
+			Story::dataProcess($data[$key], $key);
+
+		return \Template::instance()->render(
+							'story/listing.html',
+							'text/html',
+							[
+								"stories" => $data,
+								"config"	=> [ "date_format_short" => \Config::instance()->date_format_short ],
+								"BASE" => \Base::instance()->get('BASE')
+							]
+		);
+	}
+
+	protected static function dataProcess(&$item, $key)
+	{
+		$item['published']		= date(\Base::instance()->get('CONFIG')['date_format_short'],$item['published']);
+		$item['modified']		= date(\Base::instance()->get('CONFIG')['date_format_short'],$item['modified']);
+		$item['number']			= isset($item['inorder']) ? "{$item['inorder']}&nbsp;" : "";
+		$item['wordcount']		= number_format($item['wordcount'], 0, '','.');
+		$item['count']			= number_format($item['count'], 0, '','.');
+		$item['authorblock']	= Story::buildList($item['authorblock']);
+		$item['categoryblock']= Story::buildList($item['categoryblock']);
+		$item['tagblock']		= Story::buildList($item['tagblock']);
+	}
+	
+	protected static function buildList($input,$which="",$direction="add")
+	{
+		$tmp = array();
+		// stripping possible double values
+		$input = unserialize($input);
+		while ( list(  ,$element ) = each ( $input ) )
+		{
+			$tmp[] = $element[1];
+		}
+		return implode(", ", $tmp);
+	}
+
 	public static function buildTOC($tocData, $storyData)
 	{
 		\Registry::get('VIEW')->javascript('body', TRUE, 'jquery.columnizer.js' );

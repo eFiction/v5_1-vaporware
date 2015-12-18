@@ -16,7 +16,7 @@ class Authors extends Base {
 		$menu = $this->model->menuLetters($letters);
 
 		// set header
-		$header = "__authors";
+		$header[] = "__authors";
 
 		if ( empty($params[1]) )
 		{
@@ -38,7 +38,12 @@ class Authors extends Base {
 		elseif ( is_numeric($params[1]) )
 		{
 			$this->buffer ( "{BLOCK:profile.{$params[1]}}", "RIGHT" );
-			$content = $this->profile();
+			list($authorInfo, $content) = \Controller\Story::instance()->author($params[1]);//$this->profile();
+
+			$header[] = $authorInfo;
+
+			//$this->buffer ( $content );
+			//return TRUE;
 		}
 
 		// output

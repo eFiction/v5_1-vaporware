@@ -12,7 +12,10 @@ class Story extends Base
 
 	public function index(\Base $f3, $params)
 	{
-		switch($params['action'])
+		if ( empty($params['action']) )
+			$data = $this->intro($f3);
+		
+		else switch($params['action'])
 		{
 			case 'read':
 				$data = $this->read($params['id']);
@@ -23,6 +26,31 @@ class Story extends Base
 				
 		}
 		$this->buffer ($data);
+	}
+	
+	protected function intro(\Base $f3)
+	{
+		$data = $this->model->intro();
+		
+		return \View\Story::showIntro($data);
+		/*
+				$limit = 5;
+		// now build the query for the listing
+		$this->sql_replacement['limit'] = "LIMIT 0,{$eFI->config['story_intro_items']}";
+		$this->sql_replacement['order'] = "ORDER BY {$eFI->config['story_intro_order']} DESC";
+
+		return $this->buildScreenData($this->buildSQL(),FALSE);
+
+		*/
+		return print_r($data,1);
+	}
+	
+	public function author($id)
+	{
+		list($info, $data) = $this->model->author($id);
+		//return print_r($info,1);
+		$stories = \View\Story::showIntro($data);
+		return [ $info[0], $stories];
 	}
 	
 	protected function printer($id)

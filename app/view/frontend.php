@@ -35,16 +35,21 @@ class Frontend extends Base
 	public function tagWork($tpl)
 	{
 		//$fw = \Base::instance();
-		$expression = "/{(BLOCK|PAGE|LINK):([a-z][\w].+?)}/is";
+		$expression = "/{(BLOCK|PAGE|LINK):([a-z][\w]*)([\.\w]*)}/is";
 
 		if( preg_match($expression,$tpl,$match) )
 		{
-			// Array ( [0] => {BLOCK:home.navbar} [1] => BLOCK [2] => home.navbar )
+			// Array (     [0] => {BLOCK:menu.main}     [1] => BLOCK    [2] => menu    [3] => .main )
 			if ( $match[1] == "BLOCK" AND isset( $this->modules[$match[2]] ) )
 			{
 				$call = $this->modules[$match[2]][0];//'\\'.$m[0].'\Block';
 				// call or recall block module
-				$tpl = str_replace ( $match[0], $call::instance()->{$this->modules[$match[2]][1]}(), $tpl );
+				$qq = $this->modules[$match[2]][1];
+				if ( isset($this->modules[$match[2]][2]) )
+					$tpl = str_replace ( $match[0], $call::{$this->modules[$match[2]][1]}($match[3]), $tpl );
+				else
+					$tpl = str_replace ( $match[0], $call::instance()->{$this->modules[$match[2]][1]}($match[3]), $tpl );
+				//$call::instance()->{$this->modules[$match[2]][1]}(), $tpl );
 			}
 			elseif ( $match[1] == "PAGE" )
 			{

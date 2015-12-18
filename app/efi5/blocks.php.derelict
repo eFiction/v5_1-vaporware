@@ -1,0 +1,11 @@
+<?php
+
+class Blocks extends \Prefab {
+	
+
+	public function menu()
+	{
+		return "Menu";
+	}
+
+}

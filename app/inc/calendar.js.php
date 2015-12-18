@@ -7,7 +7,7 @@ function getCalendar(data)
 {
 	$.ajax
 	({
-			url: "<?php echo $_GET['base']; ?>/news/calendar/"+data,	
+			url: "<?php echo $_GET['base']; ?>/blocks/calendar/"+data,	
 			type: "GET",		
 			cache: false,
 			success: function (data) { $('#sb_cell_calendar').html(data); }		

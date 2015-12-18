@@ -2,9 +2,9 @@
 
 namespace Controller;
 
-abstract class Base {
+//abstract class Base {
+class Base extends \Prefab {
 
-	/** @var \View\Base */
 	protected $response;
 	protected $data = array ( "BODY" => "", "RIGHT" => "", "LEFT" => "" );
 

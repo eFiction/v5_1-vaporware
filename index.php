@@ -3,7 +3,11 @@
 $fw = require('lib/base.php');
 $fw->set('APP_VERSION', '5.0.0-dev');
 
-new Session();
+//new Session();
+		function storyDataBuild(&$item, $key)
+		{
+			print_r($item);
+		}
 
 ini_set('display_errors', 1);
 error_reporting(1);
@@ -34,6 +38,7 @@ else
 	// Add guest-routes
 	$fw->config('data/routes.guest.ini');
 }
+
 //$fw->set('DEBUG', 1);
 
 $fw->run();

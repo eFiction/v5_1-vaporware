@@ -1,28 +1,47 @@
 <?php
+
 namespace Model;
 
 class Story extends Base
 {
+	public function intro()
+	{
+		$replacements =
+		[
+			"ORDER" => "ORDER BY ". \Base::instance()->get('CONFIG')['story_intro_order']." DESC" ,
+			"LIMIT" => "LIMIT 0,".\Base::instance()->get('CONFIG')['story_intro_items']
+		];
+		$data = $this->exec($this->storySQL($replacements));
+
+		return $data;
+	}
+	
+	public function author($id)
+	{
+		$author = "SELECT U.uid, U.nickname as name, COUNT(rSA.sid) as counter FROM `tbl_stories_authors`rSA INNER JOIN `tbl_users`U ON ( rSA.aid = U.uid AND rSA.aid = :aid ) GROUP BY rSA.aid";
+		$info = $this->exec( $author, ["aid" => $id] );
+		$replacements =
+		[
+			"ORDER" => "ORDER BY S.updated DESC" ,
+			"LIMIT" => "LIMIT 0,".\Base::instance()->get('CONFIG')['story_intro_items'],
+			"JOIN" => "INNER JOIN `tbl_stories_authors`rSA ON ( rSA.sid = S.sid AND rSA.aid = :aid )"
+		];
+		$data = $this->exec($this->storySQL($replacements),["aid" => $id]);
+
+		return [$info, $data];
+	}
+	
 	public function getStory($story)
 	{
-		$data = $this->exec("SELECT SQL_CALC_FOUND_ROWS
-			Cache.*,
-			S.title, S.summary, S.storynotes, S.completed, S.wordcount, UNIX_TIMESTAMP(S.date) as published, UNIX_TIMESTAMP(S.updated) as modified, 
-			S.count,GROUP_CONCAT(rSC.chalid) as contests,GROUP_CONCAT(Ser.seriesid,',',rSS.inorder,',',Ser.title ORDER BY Ser.title DESC SEPARATOR '||') as in_series,
-			Ra.rating as rating_name
-		FROM `tbl_stories`S
-			LEFT JOIN `tbl_stories_blockcache`Cache ON ( S.sid = Cache.sid )
-			LEFT JOIN `tbl_contest_relation`rSC ON ( rSC.relid = S.sid AND rSC.type = 'story' )
-			LEFT JOIN `tbl_series_stories`rSS ON ( rSS.sid = S.sid )
-				LEFT JOIN `tbl_series`Ser ON ( Ser.seriesid=rSS.seriesid )
-			LEFT JOIN `tbl_ratings`Ra ON ( Ra.rid = S.rid )
-		WHERE  S.validated > 0 AND S.sid = :sid
-		GROUP BY S.sid",[ ":sid" => $story ]);
+		$replacements =
+		[
+			"WHERE" => "AND S.sid = :sid"
+		];
+		$data = $this->exec($this->storySQL($replacements), [ ":sid" => $story ]);
+
 		if ( sizeof($data)==1 )
 			return $data[0];
 		else return FALSE;
-		// WHERE : S.completed @COMPLETED@ 0 AND
-		
 	}
 	
 	public function getChapter( $story, $chapter, $counting = TRUE )
@@ -49,6 +68,43 @@ class Story extends Base
 			$this->exec($sql_tracker);
 		}
 		return nl2br($chapterText);
+	}
+	
+	public function storySQL($replacements=[])
+	{
+		// $replacements = [ "EXTRA" => , "JOIN" => , "WHERE" => , "ORDER" => , "LIMIT" =>
+		$sql_StoryConstruct = "SELECT SQL_CALC_FOUND_ROWS
+				Cache.*,
+				S.title, S.summary, S.storynotes, S.completed, S.wordcount, UNIX_TIMESTAMP(S.date) as published, UNIX_TIMESTAMP(S.updated) as modified, 
+				S.count,GROUP_CONCAT(rSC.chalid) as contests,GROUP_CONCAT(Ser.seriesid,',',rSS.inorder,',',Ser.title ORDER BY Ser.title DESC SEPARATOR '||') as in_series @EXTRA@,
+				Ra.rating as rating_name
+			FROM `tbl_stories`S
+				@JOIN@
+			LEFT JOIN `tbl_stories_blockcache`Cache ON ( S.sid = Cache.sid )
+			LEFT JOIN `tbl_contest_relation`rSC ON ( rSC.relid = S.sid AND rSC.type = 'story' )
+			LEFT JOIN `tbl_series_stories`rSS ON ( rSS.sid = S.sid )
+				LEFT JOIN `tbl_series`Ser ON ( Ser.seriesid=rSS.seriesid )
+			LEFT JOIN `tbl_ratings`Ra ON ( Ra.rid = S.rid )
+			WHERE S.completed @COMPLETED@ 0 AND S.validated > 0 @WHERE@
+			GROUP BY S.sid
+			@ORDER@
+			@LIMIT@";
+			
+		$replace =
+		[
+			"@EXTRA@"			=> "",
+			"@JOIN@"				=> "",
+			"@COMPLETED@"	=> ">=",
+			"@WHERE@"			=> "",
+			"@ORDER@"			=> "",
+			"@LIMIT@"			=> ""
+		];
+		
+		foreach ( $replacements as $key => $value )
+		{
+			$replace["@{$key}@"] = $value;
+		}
+		return str_replace(array_keys($replace), array_values($replace), $sql_StoryConstruct);
 	}
 	
 	public function getTOC($story)

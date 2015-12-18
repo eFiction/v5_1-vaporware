@@ -34,5 +34,30 @@ class Base extends \Prefab {
 		return $this->exec($this->sqlTmp[$id]['sql'], $this->sqlTmp[$id]['param']);
 	}
 	
+	protected function panelMenu($selected=FALSE, $admin=FALSE)
+	{
+		if ( $admin )
+		{
+			
+		}
+		else
+		{
+			if ( $selected )
+			{
+				
+			}
+			else
+			{
+				$sql = "SELECT M.label, M.link, M.icon, M.evaluate FROM `tbl_menu_userpanel`M WHERE M.child_of IS NULL;";
+				$data = $this->exec($sql);
+				foreach ( $data as $item )
+				{
+					$menu[$item["link"]] = [ "label" => $item["label"], "icon" => $item["icon"] ];
+				}
+			}
+		}
+		return $menu;
+	}
+	
 	//protected function update()
 }

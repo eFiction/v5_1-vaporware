@@ -1,11 +1,14 @@
-<h1>{{ @header }}</h1>
-	
+<h1>{{ @header.0 }}<check if="{{empty(@header.1)}}"><true></h1>
+
 <div class="pagination">
 <ul>
 <repeat group="{{ @letters }}" value="{{ @letter }}"><li><check if="{{ @letter.href }}"><true><a href="{{@BASE}}/authors{{ @letter.href.0 }}" title="{{ @letter.href.0 }}">{{ @letter.label }}</a></true><false>{{ @letter.label }}</false></check></li></repeat>
 </ul>
 </div>
-    	
+</true>
+<false>: {{@header.1.name}}</h1>
+</false>
+</check>
 <!-- BLOCK:CONTENT -->
 {{ @content | raw }}
 <!-- END:CONTENT -->
