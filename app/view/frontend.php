@@ -3,7 +3,13 @@ namespace View;
 
 class Frontend extends Base
 {
-
+/*
+	public function __construct()
+	{
+		parent::__construct();
+		//$this->iconset = Iconset::instance();
+	}
+*/
 	/*
 		Base render function wrapper
 	*/
@@ -27,6 +33,16 @@ class Frontend extends Base
 												\Template::instance()->render('body.html')
 										)
 								);
+
+		$body = preg_replace_callback(
+								'/\{ICON:([\w-]+)\}/s',
+								function ($icon)
+								{
+									return Iconset::instance()->$icon[1];
+								}
+								, $body
+							);
+
 		$fw->set('BODY', $body);
 		
 		return \Template::instance()->render('layout.html');
@@ -34,7 +50,6 @@ class Frontend extends Base
 
 	public function tagWork($tpl)
 	{
-		//$fw = \Base::instance();
 		$expression = "/{(BLOCK|PAGE|LINK):([a-z][\w]*)([\.\w]*)}/is";
 
 		if( preg_match($expression,$tpl,$match) )
@@ -49,7 +64,6 @@ class Frontend extends Base
 					$tpl = str_replace ( $match[0], $call::{$this->modules[$match[2]][1]}($match[3]), $tpl );
 				else
 					$tpl = str_replace ( $match[0], $call::instance()->{$this->modules[$match[2]][1]}($match[3]), $tpl );
-				//$call::instance()->{$this->modules[$match[2]][1]}(), $tpl );
 			}
 			elseif ( $match[1] == "PAGE" )
 			{
@@ -99,4 +113,55 @@ class Frontend extends Base
 		return $buffer;
 	}
 	
+	protected function loadIcons()
+	{
+		
+	}
+	
+}
+
+class Iconset extends \DB\Jig\Mapper {
+	
+	public function __construct()
+	{
+		$db = new \DB\Jig('tmp/');
+		parent::__construct($db,"iconset.{$_SESSION['tpl'][1]}.json");
+		$this->load();
+	}
+	
+	static public function instance()
+	{
+		if (\Registry::exists('ICONSET'))
+			return \Registry::get('ICONSET');
+		else
+		{
+			$icon = new self;
+			if ( empty($icon->_name) ) $icon = self::rebuild($icon);
+			\Registry::set('ICONSET',$icon);
+			return $icon;
+		}
+	}
+	
+	static protected function rebuild($icon)
+	{
+		$set = $_SESSION['tpl'][1];
+		$sql = "SELECT `name`, `value` FROM `tbl_iconsets` WHERE `set_id` = {$set}";
+		$db = \Model\Base::instance();
+		$data = $db->exec($sql);
+		foreach ( $data as $item )
+		{
+			if(strpos($item["name"],"#")===0)
+			{
+				if ( $item["name"]=="#pattern" && $item['value']!=NULL )
+					$pattern = $item["value"];
+				elseif ( $item["name"]=="#directory" && $item['value']!=NULL )
+					$pattern = "<img src=\"{$BASE}/template/iconset/{$item['value']}/@1@\" >";
+				if ( $item["name"]=="#name" )
+					$icon->_name = $item['value'];
+			}
+			else $icon->$item['name'] = str_replace("@1@",$item["value"],$pattern);
+		}
+		$icon->save();
+		return $icon;
+	}
 }

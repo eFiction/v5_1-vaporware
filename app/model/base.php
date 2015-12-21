@@ -13,7 +13,7 @@ class Base extends \Prefab {
 		$this->prefix = \Config::instance()->prefix;
 	}
 	
-	protected function exec($cmds,$args=NULL,$ttl=0,$log=TRUE)
+	public function exec($cmds,$args=NULL,$ttl=0,$log=TRUE)
 	{
 		return $this->db->exec(str_replace("`tbl_", "`{$this->prefix}", $cmds), $args,$ttl,$log);
 	}

@@ -52,6 +52,7 @@ class Auth extends Base {
 			$_SESSION['userID']			= $user['userID'];
 			$_SESSION['username']			= $user['nickname'];
 			$_SESSION['mail']					= array($user['mail'],$user['unread']);
+			$_SESSION['tpl']		= [ "default", 1];
 			
 			return TRUE;
 		}
@@ -64,6 +65,7 @@ class Auth extends Base {
 			$_SESSION['userID']			= FALSE;
 			$_SESSION['username']			= "__Guest";
 			$_SESSION['mail']					= FALSE;
+			$_SESSION['tpl']		= [ "default", 1];
 			
 			return FALSE;
 		}

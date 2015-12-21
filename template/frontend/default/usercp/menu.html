@@ -1,14 +1,12 @@
 <div class="cp-menu-wrapper">
 	<ul class="cp-main-menu">
 		<repeat group="{{ @menu }}" value="{{ @line }}" key="{{ @link }}">
-		<li><a href="{{@BASE}}{{@link}}">{{@line.icon}}&nbsp;{{@line.label}}</a></li>
-		<check if="{{isset(@lin.sub}}
+		<li><a href="{{@BASE}}/userCP/{{@link}}">{{@line.icon}}&nbsp;{{@line.label}}</a></li>
+		<check if="{{isset(@line.sub)}}">
 			<ul class="cp-sub-menu">
-				<li><a href="http://dev.campzero.net/efi5/?action=controlpanel,user&amp;module=author,story&amp;uid=1"><span class='tinyicon'><span class="fa fa-user"></span></span>&nbsp;Emony (106)</a></li>
-				<li>-- <a href="http://dev.campzero.net/efi5/?action=controlpanel,user&amp;module=author,story,finished&amp;uid=1">&nbsp;Finished (100)</a></li>
-				<li>-- <a href="http://dev.campzero.net/efi5/?action=controlpanel,user&amp;module=author,story,unfinished&amp;uid=1">&nbsp;Unfinished (6)</a></li>
-				<li>-- <a href="http://dev.campzero.net/efi5/?action=controlpanel,user&amp;module=author,story,add&amp;uid=1"><span class="fa fa-file-text-o"></span>&nbsp;Add Story</a></li>
-				<li><a href="http://dev.campzero.net/efi5/?action=controlpanel,user&amp;module=author,curator"><span class='tinyicon'></span>&nbsp;__Curator</a></li>
+				<repeat group="{{ @line.sub }}" value="{{ @sub }}" key="{{ @sublink }}">
+				<li><a href="{{@BASE}}{{@link}}">{{@line.icon}}&nbsp;{{@line.label}}</a></li>
+				</repeat>
 			</ul>
 		</check>
 		</repeat>
