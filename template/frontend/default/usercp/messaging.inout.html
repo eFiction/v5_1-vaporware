@@ -1,5 +1,5 @@
 <fieldset>
-	<legend>{WHICH}</legend>
+	<legend>{{@WHICH}}</legend>
 	<table class="pm-box" width="100%">
 		<colgroup>
 			<col width='10%'>
@@ -10,40 +10,40 @@
 		</colgroup>
 		<tr>
 			<td>&nbsp;</td>
-			<td><span class="fa fa-calendar"></span> {DATE_TYPE}</td>
+			<td><span class="fa fa-calendar"></span> {{@DATE_MEANS}}</td>
 			<td><span class="fa fa-file-text-o"></span> __Subject</td>
-			<td><span class="fa fa-user"></span> {DIRECTION}</td>
+			<td><span class="fa fa-user"></span> {{@PERSON_IS}}</td>
 			<td>&nbsp;</td>
 		</tr>
 
-<check if="{{ @pm_count > 0 }}">
+<check if="{{ sizeof(@messages) > 0 }}">
 	<true>
-/* show all messages, line by line */
-<repeat group="{{ @pm_lines }}" value="{{ @pm_line }}">
+{* show all messages, line by line *}
+<repeat group="{{ @messages }}" value="{{ @pm_line }}">
 		<tr>
-			/* check if mail has been read */
-			<td><check if="{{ @pm_line['read']!==NULL }}">
-					<true><span class="fa fa-envelope-o" title="{{ date(@config['date_format_short'],@pm_line['read']) }}"></span></true>
+			{* check if mail has been read *}
+			<td><check if="{{ @pm_line['date_read']!==NULL }}">
+					<true><span class="fa fa-envelope-o" title="{{ date(\Base::instance()->get('CONFIG')['date_format_short'],@pm_line['read']) }}"></span></true>
 					<false><span class="fa fa-envelope" title="__unread"></span></false>
 			</check></td>
-			<td>{{ date(@config['date_format_short'],@pm_line['date']) }}</td>
-			<td><a href="__baseURL?action=controlpanel&amp;module=messaging,read&amp;mid={{ @pm_line['mid'] }}&amp;return={MODULE}">{{ @pm_line['subject'] }}</a></td>
-			<td><check if="{{ @pm_line['read']!==NULL }}">
+			<td>{{ date(\Base::instance()->get('CONFIG')['date_format_short'],@pm_line['date_sent']) }}</td>
+			<td><a href="{{@BASE}}/userCP/messaging/read,{{ @pm_line['mid'] }}">{{ @pm_line['subject'] }}</a></td>
+			<td><check if="{{ @pm_line['date_read']!==NULL }}">
 				<true><a href="__baseURL?action=controlpanel&amp;module=viewprofile&amp;uid={{ @pm_line['name_id'] }}">{{ @pm_line['name'] }}</a></true>
 				<false>{{ @pm_line['name'] }}</false>
 			</check></td>
-			/* check if mail can be deleted (inbox always, outbox only if not read by recipient */
+			{* check if mail can be deleted (inbox always, outbox only if not read by recipient *}
 			<td><check if="{{ @pm_line['can_delete'] }}">
 						<true><span class="fa fa-trash-o delete" id="{{ @pm_line['mid'] }}"></span></true>
 						<false>&nbsp;</false>
 			</check></td>
 		</tr>
 </repeat>
-/* END all messages */
+{* END all messages *}
 	</true>
 	<false>
 		<tr>
-			<td colspan="4">__Your{WHICH} __isEmpty</td>
+			<td colspan="4">__Your{{@WHICH}} __isEmpty</td>
 		</tr>
 	</false>
 </check>

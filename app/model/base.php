@@ -44,7 +44,12 @@ class Base extends \Prefab {
 		{
 			if ( $selected )
 			{
-				
+				$sql = "SELECT M.label, M.link, M.icon, M.evaluate FROM `tbl_menu_userpanel`M WHERE M.child_of = :selected;";
+				$data = $this->exec($sql, ["selected"=> $selected]);
+				foreach ( $data as $item )
+				{
+					$menu[$item["link"]] = [ "label" => $item["label"], "icon" => $item["icon"] ];
+				}
 			}
 			else
 			{
