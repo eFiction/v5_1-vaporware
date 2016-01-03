@@ -17,7 +17,7 @@ class Frontend extends Base
 	{
         /** @var \Base $f3 */
         $fw = \Base::instance();
-  		include('app/efi5/loader.php');
+  		include('app/loader.php');
 
 		if($this->data)
             $fw->mset($this->data);
@@ -79,12 +79,25 @@ class Frontend extends Base
 	private function post_render($buffer)
 	{
 		$fw = \Base::instance();
+		$cfg = $fw->get('CONFIG');
 		
 		if ( isset($this->JS['head']) ) $fw->set( 'JS_HEAD', implode("\n", $this->JS['head']) );
 		if ( isset($this->JS['body']) ) $fw->set( 'JS_BODY', implode("\n", $this->JS['body']) );
 
 		$debug[] = $fw->get('DB')->log();
 				$debug[] = "SESSION: ".print_r($_SESSION,TRUE);
+
+		if($cfg['page_title_add']=='slogan')
+		{
+			$fw->set('TITLE', $cfg['page_title'].$cfg['page_title_separator'].$cfg['page_slogan']);
+		}
+		elseif($cfg['page_title_add']=='path')
+		{
+			//echo implode($cfg['page_title_separator'], array_merge([$cfg['page_title']],$this->title) );
+			$fw->set('TITLE', implode($cfg['page_title_separator'], array_merge([$cfg['page_title']],$this->title) ) );
+		}
+
+		else $fw->set('TITLE', '');
 		/*
 		switch($eFI->config['show_debug'])
 		{
@@ -111,11 +124,6 @@ class Frontend extends Base
 		*/
 		$fw->set('DEBUGLOG', implode("\n", $debug));
 		return $buffer;
-	}
-	
-	protected function loadIcons()
-	{
-		
 	}
 	
 }

@@ -6,39 +6,59 @@ class UserCP extends Base
 
 	public static function showMenu($menu="")
 	{
-		return \Template::instance()->render
-														('usercp/menu.html','text/html', 
-															[
-																"menu"	=> $menu,
-																"BASE"		=> \Base::instance()->get('BASE')
-															]
-														);
+		\Base::instance()->set('panel_menu', $menu);
+		return \Template::instance()->render('usercp/menu.html');
 	}
 
 	public static function msgInOutbox($data, $select="inbox")
 	{
 		if ( $select == "outbox" )
 		{
-			$select = "__Outbox";
-			$person_is = "__Recipient";
-			$date_means = "__Sent";
+			$select = "Outbox";
+			$person_is = "Recipient";
+			$date_means = "Sent";
 		}
 		else
 		{
-			$select = "__Inbox";
-			$person_is = "__Sender";
-			$date_means = "__Received";
+			$select = "Inbox";
+			$person_is = "Sender";
+			$date_means = "Received";
 		}
-		return \Template::instance()->render
-														('usercp/messaging.inout.html','text/html', 
+		$fw = \Base::instance();
+
+		$fw->set('messages', $data);
+		$fw->set('WHICH', $select);
+		$fw->set('PERSON_IS', $person_is);
+		$fw->set('DATE_MEANS', $date_means);
+
+		return \Template::instance()->render('usercp/messaging.inout.html');
+														/*,'text/html', 
 															[
-																"messages"	=> $data,
+																//"messages"	=> $data,
 																"WHICH"		=> $select,
 																"PERSON_IS"	=> $person_is,
 																"DATE_MEANS"	=> $date_means,
 																"BASE"			=> \Base::instance()->get('BASE')
 															]
+														);*/
+	}
+
+	public static function msgRead($data)
+	{
+		return \Template::instance()->render
+														('usercp/messaging.read.html','text/html', 
+															[
+																"message"	=> $data,
+																"forward"		=> ($data['sender_id']==$_SESSION['userID']),
+																"BASE"		=> \Base::instance()->get('BASE')
+															]
 														);
+	}
+
+	public static function msgWrite($data)
+	{
+		\Base::instance()->set('write_data', $data);
+		return \Template::instance()->render('usercp/messaging.write.html');
 	}
 
 }

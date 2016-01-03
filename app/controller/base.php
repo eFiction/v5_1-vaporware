@@ -11,10 +11,11 @@ class Base extends \Prefab {
 	/**
 	 * set a new view
 	 * @param \View\Base $view
-	 */
+	 
 	public function setView(\View\Base $view) {
 		$this->response = $view;
 	}
+*/
 
 	/**
 	 * init the View

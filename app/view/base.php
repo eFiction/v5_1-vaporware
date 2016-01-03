@@ -5,6 +5,7 @@ abstract class Base {
     public $data = array();
 	public $JS = [];
     public $modules = [];
+	protected $title = [];
 
 	/**
      * create and return response content
@@ -37,6 +38,11 @@ abstract class Base {
 																: "<script src=\"".$fw->get('BASE')."/app/inc/{$string}\"></script>";
 		}
 		else $this->JS[$location][] = "<script type=\"text/javascript\">{$string}</script>";
+	}
+	
+	public function addTitle($string)
+	{
+		 $this->title[] = $string;
 	}
 	
 	//abstract public function render();

@@ -44,4 +44,60 @@ class UserCP extends Base
 		return $this->exec($sql);
 	}
 	
+	public function msgRead($msgID)
+	{
+		//$this->title[] = "__ReadMessage";
+		
+		$sql = "SELECT m.mid,UNIX_TIMESTAMP(m.date_sent) as date_sent,UNIX_TIMESTAMP(m.date_read) as date_read,m.subject,m.message,
+								m.sender as sender_id, u1.nickname as sender,
+								m.recipient as recipient_id, u2.nickname as recipient 
+								FROM `tbl_messaging`m 
+								INNER JOIN `tbl_users`u1 ON ( m.sender = u1.uid ) 
+								INNER JOIN `tbl_users`u2 ON ( m.recipient = u2.uid ) 
+								WHERE m.mid = :mid AND ( m.sender = {$_SESSION['userID']} OR m.recipient = {$_SESSION['userID']} ) ORDER BY date_sent DESC";
+		$data = $this->exec($sql, ["mid" => $msgID]);
+		if ( empty($data) ) return FALSE;
+
+		/* if unread, set read date and change unread counter in SESSION */
+		if($data[0]['date_read']==NULL AND $data[0]['recipient_id']==$_SESSION['userID'])
+		{
+			$this->exec("UPDATE `tbl_messaging`m SET m.date_read = CURRENT_TIMESTAMP WHERE m.mid = {$data[0]['mid']};");
+			$_SESSION['mail'][1]--;
+		}
+		return $data[0];
+	}
+	
+	public function msgReply($msgID=NULL)
+	{
+		//$this->title[] = "__ReadMessage";
+		if ( $msgID )
+		{
+			$sql = "SELECT m.mid,UNIX_TIMESTAMP(m.date_sent) as date_sent,UNIX_TIMESTAMP(m.date_read) as date_read,m.subject,m.message,
+									IF(m.recipient = {$_SESSION['userID']},m.sender,NULL) as recipient_id,
+									IF(m.recipient = {$_SESSION['userID']},u1.nickname,NULL) as recipient,
+									u1.nickname as sender
+									FROM `tbl_messaging`m 
+									INNER JOIN `tbl_users`u1 ON ( m.sender = u1.uid ) 
+									INNER JOIN `tbl_users`u2 ON ( m.recipient = u2.uid ) 
+									WHERE m.mid = :mid AND ( m.sender = {$_SESSION['userID']} OR m.recipient = {$_SESSION['userID']} ) ORDER BY date_sent DESC";
+			$data = $this->exec($sql, ["mid" => $msgID]);
+		}
+		
+		if ( empty($data) )
+		{
+			return
+			[
+				'recipient' => "",
+				'subject' => "",
+				'message' => ""
+			];
+		}
+
+		$data = $data[0];
+		$data['recipient'] = ($data['recipient']==NULL) ? "" : json_encode ( array ( "name"	=> $data['recipient'], "id" => $data['recipient_id'] ) );
+		$data['subject'] = \Base::instance()->get('LN__PM_ReplySubject')." ".$data['subject'];
+
+		return $data;
+	}
+	
 }

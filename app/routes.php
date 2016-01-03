@@ -1,0 +1,83 @@
+<?php
+/* --------------------
+	Common routes
+-------------------- */
+
+$fw->route( 'GET /', 'Controller\Page->getMain' );
+
+$fw->route(
+  [ 'GET /?/redirect/@b/@c', 'GET /redirect/@a/@b', ],
+  'Controller\Redirect->filter' );
+
+$fw->route(
+  [ 'GET /story', 'GET /story/@action/@id', ],
+  'Controller\Story->index' );
+
+$fw->route(
+  [ 'GET /story/search', 'GET /story/search/@terms', ],
+  'Controller\Story->search' );
+
+$fw->route(
+  [ 'GET /authors', 'GET /authors/*', ],
+  'Controller\Authors->index' );
+
+$fw->route( 'GET /shoutbox/@action/@sub', 'Controller\Blocks->shoutbox' );
+
+// Ajax routes
+$fw->route( 'GET /blocks/calendar/* [ajax]', 'Controller\Blocks->calendar' );
+
+if (\Controller\Auth::isLoggedIn())
+{
+	/* --------------------
+		Member routes
+	-------------------- */
+	$fw->route('GET|POST /login', function($fw) { $fw->reroute('/', false); } );
+
+	$fw->route(
+		[ 'GET /logout', 'GET /logout/*' ],
+		'Controller\Auth->logout' );
+
+	$fw->route( 'GET|POST /panel', 'Controller\Panel->main' );
+
+	$fw->route(
+		[ 'GET|POST /userCP', 'GET|POST /userCP/*' ],
+		'Controller\Auth->index' );
+	
+	$fw->route(
+		[ 'GET|POST /userCP/messaging', 'GET|POST /userCP/messaging/*' ],
+		'Controller\Auth->messaging' );
+	
+	// Ajax routes
+	$fw->route( 'userCP/@module/* [ajax]', 'Controller\UserCP->ajax' );
+
+	if ( $_SESSION['groups'] & 64 )
+	{
+		/* --------------------
+			Mod/Admin routes
+		-------------------- */
+
+		
+	}
+}
+else
+{
+	/* --------------------
+		Guest routes
+	-------------------- */
+
+	$fw->route( 'GET|POST /forgotpw', 'Controller\Auth->forgotpw' );
+
+	$fw->route( 'GET|POST /register', 'Controller\Auth->register' );
+
+	$fw->route(
+		[ 'GET|POST /logout', 'GET|POST /logout' ],
+		function($fw) { $fw->reroute('/', false); } );
+
+	$fw->route(
+		[
+			'GET|POST /userCP',
+			'GET|POST /userCP/*',
+			'GET|POST /login'
+		],
+		'Controller\Auth->login' );
+}

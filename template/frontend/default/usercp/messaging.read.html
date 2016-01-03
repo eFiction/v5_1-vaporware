@@ -1,0 +1,11 @@
+<div class="form-wrapper">
+<fieldset>
+	<legend>__ReadPM</legend>
+	<table width="100%">
+		<tr><td><h6>__Sender:</h6></td><td>{{@message.sender}}</td><td>{{ date(\Base::instance()->get('CONFIG')['date_format_long'],@message.date_sent) }}</td></tr>
+		<tr><td><h6>__Recipient:</h6></td><td>{{@message.recipient}}</td><td>{{ date(\Base::instance()->get('CONFIG')['date_format_long'],@message.date_read) }}</td></tr>
+		<tr><td><h6>__Subject:</h6></td><td colspan="2">{{@message.subject}}</td></tr>
+		<tr><td colspan="3"><textarea class="textarea" readonly>{{@message.message}}</textarea></td></tr>
+		<tr><td><a class="button" href="{{@BASE}}/userCP/messaging/write,{{@message.mid}}"><check if="({{@forward}})"><true>__Forward</true><false>__Reply</false></check></a></td><td colspan="2"><input class="button delete" type="submit" value="delete" id="{{@message.mid}}"></td></tr></table>
+</fieldset>
+</div>

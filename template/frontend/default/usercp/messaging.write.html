@@ -1,0 +1,22 @@
+<div class="form-wrapper">
+<fieldset>
+	<legend>{{@LN__PM_WritePM}}</legend>
+	<form method="post" action="{{@BASE}}/userCP/messaging/write">
+	<table width="100%"><tr><td>
+		<h6>{{@LN__PM_Recipient}}:</h6></td><td><div class="field"><input class="field input" type="text" name="form[recipient]" id="recipient"></div></td></tr>
+        <script type="text/javascript">
+        $(document).ready(function() {
+            $("#recipient").tokenInput("{{$BASE}}/userCP/messaging",{
+            	method: "get",
+            	queryParam: "recipient",
+            	tokenLimit: 1,
+            	prePopulate: [{{@write_data.recipient|raw}}]
+            });
+        });
+        </script>
+		<tr><td><h6>{{@LN__PM_Subject}}:</h6></td><td><input class="text-input" type="text" name="form[subject]" value="{{@write_data.subject}}"></td></tr>
+		<tr><td colspan="2"><textarea class="textarea" name="form[message]"><check if="{{@write_data.message}}">&#13;&#10;&nbsp&#13;&#10;--- {{@LN__PM_ReplyMessageHeader, date(\Base::instance()->get('CONFIG')['date_format_long'],@write_data.date_sent), @write_data.sender | format}} ---&#13;&#10;|&#13;&#10;| {{ str_replace("\n", "\n| ", @write_data.message) }}</check></textarea></td></tr>
+		<tr><td colspan="2"><input class="button" type="submit"><input type="hidden" name="form[return]" value="{RETURN}"></td></tr></table>
+	</form>
+</fieldset>
+</div>

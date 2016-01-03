@@ -1,4 +1,11 @@
 <div class="grid-wrapper">
+<check if ="{{ isset(@success)}}"><true>
+	<div class="centermessage">
+Good!
+<a href="{{ @BASE }}{{ @returnpath}}">__Click</a>
+	</div>
+</true>
+<false>
 	<check if="{{ isset(@login.error) }}"><div class="gb-full"><div class="note alert-box error">{{@login.error}}</div></div></check>
 	<check if="{{ isset(@login.info) }}"><div class="gb-full"><div class="note alert-box info">{{@login.info}}</div></div></check>
 	<div class="gb-half">
@@ -28,4 +35,5 @@
 	<check if="{{ @allow_registration }}">
 	<div class="gb-full"><a href="{{ @BASE }}/register">__RegisterNow</a></div>
 	</check>
+</false></check>
 </div>

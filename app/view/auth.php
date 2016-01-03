@@ -22,4 +22,17 @@ class Auth extends Base
 		}
 		return \Template::instance()->render('main/login.html','text/html', $data);
 	}
+
+	public static function loginSuccess(\Base $fw)
+	{
+		$data =
+		[
+			"returnpath" 	=>	$fw->get('POST.returnpath'),//['returnpath'],
+			"BASE"			=>	$fw->get('BASE'),
+			"success"		=>	TRUE,
+		];
+
+		return \Template::instance()->render('main/login.html','text/html', $data);
+	}
+	
 }

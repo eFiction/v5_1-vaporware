@@ -73,16 +73,21 @@ class Auth extends Base {
 	
 	public function login($fw,$params)
 	{
+		\Registry::get('VIEW')->addTitle('__Login');
 		if( $fw->exists('POST.login') && $fw->exists('POST.password') )
 		{
 			if ( $userID = $this->model->userLoad($fw->get('POST.login'), $fw->get('POST.password') ) )
 			{
-				echo "Hilfe";
-				$fw->reroute($fw->get('POST')['returnpath']);
+				/*
+				$this->buffer( \View\Auth::loginSuccess($fw) );
+				*/
+				$fw->reroute($fw->get('POST')['returnpath'], false);
 				exit;
 			}
 		}
-		$this->buffer( \View\Auth::loginError($fw) );
+
+		else
+			$this->buffer( \View\Auth::loginError($fw) );
 	}
 	
 	public function logout($fw,$params)
@@ -96,7 +101,7 @@ class Auth extends Base {
 		setcookie("session_id", "", time()-1, $fw->get('BASE') );
 		//session_destroy();
 		
-		$fw->reroute($returnpath);
+		$fw->reroute($returnpath, false);
 	}
 
 }

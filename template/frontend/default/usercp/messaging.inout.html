@@ -1,5 +1,5 @@
 <fieldset>
-	<legend>{{@WHICH}}</legend>
+	<legend>{{ ${"LN__PM_".@WHICH} }}</legend>
 	<table class="pm-box" width="100%">
 		<colgroup>
 			<col width='10%'>
@@ -10,9 +10,9 @@
 		</colgroup>
 		<tr>
 			<td>&nbsp;</td>
-			<td><span class="fa fa-calendar"></span> {{@DATE_MEANS}}</td>
-			<td><span class="fa fa-file-text-o"></span> __Subject</td>
-			<td><span class="fa fa-user"></span> {{@PERSON_IS}}</td>
+			<td><span class="fa fa-calendar"></span> {{ ${"LN__PM_".@DATE_MEANS} }}</td>
+			<td><span class="fa fa-file-text-o"></span> {{@LN__PM_Subject}}</td>
+			<td><span class="fa fa-user"></span> {{ ${"LN__PM_".@PERSON_IS} }}</td>
 			<td>&nbsp;</td>
 		</tr>
 
@@ -23,8 +23,8 @@
 		<tr>
 			{* check if mail has been read *}
 			<td><check if="{{ @pm_line['date_read']!==NULL }}">
-					<true><span class="fa fa-envelope-o" title="{{ date(\Base::instance()->get('CONFIG')['date_format_short'],@pm_line['read']) }}"></span></true>
-					<false><span class="fa fa-envelope" title="__unread"></span></false>
+					<true><span class="fa fa-envelope-o" title="{{ date(\Base::instance()->get('CONFIG')['date_format_short'],@pm_line['date_read']) }}"></span></true>
+					<false><span class="fa fa-envelope" title="{{@LN__PM_unread}}"></span></false>
 			</check></td>
 			<td>{{ date(\Base::instance()->get('CONFIG')['date_format_short'],@pm_line['date_sent']) }}</td>
 			<td><a href="{{@BASE}}/userCP/messaging/read,{{ @pm_line['mid'] }}">{{ @pm_line['subject'] }}</a></td>
@@ -43,7 +43,7 @@
 	</true>
 	<false>
 		<tr>
-			<td colspan="4">__Your{{@WHICH}} __isEmpty</td>
+			<td colspan="4">{{ ${"LN__PM_".@WHICH."_empty"} }}</td>
 		</tr>
 	</false>
 </check>
@@ -51,8 +51,8 @@
 	</table>
 </fieldset>
 
-<div id="delete-confirm" title="Delete message?" style="display:none">
-  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>__DeleteMessage. __Sure?</p>
+<div id="delete-confirm" title="{{@LN__PM_question_Delete }}?" style="display:none">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>{{@LN__PM_confirm_Delete }}</p>
 </div>
 
 <script type="text/javascript">
