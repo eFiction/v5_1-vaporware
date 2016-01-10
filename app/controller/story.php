@@ -7,7 +7,12 @@ class Story extends Base
 	public function __construct()
 	{
 		$this->model = \Model\Story::instance();
-		//$this->view = new \View\Story;
+	}
+
+	public function beforeroute()
+	{
+		parent::beforeroute();
+		\Registry::get('VIEW')->addTitle( \Base::instance()->get('LN__Stories') );
 	}
 
 	public function index(\Base $f3, $params)
@@ -22,6 +27,9 @@ class Story extends Base
 				break;
 			case 'print':
 				$this->printer($params['id']);
+				break;
+			case 'categories':
+				$data = $this->categories(isset($params['id'])?$params['id']:FALSE);
 				break;
 				
 		}
@@ -53,6 +61,11 @@ class Story extends Base
 		return [ $info[0], $stories];
 	}
 	
+	protected function categories($id)
+	{
+		return 1;
+	}
+	
 	protected function printer($id)
 	{
 		$id = explode(",",$id);
@@ -63,6 +76,25 @@ class Story extends Base
 
 	}
 
+	public function search(\Base $f3, $params)
+	{
+		\Registry::get('VIEW')->addTitle($f3->get('LN__Search'));
+
+		if ( isset($params[1]) )
+		{
+			$termsTMP = explode("/",$params[1]);
+			foreach ( $termsTMP as $t )
+			{
+				list ($term, $param) = explode(":",$t);
+				$terms[$term] = explode(",",$param);
+			}
+		}
+		else $terms = NULL;
+
+
+
+		$this->buffer ( print_r($terms,TRUE) );
+	}
 
 	protected function read($id)
 	{

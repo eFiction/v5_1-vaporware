@@ -1,11 +1,11 @@
 <repeat group="{{ @stories }}" value="{{ @story }}" counter="{{ @ctr }}">
 	<div class="story-box">
 	<!-- {RATING_IMG} {STATS}-->
-	<h5>{{@story.number}}<a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a> by {{@story.authorblock}}</h5>
+	<h5>{{@story.number}}<a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a> by <repeat group="{{@story.authorblock}}" value="{{@author}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check><a href="{{@BASE}}/authors/{{@author.0}}">{{@author.1}}</a></repeat></h5>
 	<div class="story-info1"><span class="fa fa-bookmark"></span> {ICON:favourite} <span class="fa fa-flag"></span> {{@story.reviews}}</div>
-	<div class="story-groupings">{{@story.categoryblock}}</div>
+	<div class="story-groupings"><repeat group="{{@story.categoryblock}}" value="{{@category}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check>{{@category.1}}</repeat></div>
 	<div class="story-info2">{{@story.summary |raw}}</div>
-	<div class="story-info2"><i class="fa fa-tag"></i> {{@story.tagblock}}</div>
+	<div class="story-info2"><i class="fa fa-tag"></i> <repeat group="{{@story.tagblock}}" value="{{@tag}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check>{{@tag.1}}</repeat></div>
 	<div class="story-info3"><small>__Published: {{@story.published}} &bull; __Chapters: {{@story.chapters}} &bull; __Words: {{@story.wordcount}} &bull; __Status: {{@story.completed}} &bull; __Rating: {{@story.rating_name}} &bull; __Hits: {{@story.count}} </small></div>
 	</div>
 </repeat>

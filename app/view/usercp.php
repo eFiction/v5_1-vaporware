@@ -32,15 +32,6 @@ class UserCP extends Base
 		$fw->set('DATE_MEANS', $date_means);
 
 		return \Template::instance()->render('usercp/messaging.inout.html');
-														/*,'text/html', 
-															[
-																//"messages"	=> $data,
-																"WHICH"		=> $select,
-																"PERSON_IS"	=> $person_is,
-																"DATE_MEANS"	=> $date_means,
-																"BASE"			=> \Base::instance()->get('BASE')
-															]
-														);*/
 	}
 
 	public static function msgRead($data)

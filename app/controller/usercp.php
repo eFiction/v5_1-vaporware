@@ -12,6 +12,12 @@ class UserCP extends Base
 		\Base::instance()->set('systempage', TRUE);
 	}
 	
+	public function beforeroute()
+	{
+		parent::beforeroute();
+		\Registry::get('VIEW')->addTitle( \Base::instance()->get('LN__UserCP') );
+	}
+
 	public function index(\Base $fw, $params)
 	{
 		
@@ -20,7 +26,7 @@ class UserCP extends Base
 	
 	public function messaging(\Base $fw, $params)
 	{
-		\Registry::get('VIEW')->addTitle('__UserCP');
+		\Registry::get('VIEW')->addTitle( $fw->get('LN__UserCP') );
 		\Registry::get('VIEW')->addTitle( $fw->get('LN__PM_Messaging') );
 		if ( isset($params[1]) )
 		{

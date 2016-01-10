@@ -26,11 +26,12 @@ class Story extends Base
 		$item['number']			= isset($item['inorder']) ? "{$item['inorder']}&nbsp;" : "";
 		$item['wordcount']		= number_format($item['wordcount'], 0, '','.');
 		$item['count']			= number_format($item['count'], 0, '','.');
-		$item['authorblock']	= Story::buildList($item['authorblock']);
-		$item['categoryblock']= Story::buildList($item['categoryblock']);
-		$item['tagblock']		= Story::buildList($item['tagblock']);
+		$item['authorblock']	= unserialize($item['authorblock']);
+		$item['categoryblock']= unserialize($item['categoryblock']);
+		$item['tagblock']		= unserialize($item['tagblock']);
 	}
-	
+
+/*	
 	protected static function buildList($input,$which="",$direction="add")
 	{
 		$tmp = array();
@@ -42,22 +43,28 @@ class Story extends Base
 		}
 		return implode(", ", $tmp);
 	}
-
+*/
 	public static function buildTOC($tocData, $storyData)
 	{
 		\Registry::get('VIEW')->javascript('body', TRUE, 'jquery.columnizer.js' );
 		\Registry::get('VIEW')->javascript('body', FALSE, "$(function(){ $('.columnize').columnize({ columns: 2 }); });" );
 		
 		$infoblock = \View\Story::buildInfoblock($storyData);
+
+		\Base::instance()->set('tocData', $tocData);
+		\Base::instance()->set('storyID', $storyData['sid']);
 		
-		return $infoblock.\Template::instance()->render('story/toc.html','text/html', [ "tocs" => $tocData, "story" => $storyData['sid'], "BASE" => \Base::instance()->get('BASE') ]);
+		return $infoblock.\Template::instance()->render('story/toc.html');
 	}
 	
 	public static function buildInfoblock($storyData)
 	{
 		$storyData['categoryblock'] = unserialize($storyData['categoryblock']);
 		$storyData['tagblock'] = unserialize($storyData['tagblock']);
-		return \Template::instance()->render('story/information.html','text/html', [ "story" => $storyData, "BASE" => \Base::instance()->get('BASE') ]);
+
+		\Base::instance()->set('storyData', $storyData);
+
+		return \Template::instance()->render('story/information.html');
 	}
 
 	public static function buildStory($storyData,$content,$dropdown)

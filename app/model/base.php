@@ -38,7 +38,7 @@ class Base extends \Prefab {
 	{
 		if ( $admin )
 		{
-			
+			$menu = [];
 		}
 		else
 		{

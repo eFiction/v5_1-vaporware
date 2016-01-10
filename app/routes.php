@@ -10,11 +10,11 @@ $fw->route(
   'Controller\Redirect->filter' );
 
 $fw->route(
-  [ 'GET /story', 'GET /story/@action/@id', ],
+  [ 'GET /story', 'GET /story/@action', 'GET /story/@action/@id', ],
   'Controller\Story->index' );
 
 $fw->route(
-  [ 'GET /story/search', 'GET /story/search/@terms', ],
+  [ 'GET /story/search', 'GET /story/search/*', ],
   'Controller\Story->search' );
 
 $fw->route(
@@ -41,20 +41,23 @@ if (\Controller\Auth::isLoggedIn())
 
 	$fw->route(
 		[ 'GET|POST /userCP', 'GET|POST /userCP/*' ],
-		'Controller\Auth->index' );
+		'Controller\UserCP->index' );
 	
 	$fw->route(
 		[ 'GET|POST /userCP/messaging', 'GET|POST /userCP/messaging/*' ],
-		'Controller\Auth->messaging' );
+		'Controller\UserCP->messaging' );
 	
 	// Ajax routes
-	$fw->route( 'userCP/@module/* [ajax]', 'Controller\UserCP->ajax' );
+	$fw->route( 'GET /userCP/@module/* [ajax]', 'Controller\UserCP->ajax' );
 
 	if ( $_SESSION['groups'] & 64 )
 	{
 		/* --------------------
 			Mod/Admin routes
 		-------------------- */
+		$fw->route(
+			[ 'GET|POST /modCP', 'GET|POST /modCP/*' ],
+			'Controller\ModCP->index' );
 
 		
 	}
@@ -77,6 +80,8 @@ else
 		[
 			'GET|POST /userCP',
 			'GET|POST /userCP/*',
+			'GET|POST /modCP',
+			'GET|POST /modCP/*',
 			'GET|POST /login'
 		],
 		'Controller\Auth->login' );

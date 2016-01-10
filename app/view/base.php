@@ -45,20 +45,50 @@ abstract class Base {
 		 $this->title[] = $string;
 	}
 	
-	//abstract public function render();
+}
+
+class Iconset extends \DB\Jig\Mapper {
 	
-	/*
-	static public function getCSS()
+	public function __construct()
 	{
-		// in template:_ 		{{ \View\Base::getCSS() }}
-		$fw = \Base::instance();
-		$view = \Registry::get('VIEW');
-		foreach ( $view->css as $cssfile )
-		{
-			$css[] = "<link rel='stylesheet' type='text/css' href='{$fw->get('UI')}css/styles.css'>";
-		}
-	return implode("\n",$css)."\n";
+		$db = new \DB\Jig('tmp/');
+		parent::__construct($db,"iconset.{$_SESSION['tpl'][1]}.json");
+		$this->load();
 	}
-	*/
 	
+	static public function instance()
+	{
+		if (\Registry::exists('ICONSET'))
+			return \Registry::get('ICONSET');
+		else
+		{
+			$icon = new self;
+			if ( empty($icon->_name) ) $icon = self::rebuild($icon);
+			\Registry::set('ICONSET',$icon);
+			return $icon;
+		}
+	}
+	
+	static protected function rebuild($icon)
+	{
+		$set = $_SESSION['tpl'][1];
+		$sql = "SELECT `name`, `value` FROM `tbl_iconsets` WHERE `set_id` = {$set}";
+		$db = \Model\Base::instance();
+		$data = $db->exec($sql);
+		foreach ( $data as $item )
+		{
+			if(strpos($item["name"],"#")===0)
+			{
+				if ( $item["name"]=="#pattern" && $item['value']!=NULL )
+					$pattern = $item["value"];
+				elseif ( $item["name"]=="#directory" && $item['value']!=NULL )
+					$pattern = "<img src=\"{$BASE}/template/iconset/{$item['value']}/@1@\" >";
+				if ( $item["name"]=="#name" )
+					$icon->_name = $item['value'];
+			}
+			else $icon->$item['name'] = str_replace("@1@",$item["value"],$pattern);
+		}
+		$icon->save();
+		return $icon;
+	}
 }
