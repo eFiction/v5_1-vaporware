@@ -56,8 +56,8 @@ if (\Controller\Auth::isLoggedIn())
 			Mod/Admin routes
 		-------------------- */
 		$fw->route(
-			[ 'GET|POST /modCP', 'GET|POST /modCP/*' ],
-			'Controller\ModCP->index' );
+			[ 'GET|POST /AdminCP', 'GET|POST /AdminCP/*' ],
+			'Controller\AdminCP->index' );
 
 		
 	}

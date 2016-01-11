@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+	    <base href="{{@SCHEME.'://'.@HOST.@BASE.'/'}}"/>
+		<meta http-equiv="content-Type" content="text/html; charset=utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="author" content="">
+		<meta name="keywords" content="{KEYWORDS}">
+		<meta name="description" content="">
+		<meta name="robots" content="INDEX,FOLLOW">
+		<link rel="shortcut icon" href="http://treknation.net/webpics/favicon.ico" type="image/x-icon" />
+		<title>{{@TITLE}}</title>
+		<link rel='stylesheet' type='text/css' href="{{@UI}}css/styles.css" />
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+		<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
+		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+		<script src="{{ @BASE }}/app/inc/jquery.tokeninput.js"></script>
+<!--		<script src="{{ @BASE }}/app/inc/jquery.ba-hashchange.js"></script> -->
+		<check if="{{ isset(@JS_HEAD)}}">{{ @JS_HEAD | raw }}</check>
+	</head>
+<body>
+	<div class="grid-wrapper" id="container">
+	<div class="grid-wrapper header">
+		<div class="gb-1qrt screen-micro">
+			<a href="{{@BASE}}"><div class="header_img"></div></a>
+		</div>
+		<div class="gb-3qrt">
+			{BLOCK:menu.main}
+		</div>
+	</div><!-- end header -->
+
+	<!-- layout for system pages (admin panel, error pages, ...) -->
+			<div class="gb-20 screen-micro">
+				<div class="cp-menu-wrapper">{{@LEFT|raw}}</div>
+			</div>
+			<div class="gb-80" id="content">
+
+	<check if="{{ isset(@title_h1) }}">
+		<h1>{{ @title_h1 }}</h1>
+	</check>
+		
+	<check if="{{ isset(@title_h3) }}">
+		<h3>{{ @title_h3 }}</h3>
+	</check>
+
+		{{@BODY | raw }}
+		</div>
+
+		<div class="grid-wrapper footer">
+			<div class="gb-full">
+				{PAGE:footer}<br />
+				{{ \Base::instance()->format('eFiction v{0}, using {1}, page rendered in {2} msecs / Memory usage {3} KB',@APP_VERSION,@CONFIG->ACTIVE_DB,round(1e3*(microtime(TRUE)-$TIME),2),round(memory_get_usage(TRUE)/1e3,1)) }}
+			</div>
+		</div> <!-- end footer -->
+	</div> <!-- end container -->
+
+	<check if="{{ isset(@JS_BODY)}}">{{ @JS_BODY | raw }}</check>
+	<check if="{{ @CONFIG->debug > 0 OR isset(@DEBUGLOG) }}"><div><textarea cols=120 rows=30>{{ @DEBUGLOG }}</textarea></div></check>
+</body>
+</html>

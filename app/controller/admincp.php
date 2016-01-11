@@ -1,12 +1,12 @@
 <?php
 namespace Controller;
 
-class ModCP extends Base
+class AdminCP extends Base
 {
 
 	public function __construct()
 	{
-		$this->model = \Model\ModCP::instance();
+		$this->model = \Model\AdminCP::instance();
 		//$mapper = new \Model\News();
 		//parent::__construct($mapper);
 		\Base::instance()->set('systempage', TRUE);
@@ -20,15 +20,14 @@ class ModCP extends Base
 
 	public function index(\Base $fw, $params)
 	{
-		
-		$this->showMenu();
+		$this->showMenu("home");
 	}
 
 	protected function showMenu($selected=FALSE)
 	{
 		$this->buffer
 		( 
-			\View\ModCP::showMenu($this->model->showMenu($selected)), 
+			\View\AdminCP::showMenu($this->model->showMenu($selected)), 
 			"LEFT"
 		);
 	}

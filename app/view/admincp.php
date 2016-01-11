@@ -1,7 +1,7 @@
 <?php
 namespace View;
 
-class ModCP extends Base
+class AdminCP extends Base
 {
 
 	public static function showMenu($menu="")

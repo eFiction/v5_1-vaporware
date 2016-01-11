@@ -36,30 +36,25 @@ class Base extends \Prefab {
 	
 	protected function panelMenu($selected=FALSE, $admin=FALSE)
 	{
+		$sql = "SELECT M.label, M.link, M.icon, M.evaluate FROM ";
 		if ( $admin )
 		{
-			$menu = [];
+			if ( $selected )
+				$sql .= "`tbl_menu_adminpanel`M WHERE `child_of` = :selected ORDER BY M.child_of,M.order ASC";
+			else
+				$sql .= "`tbl_menu_adminpanel`M WHERE `child_of` IS NULL ORDER BY M.child_of,M.order ASC";
 		}
 		else
 		{
 			if ( $selected )
-			{
-				$sql = "SELECT M.label, M.link, M.icon, M.evaluate FROM `tbl_menu_userpanel`M WHERE M.child_of = :selected;";
-				$data = $this->exec($sql, ["selected"=> $selected]);
-				foreach ( $data as $item )
-				{
-					$menu[$item["link"]] = [ "label" => $item["label"], "icon" => $item["icon"] ];
-				}
-			}
+				$sql .= "`tbl_menu_userpanel`M WHERE M.child_of = :selected;";
 			else
-			{
-				$sql = "SELECT M.label, M.link, M.icon, M.evaluate FROM `tbl_menu_userpanel`M WHERE M.child_of IS NULL;";
-				$data = $this->exec($sql);
-				foreach ( $data as $item )
-				{
-					$menu[$item["link"]] = [ "label" => $item["label"], "icon" => $item["icon"] ];
-				}
-			}
+				$sql .= "`tbl_menu_userpanel`M WHERE M.child_of IS NULL;";
+		}
+		$data = $this->exec($sql, ["selected"=> $selected]);
+		foreach ( $data as $item )
+		{
+			$menu[$item["link"]] = [ "label" => $item["label"], "icon" => $item["icon"] ];
 		}
 		return $menu;
 	}

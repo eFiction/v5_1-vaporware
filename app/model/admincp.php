@@ -1,7 +1,7 @@
 <?php
 namespace Model;
 
-class ModCP extends Base
+class AdminCP extends Base
 {
 	protected $menu = [];
 	

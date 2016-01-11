@@ -1,0 +1,14 @@
+<div class="cp-menu-wrapper">
+	<ul class="cp-main-menu">
+		<repeat group="{{ @panel_menu }}" value="{{ @line }}" key="{{ @link }}">
+		<li><a href="{{@BASE}}/adminCP/{{@link}}">{{@line.icon}}&nbsp;{{ ${@line.label} }}</a></li>
+		<check if="{{isset(@line.sub)}}">
+			<ul class="cp-sub-menu">
+				<repeat group="{{ @line.sub }}" value="{{ @sub }}" key="{{ @sublink }}">
+				<li><a href="{{@BASE}}/adminCP/{{@sublink}}">{{@sub.icon}}&nbsp;{{ ${@sub.label} }}</a></li>
+				</repeat>
+			</ul>
+		</check>
+		</repeat>
+	</ul>
+</div>

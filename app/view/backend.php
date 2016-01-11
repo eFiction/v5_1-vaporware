@@ -34,6 +34,7 @@ class Backend extends Base
 		$fw->set('TITLE', implode($cfg['page_title_separator'], array_merge([$cfg['page_title']],$this->title) ) );
 
 		//$body =  \Template::instance()->render('body.html');
+		$fw->set('DEBUGLOG', $fw->get('DB')->log());
 
 		return preg_replace_callback(
 								'/\{ICON:([\w-]+)\}/s',
