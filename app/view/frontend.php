@@ -70,7 +70,7 @@ class Frontend extends Base
 				$page = \View\Page::load($match[2]);
 				$tpl = str_replace ( $match[0], $page, $tpl );
 			}
-			else $tpl = str_replace ( $match[0], "", $tpl );
+			else $tpl = str_replace ( $match[0], "*{$match[2]}*", $tpl );
 			return $this->tagWork ( $tpl );
 		}
 		else return $tpl;

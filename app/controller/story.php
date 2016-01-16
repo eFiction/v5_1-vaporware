@@ -40,7 +40,7 @@ class Story extends Base
 	{
 		$data = $this->model->intro();
 		
-		return \View\Story::showIntro($data);
+		return \View\Story::viewList($data);
 		/*
 				$limit = 5;
 		// now build the query for the listing
@@ -57,7 +57,7 @@ class Story extends Base
 	{
 		list($info, $data) = $this->model->author($id);
 		//return print_r($info,1);
-		$stories = \View\Story::showIntro($data);
+		$stories = \View\Story::viewList($data);
 		return [ $info[0], $stories];
 	}
 	
@@ -141,5 +141,37 @@ class Story extends Base
 		return ( $data );
 		*/
 	}
+	
+	public function storyBlocks($select)
+	{
+		if ( empty($select) OR $select == ".home" )
+		{
+			return \View\Story::storyHome();
+		}
+		elseif ( $select == ".stats" )
+		{
+			$statsCache = $this->model->getStats();
+
+			foreach($statsCache as $sC)
+			{
+				$data[$sC['field']] = $sC['value'];
+			}
+			if ( $data['newmember']!="" ) $data['newmember'] = explode(",",$data['newmember']);
+			return \View\Story::archiveStats($data);
+		}
+		elseif ( $select == ".spot" )
+		{
+			return "**SPOTLIGHT**";
+		}
+		elseif ( $select == ".featured" )
+		{
+			return "**FEATURED**";
+		}
+		elseif ( $select == ".tagcloud" )
+		{
+			return "**TAGCLOUD**";
+		}
+	}
+
 	
 }

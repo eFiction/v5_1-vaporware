@@ -145,6 +145,12 @@ class Story extends Base
 		return $chapterData;
 	}
 
+	public function getStats()
+	{
+		$stats= $this->exec('SELECT SC.field, IF(SC.name IS NULL,SC.value,SC.name) as value FROM `tbl_stats_cache`SC;');
+		return $stats;
+	}
+	
 	public function printEPub($id)
 	{
 		$epubSQL =	"SELECT 

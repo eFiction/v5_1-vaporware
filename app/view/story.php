@@ -3,7 +3,7 @@ namespace View;
 
 class Story extends Base
 {
-	public static function showIntro($data)
+	public static function viewList($data)
 	{
 		while ( list($key, $value) = each($data) )
 			Story::dataProcess($data[$key], $key);
@@ -17,6 +17,11 @@ class Story extends Base
 								"BASE" => \Base::instance()->get('BASE')
 							]
 		);
+	}
+	
+	public static function storyHome()
+	{
+		return  \Template::instance()->render( 'story/blocks.layout.html' );
 	}
 
 	protected static function dataProcess(&$item, $key)
@@ -202,4 +207,11 @@ class Story extends Base
 		}
 	}
 
+	public static function archiveStats($stats)
+	{
+		\Base::instance()->set('archiveStats', $stats);
+		//return print_r($stats,1);
+		return \Template::instance()->render('story/block.stats.html');
+	}
+	
 }

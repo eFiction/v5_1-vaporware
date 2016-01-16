@@ -42,7 +42,7 @@ class Blocks extends Base
 		exit;		
 	}
 
-	public function calendar(\Base $f3, $params) {
+	public function calendar(\Base $fw, $params) {
 
 		$data = $this->model->ajaxCalendar($params);
 		
@@ -61,4 +61,5 @@ class Blocks extends Base
 		//print_r($data);
 		return \View\Blocks::pageMenu($main, $sub);//$menuSelect.$pageSelect;
 	}
+	
 }
