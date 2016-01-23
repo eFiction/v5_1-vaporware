@@ -1,13 +1,13 @@
 <div class="menu">
 	<ul>
-	<repeat group="{{ @main }}" value="{{ @item }}">
+	<repeat group="{{ @menuMain }}" value="{{ @item }}">
 		<li class='active'><a href='{{@BASE}}/{{@item.link}}'>{{@item.label}}</a></li>
 	</repeat>
 	</ul>
-	<check if="{{ ( @sub )}}">
+	<check if="{{ ( @menuSub )}}">
 		<div class="submenu">
 			<ul>
-			<repeat group="{{ @sub }}" value="{{ @item }}">
+			<repeat group="{{ @menuSub }}" value="{{ @item }}">
 				<li class='active'><a href='{{@BASE}}/{{@item.link}}'>{{@item.label}}</a></li>
 			</repeat>
 			</ul>

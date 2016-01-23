@@ -4,28 +4,38 @@ namespace View;
 class Blocks extends Base
 {
 	
-	public static function pageMenu($main, $sub)
+	public static function pageMenu($main, $sub, $vertical = FALSE)
 	{
-		return \Template::instance()->render('blocks/menu.html','text/html', [ "main" => $main, "sub" => $sub, "BASE" => \Base::instance()->get('BASE') ]);
+		\Base::instance()->set('menuMain', $main);
+		\Base::instance()->set('menuSub', $sub);
+		
+		if ( $vertical )
+			return parent::render('blocks/menu.vert.html');
+		
+		else
+			return parent::render('blocks/menu.html');
 	}
 
 	public static function shoutboxInit()
 	{
 		\Registry::get('VIEW')->javascript( 'head', TRUE, "shoutbox.js.php?base=".\Base::instance()->get('BASE') );
-		return \Template::instance()->render('blocks/shoutbox.html');
+		return parent::render('blocks/shoutbox.html');
 	}
 
 	public static function shoutboxLines($data)
 	{
-		return \Template::instance()->render('blocks/shoutbox.inner.html','text/html', [ "lines" => $data, "BASE" => \Base::instance()->get('BASE') ]);
+		\Base::instance()->set('shoutboxLines', $data);
+		return parent::render('blocks/shoutbox.inner.html');
 	}
 
 	public static function shoutboxForm()
 	{
 		if ( $_SESSION['userID']==0 )
-			return \Template::instance()->render('blocks/shoutbox.inner.html','text/html', [ "formGuest" => TRUE, "BASE" => \Base::instance()->get('BASE') ]);
+			\Base::instance()->set('shoutboxGuest', TRUE);
 		else
-			return \Template::instance()->render('blocks/shoutbox.inner.html','text/html', [ "formMember" => TRUE, "BASE" => \Base::instance()->get('BASE') ]);
+			\Base::instance()->set('shoutboxMember', TRUE);
+		
+		return parent::render('blocks/shoutbox.inner.html');
 	}
 	
 	public static function calendarInit()
@@ -95,6 +105,6 @@ class Blocks extends Base
 			"FORWARD"	=>	$forward,
 			"TITLE"		=>	date("__F Y",mktime(0,0,0,$c['month'],1,$c['year'])),
 		];
-		return \Template::instance()->render('blocks/calendar.html','text/html', $data);
+		return parent::render('blocks/calendar.html','text/html', $data);
 	}
 }

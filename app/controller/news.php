@@ -17,7 +17,12 @@ class News extends Base
 	
 	public function blocks($select)
 	{
-		return "** NEWS **";
+		$select = explode(".",$select);
+		$items = (isset($select[2]) AND $select[2]<=3) ? $select[2] : 3;
+		
+		$data = $this->model->loadOverview($items);
+		return \View\News::block($data);//"** NEWS **".$items;
+		
 	}
 
 }

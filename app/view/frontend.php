@@ -13,7 +13,7 @@ class Frontend extends Base
 	/*
 		Base render function wrapper
 	*/
-    public function render()
+    public function finish()
 	{
         /** @var \Base $f3 */
         $fw = \Base::instance();
@@ -38,7 +38,7 @@ class Frontend extends Base
 								'/\{ICON:([\w-]+)\}/s',
 								function ($icon)
 								{
-									return Iconset::instance()->$icon[1];
+									return Iconset::instance()->{$icon[1]};
 								}
 								, $body
 							);

@@ -145,10 +145,52 @@ class Story extends Base
 		return $chapterData;
 	}
 
-	public function getStats()
+	public function blockStats()
 	{
-		$stats= $this->exec('SELECT SC.field, IF(SC.name IS NULL,SC.value,SC.name) as value FROM `tbl_stats_cache`SC;');
-		return $stats;
+		return $this->exec('SELECT SC.field, IF(SC.name IS NULL,SC.value,SC.name) as value FROM `tbl_stats_cache`SC;');
+	}
+	
+	public function blockNewStories($items)
+	{
+		return $this->exec('SELECT S.sid, S.title, S.summary, 
+											Cache.*
+										FROM `tbl_stories`S
+											INNER JOIN `tbl_stories_blockcache`Cache ON ( S.sid = Cache.sid )
+										WHERE (datediff(S.updated,S.date) = 0)
+										ORDER BY S.updated DESC
+										LIMIT 0,'.(int)$items);
+	}
+	
+	public function blockRandomStory($items=1)
+	{
+		return $this->exec('SELECT S.title, S.sid, S.summary, Cache.authorblock, Cache.rating
+				FROM `tbl_stories`S
+					INNER JOIN `tbl_stories_blockcache`Cache ON ( S.sid = Cache.sid  )
+			ORDER BY RAND() 
+			LIMIT '.(int)$items);
+	}
+	
+	public function blockTagcloud($items)
+	{
+		return $this->exec('SELECT T.tid, T.label, T.count
+				FROM `tbl_tags`T
+			WHERE T.tgid = 1 AND T.count > 0
+			ORDER BY T.count DESC
+			LIMIT 0, '.(int)$items);
+	}
+	
+	public function blockFeaturedStory($items=1, $order=FALSE)
+	{
+		if ( $order == "random" ) $sort = 'RAND()';
+		else $sort = 'S.featured DESC';
+		return $this->exec("SELECT S.title, S.sid, S.summary, Cache.authorblock, Cache.rating
+				FROM `tbl_stories`S
+					INNER JOIN `tbl_stories_blockcache`Cache ON ( S.sid = Cache.sid  )
+			WHERE ( S.featured = 1 OR (S.featured > 2 AND S.featured < UNIX_TIMESTAMP(NOW())) )
+			ORDER BY {$sort} 
+			LIMIT 0,".$items);
+		// 1 = aktuell, 2, ehemals
+		//return $this
 	}
 	
 	public function printEPub($id)

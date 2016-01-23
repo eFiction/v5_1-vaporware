@@ -19,7 +19,7 @@ class Backend extends Base
 	/*
 		Base render function wrapper
 	*/
-    public function render()
+    public function finish()
 	{
         /** @var \Base $f3 */
         $fw = \Base::instance();

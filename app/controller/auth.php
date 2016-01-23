@@ -45,7 +45,7 @@ class Auth extends Base {
 		else $session_id = \Model\Auth::instance()->createSession($ip_db);
 //		echo "<br>old: ".$_SESSION['session_id'];
 
-		if ( isset($session_id) && is_numeric("0x".$session_id) && $user = \Model\Auth::instance()->validateSession($session_id,$ip_db) AND $user['userID']>0 )
+		if ( isset($session_id) && $user = \Model\Auth::instance()->validateSession($session_id,$ip_db) AND $user['userID']>0 )
 		{
 			$_SESSION['groups'] 			= $user['groups'];
 			$_SESSION['admin_active'] = $user['admin_active'];

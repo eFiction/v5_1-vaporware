@@ -19,36 +19,20 @@ class Story extends Base
 		);
 	}
 	
-	public static function storyHome()
+	protected static function dataProcess(&$item, $key=NULL)
 	{
-		return  \Template::instance()->render( 'story/blocks.layout.html' );
+		if (isset($item['published']))			$item['published']		= date(\Base::instance()->get('CONFIG')['date_format_short'],$item['published']);
+		if (isset($item['modified']))			$item['modified']		= date(\Base::instance()->get('CONFIG')['date_format_short'],$item['modified']);
+		$item['number']																= isset($item['inorder']) ? "{$item['inorder']}&nbsp;" : "";
+		if (isset($item['wordcount'])) 		$item['wordcount']		= number_format($item['wordcount'], 0, '','.');
+		if (isset($item['count'])) 				$item['count']			= number_format($item['count'], 0, '','.');
+		$item['authors'] = $item['authorblock'] = unserialize($item['authorblock']);
+		array_walk($item['authors'], function (&$v, $k){ $v = $v[1];} );
+//		$item['authors'] = implode
+		if (isset($item['categoryblock'])) 	$item['categoryblock']= unserialize($item['categoryblock']);
+		if (isset($item['tagblock'])) 			$item['tagblock']		= unserialize($item['tagblock']);
 	}
 
-	protected static function dataProcess(&$item, $key)
-	{
-		$item['published']		= date(\Base::instance()->get('CONFIG')['date_format_short'],$item['published']);
-		$item['modified']		= date(\Base::instance()->get('CONFIG')['date_format_short'],$item['modified']);
-		$item['number']			= isset($item['inorder']) ? "{$item['inorder']}&nbsp;" : "";
-		$item['wordcount']		= number_format($item['wordcount'], 0, '','.');
-		$item['count']			= number_format($item['count'], 0, '','.');
-		$item['authorblock']	= unserialize($item['authorblock']);
-		$item['categoryblock']= unserialize($item['categoryblock']);
-		$item['tagblock']		= unserialize($item['tagblock']);
-	}
-
-/*	
-	protected static function buildList($input,$which="",$direction="add")
-	{
-		$tmp = array();
-		// stripping possible double values
-		$input = unserialize($input);
-		while ( list(  ,$element ) = each ( $input ) )
-		{
-			$tmp[] = $element[1];
-		}
-		return implode(", ", $tmp);
-	}
-*/
 	public static function buildTOC($tocData, $storyData)
 	{
 		\Registry::get('VIEW')->javascript('body', TRUE, 'jquery.columnizer.js' );
@@ -167,7 +151,6 @@ class Story extends Base
 	public static function epubRoot( $chapterTOC )
 	{
 		$ebook = \Base::instance()->get('EPUB');
-		//print_r($ebook);exit;
 		if ( $ebook['version']==3 )
 		{
 			
@@ -186,7 +169,6 @@ class Story extends Base
 	public static function epubTOC( $chapterTOC, $version = 2 )
 	{
 		$ebook = \Base::instance()->get('EPUB');
-		//print_r($ebook);exit;
 		if ( $version==3 )
 		{
 			return \Template::instance()->render('toc.xhtml', 'application/xhtml+xml',
@@ -210,8 +192,50 @@ class Story extends Base
 	public static function archiveStats($stats)
 	{
 		\Base::instance()->set('archiveStats', $stats);
-		//return print_r($stats,1);
-		return \Template::instance()->render('story/block.stats.html');
+		return parent::render('story/block.stats.html');
+	}
+	
+	public static function blockNewStories($stories)
+	{
+		while ( list($key, $value) = each($stories['data']) )
+			Story::dataProcess($stories['data'][$key]);
+
+		\Base::instance()->set('renderData', $stories);
+		return parent::render('story/block.new.html');
+	}
+	
+	public static function blockRandomStory($stories)
+	{
+		while ( list($key, ) = each($stories) )
+			Story::dataProcess($stories[$key]);
+
+		\Base::instance()->set('renderData', $stories);
+		return parent::render('story/block.random.html');
+	}
+	
+	public static function blockFeaturedStory($stories)
+	{
+		while ( list($key, ) = each($stories) )
+			Story::dataProcess($stories[$key]);
+
+		\Base::instance()->set('renderData', $stories);
+		return parent::render('story/block.featured.html');
+	}
+	
+	public static function blockTagcloud($taglist)
+	{
+		$max = current($taglist)['count'];
+		$min = end($taglist)['count'];
+		shuffle($taglist);
+		foreach ( $taglist as &$tag )
+		{
+			$size_factor = ( \Config::instance()->tagcloud_spread - 1 ) / ( ($min==$max)?1:($max - $min) ) * ( $tag['count'] - $min ) + 1;
+			$tag['z_index'] = $max-$tag['count'];
+			$tag['percent'] = intval(\Config::instance()->tagcloud_basesize*$size_factor);
+		}
+
+		\Base::instance()->set('renderData', $taglist);
+		return parent::render('story/block.tagcloud.html');
 	}
 	
 }

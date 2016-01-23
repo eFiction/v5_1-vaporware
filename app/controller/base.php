@@ -48,6 +48,6 @@ class Base extends \Prefab {
 			trigger_error('No View has been set.');
 		
 		$this->response->data = $this->data;
-		echo $this->response->render();
+		echo $this->response->finish();
 	}
 }

@@ -45,6 +45,11 @@ abstract class Base {
 		 $this->title[] = $string;
 	}
 	
+	public static function render($file,$mime='text/html',array $hive=NULL,$ttl=0)
+	{
+		return "<!-- FILE: {$file} -->".\Template::instance()->render($file,$mime,$hive,$ttl)."<!-- END: {$file} -->";
+	}
+	
 }
 
 class Iconset extends \DB\Jig\Mapper {
@@ -86,7 +91,7 @@ class Iconset extends \DB\Jig\Mapper {
 				if ( $item["name"]=="#name" )
 					$icon->_name = $item['value'];
 			}
-			else $icon->$item['name'] = str_replace("@1@",$item["value"],$pattern);
+			else $icon->{$item['name']} = str_replace("@1@",$item["value"],$pattern);
 		}
 		$icon->save();
 		return $icon;

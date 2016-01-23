@@ -144,13 +144,16 @@ class Story extends Base
 	
 	public function storyBlocks($select)
 	{
+		$select = explode(".",$select);
+/*
 		if ( empty($select) OR $select == ".home" )
 		{
 			return \View\Story::storyHome();
 		}
-		elseif ( $select == ".stats" )
+*/
+		if ( $select[1] == "stats" )
 		{
-			$statsCache = $this->model->getStats();
+			$statsCache = $this->model->blockStats();
 
 			foreach($statsCache as $sC)
 			{
@@ -159,18 +162,44 @@ class Story extends Base
 			if ( $data['newmember']!="" ) $data['newmember'] = explode(",",$data['newmember']);
 			return \View\Story::archiveStats($data);
 		}
-		elseif ( $select == ".spot" )
+		elseif ( $select[1] == "new" )
 		{
-			return "**SPOTLIGHT**";
+			$items = (isset($select[2]) AND is_numeric($select[2])) ? $select[2] : 5;
+			$data['data'] = $this->model->blockNewStories($items);
+			$data['size'] = isset($select[3]) ? $select[3] : 'large';
+			
+			return \View\Story::blockNewStories($data);
 		}
-		elseif ( $select == ".featured" )
+		elseif ( $select[1] == "random" )
 		{
-			return "**FEATURED**";
+			$items = (isset($select[2]) AND is_numeric($select[2])) ? $select[2] : 1;
+			$data = $this->model->blockRandomStory($items);
+			
+			return \View\Story::blockRandomStory($data);
 		}
-		elseif ( $select == ".tagcloud" )
+		elseif ( $select[1] == "featured" )
 		{
-			return "**TAGCLOUD**";
+			$items = (isset($select[2]) AND is_numeric($select[2])) ? $select[2] : 1;
+			$order = isset($select[3]) ? $select[3] : FALSE;
+			$data = $this->model->blockFeaturedStory($items,$order);
+			
+			return \View\Story::blockFeaturedStory($data);
 		}
+		elseif ( $select[1] == "recommend" )
+		{
+			// break if module not enabled
+			if ( empty(\Config::instance()->optional_modules['recommendation']) ) return NULL;
+			
+			return "**recommend**";
+		}
+		elseif ( $select[1] == "tagcloud" )
+		{
+			$items = (isset($select[2]) AND is_numeric($select[2])) ? $select[2] : 15;
+			$data = $this->model->blockTagcloud($items);
+			
+			return \View\Story::blockTagcloud($data);
+		}
+		return "";
 	}
 
 	

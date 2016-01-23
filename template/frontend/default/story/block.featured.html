@@ -1,0 +1,6 @@
+<div class="spotlight">
+<h3><check if="{{sizeof(@renderData)>1}}"><true>{{@LN__St_FeaturedStories}}</true><false>{{@LN__St_FeaturedStory}}</false></check></h3>
+<repeat group="{{@renderData}}"  value="{{ @story }}" counter="{{ @ctr }}">
+	<div class='spotlight'><a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a><br /> __by {{implode(', ',@story.authors)}}<br />__Rating: {RATING}<br />{SHORT}</div>
+</repeat>
+</div>

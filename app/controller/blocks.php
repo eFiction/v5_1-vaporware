@@ -53,13 +53,13 @@ class Blocks extends Base
 	public function buildMenu($menuSelect)
 	{
 		$pageSelect	= explode("/",\Base::instance()->get('PARAMS.0'))[1];
-		$menuSelect	= explode(".",$menuSelect)[1];
+		$menuSelect	= explode(".",$menuSelect);
 		
 		$data = $this->model->menuData($pageSelect);
 		$main = $data['main'];
 		$sub = empty($data['sub'])?FALSE:$data['sub'];
 		//print_r($data);
-		return \View\Blocks::pageMenu($main, $sub);//$menuSelect.$pageSelect;
+		return \View\Blocks::pageMenu($main, $sub, isset($menuSelect[2]) );//$menuSelect.$pageSelect;
 	}
 	
 }

@@ -1,16 +1,17 @@
-<div class="sbarstats"><h3>__ArchiveStats</h3>
-<table>
-<tr><td>__Members:</td><td>{{@archiveStats.users}}</td></tr>
-<tr><td>__Authors:</td><td>{{@archiveStats.authors}}</td></tr>
-<tr><td colspan="2">&nbsp;</td></tr>
-<tr><td>__Stories:</td><td>{{@archiveStats.stories}}</td></tr>
-<tr><td>__Chapters:</td><td>{{@archiveStats.chapters}}</td></tr>
-<tr><td>__Reviews:</td><td>{{@archiveStats.reviews}}</td></tr>
-<tr><td colspan="2">&nbsp;</td></tr>
-<tr><td colspan="2">__Online:</td></tr>
-<tr><td>__Guests:</td><td>{{ @usercount['guest'] }}</td></tr>
-<tr><td>__Users:</td><td>{{ @usercount['member'] }}</td></tr>
-</table>
-<br />
-__LatestMember: <a href="{{@BASE}}/member/profile/{{@archiveStats.newmember.0}}">{{@archiveStats.newmember.1}}</a>.<br />
+<div class="sbarstats">
+	<h3>__ArchiveStats</h3>
+	<table>
+		<tr><td>__Members:</td><td>{{@archiveStats.users}}</td></tr>
+		<tr><td>__Authors:</td><td>{{@archiveStats.authors}}</td></tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr><td>__Stories:</td><td>{{@archiveStats.stories}}</td></tr>
+		<tr><td>__Chapters:</td><td>{{@archiveStats.chapters}}</td></tr>
+		<tr><td>__Reviews:</td><td>{{@archiveStats.reviews}}</td></tr>
+		<tr><td colspan="2">&nbsp;</td></tr>
+		<tr><td colspan="2">__Online:</td></tr>
+		<tr><td>__Guests:</td><td>{{ @usercount['guest'] }}</td></tr>
+		<tr><td>__Users:</td><td>{{ @usercount['member'] }}</td></tr>
+	</table>
+	<br />
+	__LatestMember: <a href="{{@BASE}}/member/profile/{{@archiveStats.newmember.0}}">{{@archiveStats.newmember.1}}</a>.<br />
 </div>

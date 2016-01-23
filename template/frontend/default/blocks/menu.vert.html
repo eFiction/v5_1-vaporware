@@ -1,0 +1,16 @@
+<div class="menu">
+	<ul>
+	<repeat group="{{ @menuMain }}" value="{{ @item }}">
+		<li class='active'><a href='{{@BASE}}/{{@item.link}}'>{{@item.label}}</a></li>
+		<check if="{{ ( @item.selected )}}">
+			<div class="submenu">
+				<ul>
+				<repeat group="{{ @menuSub }}" value="{{ @itemSub }}">
+					<li class='active'><a href='{{@BASE}}/{{@itemSub.link}}'>{{@itemSub.label}}</a></li>
+				</repeat>
+				</ul>
+			</div>
+		</check>
+	</repeat>
+	</ul>
+</div>
