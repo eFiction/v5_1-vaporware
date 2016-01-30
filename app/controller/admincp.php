@@ -26,11 +26,12 @@ class AdminCP extends Base
 		$this->showMenu("home");
 	}
 
-	public function settings(\Base $fw, $params)
+	public function settings(\Base $fw, $params, $feedback = [ NULL, NULL ] )
 	{
+		$data = NULL;
 		$this->response->addTitle( $fw->get('LN__AdminMenu_Settings') );
 		$this->showMenu("settings");
-		$params = @$params[1] ?: "home";
+		$params = @$params['module'] ?: "home";
 
 		switch ( @$params )
 		{
@@ -51,15 +52,22 @@ class AdminCP extends Base
 				$this->response->addTitle( $fw->get('LN__AdminMenu_Language') );
 				break;
 			default:
-				$data=[];
+				$data['General'] = $this->model->settingsFields('settings_general');
 		}
-	$this->buffer( \View\AdminCP::settingsFields($data, $params) );
+		if ($data) $this->buffer( \View\AdminCP::settingsFields($data, $params, $feedback) );
 	}
 
 	public function settingsSave(\Base $fw, $params)
 	{
+		if (empty($params['module']))
+		{
+			$fw->reroute('/adminCP/settings', false);
+			exit;
+		}
+		$results = $this->model->saveKeys($fw->get('POST.form_data'));
+		//print_r($fw->get('POST'));
 		//$this->showMenu("home");
-		$fw->reroute('/adminCP/settings', false);
+		$this->settings($fw, $params, $results);
 	}
 
 	protected function showMenu($selected=FALSE)

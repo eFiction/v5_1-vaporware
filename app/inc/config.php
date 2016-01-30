@@ -15,7 +15,6 @@ class Config extends \DB\Jig\Mapper {
 	
 	public function __construct()
 	{
-		//include('data/config.php');
 		$db = new \DB\Jig('data/');
 		parent::__construct($db,'config.json');
 		$this->load();

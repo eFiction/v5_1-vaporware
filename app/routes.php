@@ -68,11 +68,11 @@ if (\Controller\Auth::isLoggedIn())
 			Admin only routes
 		-------------------- */
 		$fw->route(
-			[ 'GET|POST /adminCP/settings', 'GET|POST /adminCP/settings/*' ],
+			[ 'GET /adminCP/settings', 'GET|POST /adminCP/settings/@module' ],
 			'Controller\AdminCP->settings' );
 
 			$fw->route(
-			[ 'POST /adminCP/settings/save', 'POST /adminCP/settings/save/*' ],
+			[ 'POST /adminCP/settings/@module' ], //, 'POST /adminCP/settings/save/*' ],
 			'Controller\AdminCP->settingsSave' );
 
 		

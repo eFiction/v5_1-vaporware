@@ -31,7 +31,27 @@ class AdminCP extends Base
                       function(&$v) { $v = @explode("=",$v); },  NULL);
 			}
 		}
-		return $data;
+		return [ "section" => $select, "fields" => $data];
+	}
+	
+	public function saveKeys($data)
+	{
+		$affected=0;
+		$sql = "UPDATE `tbl_config` SET `value` = :value WHERE `name` = :key and `admin_module` = :section;";
+		
+		foreach ( $data as $section => $fields )
+		{
+			foreach($fields as $key => $value)
+			{
+				if ($this->exec($sql,[ ":value" => $value, ":key" => $key, ":section" => $section ]) )
+				{
+					$affected++;	
+				}
+				//echo "{$section} - {$key}: {$value}<br />";
+				//if ( !$this->exec)
+			}
+		}
+		return [ $affected, FALSE ]; // prepare for error check
 	}
 
 	public function showMenu($selected=FALSE)

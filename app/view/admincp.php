@@ -10,12 +10,12 @@ class AdminCP extends Base
 		return \Template::instance()->render('menu.html');
 	}
 	
-	public static function settingsFields($data,$target)
+	public static function settingsFields($data,$target,$feedback)
 	{
-			\Base::instance()->set('form_target', $target);
-			\Base::instance()->set('form_elements', $data);
-			$html = \Template::instance()->render('form_blocks.html');
-			//print_r($form_fields);
+		\Base::instance()->set('form_target', $target);
+		\Base::instance()->set('form_elements', $data);
+		\Base::instance()->set('form_feedback', $feedback);
+		$html = \Template::instance()->render('form_blocks.html');
 		return $html;
 	}
 
