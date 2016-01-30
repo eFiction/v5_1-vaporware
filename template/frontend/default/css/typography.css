@@ -1,9 +1,9 @@
 /* import fonts */
-@import url(http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300|Raleway:400,300,500,600,700|Bree+Serif|Roboto+Slab:400,300,700);
+@import url(http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300|Maven+Pro:400,700|Bree+Serif|Overlock:400,400italic,700,900);
 @import url(font-awesome.min.css);
 
 body, p {
-	font-family: 'Raleway', sans-serif;
+	font-family: 'Maven Pro', sans-serif;
 	font-size: 11pt;
 	color: #141516;
 	}
@@ -21,26 +21,26 @@ a, a:active, a:visited {
 	font-weight: normal;
 	text-decoration: none;
 	text-transform: none;
-	color: #139baf;
+	color: #48779f;
 	-webkit-transition: 1s;
 	-moz-transition: 1s;
 	transition: 1s;
 	}
 
-a:hover { color: #1d5d81; }
+a:hover { color: #efefef; }
 
 a.disabled { color: #141516; }
 
 /*-----------------  HEADLINES  -----------------*/
 
 h1, h2, h3, h4, h5, h6 {
-	font-family: 'Roboto Slab', serif;
+	font-family: 'Overlock', cursive;
 	}
 
 /* i.e. major headlines */
 h1 {
 	font-size: 24pt;
-	color: #a0252a;
+	color: #32383e;
 	text-align: center;
 	font-weight: 300;
 	text-transform: uppercase;
@@ -60,7 +60,7 @@ h3 {
 	text-align: center;
 	margin:  0 0 10px 0;
 	padding: 0; 
-	color: #e5a50c;
+	color: #32383e;
 	border-bottom: 1px dashed #dcdcdc;
 	font-weight: 300;
 	text-transform: none;

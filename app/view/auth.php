@@ -12,14 +12,18 @@ class Auth extends Base
 			"allow_registration" => $fw->get('CONFIG')['allow_registration'],
 		];
 
-		if( ""==$fw->get('POST.login') || ""==$fw->get('POST.password') )
+		if( sizeof($fw->get('POST'))>0 )
 		{
-			$data['login']['error'] = "No data";
+			if(""==$fw->get('POST.login') || ""==$fw->get('POST.password')) 
+			{
+				$data['login']['error'] = "No data";
+			}
+			else
+			{
+				$data['login']['error'] = "No match";
+			}
 		}
-		else
-		{
-			$data['login']['error'] = "No match";
-		}
+
 		return \Template::instance()->render('main/login.html','text/html', $data);
 	}
 

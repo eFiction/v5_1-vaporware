@@ -51,13 +51,13 @@ class Story extends Base
 		if ( $location == "local" )
 		{
 			$db = \storage::instance()->localChapterDB();
-			$chapterLoad= $db->exec('SELECT "storytext" FROM "chapters" WHERE "sid" = :sid AND "inorder" = :inorder', array(':sid' => $story, ':inorder' => $chapter ));
+			$chapterLoad= $db->exec('SELECT "chaptertext" FROM "chapters" WHERE "sid" = :sid AND "inorder" = :inorder', array(':sid' => $story, ':inorder' => $chapter ))[0];
 		}
 		else
 		{
-			$chapterLoad = $this->exec("SELECT C.storytext FROM `tbl_chapters`C WHERE C.sid=:sid AND C.inorder=:inorder", array(':sid' => $story, ':inorder' => $chapter ));
+			$chapterLoad = $this->exec("SELECT C.chaptertext FROM `tbl_chapters`C WHERE C.sid=:sid AND C.inorder=:inorder", array(':sid' => $story, ':inorder' => $chapter ))[0];
 		}
-		if ( sizeof($chapterLoad)>0 ) $chapterText = $chapterLoad[0]['storytext'];
+		if ( sizeof($chapterLoad)>0 ) $chapterText = $chapterLoad['chaptertext'];
 		else return FALSE;
 		
 		if ( $counting AND \Base::instance()->get('SESSION')['userID'] > 0 )
@@ -124,25 +124,6 @@ class Story extends Base
 		return $this->exec( "SELECT Ch.title, Ch.inorder as chapter
 		FROM `tbl_chapters`Ch 
 		WHERE Ch.sid = :story ORDER BY Ch.inorder ASC", [ ":story" => $story ]);
-	}
-
-	protected function loadChapter($story, $chapter)
-	{
-		$location = \Config::instance()->chapter_data_location;
-
-		$chapterData = $this->exec(
-					"SELECT C.*,rSA.aid AS uid FROM `tbl_chapters`C 
-								INNER JOIN `tbl_stories_authors`rSA ON ( rSA.sid = C.sid AND rSA.ca = 0 )
-								WHERE C.sid=:sid AND C.inorder=:inorder", 
-					array(':sid' => $story, ':inorder' => $chapter )
-		);
-
-		if ( $location == "local" )
-		{
-			$db = \storage::instance()->localChapterDB();
-			$chapterData['storytext'] = $db->exec('SELECT "storytext" FROM "chapters" WHERE "sid" = :sid AND "inorder" = :inorder', array(':sid' => $story, ':inorder' => $chapter ))[0]['storytext'];
-		}
-		return $chapterData;
 	}
 
 	public function blockStats()

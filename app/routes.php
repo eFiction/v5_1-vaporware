@@ -56,8 +56,24 @@ if (\Controller\Auth::isLoggedIn())
 			Mod/Admin routes
 		-------------------- */
 		$fw->route(
-			[ 'GET|POST /AdminCP', 'GET|POST /AdminCP/*' ],
+			[ 'GET|POST /adminCP', 'GET|POST /adminCP/*' ],
 			'Controller\AdminCP->index' );
+
+		
+	}
+
+	if ( $_SESSION['groups'] & 128 )
+	{
+		/* --------------------
+			Admin only routes
+		-------------------- */
+		$fw->route(
+			[ 'GET|POST /adminCP/settings', 'GET|POST /adminCP/settings/*' ],
+			'Controller\AdminCP->settings' );
+
+			$fw->route(
+			[ 'POST /adminCP/settings/save', 'POST /adminCP/settings/save/*' ],
+			'Controller\AdminCP->settingsSave' );
 
 		
 	}
@@ -80,8 +96,8 @@ else
 		[
 			'GET|POST /userCP',
 			'GET|POST /userCP/*',
-			'GET|POST /modCP',
-			'GET|POST /modCP/*',
+			'GET|POST /adminCP',
+			'GET|POST /adminCP/*',
 			'GET|POST /login'
 		],
 		'Controller\Auth->login' );

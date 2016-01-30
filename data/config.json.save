@@ -1,0 +1,32 @@
+{
+    "5270220ebb01b0.93149557": {
+        "ACTIVE_DB": "MYSQL",
+        "DB_MYSQL": {
+            "dsn": "mysql:dbname=efiction_dev_a0010;host=localhost;charset=UTF8MB4",
+            "user": "efiction",
+            "password": "CzFc67feLMptV73P"
+        },
+        "prefix": "efi5_",
+        "debug": "0",
+        "page_title": "TrekNation",
+		"page_title_separator" : " :: ",
+		"page_slogan" : "Das ultimative Archiv deutscher Star Trek Fanfiction!",
+		"page_title_add" : "path",
+        "date_format_long": "d.m.Y H:i (T)",
+        "date_format_short": "d.m.Y",
+        "monday_first_day": 1,
+        "shoutbox_entries": 5,
+		"optional_modules" : { "recommendation" : 1 },
+        "shoutbox_guest": true,
+        "chapter_data_location": "db",
+        "allow_registration": true,
+        "epub_namespace": "8e5cb6a9-21a3-5605-a216-cbac1ab65d6b",
+		"story_intro_items": 5,
+		"story_intro_order": "modified",
+		"tagcloud_basesize" : 70,
+		"tagcloud_minimum_elements" : 10,
+		"tagcloud_spread" : 4,
+		"iconset_default" : 1
+    }
+}
+

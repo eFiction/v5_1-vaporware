@@ -1,17 +1,17 @@
 <div class="sbarstats">
-	<h3>__ArchiveStats</h3>
+	<h3>{{@LN__AS_ArchiveStats}}</h3>
 	<table>
-		<tr><td>__Members:</td><td>{{@archiveStats.users}}</td></tr>
-		<tr><td>__Authors:</td><td>{{@archiveStats.authors}}</td></tr>
+		<tr><td>{{@LN__AS_Members}}:</td><td>{{@archiveStats.users}}</td></tr>
+		<tr><td>{{@LN__AS_Authors}}:</td><td>{{@archiveStats.authors}}</td></tr>
 		<tr><td colspan="2">&nbsp;</td></tr>
-		<tr><td>__Stories:</td><td>{{@archiveStats.stories}}</td></tr>
-		<tr><td>__Chapters:</td><td>{{@archiveStats.chapters}}</td></tr>
-		<tr><td>__Reviews:</td><td>{{@archiveStats.reviews}}</td></tr>
+		<tr><td>{{@LN__AS_Stories}}:</td><td>{{@archiveStats.stories}}</td></tr>
+		<tr><td>{{@LN__AS_Chapters}}:</td><td>{{@archiveStats.chapters}}</td></tr>
+		<tr><td>{{@LN__AS_Reviews}}:</td><td>{{@archiveStats.reviews}}</td></tr>
 		<tr><td colspan="2">&nbsp;</td></tr>
-		<tr><td colspan="2">__Online:</td></tr>
-		<tr><td>__Guests:</td><td>{{ @usercount['guest'] }}</td></tr>
-		<tr><td>__Users:</td><td>{{ @usercount['member'] }}</td></tr>
+		<tr><td colspan="2">{{@LN__AS_Online}}</td></tr>
+		<tr><td>{{@LN__AS_Guests}}:</td><td>{{ @usercount['guest'] }}</td></tr>
+		<tr><td>{{@LN__AS_Users}}:</td><td>{{ @usercount['member'] }}</td></tr>
 	</table>
 	<br />
-	__LatestMember: <a href="{{@BASE}}/member/profile/{{@archiveStats.newmember.0}}">{{@archiveStats.newmember.1}}</a>.<br />
+	{{@LN__AS_LatestMember}}: <a href="{{@BASE}}/member/profile/{{@archiveStats.newmember.0}}">{{@archiveStats.newmember.1}}</a>.<br />
 </div>

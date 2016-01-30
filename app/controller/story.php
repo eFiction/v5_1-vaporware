@@ -188,7 +188,7 @@ class Story extends Base
 		elseif ( $select[1] == "recommend" )
 		{
 			// break if module not enabled
-			if ( empty(\Config::instance()->optional_modules['recommendation']) ) return NULL;
+			if ( empty(\Config::instance()->modules_enabled['recommendation']) ) return NULL;
 			
 			return "**recommend**";
 		}

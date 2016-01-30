@@ -74,6 +74,7 @@ class Blocks extends Base
 	
 	function menuData($selected="")
 	{
+		/*
 		if ( $selected > "")
 		{
 			$menuSQL = "SELECT M.id,M.label,M.link,M1.label as sub_label,M1.link as sub_link,M1.child_of
@@ -106,6 +107,16 @@ class Blocks extends Base
 				}
 				$menu['sub'][] = [ "label" => $tmp['sub_label'], "link" => $tmp['sub_link'], "selected" => FALSE ];
 			}
+		}
+		*/
+		$menuSQL = "SELECT M.id,M.label,M.link,M.child_of
+												FROM `tbl_menu` M
+												WHERE M.child_of IS NULL AND M.active = '1'
+												ORDER BY M.order";
+		$temp = $this->exec($menuSQL);
+		foreach ( $temp as $tmp )
+		{
+			$menu['main'][] = [ "label" => $tmp['label'], "link" => $tmp['link'], "selected" => FALSE ];
 		}
 		return $menu;
 	}

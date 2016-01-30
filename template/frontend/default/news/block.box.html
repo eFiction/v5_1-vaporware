@@ -1,11 +1,11 @@
 <h1>{{@LN__News_Box}}</h1>
 <repeat group="{{ @newsItems }}" value="{{ @news }}" counter="{{ @ctr }}">
-	<div class="newsbox">
+	<div class="news-box">
 		<h2>{{ @news.headline }}</h2>
-		<div class="newsdateauthor">__newsby <a href='{{@BASE}}/member/profile/{{ @news.uid }}'>{{ @news.nickname }}</a> @ {{ date(@CONFIG["date_format_long"], @news.timestamp) }}</div>
+		<div class="news-dateauthor">{{@LN__News_writtenby}} <a href='{{@BASE}}/member/profile/{{ @news.uid }}'>{{ @news.nickname }}</a> @ {{ date(@CONFIG["date_format_long"], @news.timestamp) }}</div>
 		{{ @news.newstext | raw}}
-		<div class="newsfull">{NEWSMORE}</div>
-		<div class="newscomment"><a href='__baseURL?action=news,read&amp;id={NEWSID}'><input class="button" type="submit" {STYLE} value="{NEWSCOMMENT}"></a></div>
+		<div class="news-full">{NEWSMORE}</div>
+		<div class="news-comment"><a href='__baseURL?action=news,read&amp;id={NEWSID}'><input class="button" type="submit" {STYLE} value="{NEWSCOMMENT}"></a></div>
 	</div>
 </repeat>
-<a href='{{@BASE}}/news'>{{@LN__News_Archive}}</a>
+<div id="news-archive"><a href='{{@BASE}}/news'>{{@LN__News_Archive}}</a></div>

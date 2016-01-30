@@ -84,6 +84,7 @@ class Auth extends Base {
 				$fw->reroute($fw->get('POST')['returnpath'], false);
 				exit;
 			}
+			$this->buffer( \View\Auth::loginError($fw) );
 		}
 
 		else

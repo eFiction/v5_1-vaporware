@@ -103,7 +103,7 @@ class Blocks extends Base
 			"BACK"		=>	$back,
 			"TODAY"		=>	$today,
 			"FORWARD"	=>	$forward,
-			"TITLE"		=>	date("__F Y",mktime(0,0,0,$c['month'],1,$c['year'])),
+			"TITLE"		=>	date("F Y",mktime(0,0,0,$c['month'],1,$c['year'])),
 		];
 		return parent::render('blocks/calendar.html','text/html', $data);
 	}

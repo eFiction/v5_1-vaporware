@@ -33,22 +33,19 @@ class Backend extends Base
 		
 		$fw->set('TITLE', implode($cfg['page_title_separator'], array_merge([$cfg['page_title']],$this->title) ) );
 
-		//$body =  \Template::instance()->render('body.html');
 		$fw->set('DEBUGLOG', $fw->get('DB')->log());
 
 		return preg_replace_callback(
 								'/\{ICON:([\w-]+)\}/s',
 								function ($icon)
 								{
-									return Iconset::instance()->$icon[1];
+									return Iconset::instance()->{$icon[1]};
+									//return "#";
 								}
 								, \Template::instance()->render('layout.html')
 							);
 
-		//$fw->set('BODY', $body);
-		
 		return $body;
-		// \Template::instance()->render('layout.html');
     }
 
 	
