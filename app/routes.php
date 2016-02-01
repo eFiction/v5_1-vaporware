@@ -57,9 +57,32 @@ if (\Controller\Auth::isLoggedIn())
 		-------------------- */
 		$fw->route(
 			[ 'GET|POST /adminCP', 'GET|POST /adminCP/*' ],
-			'Controller\AdminCP->index' );
+			'Controller\AdminCP->catch' );
 
-		
+		// Archive
+		$fw->route(
+			[ 'GET /adminCP/archive', 'GET /adminCP/archive/@module', 'GET /adminCP/archive/@module/*' ],
+			'Controller\AdminCP_Archive->index' );
+		$fw->route( 'POST /adminCP/archive/@module', 'Controller\AdminCP_Archive->save' );
+
+		// Home
+		$fw->route(
+			[ 'GET /adminCP/home', 'GET /adminCP/home/@module', 'GET /adminCP/home/@module/*' ],
+			'Controller\AdminCP_Home->index' );
+		$fw->route( 'POST /adminCP/home/@module', 'Controller\AdminCP_Home->save' );
+
+		// Members
+		$fw->route(
+			[ 'GET /adminCP/members', 'GET /adminCP/members/@module', 'GET /adminCP/members/@module/*' ],
+			'Controller\AdminCP_Members->index' );
+		$fw->route( 'POST /adminCP/members/@module', 'Controller\AdminCP_Members->save' );
+
+		// Stories
+		$fw->route(
+			[ 'GET /adminCP/stories', 'GET /adminCP/stories/@module', 'GET /adminCP/stories/@module/*' ],
+			'Controller\AdminCP_Stories->index' );
+		$fw->route( 'POST /adminCP/stories/@module', 'Controller\AdminCP_Stories->save' );
+
 	}
 
 	if ( $_SESSION['groups'] & 128 )
@@ -69,11 +92,8 @@ if (\Controller\Auth::isLoggedIn())
 		-------------------- */
 		$fw->route(
 			[ 'GET /adminCP/settings', 'GET|POST /adminCP/settings/@module' ],
-			'Controller\AdminCP->settings' );
-
-			$fw->route(
-			[ 'POST /adminCP/settings/@module' ], //, 'POST /adminCP/settings/save/*' ],
-			'Controller\AdminCP->settingsSave' );
+			'Controller\AdminCP_Settings->index' );
+		$fw->route( 'POST /adminCP/settings/@module', 'Controller\AdminCP_Settings->save' );
 
 		
 	}

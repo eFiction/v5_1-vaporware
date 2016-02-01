@@ -1,9 +1,9 @@
 <form method="post" action="{{@BASE}}/adminCP/settings/{{@form_target}}">
 	<check if="{{ @form_feedback.0 }}">
-	<div class="alert-box success">{{ @form_feedback.affected }} <check if="{{ @form_feedback.affected==1 }}"><true>__Entry</true><false>__Entries</false></check> __SuccessfullySaved</div>
+	<div class="alert-box success">{{ @form_feedback.0 }} <check if="{{ @form_feedback.0==1 }}"><true>__Entry</true><false>__Entries</false></check> __SuccessfullySaved</div>
 	</check>
 	<check if="{{ @form_feedback.1 }}">
-	<div class="alert-box error">{{ @form_feedback.error }} <check if="{{ @form_feedback.error==1 }}"><true>__Error</true><false>__Errors</false></check> __SavingData.<br>__CheckData</div>
+	<div class="alert-box error">{{ @form_feedback.1 }} <check if="{{ @form_feedback.1==1 }}"><true>__Error</true><false>__Errors</false></check> __SavingData.<br>__CheckData</div>
 	</check>
 	
 	<repeat group="{{ @form_elements }}" key="{{@title }}" value="{{ @elements }}" counter="{{ @ctr }}">

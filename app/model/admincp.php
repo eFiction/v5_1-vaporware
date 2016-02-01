@@ -37,20 +37,27 @@ class AdminCP extends Base
 	public function saveKeys($data)
 	{
 		$affected=0;
-		$sql = "UPDATE `tbl_config` SET `value` = :value WHERE `name` = :key and `admin_module` = :section;";
+		$sqlUpdate = "UPDATE `tbl_config` SET `value` = :value WHERE `name` = :key and `admin_module` = :section;";
+		$sqlFile = "SELECT 1 from `tbl_config` WHERE `name`= :key and `admin_module`= :section and `to_config_file`=1";
 		
+		$mapper = \Config::instance();
 		foreach ( $data as $section => $fields )
 		{
 			foreach($fields as $key => $value)
 			{
-				if ($this->exec($sql,[ ":value" => $value, ":key" => $key, ":section" => $section ]) )
+				if ( $res = $this->exec($sqlUpdate,[ ":value" => $value, ":key" => $key, ":section" => $section ]) )
 				{
+					if ( $this->exec($sqlFile,[ ":key" => $key, ":section" => $section ]) )
+					{
+						$mapper->{$key} = $value;
+					}
 					$affected++;	
 				}
 				//echo "{$section} - {$key}: {$value}<br />";
 				//if ( !$this->exec)
 			}
 		}
+		if ( $affected ) $mapper->save();
 		return [ $affected, FALSE ]; // prepare for error check
 	}
 

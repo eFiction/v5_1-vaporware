@@ -50,6 +50,11 @@ abstract class Base {
 		return "<!-- FILE: {$file} -->".\Template::instance()->render($file,$mime,$hive,$ttl)."<!-- END: {$file} -->";
 	}
 	
+	public static function stub($text="")
+	{
+		return \Template::instance()->render('stub.html');
+	}
+	
 }
 
 class Iconset extends \DB\Jig\Mapper {

@@ -1,21 +1,23 @@
 /*-----------------  MAIN MENU  -----------------*/
 .menu {
-	text-align: right;
-	z-index: 1;
+	text-align: center;
+	z-index: 15;
 	}
 .menu ul {
+	background: #2e2e2e;
 	margin: 0;
-	padding: 0;
+	padding: 10px;
 	}
 .menu li {
 	list-style-type: none;
 	display: inline;
 	white-space: nowrap;
-	padding: 5px 5px;
+	padding: 0 5px;
 	margin: 0;
 	}
 .menu li:hover {
-	background-color: transparent;
+	padding: 5px;
+	margin: 0;
 	}
 .menu a, .menu a:active, .menu a:visited {
 	font-family: 'Open Sans Condensed', sans-serif;
@@ -26,43 +28,9 @@
 	text-shadow: 0 0 2px #fafafa;
 }
 .menu a:hover {
-	color: #e5ba0c;
+	color: #48779f;
 	text-shadow: 0 0 2px #292929;
 	}
-/*-----------------  SUB MENU  -----------------*/
-
-.submenu {
-  position: relative;
-  top: 0;
-  left: 0;
-  padding: 5px 0;  
-	margin: 0;
-	}  
-.submenu ul {  
-  margin: 0;  
-  padding: 0;  
-  z-index: 1;  
-	}  
-.submenu li {  
- 	white-space: nowrap;
-	padding: 5px 5px;
-	margin: 1px 0;
-  list-style: none;  
-  text-align: left;
-  display: inline;
-   }
-.submenu li:hover {  
-  }  
-.submenu a {  
-  color: #fafafa;
-  font-family: 'Open Sans Condensed',arial,sans-serif;
-  font-size: 11pt;
-  text-transform: uppercase;
-}
-.submenu a:hover {
-	color: #e5ba0c;
-	text-shadow: 0 0 2px #292929;
-}
 
 /*-----------------  UCP/ACP MENU  -----------------*/
 

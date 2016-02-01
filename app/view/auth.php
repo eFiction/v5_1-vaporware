@@ -7,7 +7,7 @@ class Auth extends Base
 	{
 		$data =
 		[
-			"returnpath" 	=>	$fw->get('POST.returnpath'),//['returnpath'],
+			"returnpath" 	=>	(""==$fw->get('POST.returnpath')) ? $fw->get('PATH') : $fw->get('POST.returnpath'),//['returnpath'],
 			"BASE"			=>	$fw->get('BASE'),
 			"allow_registration" => $fw->get('CONFIG')['allow_registration'],
 		];

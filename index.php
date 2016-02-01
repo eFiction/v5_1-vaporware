@@ -28,7 +28,6 @@ $fw->set('CONFIG', $cfg);
 
 require('app/routes.php');
 
-$fw->set('LOCALES','languages/');
 $fw->set('LANGUAGE','de.UTF-8');
 //$fw->set('DEBUG', 1);
 

@@ -11,15 +11,15 @@
 
 
 body {
-	background-color: #e5e5e5;
-	background-image: url(../images/pattern.png);
+	background: #efefef;
+	background-image: url();
 	background-repeat: repeat;
 	padding: 0;
 	margin: 0 auto;
 }
 
 #top-navbar {
-	background-color: #2e2e2e;
+	background: #2e2e2e;
 	color: #fafafa;
 	padding: 5px;
 	width: 100%;
@@ -27,27 +27,13 @@ body {
 }
 
 .header {
-	background: #2c2c2c;
-	background: -webkit-gradient(linear, left top, left bottom, from(#2c2c2c), to(#525252));  /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top, #2c2c2c, #525252); /* Chrome10+,Safari5.1+ */
-	background: -moz-linear-gradient(top, #2c2c2c, #525252); /* FF3.6+ */
-	background: -ms-linear-gradient(top, #2c2c2c, #525252); /* IE10+ */
-	background: -o-linear-gradient(top, #2c2c2c, #525252); /* Opera 11.10+ */
-	background: linear-gradient(top, #2c2c2c, #525252); /* W3C */
-	background: filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#2c2c2c', endColorstr='#525252',GradientType=0 ); /* IE6-9 */
+
 	margin: 0;
 	}
 
 .footer {
 	color: #fafafa;
-	background: #525252;
-	background: -webkit-gradient(linear, left top, left bottom, from(#525252), to(#2c2c2c));  /* Chrome,Safari4+ */
-	background: -webkit-linear-gradient(top, #525252, #2c2c2c); /* Chrome10+,Safari5.1+ */
-	background: -moz-linear-gradient(top, #525252, #2c2c2c); /* FF3.6+ */
-	background: -ms-linear-gradient(top, #525252, #2c2c2c); /* IE10+ */
-	background: -o-linear-gradient(top, #525252, #2c2c2c); /* Opera 11.10+ */
-	background: linear-gradient(top, #525252, #2c2c2c); /* W3C */
-	background: filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#525252', endColorstr='#2c2c2c',GradientType=0 ); /* IE6-9 */
+	background: #2e2e2e;
 	text-align: center;
 	padding: 10px;
 	margin-top: 10px;
@@ -55,12 +41,12 @@ body {
 	}
 
 #container {
-	background-color: #fafafa;
-	padding: 10px;
-	margin: 15px auto;
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
-	border-radius: 10px;
+	background: #fafafa;
+	padding: 10px 0;
+	margin: 0 auto;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	border-radius: 2px;
 }
 
 #content {
@@ -71,21 +57,26 @@ body {
 	}
 
 .header_img {
-	background-image: url(../images/treknation_2014.png);
+	background-image: url(../images/logo.png);
 	background-repeat: no-repeat;
- 	height: 125px;
-	width: 450px;
-	margin: 0;
+ 	height: 0;
+	width: 0;
+	margin: 0 auto;
 	}
 
 @media handheld, only screen and (max-width: 825px) {
 	.header_img {
-	background-image: url(../images/treknation_2014_tiny.png);
+	background-image: url(../images/logo.png);
 	background-repeat: no-repeat;
- 	height: 63px;
-	width: 225px;
+ 	height: 0;
+	width: 0;
 	margin: 0 auto;
 	}
+}
+
+img {
+	max-height: auto;
+	max-width: 100%
 }
 
 .clearfix { clear: both; }
@@ -171,7 +162,7 @@ body {
 
 /*-----------------  SITE NEWS  -----------------*/
 
-.newsbox {
+.news-box {
 	background-color: #f4f4f4;
 	border: 1px solid #dcdcdc;	
 	-webkit-border-radius: 4px;
@@ -180,12 +171,12 @@ body {
 	padding: 5px;
 	margin: 10px 0;
 	}
-.newsdateauthor {
+.news-dateauthor {
 	margin: -12px 0 5px 0;
 	padding: 5px 0;
 	font-size: 10pt;
 	}
-.newscomment {
+.news-comment {
 	text-align: right;
 	padding: 10px;
 	}	
@@ -215,11 +206,15 @@ body {
 	left: -15px;
 	top: 25px;
 }
-.commentdateauthor {
+.comment-dateauthor {
 	padding: 0 0 10px 0;
 }
 .adminoptions {
 	text-align: right;
+}
+
+#news-archive {
+	text-align: center;
 }
 
 /*-----------------  TABLE BODY  -----------------*/
