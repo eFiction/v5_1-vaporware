@@ -1,4 +1,3 @@
-<!-- single -->
 	<div id="story-container">
 		<div class="story-date">__Published: {{@story.published}} <check if="{{ @story.published != @story.modified}}"> / __Updated: {{@story.modified}}</check></div>
 		<div class="story-info1"><span class="fa fa-bookmark"></span> {ICON:favourite} <span class="fa fa-print"></span> <span class="fa fa-flag"></span> <span class="fa fa-download"></span> <a href="{{@BASE}}/story/print/{{@story.sid}},epub">epub</a> <check if="{{ @groups & 64 }}"><a href="__baseURL?action=controlpanel,admin&amp;module=stories,edit&amp;story={SID}">{ICON:edit}</a></check></div>
@@ -11,10 +10,7 @@
 			</div>
 		</check>
 		<div class="story-text">
-			{{@content | raw }}
 			<a name="rev"></a>
-			{REVIEWS}
-			{REVIEW_FORM}
+			{{@content | raw }}
 		</div>
 	</div>
-<!-- !single -->

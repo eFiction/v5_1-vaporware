@@ -19,6 +19,11 @@ class AdminCP extends Base
 		return $html;
 	}
 
-	
+	public static function homeWelcome($v, $c)
+	{
+		\Base::instance()->set('script_versions', $v);
+		\Base::instance()->set('versions_compare', $c);
+		return \Template::instance()->render('home_welcome.html');
+	}
 	
 }

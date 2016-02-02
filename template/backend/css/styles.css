@@ -587,11 +587,11 @@ hr:after {
 	
 /*----------------- ALERTS -----------------*/
 .alert-box {
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
-	border-radius: 10px; 
-  padding: 10px 10px 10px 36px;
-  margin: 10px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	border-radius: 5px; 
+  padding: 2px 2px 2px 2px;
+  margin: 5px 5px 5px 5px;
 }
 .alert-box span {
   font-weight: bold;
@@ -601,7 +601,7 @@ hr:after {
   background-color:#ffecec;
   border: 1px solid #f5aca6;
 }
-.success {
+.alert-box.success {
   background-color:#e9ffd9;
   border: 1px solid #a6ca8a;
 }
@@ -612,6 +612,9 @@ hr:after {
 .info {
   background-color:#e3f7fc;
   border: 1px solid #8ed9f6;
+}
+.alert-box.blank {
+	border: none;
 }
 
 .page_centered  {

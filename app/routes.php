@@ -12,6 +12,8 @@ $fw->route(
 $fw->route(
   [ 'GET /story', 'GET /story/@action', 'GET /story/@action/@id', ],
   'Controller\Story->index' );
+$fw->route(
+  [ 'POST /story', 'POST /story/@action' ], 'Controller\Story->save' );
 
 $fw->route(
   [ 'GET /story/search', 'GET /story/search/*', ],

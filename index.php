@@ -1,7 +1,7 @@
 <?php
 /** @var Base $f3 */
 $fw = require('lib/base.php');
-$fw->set('APP_VERSION', '5.0.0-dev');
+$fw->set('APP_VERSION', '5.0.0-dev.0');
 
 //new Session();
 /*

@@ -107,6 +107,74 @@ class Story extends Base
 		return str_replace(array_keys($replace), array_values($replace), $sql_StoryConstruct);
 	}
 	
+	public function loadReviews($storyID)
+	{
+		$limit=5;
+		$sql = "SELECT 
+						F1.*, 
+						F2.fid as comment_id, 
+						F2.text as comment_text, 
+						F2.reference_sub as parent_item, 
+						IF(F2.writer_uid>0,U2.nickname,F2.writer_name) as comment_writer_name, 
+						F2.writer_uid as comment_writer_uid 
+					FROM 
+					(
+						SELECT 
+							F.fid as review_id, 
+							F.text as review_text, 
+							F.reference as review_storyid, 
+							F.reference_sub as review_chapterid, 
+							IF(F.writer_uid>0,U.nickname,F.writer_name) as review_writer_name, 
+							F.writer_uid as review_writer_uid 
+						FROM `tbl_feedback`F 
+							JOIN `tbl_users`U ON ( F.writer_uid = U.uid )
+						WHERE F.reference = :storyid AND F.type='ST' 
+						ORDER BY F.datetime 
+						DESC LIMIT 0,".$limit."
+					) F1
+				JOIN `tbl_feedback`F2  ON (F1.review_id = F2.reference AND F2.type='C')
+					JOIN `tbl_users`U2 ON ( F2.writer_uid = U2.uid )
+				ORDER BY F2.datetime ASC";
+		$flat = $this->exec( $sql, [':storyid' => $storyID] );
+		
+		if ( sizeof($flat) == 0 ) return FALSE;
+		
+		$current_id = 0;
+		foreach ( $flat as $item )
+		{
+			if ( $item['review_id']!=$current_id )
+			{
+				// remember current review ID
+				$current_id = $item['review_id'];
+				$data[] =
+				[
+					"level"	=> 1,
+					"sid"	=>	$item['review_storyid'],
+					"id"	=> $item['review_id'],
+					"text" => $item['review_text'],
+					"name" => $item['review_writer_name'],
+					"uid" =>	$item['review_writer_uid']
+				];
+			}
+			// Check parent level and remember this node's level
+			if ( isset($depth[$item['parent_item']]) )
+				$depth[$item['comment_id']] = $depth[$item['parent_item']] + 1;
+			else
+				$depth[$item['comment_id']] = 2;
+			
+			$data[] =
+			[
+				"level"	=> min ($depth[$item['comment_id']], 3),
+				"sid"	=>	$item['review_storyid'],
+				"id"	=> $item['comment_id'],
+				"text" => $item['comment_text'],
+				"name" => $item['comment_writer_name'],
+				"uid" =>	$item['comment_writer_uid']
+			];
+		}
+		return $data;
+	}
+	
 	public function getTOC($story)
 	{
 		return $this->exec( "SELECT UNIX_TIMESTAMP(T.last_read) as tracker_last_read, T.last_chapter, IF(T.last_chapter=Ch.inorder,1,0) as last,

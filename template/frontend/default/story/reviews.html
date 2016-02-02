@@ -1,0 +1,13 @@
+<span class="review_container">
+<set last_level="0">
+<repeat group="{{ @story_reviews }}" value="{{ @item }}">
+	<check if="{{@last_level==@item.level}}"></div></check>
+	<loop from="{{ @i=@last_level }}" to="{{ @i >= @item.level }}" step="{{ @i-- }}"></div></loop>
+	<div class="review review-level-{{@item.level}}">
+		{{@item.name}}:
+		{{@item.text | raw}} <br /><div align="right"><span id="{{@item.id}}" class="openform"><input class="button" type="submit" value="__Comment"></span></div>
+		<set last_level="{{@item.level}}">
+		<div class="ajaxform"></div>
+</repeat>
+<loop from="{{ @k=@last_level }}" to="{{ @k > 0 }}" step="{{ @k-- }}"></div></loop>
+</span>

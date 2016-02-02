@@ -17,6 +17,9 @@ class Story extends Base
 
 	public function index(\Base $f3, $params)
 	{
+		if ( $f3->get('AJAX')===TRUE )
+			$this->ajax($f3, $params);
+		
 		if ( empty($params['action']) )
 			$data = $this->intro($f3);
 		
@@ -34,6 +37,19 @@ class Story extends Base
 				
 		}
 		$this->buffer ($data);
+	}
+	
+	protected function ajax(\Base $f3, $params)
+	{
+		$id = @explode(",",$params['id']);
+		if(empty($id[1])) exit;
+		
+		if ( $id[1]=="commentform" )
+		{
+			if(empty($id[2])) exit;
+			echo \View\Story::commentForm((int)$id[0], (int)$id[2]);
+		}
+		exit;
 	}
 	
 	protected function intro(\Base $f3)
@@ -107,8 +123,11 @@ class Story extends Base
 
 			if ( isset($id[1]) AND $id[1] == "reviews" )
 			{
+				$content = "*No reviews found";
 				$tocData = $this->model->getMiniTOC($story);
-				$content = "";
+				//$offset = isset((int)@$id[2]) ? 1:2;
+				if ( $reviewData = $this->model->loadReviews($story) )
+					$content = \View\Story::buildReviews($reviewData);
 			}
 			elseif ( isset($id[1]) AND $id[1] == "toc" AND $storyData['chapters']>1 )
 			{

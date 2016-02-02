@@ -56,11 +56,27 @@ class Story extends Base
 		return \Template::instance()->render('story/information.html');
 	}
 
+	public static function buildReviews($reviewData)
+	{
+		\Base::instance()->set('story_reviews', $reviewData);
+
+		return \Template::instance()->render('story/reviews.html');
+	}
+
+	public static function commentForm($storyID, $parentID)
+	{
+		return \Template::instance()->render('main/feedback_form.html');
+	}
+
+	public static function reviewForm($storyID, $parentID)
+	{
+		return \Template::instance()->render('main/feedback_form.html');
+	}
+
 	public static function buildStory($storyData,$content,$dropdown)
 	{
 		\Registry::get('VIEW')->javascript('body', TRUE, 'chapter.js' );
 		\Registry::get('VIEW')->javascript('body', FALSE, "var url='".\Base::instance()->get('BASE')."/story/read/{$storyData['sid']},'" );
-
 
 		$storyData['authorblock'] = unserialize($storyData['authorblock']);
 		$storyData['published'] = date( \Config::instance()->date_format_short, $storyData['published']);

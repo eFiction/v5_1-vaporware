@@ -444,7 +444,12 @@ span.count {
 }
 
 /*-----------------  REVIEWS  -----------------*/
-
+.review
+{
+	border: 1px solid #dcdcdc;
+	padding: 10px;
+}
+/*
 .review {
 	position: relative;
 	padding: 10px;
@@ -493,7 +498,7 @@ span.count {
 	margin: 0;
 	padding: 0 0 0 5px;
 }
-
+*/
 /*----------------- CONTEXTUAL POPUP -----------------*/
 
 a.contextual-popup { text-decoration: none; }

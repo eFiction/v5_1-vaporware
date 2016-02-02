@@ -41,13 +41,17 @@ class AdminCP_Home extends AdminCP
 		$versions = @curl_exec($ch);
 		@curl_close($ch);
 		
+		$compare['base'] = \Base::instance()->get('APP_VERSION');
+
 		if ($versions)
 		{
-			$version = unserialize($versions)['efiction5'];
-			$this->buffer ( print_r($version,TRUE ) );
+			$version = @unserialize($versions)['efiction5'];
+			if ( @$version['dev'] ) $compare['dev'] = version_compare ( $version['dev'], $compare['base'] );
+			if ( @$version['stable'] ) $compare['stable'] = version_compare ( $version['stable'], $compare['base'] );
 		}
-		else $this->buffer ( "No version" );
-		$this->buffer( \View\Base::stub() );
+		else $version = FALSE;
+		
+		$this->buffer( \View\AdminCP::homeWelcome($version, $compare) );
 	}
 
 
