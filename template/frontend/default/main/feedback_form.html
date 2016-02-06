@@ -1,22 +1,29 @@
 <div class="write-review">
-	<fieldset>
-		<form class="write_review" method="post" action="{{@BASE.@PATH}}">
-			<check if="{{@_SESSION.userID}}">
-				<true>
-					<legend>{TITLE}</legend>
-					<div class="user-icon"><span class="fa fa-user fa-lg"></span>{{@_SESSION.username}}</div>
-				</true>
-				<false>
-					<legend>__Review / Anonymous</legend>
-					<div class="field"><span class="fa fa-user fa-fw icon"></span><input class="field input" placeholder="name" type="text" name="name"></div>
-					<div class="field"><span class="fa fa-envelope fa-fw icon"></span><input class="field input" placeholder="email"  type="text" name="email"></div>
-				</false>
-			</check>
-			<div class="field textarea"><textarea class="message" placeholder="please leave a comment/review"></textarea></div>
-			{FULL}{BUTTON}
-			<input class="button" type="submit" value="__Submit">
-			<input type="hidden" name="write[chapid]" value="{CHAPID}">
-			<input type="hidden" name="write[childof]" value="{CHILDOF}">
-		</form>
-	</fieldset>
+	<check if="{{@_SESSION.userID OR TRUE===\Config::instance()->allow_guest_reviews }}">
+	<true>
+		<fieldset>
+			<form class="write_review" method="post" action="{{@BASE.@PATH}}">
+				<check if="{{@_SESSION.userID}}">
+					<true>
+						<legend>{TITLE}</legend>
+						<div class="user-icon"><span class="fa fa-user fa-lg"></span>{{@_SESSION.username}}</div>
+					</true>
+					<false>
+						<legend>__Review / Anonymous</legend>
+						<div class="field"><span class="fa fa-user fa-fw icon"></span><input class="field input" placeholder="name" type="text" name="name"></div>
+						<div class="field"><span class="fa fa-envelope fa-fw icon"></span><input class="field input" placeholder="email"  type="text" name="email"></div>
+					</false>
+				</check>
+				<div class="field textarea"><textarea class="message" placeholder="please leave a comment/review"></textarea></div>
+				{FULL}{BUTTON}
+				<input class="button" type="submit" value="__Submit">
+				<input type="hidden" name="write[chapid]" value="{CHAPID}">
+				<input type="hidden" name="write[childof]" value="{CHILDOF}">
+			</form>
+		</fieldset>
+	</true>
+	<false>
+		You need to be logged in to use write a review or comment
+	</false>
+	</check>
 </div>

@@ -81,15 +81,15 @@ class Story extends Base
 		$storyData['authorblock'] = unserialize($storyData['authorblock']);
 		$storyData['published'] = date( \Config::instance()->date_format_short, $storyData['published']);
 		$storyData['modified'] = date( \Config::instance()->date_format_short, $storyData['modified']);
-		return \Template::instance()->render('story/single.html','text/html',
-															[ 
-																"story" => $storyData,
-																"content" => $content,
-																"dropdown" => $dropdown,
-																"groups" => $_SESSION['groups'],
-																"BASE" => \Base::instance()->get('BASE'),
-															]
-		);
+		
+		\Base::instance()->set('render_data', [
+												"story" => $storyData,
+												"content" => $content,
+												"dropdown" => $dropdown,
+												"groups" => $_SESSION['groups'],
+												]);
+		
+		return \Template::instance()->render('story/single.html');
 	}
 
 	public static function dropdown($data,$chapter)
