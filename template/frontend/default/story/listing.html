@@ -5,7 +5,12 @@
 	<div class="story-info1"><span class="fa fa-bookmark"></span> {ICON:favourite} <span class="fa fa-flag"></span> {{@story.reviews}}</div>
 	<div class="story-groupings"><repeat group="{{@story.categoryblock}}" value="{{@category}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check>{{@category.1}}</repeat></div>
 	<div class="story-info2">{{@story.summary |raw}}</div>
-	<div class="story-info2"><i class="fa fa-tag"></i> <repeat group="{{@story.tagblock}}" value="{{@tag}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check>{{@tag.1}}</repeat></div>
+	<div class="story-info2"><i class="fa fa-tag"></i>
+		<check if="{{isset(@story.tagblock.0.1)}}">
+			<true><repeat group="{{@story.tagblock}}" value="{{@tag}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check>{{@tag.1}}</repeat></true>
+			<false>{{@LN__St_NoTags}}</false>
+		</check>
+	</div>
 	<div class="story-info3"><small>__Published: {{@story.published}} &bull; __Chapters: {{@story.chapters}} &bull; __Words: {{@story.wordcount}} &bull; __Status: {{@story.completed}} &bull; __Rating: {{@story.rating_name}} &bull; __Hits: {{@story.count}} </small></div>
 	</div>
 </repeat>

@@ -7,28 +7,41 @@ class Story extends Base
 	{
 		while ( list($key, $value) = each($data) )
 			Story::dataProcess($data[$key], $key);
-
-		return \Template::instance()->render(
-							'story/listing.html',
-							'text/html',
-							[
-								"stories" => $data,
-								"config"	=> [ "date_format_short" => \Config::instance()->date_format_short ],
-								"BASE" => \Base::instance()->get('BASE')
-							]
-		);
+		
+		\Base::instance()->set('stories', $data);
+		
+		return \Template::instance()->render( 'story/listing.html' );
+	}
+	
+	public static function searchPage($terms=array(), $data=array())
+	{
+		$form = \View\Story::searchForm($terms);
+		return $form;
+	}
+	
+	protected static function searchForm($terms)
+	{
+		$pre = [
+			'tags'				=>	'[]',
+			'authors'			=>	'[]',
+			'categories'	=>	'[]'
+		];
+		\Base::instance()->set('prepopulateData', $pre);
+		
+		return \Template::instance()->render('story/search.html');
 	}
 	
 	protected static function dataProcess(&$item, $key=NULL)
 	{
-		if (isset($item['published']))			$item['published']		= date(\Base::instance()->get('CONFIG')['date_format_short'],$item['published']);
-		if (isset($item['modified']))			$item['modified']		= date(\Base::instance()->get('CONFIG')['date_format_short'],$item['modified']);
-		$item['number']																= isset($item['inorder']) ? "{$item['inorder']}&nbsp;" : "";
-		if (isset($item['wordcount'])) 		$item['wordcount']		= number_format($item['wordcount'], 0, '','.');
-		if (isset($item['count'])) 				$item['count']			= number_format($item['count'], 0, '','.');
-		$item['authors'] = $item['authorblock'] = unserialize($item['authorblock']);
+		if (isset($item['published']))	$item['published']	= date(\Base::instance()->get('CONFIG')['date_format_short'],$item['published']);
+		if (isset($item['modified']))		$item['modified']		= date(\Base::instance()->get('CONFIG')['date_format_short'],$item['modified']);
+																		$item['number']			= isset($item['inorder']) ? "{$item['inorder']}&nbsp;" : "";
+		if (isset($item['wordcount'])) 	$item['wordcount']	= number_format($item['wordcount'], 0, '','.');
+		if (isset($item['count'])) 			$item['count']			= number_format($item['count'], 0, '','.');
+																		$item['authors'] 		= $item['authorblock'] = unserialize($item['authorblock']);
+
 		array_walk($item['authors'], function (&$v, $k){ $v = $v[1];} );
-//		$item['authors'] = implode
+
 		if (isset($item['categoryblock'])) 	$item['categoryblock']= unserialize($item['categoryblock']);
 		if (isset($item['tagblock'])) 			$item['tagblock']		= unserialize($item['tagblock']);
 	}
@@ -102,6 +115,13 @@ class Story extends Base
 		}
 		$dropDown[] = array ( ($chapter==="reviews"), "reviews", FALSE, "__Reviews" );
 		return $dropDown;
+	}
+	
+	public static function categories($data)
+	{
+		\Base::instance()->set('categoriesData', $data);
+		
+		return \Template::instance()->render('story/categories.html');
 	}
 	
 	public static function epubXMLtag()

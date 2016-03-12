@@ -1,0 +1,45 @@
+<form method="get" action="__baseURL">
+	<input type="hidden" name="action" value="story,search">
+	<fieldset><legend>Advanced Search</legend>
+	__Title<br /><input class="text-input" placeholder="" type="text" name="form[story_title]" value="">
+	__Tags<br /><input type="text" id="tag-select" name="tags" />
+        <script type="text/javascript">
+        $(document).ready(function() {
+            $("#tag-select").tokenInput("{{@BASE}}/story/ajax/search/",{
+            	method: "get",
+            	queryParam: "tag",
+            	preventDuplicates: true,
+            	prePopulate: {{@prepopulateData.tags}}
+            });
+        });
+        </script>
+__Author<br /><input type="text" id="author-select" name="author" />
+        <script type="text/javascript">
+        $(document).ready(function() {
+            $("#author-select").tokenInput("{{@BASE}}/story/ajax/search/",{
+            	method: "get",
+            	queryParam: "author",
+            	tokenLimit: 1,
+            	prePopulate: {{@prepopulateData.authors}}
+            });
+        });
+        </script>
+__Categories<br /><input type="text" id="category-select" name="category" />
+        <script type="text/javascript">
+        $(document).ready(function() {
+            $("#category-select").tokenInput("{{@BASE}}/story/ajax/search/",{
+            	method: "get",
+            	queryParam: "category",
+            	preventDuplicates: true,
+            	prePopulate: {{@prepopulateData.categories}}
+            });
+        });
+        </script>
+    
+<br />__Rating <select name=""><option value="one">select</select>
+<br /><input type="checkbox" name="exclude_wip" {EXCLUDE_WIP} value="1">__Completed
+<br /><br /><input type="radio" name="oneshot" value="oneshot">__Oneshot <input type="radio" name="multichapters" value="multichapters">__MultiChapters <input type="radio" name="both" value="both"> __Both
+<br /><br /><button type="submit">submit</button> <button type="reset">reset</button>
+
+	</fieldset>
+</form>

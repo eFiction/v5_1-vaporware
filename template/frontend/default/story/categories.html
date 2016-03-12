@@ -1,0 +1,23 @@
+<check if="{{isset(@categoriesData['parent'])}}">
+Browsing: {{@categoriesData['parent'][0]['category']}}</br >
+Go back <a href="{{@BASE}}/story/categories/{{@categoriesData['parent'][0]['parent_cid']}}">up</a><br />
+</check>
+<repeat group="{{ @categoriesData['elements'] }}" value="{{ @element }}">
+	<check if="{{sizeof(@element['stats']['sub'])}}">
+		<true>
+			<h3><a href="{{@BASE}}/story/categories/{{@element['cid']}}">{{ @element['category']}}</a></h3><br />
+		</true><false>
+			<h3>{{ @element['category']}}</h3><br />
+		</false>
+	</check>
+	{{@element['description'] |raw }}<br />
+	<check if="{{@element['count']>0}}">{{@element['count'] }} stories in this category. [ <a href="{{@BASE}}/story/categories/{{@element['stats']['cid']}}/view">View</a> ]<br /></check>
+	<check if="{{@element['count'] < @element['stats']['count'] }}">{{@element['stats']['count'] - @element['count']}} stories in these sub-categories:<br /></check>
+	<check if="{{sizeof(@element['stats']['sub'])}}">
+		<table>
+		<repeat group="{{ @element['stats']['sub'] }}" key="{{@name}}" value="{{ @count }}" counter="{{@line}}">
+			<tr><td><check if="{{@line==1}}">Sub-categories:</check>&nbsp;</td><td>{{@name}}: {{ @count }}</td></tr>
+		</repeat>
+		</table>
+	</check>
+</repeat>

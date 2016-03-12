@@ -31,6 +31,16 @@ class Story extends Base
 		return [$info, $data];
 	}
 	
+	public function search ($terms)
+	{
+		
+	}
+	
+	public function searchAjax ($sql, $bind = array())
+	{
+		return $this->exec($sql, $bind);
+	}
+	
 	public function getStory($story)
 	{
 		$replacements =
@@ -105,6 +115,36 @@ class Story extends Base
 			$replace["@{$key}@"] = $value;
 		}
 		return str_replace(array_keys($replace), array_values($replace), $sql_StoryConstruct);
+	}
+	
+	public function categories( $cid, $list=FALSE )
+	{
+		// $cid is safe
+		if($list)
+		{
+			
+		}
+		else
+		{
+			$sql = "SELECT C.cid, C.category, C.description, C.image, C.count, C.stats, C.parent_cid
+							FROM `tbl_categories`C 
+							WHERE C.parent_cid ='{$cid}' 
+						GROUP BY C.cid 
+						ORDER BY C.inorder ASC";
+			$data['elements'] = $this->exec($sql);
+			foreach ( $data['elements'] as &$entry ) $entry['stats'] = unserialize($entry['stats']);
+		}
+		
+		if ( $list OR $cid > 0 )
+		{
+			$sql = "SELECT C.category, C.description, C.image, C.stats, C.parent_cid
+							FROM `tbl_categories`C 
+							WHERE C.cid ='{$cid}' ";
+			$data['parent'] = $this->exec($sql);
+			if ( sizeof($data['parent'])==1 )
+				$data['parent'][0]['stats'] = unserialize($data['parent'][0]['stats']);
+		}
+		return $data;
 	}
 	
 	public function loadReviews($storyID)

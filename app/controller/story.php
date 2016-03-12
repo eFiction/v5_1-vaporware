@@ -12,11 +12,13 @@ class Story extends Base
 	public function beforeroute()
 	{
 		parent::beforeroute();
-		\Registry::get('VIEW')->addTitle( \Base::instance()->get('LN__Stories') );
+		$this->view  = \Registry::get('VIEW');
+		$this->view->addTitle( \Base::instance()->get('LN__Stories') );
 	}
 
 	public function index(\Base $f3, $params)
 	{
+		
 		if ( $f3->get('AJAX')===TRUE )
 			$this->ajax($f3, $params);
 		
@@ -32,24 +34,52 @@ class Story extends Base
 				$this->printer($params['id']);
 				break;
 			case 'categories':
-				$data = $this->categories(isset($params['id'])?$params['id']:FALSE);
+				$data = $this->categories($params);
 				break;
-				
+			default:
+				$data = "";
 		}
 		$this->buffer ($data);
 	}
 	
-	protected function ajax(\Base $f3, $params)
+	public function ajax(\Base $f3, $params)
 	{
-		$id = @explode(",",$params['id']);
-		if(empty($id[1])) exit;
-		
-		if ( $id[1]=="commentform" )
+		if ( isset($params['id']) && $params['id']=="search" )
 		{
-			if(empty($id[2])) exit;
-			echo \View\Story::commentForm((int)$id[0], (int)$id[2]);
+			$query = explode( "=", parse_url($params[0])['query'] );
+
+			if( @$query[0]=="tag" )
+			{
+				$ajax_sql = "SELECT label as name, tid as id from `tbl_tags`T WHERE T.label LIKE :tag ORDER BY T.label ASC LIMIT 5";
+				$bind = [ "tag" =>  "%{$query[1]}%" ];
+			}
+			elseif( @$query[0]=="author" )
+			{
+				$ajax_sql = "SELECT U.nickname as name, U.uid as id from `tbl_users`U WHERE U.nickname LIKE :nickname AND ( U.groups & 5 ) ORDER BY U.nickname ASC LIMIT 5";
+				$bind = [ "nickname" =>  "%{$query[1]}%" ];
+			}
+			elseif( @$query[0]=="category" )
+			{
+				$ajax_sql = "SELECT category as name, cid as id from `tbl_categories`C WHERE C.category LIKE :category ORDER BY C.category ASC LIMIT 5";
+				$bind = [ "category" =>  "%{$query[1]}%" ];
+			}
+
+			if ( isset($ajax_sql) )
+			{
+				$data = $this->model->searchAjax($ajax_sql, $bind);
+				echo json_encode($data);
+			}
+			exit;
 		}
-		exit;
+		elseif ( $id = @explode(",",$params['id']) )
+		{
+			if ( $id[1]=="commentform" )
+			{
+				if(empty($id[2])) exit;
+				echo \View\Story::commentForm((int)$id[0], (int)$id[2]);
+			}
+			exit;
+		}
 	}
 	
 	protected function intro(\Base $f3)
@@ -77,9 +107,19 @@ class Story extends Base
 		return [ $info[0], $stories];
 	}
 	
-	protected function categories($id)
+	protected function categories($params)
 	{
-		return 1;
+		$id = empty($params['id']) ? 0 : $params['id'];
+		if(empty($params[3]))
+		{
+			$data = $this->model->categories( (int)$id );
+
+			return \View\Story::categories($data);
+		}
+		else
+		{
+			
+		}
 	}
 	
 	protected function printer($id)
@@ -94,22 +134,24 @@ class Story extends Base
 
 	public function search(\Base $f3, $params)
 	{
-		\Registry::get('VIEW')->addTitle($f3->get('LN__Search'));
+		$this->view->addTitle($f3->get('LN__Search'));
 
 		if ( isset($params[1]) )
 		{
-			$termsTMP = explode("/",$params[1]);
+			$termsTMP = explode(" ",$params[1]);
 			foreach ( $termsTMP as $t )
 			{
 				list ($term, $param) = explode(":",$t);
 				$terms[$term] = explode(",",$param);
 			}
+			$data = $this->model->search($terms);
 		}
 		else $terms = NULL;
 
 
 
-		$this->buffer ( print_r($terms,TRUE) );
+		$this->buffer ( \View\Story::searchPage() );
+//		$this->buffer ( print_r($terms,TRUE) );
 	}
 
 	protected function read($id)
