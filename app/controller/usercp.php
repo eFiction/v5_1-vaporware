@@ -18,16 +18,16 @@ class UserCP extends Base
 		$this->response->addTitle( \Base::instance()->get('LN__UserCP') );
 	}
 
-	public function index(\Base $fw, $params)
+	public function index(\Base $f3, $params)
 	{
 		
 		$this->showMenu();
 	}
 	
-	public function messaging(\Base $fw, $params)
+	public function messaging(\Base $f3, $params)
 	{
-		$this->response->addTitle( $fw->get('LN__UserCP') );
-		$this->response->addTitle( $fw->get('LN__PM_Messaging') );
+		$this->response->addTitle( $f3->get('LN__UserCP') );
+		$this->response->addTitle( $f3->get('LN__PM_Messaging') );
 		if ( isset($params[1]) )
 		{
 			$params = explode("/",$params[1]);
@@ -37,33 +37,33 @@ class UserCP extends Base
 		switch ( $params[0][0] )
 		{
 			case "outbox":
-				$this->msgOutbox($fw, $params);
+				$this->msgOutbox($f3, $params);
 				break;
 			case "read":
-				$this->msgRead($fw, $params);
+				$this->msgRead($f3, $params);
 				break;
 			case "write":
-				$this->msgWrite($fw, $params);
+				$this->msgWrite($f3, $params);
 				break;
 			default:
-				$this->msgInbox($fw, $params);
+				$this->msgInbox($f3, $params);
 		}
 		$this->showMenu("messaging");
 	}
 	
-	public function msgInbox(\Base $fw, $params)
+	public function msgInbox(\Base $f3, $params)
 	{
 		$data = $this->model->msgInbox();
 		$this->buffer ( \View\UserCP::msgInOutbox($data, "inbox") );
 	}
 	
-	public function msgOutbox(\Base $fw, $params)
+	public function msgOutbox(\Base $f3, $params)
 	{
 		$data = $this->model->msgOutbox();
 		$this->buffer ( \View\UserCP::msgInOutbox($data, "outbox") );
 	}
 	
-	public function msgRead(\Base $fw, $params)
+	public function msgRead(\Base $f3, $params)
 	{
 		if ( $data = $this->model->msgRead($params[0][1]) )
 		{
@@ -72,7 +72,7 @@ class UserCP extends Base
 		else $this->buffer( "*** No such message or access violation!");
 	}
 	
-	public function msgWrite(\Base $fw, $params)
+	public function msgWrite(\Base $f3, $params)
 	{
 		if ( isset($params[0][1]) AND is_numeric($params[0][1]) )
 			$data = $this->model->msgReply($params[0][1]);

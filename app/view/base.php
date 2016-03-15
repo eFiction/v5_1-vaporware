@@ -12,17 +12,17 @@ abstract class Base {
      * @return mixed
      */
 	public function __construct() {
-		$fw = \Base::instance();
-		$UI = $fw->get('UI');
+		$f3 = \Base::instance();
+		$UI = $f3->get('UI');
 
 		// develop
 		$tpl = 'default';
 		
 		$folder = file_exists($UI.$tpl.'/layout.html') ? $tpl : 'default';
-		$fw->set('UI', "{$UI}{$folder}/");
+		$f3->set('UI', "{$UI}{$folder}/");
 
 		
-		$fw->set('SELF', rawurlencode($_SERVER["QUERY_STRING"]));
+		$f3->set('SELF', rawurlencode($_SERVER["QUERY_STRING"]));
 
 		\View\Base::javascript('body', TRUE, 'global.js' );
 		//$this->css[] = "styles.css";
@@ -30,12 +30,12 @@ abstract class Base {
 	
 	public function javascript($location, $file=FALSE, $string)
 	{
-		$fw = \Base::instance();
+		$f3 = \Base::instance();
 		if($file)
 		{
 			$this->JS[$location][] = (strpos($string,"//")===0)
 																? "<script src=\"{$string}\"></script>"
-																: "<script src=\"".$fw->get('BASE')."/app/inc/{$string}\"></script>";
+																: "<script src=\"".$f3->get('BASE')."/app/inc/{$string}\"></script>";
 		}
 		else $this->JS[$location][] = "<script type=\"text/javascript\">{$string}</script>";
 	}

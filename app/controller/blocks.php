@@ -11,7 +11,7 @@ class Blocks extends Base
 		//parent::__construct($mapper);
 	}
 
-	public function shoutbox(\Base $fw, $params)
+	public function shoutbox(\Base $f3, $params)
 	{
 		//$this->model = \Model\Page::instance();
 		if ( $params['action'] == "load" )
@@ -42,7 +42,7 @@ class Blocks extends Base
 		exit;		
 	}
 
-	public function calendar(\Base $fw, $params) {
+	public function calendar(\Base $f3, $params) {
 
 		$data = $this->model->ajaxCalendar($params);
 		

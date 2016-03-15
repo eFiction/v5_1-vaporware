@@ -24,12 +24,12 @@ class UserCP extends Base
 			$person_is = "Sender";
 			$date_means = "Received";
 		}
-		$fw = \Base::instance();
+		$f3 = \Base::instance();
 
-		$fw->set('messages', $data);
-		$fw->set('WHICH', $select);
-		$fw->set('PERSON_IS', $person_is);
-		$fw->set('DATE_MEANS', $date_means);
+		$f3->set('messages', $data);
+		$f3->set('WHICH', $select);
+		$f3->set('PERSON_IS', $person_is);
+		$f3->set('DATE_MEANS', $date_means);
 
 		return \Template::instance()->render('usercp/messaging.inout.html');
 	}

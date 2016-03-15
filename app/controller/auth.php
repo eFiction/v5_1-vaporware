@@ -18,7 +18,7 @@ class Auth extends Base {
     static public function isLoggedIn()
 	{
         /** @var Base $f3 */
-        $fw = \Base::instance();
+        $f3 = \Base::instance();
 		$ip_db = sprintf("%u", ip2long($_SERVER['REMOTE_ADDR']));
 
 		/*
@@ -35,12 +35,12 @@ class Auth extends Base {
 		- guest							 0
 		*/
 
-		if ( $fw->exists('SESSION.session_id') )
-				$session_id = $fw->get('SESSION.session_id');
+		if ( $f3->exists('SESSION.session_id') )
+				$session_id = $f3->get('SESSION.session_id');
 		elseif ( isset ($_COOKIE['session_id']) )
 		{
 				$session_id = $_COOKIE['session_id'];
-				$fw->set('SESSION.session_id', $session_id);
+				$f3->set('SESSION.session_id', $session_id);
 		}
 		else $session_id = \Model\Auth::instance()->createSession($ip_db);
 //		echo "<br>old: ".$_SESSION['session_id'];
@@ -71,27 +71,27 @@ class Auth extends Base {
 		}
 	}
 	
-	public function login($fw,$params)
+	public function login($f3,$params)
 	{
 		\Registry::get('VIEW')->addTitle('__Login');
-		if( $fw->exists('POST.login') && $fw->exists('POST.password') )
+		if( $f3->exists('POST.login') && $f3->exists('POST.password') )
 		{
-			if ( $userID = $this->model->userLoad($fw->get('POST.login'), $fw->get('POST.password') ) )
+			if ( $userID = $this->model->userLoad($f3->get('POST.login'), $f3->get('POST.password') ) )
 			{
 				/*
-				$this->buffer( \View\Auth::loginSuccess($fw) );
+				$this->buffer( \View\Auth::loginSuccess($f3) );
 				*/
-				$fw->reroute($fw->get('POST')['returnpath'], false);
+				$f3->reroute($f3->get('POST')['returnpath'], false);
 				exit;
 			}
-			$this->buffer( \View\Auth::loginError($fw) );
+			$this->buffer( \View\Auth::loginError($f3) );
 		}
 
 		else
-			$this->buffer( \View\Auth::loginError($fw) );
+			$this->buffer( \View\Auth::loginError($f3) );
 	}
 	
-	public function logout($fw,$params)
+	public function logout($f3,$params)
 	{
 		$return = explode("returnpath=",$params[1]);
 		$returnpath = ( isset($return[1]) AND $return[1]!="") ? $return[1] : "/";
@@ -99,10 +99,10 @@ class Auth extends Base {
 		$this->model->userSession(NULL);
 		unset($_SESSION['session_id']);
 		unset($_COOKIE['session_id']);
-		setcookie("session_id", "", time()-1, $fw->get('BASE') );
+		setcookie("session_id", "", time()-1, $f3->get('BASE') );
 		//session_destroy();
 		
-		$fw->reroute($returnpath, false);
+		$f3->reroute($returnpath, false);
 	}
 
 }

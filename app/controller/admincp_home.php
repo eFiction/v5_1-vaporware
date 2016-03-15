@@ -4,9 +4,9 @@ namespace Controller;
 class AdminCP_Home extends AdminCP
 {
 
-	public function index(\Base $fw, $params)
+	public function index(\Base $f3, $params)
 	{
-		$this->response->addTitle( $fw->get('LN__AdminMenu_Home') );
+		$this->response->addTitle( $f3->get('LN__AdminMenu_Home') );
 		$this->showMenu("home");
 
 		switch( @$params['module'] )
@@ -28,7 +28,7 @@ class AdminCP_Home extends AdminCP
 		}
 	}
 	
-	public function save(\Base $fw, $params)
+	public function save(\Base $f3, $params)
 	{
 		
 	}

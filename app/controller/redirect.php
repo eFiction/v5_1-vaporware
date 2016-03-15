@@ -9,7 +9,7 @@ class Redirect extends Base
 		
 	}
 	
-	public function filter (\Base $fw, $params)
+	public function filter (\Base $f3, $params)
 	{
 		if ( empty($params['a']) )
 		{
@@ -18,7 +18,7 @@ class Redirect extends Base
 				$params['a'] = $params['b'];
 				$params['b'] = $params['c'];
 			}
-			else $fw->reroute("/redirect/{$params['b']}/{$params['c']}", false);
+			else $f3->reroute("/redirect/{$params['b']}/{$params['c']}", false);
 		}
 
 		$query = explode ( "&", $params['b'] );
@@ -46,7 +46,7 @@ class Redirect extends Base
 				$redirect = "/authors/".$old_data['uid'];
 		}
 		
-		if ( isset($COOKIE['redirect_seen'] ) ) $fw->reroute($redirect, false);
+		if ( isset($COOKIE['redirect_seen'] ) ) $f3->reroute($redirect, false);
 		else $this->buffer( \View\Redirect::inform($redirect) );
 	}
 

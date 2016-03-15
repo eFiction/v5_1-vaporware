@@ -3,13 +3,13 @@
 	Common routes
 -------------------- */
 
-$fw->route( 'GET /', 'Controller\Page->getMain' );
+$f3->route( 'GET /', 'Controller\Page->getMain' );
 
-$fw->route(
+$f3->route(
   [ 'GET /?/redirect/@b/@c', 'GET /redirect/@a/@b', ],
   'Controller\Redirect->filter' );
 
-$fw->route(
+$f3->route(
   [ 
 	'GET /story',
 	'GET /story/@action',
@@ -17,78 +17,78 @@ $fw->route(
 	'GET /story/@action/@id/*'
   ],
   'Controller\Story->index' );
-$fw->route(
+$f3->route(
   [ 'POST /story', 'POST /story/@action' ], 'Controller\Story->save' );
 
-$fw->route(
+$f3->route(
   [ 'GET /story/search', 'GET /story/search/*', ],
   'Controller\Story->search' );
 
-$fw->route(
+$f3->route(
   [ 'GET /authors', 'GET /authors/@id', 'GET /authors/@id/*' ],
   'Controller\Authors->index' );
 
-$fw->route( 'GET /shoutbox/@action/@sub', 'Controller\Blocks->shoutbox' );
+$f3->route( 'GET /shoutbox/@action/@sub', 'Controller\Blocks->shoutbox' );
 
 // Ajax routes
-$fw->route( 'GET /blocks/calendar/* [ajax]', 'Controller\Blocks->calendar' );
+$f3->route( 'GET /blocks/calendar/* [ajax]', 'Controller\Blocks->calendar' );
 
 if (\Controller\Auth::isLoggedIn())
 {
 	/* --------------------
 		Member routes
 	-------------------- */
-	$fw->route('GET|POST /login', function($fw) { $fw->reroute('/', false); } );
+	$f3->route('GET|POST /login', function($f3) { $f3->reroute('/', false); } );
 
-	$fw->route(
+	$f3->route(
 		[ 'GET /logout', 'GET /logout/*' ],
 		'Controller\Auth->logout' );
 
-	$fw->route( 'GET|POST /panel', 'Controller\Panel->main' );
+	$f3->route( 'GET|POST /panel', 'Controller\Panel->main' );
 
-	$fw->route(
+	$f3->route(
 		[ 'GET|POST /userCP', 'GET|POST /userCP/*' ],
 		'Controller\UserCP->index' );
 	
-	$fw->route(
+	$f3->route(
 		[ 'GET|POST /userCP/messaging', 'GET|POST /userCP/messaging/*' ],
 		'Controller\UserCP->messaging' );
 	
 	// Ajax routes
-	$fw->route( 'GET /userCP/@module/* [ajax]', 'Controller\UserCP->ajax' );
+	$f3->route( 'GET /userCP/@module/* [ajax]', 'Controller\UserCP->ajax' );
 
 	if ( $_SESSION['groups'] & 64 )
 	{
 		/* --------------------
 			Mod/Admin routes
 		-------------------- */
-		$fw->route(
+		$f3->route(
 			[ 'GET|POST /adminCP', 'GET|POST /adminCP/*' ],
 			'Controller\AdminCP->catch' );
 
 		// Archive
-		$fw->route(
+		$f3->route(
 			[ 'GET /adminCP/archive', 'GET /adminCP/archive/@module', 'GET /adminCP/archive/@module/*' ],
 			'Controller\AdminCP_Archive->index' );
-		$fw->route( 'POST /adminCP/archive/@module', 'Controller\AdminCP_Archive->save' );
+		$f3->route( 'POST /adminCP/archive/@module', 'Controller\AdminCP_Archive->save' );
 
 		// Home
-		$fw->route(
+		$f3->route(
 			[ 'GET /adminCP/home', 'GET /adminCP/home/@module', 'GET /adminCP/home/@module/*' ],
 			'Controller\AdminCP_Home->index' );
-		$fw->route( 'POST /adminCP/home/@module', 'Controller\AdminCP_Home->save' );
+		$f3->route( 'POST /adminCP/home/@module', 'Controller\AdminCP_Home->save' );
 
 		// Members
-		$fw->route(
+		$f3->route(
 			[ 'GET /adminCP/members', 'GET /adminCP/members/@module', 'GET /adminCP/members/@module/*' ],
 			'Controller\AdminCP_Members->index' );
-		$fw->route( 'POST /adminCP/members/@module', 'Controller\AdminCP_Members->save' );
+		$f3->route( 'POST /adminCP/members/@module', 'Controller\AdminCP_Members->save' );
 
 		// Stories
-		$fw->route(
+		$f3->route(
 			[ 'GET /adminCP/stories', 'GET /adminCP/stories/@module', 'GET /adminCP/stories/@module/*' ],
 			'Controller\AdminCP_Stories->index' );
-		$fw->route( 'POST /adminCP/stories/@module', 'Controller\AdminCP_Stories->save' );
+		$f3->route( 'POST /adminCP/stories/@module', 'Controller\AdminCP_Stories->save' );
 
 	}
 
@@ -97,10 +97,10 @@ if (\Controller\Auth::isLoggedIn())
 		/* --------------------
 			Admin only routes
 		-------------------- */
-		$fw->route(
+		$f3->route(
 			[ 'GET /adminCP/settings', 'GET|POST /adminCP/settings/@module' ],
 			'Controller\AdminCP_Settings->index' );
-		$fw->route( 'POST /adminCP/settings/@module', 'Controller\AdminCP_Settings->save' );
+		$f3->route( 'POST /adminCP/settings/@module', 'Controller\AdminCP_Settings->save' );
 
 		
 	}
@@ -111,15 +111,15 @@ else
 		Guest routes
 	-------------------- */
 
-	$fw->route( 'GET|POST /forgotpw', 'Controller\Auth->forgotpw' );
+	$f3->route( 'GET|POST /forgotpw', 'Controller\Auth->forgotpw' );
 
-	$fw->route( 'GET|POST /register', 'Controller\Auth->register' );
+	$f3->route( 'GET|POST /register', 'Controller\Auth->register' );
 
-	$fw->route(
+	$f3->route(
 		[ 'GET|POST /logout', 'GET|POST /logout' ],
-		function($fw) { $fw->reroute('/', false); } );
+		function($f3) { $f3->reroute('/', false); } );
 
-	$fw->route(
+	$f3->route(
 		[
 			'GET|POST /userCP',
 			'GET|POST /userCP/*',

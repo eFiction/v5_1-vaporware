@@ -16,11 +16,11 @@ class Frontend extends Base
     public function finish()
 	{
         /** @var \Base $f3 */
-        $fw = \Base::instance();
+        $f3 = \Base::instance();
   		include('app/loader.php');
 
 		if($this->data)
-            $fw->mset($this->data);
+            $f3->mset($this->data);
 
 		/*
 			3-step processing of the inner page content:
@@ -43,7 +43,7 @@ class Frontend extends Base
 								, $body
 							);
 
-		$fw->set('BODY', $body);
+		$f3->set('BODY', $body);
 		
 		return \Template::instance()->render('layout.html');
     }
@@ -78,26 +78,26 @@ class Frontend extends Base
 	
 	private function post_render($buffer)
 	{
-		$fw = \Base::instance();
-		$cfg = $fw->get('CONFIG');
+		$f3 = \Base::instance();
+		$cfg = $f3->get('CONFIG');
 		
-		if ( isset($this->JS['head']) ) $fw->set( 'JS_HEAD', implode("\n", $this->JS['head']) );
-		if ( isset($this->JS['body']) ) $fw->set( 'JS_BODY', implode("\n", $this->JS['body']) );
+		if ( isset($this->JS['head']) ) $f3->set( 'JS_HEAD', implode("\n", $this->JS['head']) );
+		if ( isset($this->JS['body']) ) $f3->set( 'JS_BODY', implode("\n", $this->JS['body']) );
 
-		$debug[] = $fw->get('DB')->log();
+		$debug[] = $f3->get('DB')->log();
 				$debug[] = "SESSION: ".print_r($_SESSION,TRUE);
 
 		if($cfg['page_title_add']=='slogan')
 		{
-			$fw->set('TITLE', $cfg['page_title'].$cfg['page_title_separator'].$cfg['page_slogan']);
+			$f3->set('TITLE', $cfg['page_title'].$cfg['page_title_separator'].$cfg['page_slogan']);
 		}
 		elseif($cfg['page_title_add']=='path')
 		{
 			//echo implode($cfg['page_title_separator'], array_merge([$cfg['page_title']],$this->title) );
-			$fw->set('TITLE', implode($cfg['page_title_separator'], array_merge([$cfg['page_title']],$this->title) ) );
+			$f3->set('TITLE', implode($cfg['page_title_separator'], array_merge([$cfg['page_title']],$this->title) ) );
 		}
 
-		else $fw->set('TITLE', '');
+		else $f3->set('TITLE', '');
 		/*
 		switch($eFI->config['show_debug'])
 		{
@@ -122,7 +122,7 @@ class Frontend extends Base
 			default:
 				$return = "";
 		*/
-		$fw->set('DEBUGLOG', implode("\n", $debug));
+		$f3->set('DEBUGLOG', implode("\n", $debug));
 		return $buffer;
 	}
 	

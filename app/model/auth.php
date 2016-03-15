@@ -57,22 +57,22 @@ class Auth extends Base {
 
 	public function createSession($ip_db)
 	{
-        $fw = \Base::instance();
+        $f3 = \Base::instance();
 		
 		$session_id = md5(time());
 		
-		$fw->set('SESSION.session_id', $session_id );
+		$f3->set('SESSION.session_id', $session_id );
 //		echo "<br>new: ".$_SESSION['session_id'];
 		$this->exec("INSERT INTO `tbl_sessions`(`session`, `user`, `lastvisited`, `ip`) VALUES
 				('{$_SESSION['session_id']}', '{NULL}', NOW(), '{$ip_db}');");
 
-	  setcookie("session_id", $session_id, time()+31536000, $fw->get('BASE') );
+	  setcookie("session_id", $session_id, time()+31536000, $f3->get('BASE') );
 	  return $session_id;
 	}
 
 	public function validateSession($session_id,$ip_db)
 	{
-        $fw = \Base::instance();
+        $f3 = \Base::instance();
 
 		$sql[] = "DELETE FROM `tbl_sessions` WHERE (user = 0 AND TIMESTAMPDIFF(MINUTE,`lastvisited`,NOW())>60 )
 																						OR 
@@ -97,7 +97,7 @@ class Auth extends Base {
 //		print_r($user);
 		if ( $user['session'] > '' && $user['userID'] > 0 )
 		{
-			$fw->set('usercount', 
+			$f3->set('usercount', 
 					[
 						"member"	=>	$user['@members']+1,
 						"guest"		=>	$user['@guests']
@@ -107,7 +107,7 @@ class Auth extends Base {
 		}
 		else
 		{
-			$fw->set('usercount', 
+			$f3->set('usercount', 
 					[
 						"member"	=>	$user['@members'],
 						"guest"		=>	$user['@guests']+1

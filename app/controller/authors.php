@@ -9,7 +9,7 @@ class Authors extends Base {
 		$this->model = \Model\Authors::instance();
 	}
 
-	public function index(\Base $fw, $params)
+	public function index(\Base $f3, $params)
 	{
 		if ( isset($params[2]) ) $this->parametric($params[2]);
 		

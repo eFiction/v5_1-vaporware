@@ -26,8 +26,8 @@ class AdminCP extends Base
 		);
 	}
 	
-	public function catch(\Base $fw, $params)
+	public function catch(\Base $f3, $params)
 	{
-		$fw->reroute('/adminCP/home', false);
+		$f3->reroute('/adminCP/home', false);
 	}
 }
