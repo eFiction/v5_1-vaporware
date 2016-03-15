@@ -35,6 +35,24 @@ class Base extends \Prefab {
 	{
 		$this->data[$section] .= $content;
 	}
+	
+	protected function parametric($params=NULL)
+	{
+		if ( $pArray = explode(";", str_replace("/",";",$params) ) )
+		{
+			foreach ( $pArray as $pElement )
+			{
+				$x = explode ( "=", $pElement );
+				if ( isset($x[1]) )
+				{
+					$r[$x[0]] = explode(",",$x[1]);
+					if ( empty($r[$x[0]][1]) ) $r[$x[0]] = $x[1];
+				}
+				else $r[$x[0]] = TRUE;
+			}
+		}
+		if(isset($r['page'])) \Base::instance()->set('paginate.page', max(1,$r['page']));
+	}
 
 	/**
 	 * kick start the View, which creates the response

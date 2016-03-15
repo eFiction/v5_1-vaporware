@@ -11,6 +11,8 @@ class Authors extends Base {
 
 	public function index(\Base $fw, $params)
 	{
+		if ( isset($params[2]) ) $this->parametric($params[2]);
+		
 		// Build menu letters
 		$letters = $this->model->letters();
 		$menu = $this->model->menuLetters($letters);
@@ -18,7 +20,7 @@ class Authors extends Base {
 		// set header
 		$header[] = "__authors";
 
-		if ( empty($params[1]) )
+		if ( empty($params['id']) )
 		{
 			// Load list of authors
 			$data = $this->model->getAuthors();
@@ -27,18 +29,18 @@ class Authors extends Base {
 			// switch off right sidebar
 			\Base::instance()->set('bigscreen', TRUE);
 		}
-		elseif ( preg_match("/[a-zA-Z#].*/", $params[1]) )
+		elseif ( preg_match("/[a-zA-Z#].*/", $params['id']) )
 		{
 			// load list of authors starting with letter
-			$letter = $params[1][0];
+			$letter = $params['id'][0];
 			$data = $this->model->getAuthors($letter);
 			// build view
 			$content = \View\Authors::letterList($letter, $data);
 		}
-		elseif ( is_numeric($params[1]) )
+		elseif ( is_numeric($params['id']) )
 		{
-			$this->buffer ( "{BLOCK:profile.{$params[1]}}", "RIGHT" );
-			list($authorInfo, $content) = \Controller\Story::instance()->author($params[1]);//$this->profile();
+			$this->buffer ( "{BLOCK:profile.{$params['id']}}", "RIGHT" );
+			list($authorInfo, $content) = \Controller\Story::instance()->author($params['id']);//$this->profile();
 
 			$header[] = $authorInfo;
 
@@ -49,13 +51,13 @@ class Authors extends Base {
 		// output
 		$this->buffer ( \View\Authors::page($header , $menu, $content) );
 	}
-	
+	/*
 	protected function letterList($letter)
 	{
 		$data = $this->model->getAuthors($letter);
 		return  "letter";
 	}
-	
+	*/
 	protected function profile()
 	{
 		return "profile";

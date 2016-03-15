@@ -25,7 +25,7 @@ $fw->route(
   'Controller\Story->search' );
 
 $fw->route(
-  [ 'GET /authors', 'GET /authors/*', ],
+  [ 'GET /authors', 'GET /authors/@id', 'GET /authors/@id/*' ],
   'Controller\Authors->index' );
 
 $fw->route( 'GET /shoutbox/@action/@sub', 'Controller\Blocks->shoutbox' );

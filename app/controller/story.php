@@ -96,7 +96,7 @@ class Story extends Base
 		return $this->buildScreenData($this->buildSQL(),FALSE);
 
 		*/
-		return print_r($data,1);
+		//return print_r($data,1);
 	}
 	
 	public function author($id)

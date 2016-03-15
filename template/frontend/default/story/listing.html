@@ -1,3 +1,4 @@
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="story/paginate.html" /></F3:check>
 <repeat group="{{ @stories }}" value="{{ @story }}" counter="{{ @ctr }}">
 	<div class="story-box">
 	<!-- {RATING_IMG} {STATS}-->
@@ -11,6 +12,7 @@
 			<false>{{@LN__St_NoTags}}</false>
 		</check>
 	</div>
-	<div class="story-info3"><small>__Published: {{@story.published}} &bull; __Chapters: {{@story.chapters}} &bull; __Words: {{@story.wordcount}} &bull; __Status: {{@story.completed}} &bull; __Rating: {{@story.rating_name}} &bull; __Hits: {{@story.count}} </small></div>
+	<div class="story-info3"><small>{{@LN__St_Published}}: {{@story.published}} &bull; {{@LN__St_Chapters}}: {{@story.chapters}} &bull; {{@LN__St_Words}}: {{@story.wordcount}} &bull; __Status: {{@story.completed}} &bull; __Rating: {{@story.rating_name}} &bull; __Hits: {{@story.count}} </small></div>
 	</div>
 </repeat>
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="story/paginate.html" /></F3:check>

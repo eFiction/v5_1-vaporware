@@ -8,26 +8,66 @@ class Story extends Base
 	{
 		$replacements =
 		[
-			"ORDER" => "ORDER BY ". \Base::instance()->get('CONFIG')['story_intro_order']." DESC" ,
-			"LIMIT" => "LIMIT 0,".\Base::instance()->get('CONFIG')['story_intro_items']
+			"ORDER" => "ORDER BY ". $this->config['story_intro_order']." DESC" ,
+			"LIMIT" => "LIMIT 0,".$this->config['story_intro_items']
 		];
 		$data = $this->exec($this->storySQL($replacements));
 
 		return $data;
 	}
 	
-	public function author($id)
+	public function author(int $id)
 	{
-		$author = "SELECT U.uid, U.nickname as name, COUNT(rSA.sid) as counter FROM `tbl_stories_authors`rSA INNER JOIN `tbl_users`U ON ( rSA.aid = U.uid AND rSA.aid = :aid ) GROUP BY rSA.aid";
+		$limit = $this->config['story_intro_items'];
+		$author = "SELECT SQL_CALC_FOUND_ROWS U.uid, U.nickname as name, COUNT(rSA.sid) as counter FROM `tbl_stories_authors`rSA INNER JOIN `tbl_users`U ON ( rSA.aid = U.uid AND rSA.aid = :aid ) GROUP BY rSA.aid";
 		$info = $this->exec( $author, ["aid" => $id] );
+		
+		$pos = (int)\Base::instance()->get('paginate.page') - 1;
+
 		$replacements =
 		[
 			"ORDER" => "ORDER BY S.updated DESC" ,
-			"LIMIT" => "LIMIT 0,".\Base::instance()->get('CONFIG')['story_intro_items'],
+			"LIMIT" => "LIMIT ".(max(0,$pos*$limit)).",".$limit,
 			"JOIN" => "INNER JOIN `tbl_stories_authors`rSA ON ( rSA.sid = S.sid AND rSA.aid = :aid )"
 		];
 		$data = $this->exec($this->storySQL($replacements),["aid" => $id]);
+		
+		//$total = $this->exec("SELECT FOUND_ROWS() as found")[0]['found'];echo $total;
+		
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/authors/".$id,
+			$limit
+		);
 
+		/*
+		Attempt to use the paginate method, yet this requires SQL views to be installed.
+		Must see if this is available to every user and across SQL platforms
+		For now, stick to the "old" way
+		
+		$mapper = new \DB\SQL\Mapper($this->db, 'view_storyByAuthor' );
+		// $pos=0,$size=10,$filter=NULL,array $options=NULL
+		$data = $mapper->paginate(
+			0,
+			\Base::instance()->get('CONFIG')['story_intro_items'],
+			array(
+				'authorID = :aid',
+				':aid' => array($id, \PDO::PARAM_INT),
+			),
+			array(
+				'order'=>'modified DESC',
+			)
+		);
+		
+		$p = [
+			'total' => $data['total'],
+			'limit' => $data['limit'],
+			'pages' => $data['count'],
+			'pos'   => $data['pos']
+		];
+		
+		$datax = json_decode(json_encode($data), true);
+		*/
 		return [$info, $data];
 	}
 	
@@ -82,7 +122,6 @@ class Story extends Base
 	
 	public function storySQL($replacements=[])
 	{
-		// $replacements = [ "EXTRA" => , "JOIN" => , "WHERE" => , "ORDER" => , "LIMIT" =>
 		$sql_StoryConstruct = "SELECT SQL_CALC_FOUND_ROWS
 				Cache.*,
 				S.title, S.summary, S.storynotes, S.completed, S.wordcount, UNIX_TIMESTAMP(S.date) as published, UNIX_TIMESTAMP(S.updated) as modified, 
