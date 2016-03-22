@@ -32,6 +32,7 @@ $f3->route( 'GET /shoutbox/@action/@sub', 'Controller\Blocks->shoutbox' );
 
 // Ajax routes
 $f3->route( 'GET /blocks/calendar/* [ajax]', 'Controller\Blocks->calendar' );
+$f3->route( 'POST /story/ajax/@segment [ajax]', 'Controller\Story->ajax' );
 
 if (\Controller\Auth::isLoggedIn())
 {

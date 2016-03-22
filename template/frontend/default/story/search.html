@@ -5,8 +5,8 @@
 	__Tags<br /><input type="text" id="tag-select" name="tags" />
         <script type="text/javascript">
         $(document).ready(function() {
-            $("#tag-select").tokenInput("{{@BASE}}/story/ajax/search/",{
-            	method: "get",
+            $("#tag-select").tokenInput("{{@BASE}}/story/ajax/search",{
+            	method: "post",
             	queryParam: "tag",
             	preventDuplicates: true,
             	prePopulate: {{@prepopulateData.tags}}
@@ -17,7 +17,7 @@ __Author<br /><input type="text" id="author-select" name="author" />
         <script type="text/javascript">
         $(document).ready(function() {
             $("#author-select").tokenInput("{{@BASE}}/story/ajax/search/",{
-            	method: "get",
+            	method: "post",
             	queryParam: "author",
             	tokenLimit: 1,
             	prePopulate: {{@prepopulateData.authors}}
@@ -28,7 +28,7 @@ __Categories<br /><input type="text" id="category-select" name="category" />
         <script type="text/javascript">
         $(document).ready(function() {
             $("#category-select").tokenInput("{{@BASE}}/story/ajax/search/",{
-            	method: "get",
+            	method: "post",
             	queryParam: "category",
             	preventDuplicates: true,
             	prePopulate: {{@prepopulateData.categories}}

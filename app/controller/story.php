@@ -18,9 +18,9 @@ class Story extends Base
 
 	public function index(\Base $f3, $params)
 	{
-		
+		// remove, once commentform is moved to post ajax
 		if ( $f3->get('AJAX')===TRUE )
-			$this->ajax($f3, $params);
+			$this->ajax_old($f3, $params);
 		/*
 		if ( empty($params['action']) )
 			$data = $this->intro($f3);
@@ -46,6 +46,41 @@ class Story extends Base
 	}
 	
 	public function ajax(\Base $f3, $params)
+	{
+		if ( isset($params['segment']) && $params['segment']=="search" )
+		{
+			$query = $f3->get('POST');
+			$item = NULL;
+
+			if ( is_array($query) ) list ( $item, $bind ) = each ( $query );
+
+			if( $item=="tag" )
+			{
+				$ajax_sql = "SELECT label as name, tid as id from `tbl_tags`T WHERE T.label LIKE :tag ORDER BY T.label ASC LIMIT 5";
+				$bind = [ "tag" =>  "%{$bind}%" ];
+			}
+			elseif( $item=="author" )
+			{
+				$ajax_sql = "SELECT U.nickname as name, U.uid as id from `tbl_users`U WHERE U.nickname LIKE :nickname AND ( U.groups & 5 ) ORDER BY U.nickname ASC LIMIT 5";
+				$bind = [ "nickname" =>  "%{$bind}%" ];
+			}
+			elseif( $item=="category" )
+			{
+				$ajax_sql = "SELECT category as name, cid as id from `tbl_categories`C WHERE C.category LIKE :category ORDER BY C.category ASC LIMIT 5";
+				$bind = [ "category" =>  "%{$bind}%" ];
+			}
+
+			if ( isset($ajax_sql) )
+			{
+				$data = $this->model->searchAjax($ajax_sql, $bind);
+				echo json_encode($data);
+			}
+			exit;
+		}
+	}
+
+
+	public function ajax_old(\Base $f3, $params)
 	{
 		if ( isset($params['id']) && $params['id']=="search" )
 		{
