@@ -4,5 +4,5 @@
 		<div class="story-info2"><b>__Reviews:</b> <check if="{{ @storyData['reviews'] }}>0" ><true><a href="{{@BASE}}/story/view/{SID}.reviews">{{ @storyData['reviews'] }} <check if="{{ @storyData['reviews'] }}>1"><true>__Reviews</true><false>__Review</false></check></a></true><false>__none</false></check></div>
 		<div class="story-info2"><b>__Tags:</b> <repeat group="{{ @storyData['tagblock'] }}" value="{{ @tag }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check><a href="{{@BASE}}?action=story,browse&amp;tags={{ @tag[0] }}">{{ @tag[1] }}</a></repeat></div>
 		<div class="story-info2"><b>__Notes:</b> {NOTES}</div>
-		<div class="story-info2"><b>__Summary</b>: {{@storyData.summary}}</div>
+		<div class="story-info2"><b>__Summary</b>: {{@storyData.summary | raw}}</div>
 		<hr />

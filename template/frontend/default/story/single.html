@@ -1,7 +1,9 @@
 	<div id="story-container">
 		<div class="story-date">__Published: {{@render_data.story.published}} <check if="{{ @render_data.story.published != @render_data.story.modified}}"> / __Updated: {{@render_data.story.modified}}</check></div>
 		<div class="story-info1"><span class="fa fa-bookmark"></span> {ICON:favourite} <span class="fa fa-print"></span> <span class="fa fa-flag"></span> <span class="fa fa-download"></span> <a href="{{@BASE}}/story/print/{{@render_data.story.sid}},epub">epub</a> <check if="{{ @_SESSION.groups & 64 }}"> / <a href="{{@BASE}}userCP/{{@render_data.story.sid}}">{ICON:edit}</a></check></div>
-		<div class="story-titleauthor"><h2>{{@render_data.story.title}}<br /> by <repeat group="{{@render_data.story.authorblock}}" value="{{@author}}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check><a href="{{@BASE}}/authors/{{@author[0]}}">{{@author[1]}}</a></repeat></h2></div>
+		<div class="story-titleauthor">
+			<h2>{{@render_data.story.title}}<br /> by <repeat group="{{@render_data.story.authorblock}}" value="{{@author}}" counter="{{ @i }}"><check if="{{ @i>1 }}">, </check><a href="{{@BASE}}/authors/{{@author[0]}}">{{@author[1]}}</a></repeat></h2>
+		</div>
 		<check if="{{ @render_data.dropdown }}">
 			<div class="story-chapter">
 			<select id='chap_change' onchange="changeChapter();">

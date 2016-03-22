@@ -21,11 +21,12 @@ class Story extends Base
 		
 		if ( $f3->get('AJAX')===TRUE )
 			$this->ajax($f3, $params);
-		
+		/*
 		if ( empty($params['action']) )
 			$data = $this->intro($f3);
+		*/
 		
-		else switch($params['action'])
+		switch(@$params['action'])
 		{
 			case 'read':
 				$data = $this->read($params['id']);
@@ -36,8 +37,10 @@ class Story extends Base
 			case 'categories':
 				$data = $this->categories($params);
 				break;
+			case 'archive':
 			default:
-				$data = "";
+				$data = $this->intro($params);
+				//$data = "";
 		}
 		$this->buffer ($data);
 	}
@@ -82,21 +85,14 @@ class Story extends Base
 		}
 	}
 	
-	protected function intro(\Base $f3)
+//	protected function intro(\Base $f3)
+	protected function intro($params)
 	{
+		if ( isset($params['id']) ) $this->parametric($params['id']);
+
 		$data = $this->model->intro();
 		
 		return \View\Story::viewList($data);
-		/*
-				$limit = 5;
-		// now build the query for the listing
-		$this->sql_replacement['limit'] = "LIMIT 0,{$eFI->config['story_intro_items']}";
-		$this->sql_replacement['order'] = "ORDER BY {$eFI->config['story_intro_order']} DESC";
-
-		return $this->buildScreenData($this->buildSQL(),FALSE);
-
-		*/
-		//return print_r($data,1);
 	}
 	
 	public function author($id)

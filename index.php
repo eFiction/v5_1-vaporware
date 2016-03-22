@@ -28,7 +28,7 @@
     Both can be found at - https://github.com/ikkez - Thanks for you works.
 
     Also using various jQuery modules, apart form the mighty jQuery itself.
-    jquery.com
+    http://jquery.com
 
  **/
 

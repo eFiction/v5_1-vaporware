@@ -6,12 +6,21 @@ class Story extends Base
 {
 	public function intro()
 	{
+		$limit = $this->config['story_intro_items'];
+		$pos = (int)\Base::instance()->get('paginate.page') - 1;
+		
 		$replacements =
 		[
 			"ORDER" => "ORDER BY ". $this->config['story_intro_order']." DESC" ,
-			"LIMIT" => "LIMIT 0,".$this->config['story_intro_items']
+			"LIMIT" => "LIMIT ".(max(0,$pos*$limit)).",".$limit,
 		];
 		$data = $this->exec($this->storySQL($replacements));
+
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/story/archive",
+			$limit
+		);
 
 		return $data;
 	}
