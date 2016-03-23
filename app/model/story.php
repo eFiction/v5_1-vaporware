@@ -85,6 +85,20 @@ class Story extends Base
 		
 	}
 	
+	public function searchPrepopulate ($item, $id)
+	{
+		if ( $item == "author")
+			$sql = "SELECT `nickname` as name, `uid` as id FROM `tbl_users` WHERE `groups` & 4 AND `uid` IN ({$id})";
+
+		elseif ( $item == "category")
+			$sql = "SELECT `category` as name, `cid` as id FROM `tbl_categories` WHERE `cid` IN ({$id})";
+
+		elseif ( $item == "tag")
+			$sql = "SELECT `label` as name, `tid` as id FROM `tbl_tags` WHERE `tid` IN ({$id})";
+
+		return json_encode( $this->exec($sql) );
+	}
+	
 	public function searchAjax ($sql, $bind = array())
 	{
 		return $this->exec($sql, $bind);

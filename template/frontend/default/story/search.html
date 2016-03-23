@@ -1,15 +1,14 @@
-<form method="get" action="__baseURL">
-	<input type="hidden" name="action" value="story,search">
+<form method="post" action="{{@BASE}}/story/search/">
 	<fieldset><legend>Advanced Search</legend>
-	__Title<br /><input class="text-input" placeholder="" type="text" name="form[story_title]" value="">
-	__Tags<br /><input type="text" id="tag-select" name="tags" />
+	__Title<br /><input class="text-input" placeholder="" type="text" name="story_title" value="">
+	__Tags<br /><input type="text" id="tag-select" name="tag" />
         <script type="text/javascript">
         $(document).ready(function() {
             $("#tag-select").tokenInput("{{@BASE}}/story/ajax/search",{
             	method: "post",
             	queryParam: "tag",
             	preventDuplicates: true,
-            	prePopulate: {{@prepopulateData.tags}}
+            	prePopulate: {{@prepopulateData.tag|raw}}
             });
         });
         </script>
@@ -20,7 +19,7 @@ __Author<br /><input type="text" id="author-select" name="author" />
             	method: "post",
             	queryParam: "author",
             	tokenLimit: 1,
-            	prePopulate: {{@prepopulateData.authors}}
+            	prePopulate: {{@prepopulateData.author|raw}}
             });
         });
         </script>
@@ -31,14 +30,17 @@ __Categories<br /><input type="text" id="category-select" name="category" />
             	method: "post",
             	queryParam: "category",
             	preventDuplicates: true,
-            	prePopulate: {{@prepopulateData.categories}}
+            	prePopulate: {{@prepopulateData.category|raw}}
             });
         });
         </script>
     
 <br />__Rating <select name=""><option value="one">select</select>
 <br /><input type="checkbox" name="exclude_wip" {EXCLUDE_WIP} value="1">__Completed
-<br /><br /><input type="radio" name="oneshot" value="oneshot">__Oneshot <input type="radio" name="multichapters" value="multichapters">__MultiChapters <input type="radio" name="both" value="both"> __Both
+<br /><br />
+	<input type="radio" name="chapters" <check if="{{(isset(@searchForm.chapters) AND @searchForm.chapters=='oneshot')}}">checked="checked" </check>value="oneshot"> __Oneshot 
+	<input type="radio" name="chapters" <check if="{{(isset(@searchForm.chapters) AND @searchForm.chapters=='multichapters')}}">checked="checked" </check>value="multichapters"> __MultiChapters 
+	<input type="radio" name="chapters" <check if="{{(empty(@searchForm.chapters) OR @searchForm.chapters=='both')}}">checked="checked" </check>value="both"> __Both
 <br /><br /><button type="submit">submit</button> <button type="reset">reset</button>
 
 	</fieldset>

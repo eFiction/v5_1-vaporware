@@ -27,13 +27,14 @@ class Story extends Base
 	
 	protected static function searchForm($terms)
 	{
+		/*
 		$pre = [
 			'tags'				=>	'[]',
 			'authors'			=>	'[]',
 			'categories'	=>	'[]'
 		];
 		\Base::instance()->set('prepopulateData', $pre);
-		
+		*/
 		return \Template::instance()->render('story/search.html');
 	}
 	

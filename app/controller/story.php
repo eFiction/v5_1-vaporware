@@ -165,7 +165,34 @@ class Story extends Base
 
 	public function search(\Base $f3, $params)
 	{
+		$searchData = ($f3->get('POST'));
 		$this->view->addTitle($f3->get('LN__Search'));
+		
+		if ( empty($searchData['author']) ) $f3->set('prepopulateData.author',"[]");
+		else
+		{
+			$arr = explode(",",$searchData['author']);
+			foreach( $arr as &$a ) $a = (int)$a;
+			$data = $this->model->searchPrepopulate( "author", implode(",",$arr) );
+			$f3->set('prepopulateData.author',$data);
+		}
+
+		if ( empty($searchData['category']) ) $f3->set('prepopulateData.category',"[]");
+		else
+		{
+			$arr = explode(",",$searchData['category']);
+			foreach( $arr as &$a ) $a = (int)$a;
+			$data = $this->model->searchPrepopulate( "category", implode(",",$arr) );
+			$f3->set('prepopulateData.category',$data);
+		}
+		if ( empty($searchData['tag']) ) $f3->set('prepopulateData.tag',"[]");
+		else
+		{
+			$arr = explode(",",$searchData['tag']);
+			foreach( $arr as &$a ) $a = (int)$a;
+			$data = $this->model->searchPrepopulate( "tag", implode(",",$arr) );
+			$f3->set('prepopulateData.tag',$data);
+		}
 
 		if ( isset($params[1]) )
 		{
