@@ -20,6 +20,24 @@ class UserCP extends Base
 		return $this->menu;
 	}
 	
+	public function ajax($key, $data)
+	{
+		$bind = NULL;
+		
+		if ( $key == "messaging" )
+		{
+			if(isset($data['recipient']))
+			{
+				$ajax_sql = "SELECT U.nickname as name, U.uid as id from `tbl_users`U WHERE U.nickname LIKE :nickname AND U.groups > 0 AND U.uid != {$_SESSION['userID']} ORDER BY U.nickname ASC LIMIT 10";
+				$bind = [ "nickname" =>  "%{$data['recipient']}%" ];
+			}
+		}
+
+		if ( isset($ajax_sql) ) return $this->exec($ajax_sql, $bind);
+		return NULL;
+
+	}
+	
 	public function msgInbox($offset=0)
 	{
 		//$this->title[] = "__Inbox";

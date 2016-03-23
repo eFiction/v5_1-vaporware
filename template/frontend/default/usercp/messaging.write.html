@@ -6,10 +6,9 @@
 		<h6>{{@LN__PM_Recipient}}:</h6></td><td><div class="field"><input class="field input" type="text" name="form[recipient]" id="recipient"></div></td></tr>
         <script type="text/javascript">
         $(document).ready(function() {
-            $("#recipient").tokenInput("{{$BASE}}/userCP/messaging",{
-            	method: "get",
+            $("#recipient").tokenInput("{{$BASE}}/userCP/ajax/messaging",{
+            	method: "post",
             	queryParam: "recipient",
-            	tokenLimit: 1,
             	prePopulate: [{{@write_data.recipient|raw}}]
             });
         });

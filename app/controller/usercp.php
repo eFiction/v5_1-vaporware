@@ -24,6 +24,20 @@ class UserCP extends Base
 		$this->showMenu();
 	}
 	
+	public function ajax(\Base $f3, $params)
+	{
+		if ( empty($params['module']) ) return NULL;
+		
+		$post = $f3->get('POST');
+		
+		if ( $params['module']=="messaging" )
+		{
+			$data = $this->model->ajax("messaging", $post);
+		}
+		echo json_encode($data);
+		exit;
+	}
+	
 	public function messaging(\Base $f3, $params)
 	{
 		$this->response->addTitle( $f3->get('LN__UserCP') );

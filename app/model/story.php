@@ -99,9 +99,26 @@ class Story extends Base
 		return json_encode( $this->exec($sql) );
 	}
 	
-	public function searchAjax ($sql, $bind = array())
+	public function searchAjax ($item, $bind = NULL)
 	{
-		return $this->exec($sql, $bind);
+		if( $item=="tag" )
+		{
+			$ajax_sql = "SELECT label as name, tid as id from `tbl_tags`T WHERE T.label LIKE :tag ORDER BY T.label ASC LIMIT 5";
+			$bind = [ "tag" =>  "%{$bind}%" ];
+		}
+		elseif( $item=="author" )
+		{
+			$ajax_sql = "SELECT U.nickname as name, U.uid as id from `tbl_users`U WHERE U.nickname LIKE :nickname AND ( U.groups & 4 ) ORDER BY U.nickname ASC LIMIT 5";
+			$bind = [ "nickname" =>  "%{$bind}%" ];
+		}
+		elseif( $item=="category" )
+		{
+			$ajax_sql = "SELECT category as name, cid as id from `tbl_categories`C WHERE C.category LIKE :category ORDER BY C.category ASC LIMIT 5";
+			$bind = [ "category" =>  "%{$bind}%" ];
+		}
+
+		if ( isset($ajax_sql) ) return $this->exec($ajax_sql, $bind);
+		return NULL;
 	}
 	
 	public function getStory($story)

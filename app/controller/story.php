@@ -54,60 +54,18 @@ class Story extends Base
 
 			if ( is_array($query) ) list ( $item, $bind ) = each ( $query );
 
-			if( $item=="tag" )
-			{
-				$ajax_sql = "SELECT label as name, tid as id from `tbl_tags`T WHERE T.label LIKE :tag ORDER BY T.label ASC LIMIT 5";
-				$bind = [ "tag" =>  "%{$bind}%" ];
-			}
-			elseif( $item=="author" )
-			{
-				$ajax_sql = "SELECT U.nickname as name, U.uid as id from `tbl_users`U WHERE U.nickname LIKE :nickname AND ( U.groups & 5 ) ORDER BY U.nickname ASC LIMIT 5";
-				$bind = [ "nickname" =>  "%{$bind}%" ];
-			}
-			elseif( $item=="category" )
-			{
-				$ajax_sql = "SELECT category as name, cid as id from `tbl_categories`C WHERE C.category LIKE :category ORDER BY C.category ASC LIMIT 5";
-				$bind = [ "category" =>  "%{$bind}%" ];
-			}
+			$data = $this->model->searchAjax($item, $bind);
+			echo json_encode($data);
 
-			if ( isset($ajax_sql) )
-			{
-				$data = $this->model->searchAjax($ajax_sql, $bind);
-				echo json_encode($data);
-			}
 			exit;
 		}
 	}
 
-
+/*
 	public function ajax_old(\Base $f3, $params)
 	{
 		if ( isset($params['id']) && $params['id']=="search" )
 		{
-			$query = explode( "=", parse_url($params[0])['query'] );
-
-			if( @$query[0]=="tag" )
-			{
-				$ajax_sql = "SELECT label as name, tid as id from `tbl_tags`T WHERE T.label LIKE :tag ORDER BY T.label ASC LIMIT 5";
-				$bind = [ "tag" =>  "%{$query[1]}%" ];
-			}
-			elseif( @$query[0]=="author" )
-			{
-				$ajax_sql = "SELECT U.nickname as name, U.uid as id from `tbl_users`U WHERE U.nickname LIKE :nickname AND ( U.groups & 5 ) ORDER BY U.nickname ASC LIMIT 5";
-				$bind = [ "nickname" =>  "%{$query[1]}%" ];
-			}
-			elseif( @$query[0]=="category" )
-			{
-				$ajax_sql = "SELECT category as name, cid as id from `tbl_categories`C WHERE C.category LIKE :category ORDER BY C.category ASC LIMIT 5";
-				$bind = [ "category" =>  "%{$query[1]}%" ];
-			}
-
-			if ( isset($ajax_sql) )
-			{
-				$data = $this->model->searchAjax($ajax_sql, $bind);
-				echo json_encode($data);
-			}
-			exit;
 		}
 		elseif ( $id = @explode(",",$params['id']) )
 		{
@@ -119,6 +77,7 @@ class Story extends Base
 			exit;
 		}
 	}
+*/
 	
 //	protected function intro(\Base $f3)
 	protected function intro($params)

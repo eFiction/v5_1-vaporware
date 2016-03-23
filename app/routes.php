@@ -56,7 +56,7 @@ if (\Controller\Auth::isLoggedIn())
 		'Controller\UserCP->messaging' );
 	
 	// Ajax routes
-	$f3->route( 'GET /userCP/@module/* [ajax]', 'Controller\UserCP->ajax' );
+	$f3->route( 'POST /userCP/ajax/@module [ajax]', 'Controller\UserCP->ajax' );
 
 	if ( $_SESSION['groups'] & 64 )
 	{
