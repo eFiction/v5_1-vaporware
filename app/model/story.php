@@ -141,7 +141,7 @@ class Story extends Base
 		if ( $location == "local" )
 		{
 			$db = \storage::instance()->localChapterDB();
-			$chapterLoad= $db->exec('SELECT "chaptertext" FROM "chapters" WHERE "sid" = :sid AND "inorder" = :inorder', array(':sid' => $story, ':inorder' => $chapter ))[0];
+			$chapterLoad= @$db->exec('SELECT "chaptertext" FROM "chapters" WHERE "sid" = :sid AND "inorder" = :inorder', array(':sid' => $story, ':inorder' => $chapter ))[0];
 		}
 		else
 		{
@@ -384,11 +384,11 @@ class Story extends Base
 		{
 			list($ebook, $filesize) = $this->createEPub($epubData['sid']);
 		}
-		
+
 		if ( $ebook )
 		{
 			header("Content-type: application/epub+zip; charset=utf-8");
-			header("Content-Disposition: filename='".$epubData['title']." - ".$epubData['authors'].".epub'");
+			header("Content-Disposition: filename=\"".$epubData['title']." by ".$epubData['authors'].".epub\"");
 			header("Content-length: ".$filesize);
 			header("Cache-control: private");
 
@@ -485,7 +485,7 @@ class Story extends Base
 			// page[n].xhtml							| epub_page
 			$chapters = $this->exec("SELECT C.title, C.inorder
 														FROM `tbl_chapters`C
-														WHERE C.validated = '1' AND C.sid = :sid
+														WHERE C.validated > '0' AND C.sid = :sid
 														ORDER BY C.inorder ASC ",
 												[ ":sid" => $epubData['sid'] ] );
 			if(sizeof($chapters)>0)
