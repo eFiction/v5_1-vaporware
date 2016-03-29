@@ -29,10 +29,10 @@ class Story extends Base
 		switch(@$params['action'])
 		{
 			case 'read':
-				$data = $this->read($params['id']);
+				$data = $this->read($params[2]);
 				break;
 			case 'print':
-				$this->printer($params['id']);
+				$this->printer($params[2]);
 				break;
 			case 'categories':
 				$data = $this->categories($params);
@@ -102,7 +102,19 @@ class Story extends Base
 	
 	protected function updates($params)
 	{
-		return "stub *cotroller-story-updates*";
+		//print_r($params);
+		if ( isset($params[2]) ) $params = $this->parametric($params[2]);
+		
+		if ( isset($params['date']) AND $selection = explode("-",$params['date']) )
+		{
+			$year = $selection[0];
+			$month = isset($selection[1]) ? min($selection[1],12) : FALSE;
+			$day = isset($selection[2]) ? min($selection[2],date("t", mktime(0, 0, 0, $month, 1, $year))) : FALSE;
+			
+			$data = $this->model->updates($year, $month, $day);
+			return \View\Story::viewList($data);
+		}
+		else return $this->intro($params);
 	}
 	
 	protected function categories($params)

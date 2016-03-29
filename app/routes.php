@@ -13,8 +13,9 @@ $f3->route(
   [ 
 	'GET /story',
 	'GET /story/@action',
-	'GET /story/@action/@id',
-	'GET /story/@action/@id/*'
+	'GET /story/@action/*',
+//	'GET /story/@action/@id',
+//	'GET /story/@action/@id/*'
   ],
   'Controller\Story->index' );
 $f3->route(

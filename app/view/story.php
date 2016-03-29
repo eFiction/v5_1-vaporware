@@ -5,12 +5,6 @@ class Story extends Base
 {
 	public static function viewList($data)
 	{
-/*		foreach ( $data as $element )
-		{
-			echo $element['title'];
-			print_r($element);exit;
-		}
-		*/
 		while ( list($key, $value) = each($data) )
 			Story::dataProcess($data[$key], $key);
 		

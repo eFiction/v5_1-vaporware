@@ -41,8 +41,6 @@ class Story extends Base
 		];
 		$data = $this->exec($this->storySQL($replacements),["aid" => $id]);
 		
-		//$total = $this->exec("SELECT FOUND_ROWS() as found")[0]['found'];echo $total;
-		
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
 			"/authors/".$id,
@@ -83,6 +81,46 @@ class Story extends Base
 	public function search ($terms)
 	{
 		
+	}
+	
+	public function updates(int $year, int $month=0, int $day=0)
+	{
+		if ( $year > 0 )
+		{
+			$filter_date[] = "YEAR(date) = ".$year;
+			$filter_updated[] = "YEAR(updated) = ".$year;
+		}
+		if ( $month > 0 )
+		{
+			$filter_date[] = "MONTH(date) = ".$month;
+			$filter_updated[] = "MONTH(updated) = ".$month;
+		}
+		if ( $day > 0 )
+		{
+			$filter_date[] = "DAY(date) = ".$day;
+			$filter_updated[] = "DAY(updated) = ".$day;
+		}
+		
+		if ( sizeof($filter_date)==0 ) return FALSE;
+
+		$limit = $this->config['story_intro_items'];
+		$pos = (int)\Base::instance()->get('paginate.page') - 1;
+		
+		$replacements =
+		[
+			"ORDER" => "ORDER BY date,updated ASC" ,
+			"LIMIT" => "LIMIT ".(max(0,$pos*$limit)).",".$limit,
+			"WHERE" => "AND ( (".implode(" AND ",$filter_date).") OR (".implode(" AND ",$filter_updated).") )"
+		];
+		$data = $this->exec($this->storySQL($replacements));
+
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/story/updates/date={$year}-{$month}-{$day}",
+			$limit
+		);
+
+		return $data;
 	}
 	
 	public function searchPrepopulate ($item, $id)

@@ -38,6 +38,7 @@ class Base extends \Prefab {
 	
 	protected function parametric($params=NULL)
 	{
+		$r = [];
 		if ( $pArray = explode(";", str_replace("/",";",$params) ) )
 		{
 			foreach ( $pArray as $pElement )
@@ -52,6 +53,7 @@ class Base extends \Prefab {
 			}
 		}
 		if(isset($r['page'])) \Base::instance()->set('paginate.page', max(1,$r['page']));
+		return $r;
 	}
 
 	/**

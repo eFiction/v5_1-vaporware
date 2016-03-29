@@ -1,6 +1,6 @@
 <h3>
 	<check if="{{@data.TITLELINK}}">
-		<true><a href="{{@BASE}}/story/updates/{{ @data.TITLELINK }}">{{ @LN__Month_Calendar, @data.TITLE | format }}</a></true>
+		<true><a href="{{@BASE}}/story/updates/date={{ @data.TITLELINK }}">{{ @LN__Month_Calendar, @data.TITLE | format }}</a></true>
 		<false>{{ @LN__Month_Calendar, @data.TITLE | format }}</false>
 	</check>
 </h3>
@@ -16,7 +16,7 @@
 		<check if="{{isset(@cell.LINK)}}">
 			<true><td>
 				<check if="{{@cell.LINK}}">
-					<true><a href='{{@BASE}}/story/updates/{{@cell.LINK}}'>{{@cell.I}}</a></true>
+					<true><a href='{{@BASE}}/story/updates/date={{@cell.LINK}}'>{{@cell.I}}</a></true>
 					<false>{{@cell.I}}</false>
 				</check></td>
 			</true>
