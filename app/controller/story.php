@@ -64,25 +64,6 @@ class Story extends Base
 		}
 	}
 
-/*
-	public function ajax_old(\Base $f3, $params)
-	{
-		if ( isset($params['id']) && $params['id']=="search" )
-		{
-		}
-		elseif ( $id = @explode(",",$params['id']) )
-		{
-			if ( $id[1]=="commentform" )
-			{
-				if(empty($id[2])) exit;
-				echo \View\Story::commentForm((int)$id[0], (int)$id[2]);
-			}
-			exit;
-		}
-	}
-*/
-	
-//	protected function intro(\Base $f3)
 	protected function intro($params)
 	{
 		if ( isset($params['id']) ) $this->parametric($params['id']);
@@ -95,14 +76,13 @@ class Story extends Base
 	public function author($id)
 	{
 		list($info, $data) = $this->model->author($id);
-		//return print_r($info,1);
+
 		$stories = \View\Story::viewList($data);
 		return [ $info[0], $stories];
 	}
 	
 	protected function updates($params)
 	{
-		//print_r($params);
 		if ( isset($params[2]) ) $params = $this->parametric($params[2]);
 		
 		if ( isset($params['date']) AND $selection = explode("-",$params['date']) )
@@ -119,7 +99,7 @@ class Story extends Base
 	
 	protected function categories($params)
 	{
-		$id = empty($params['id']) ? 0 : $params['id'];
+		$id = empty($params[2]) ? 0 : $params[2];
 		if(empty($params[3]))
 		{
 			$data = $this->model->categories( (int)$id );
@@ -128,7 +108,7 @@ class Story extends Base
 		}
 		else
 		{
-			
+			return "stub *controller-story-categories*";
 		}
 	}
 	
@@ -144,51 +124,57 @@ class Story extends Base
 
 	public function search(\Base $f3, $params)
 	{
+		$get = [];
+		if ( isset($params[1]) ) $get = $this->parametric($params[1]);
 		$searchData = ($f3->get('POST'));
+		$searchData = array_filter(array_merge($get, $searchData));
+
 		$this->view->addTitle($f3->get('LN__Search'));
 		
-		if ( empty($searchData['author']) ) $f3->set('prepopulateData.author',"[]");
+		// Author
+		if ( empty($searchData['author']) )
+			$f3->set('prepopulateData.author',"[]");
 		else
-		{
-			$arr = explode(",",$searchData['author']);
-			foreach( $arr as &$a ) $a = (int)$a;
-			$data = $this->model->searchPrepopulate( "author", implode(",",$arr) );
-			$f3->set('prepopulateData.author',$data);
-		}
+			$f3->set('prepopulateData.author', $this->model->searchPrepopulate( "author", implode(",",$this->searchCleanInput($searchData['author']) ) ) );
 
-		if ( empty($searchData['category']) ) $f3->set('prepopulateData.category',"[]");
+		// Category
+		if ( empty($searchData['category']) )
+			$f3->set('prepopulateData.category',"[]");
 		else
-		{
-			$arr = explode(",",$searchData['category']);
-			foreach( $arr as &$a ) $a = (int)$a;
-			$data = $this->model->searchPrepopulate( "category", implode(",",$arr) );
-			$f3->set('prepopulateData.category',$data);
-		}
-		if ( empty($searchData['tag']) ) $f3->set('prepopulateData.tag',"[]");
-		else
-		{
-			$arr = explode(",",$searchData['tag']);
-			foreach( $arr as &$a ) $a = (int)$a;
-			$data = $this->model->searchPrepopulate( "tag", implode(",",$arr) );
-			$f3->set('prepopulateData.tag',$data);
-		}
+			$f3->set('prepopulateData.category', $this->model->searchPrepopulate( "category", implode(",",$this->searchCleanInput($searchData['category']) ) ) );
 
-		if ( isset($params[1]) )
+		// Tag
+		if ( empty($searchData['tag']) )
+			$f3->set('prepopulateData.tag',"[]");
+		else
+			$f3->set('prepopulateData.tag', $this->model->searchPrepopulate( "tag", implode(",",$this->searchCleanInput($searchData['tag']) ) ) );
+
+		// return string
+		if ( sizeof($searchData)>0 )
 		{
-			$termsTMP = explode(" ",$params[1]);
-			foreach ( $termsTMP as $t )
+			foreach ( $searchData as $k => $v )
 			{
-				list ($term, $param) = explode(":",$t);
-				$terms[$term] = explode(",",$param);
+				if ( is_array($v) )
+					$return[] = "{$k}=".implode(",",$v);
+				elseif ( $v > "" )
+					$return[] = "{$k}={$v}";
 			}
-			$data = $this->model->search($terms);
+			$return = implode(";",$return);
+			$data = $this->model->search( $searchData, $return );
+			$this->buffer ( \View\Story::searchPage($searchData) );
+			$this->buffer ( \View\Story::viewList($data) );
 		}
-		else $terms = NULL;
 
-
-
-		$this->buffer ( \View\Story::searchPage() );
-//		$this->buffer ( print_r($terms,TRUE) );
+		else
+			$this->buffer ( \View\Story::searchPage() );
+	}
+	
+	protected function searchCleanInput(&$arr=array())
+	{
+		$arr = is_array($arr) ? $arr : explode(",",$arr);
+		foreach( $arr as &$a ) $a = (int)$a;
+		$arr = array_diff($arr, array(0));
+		return $arr;
 	}
 
 	protected function read($id)

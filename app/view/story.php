@@ -26,9 +26,9 @@ class Story extends Base
 			'tags'				=>	'[]',
 			'authors'			=>	'[]',
 			'categories'	=>	'[]'
-		];
-		\Base::instance()->set('prepopulateData', $pre);
-		*/
+		];*/
+		\Base::instance()->set('searchForm', $terms);
+		
 		return \Template::instance()->render('story/search.html');
 	}
 	

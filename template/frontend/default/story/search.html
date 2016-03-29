@@ -1,6 +1,6 @@
 <form method="post" action="{{@BASE}}/story/search/">
 	<fieldset><legend>Advanced Search</legend>
-	__Title<br /><input class="text-input" placeholder="" type="text" name="story_title" value="">
+	__Title<br /><input class="text-input" placeholder="" type="text" name="story_title" value="<check if="{{isset(@searchForm.story_title)}}">{{@searchForm.story_title}}</check>">
 	__Tags<br /><input type="text" id="tag-select" name="tag" />
         <script type="text/javascript">
         $(document).ready(function() {
@@ -35,8 +35,8 @@ __Categories<br /><input type="text" id="category-select" name="category" />
         });
         </script>
     
-<br />__Rating <select name=""><option value="one">select</select>
-<br /><input type="checkbox" name="exclude_wip" {EXCLUDE_WIP} value="1">__Completed
+<br />(*) __Rating <select name=""><option value="one">select</select>
+<br /><input type="checkbox" name="exclude_wip" <check if="{{isset(@searchForm.exclude_wip)}}">checked="checked"</check> value="1">__Completed
 <br /><br />
 	<input type="radio" name="chapters" <check if="{{(isset(@searchForm.chapters) AND @searchForm.chapters=='oneshot')}}">checked="checked" </check>value="oneshot"> __Oneshot 
 	<input type="radio" name="chapters" <check if="{{(isset(@searchForm.chapters) AND @searchForm.chapters=='multichapters')}}">checked="checked" </check>value="multichapters"> __MultiChapters 

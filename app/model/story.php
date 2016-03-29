@@ -78,9 +78,63 @@ class Story extends Base
 		return [$info, $data];
 	}
 	
-	public function search ($terms)
+	public function search ($terms, $return)
 	{
+		$where = [];
+		$bind = [];
 		
+		if ( isset($terms['chapters']) )
+		{
+			if ( $terms['chapters'] == "multichapters" )
+				$where[] = "AND Cache.chapters > 1";
+			elseif ( $terms['chapters'] == "oneshot" )
+				$where[] = "AND Cache.chapters = 1";
+
+		}
+		if ( isset($terms['story_title']) )
+		{
+			$where[] = "AND S.title LIKE :title";
+			$bind  = array_merge( $bind, [ ":title" => "%{$terms['story_title']}%" ] );
+		}
+
+		if ( isset($terms['tag']) )
+		{
+			$join[] = "INNER JOIN (SELECT sid FROM `tbl_stories_tags` WHERE tid IN (".implode(",",$terms['tag']).") GROUP BY sid having count(lid)=".count($terms['tag']).") iT ON ( iT.sid = S.sid )";
+
+		}
+		if ( isset($terms['category']) )
+		{
+			$join[] = "INNER JOIN (SELECT sid FROM `tbl_stories_categories` WHERE cid IN (".implode(",",$terms['category']).") GROUP BY sid having count(lid)=".count($terms['category']).") iC ON ( iC.sid = S.sid )";
+
+		}
+		if ( isset($terms['author']) )
+		{
+			// sidebar stuff!
+			$join[] = "INNER JOIN (SELECT sid FROM `tbl_stories_authors` WHERE aid IN (".implode(",",$terms['author']).") GROUP BY sid having count(lid)=".count($terms['author']).") iA ON ( iA.sid = S.sid )";
+
+		}
+		
+		$limit = $this->config['story_intro_items'];
+		$pos = (int)\Base::instance()->get('paginate.page') - 1;
+		
+		$replacements =
+		[
+			"ORDER"	=> "ORDER BY date,updated ASC" ,
+			"LIMIT" => "LIMIT ".(max(0,$pos*$limit)).",".$limit,
+			"JOIN"	=> isset($join) ? implode("\n",$join) : "",
+			"WHERE"	=> implode(" ", $where),
+			"COMPLETED" => isset($terms['exclude_wip']) ? ">" : ">=",
+		];
+
+		$data = $this->exec($this->storySQL($replacements), $bind );
+
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/story/search/".$return,
+			$limit
+		);
+		
+		return $data;
 	}
 	
 	public function updates(int $year, int $month=0, int $day=0)
