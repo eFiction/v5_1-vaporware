@@ -98,13 +98,21 @@ class Blocks extends Base
 			$cells[] = [ FALSE ];
 		}
 		
+		setlocale(LC_ALL, __transLocale);
+		
 		$data = [
-			"cells" => $cells,
+			"CELLS"		=>	$cells,
 			"BACK"		=>	$back,
 			"TODAY"		=>	$today,
 			"FORWARD"	=>	$forward,
-			"TITLE"		=>	date("F Y",mktime(0,0,0,$c['month'],1,$c['year'])),
+			"MONTH"		=>	$c['month'],
+			"YEAR"		=>	$c['year'],
+			"TITLE"		=>	mktime(0,0,0,$c['month'],1,$c['year']),
+			"TITLELINK" =>	$events===FALSE ? FALSE : "{$c['year']}-{$c['month']}",
 		];
-		return parent::render('blocks/calendar.html','text/html', $data);
+
+		\Base::instance()->set('data', $data);
+
+		return utf8_encode(parent::render('blocks/calendar.html'));
 	}
 }

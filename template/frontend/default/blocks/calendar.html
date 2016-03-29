@@ -1,17 +1,22 @@
-<h3>{{ @TITLE }}</h3>
+<h3>
+	<check if="{{@data.TITLELINK}}">
+		<true><a href="{{@BASE}}/story/updates/{{ @data.TITLELINK }}">{{ @LN__Month_Calendar, @data.TITLE | format }}</a></true>
+		<false>{{ @LN__Month_Calendar, @data.TITLE | format }}</false>
+	</check>
+</h3>
 
 <div class="calendar-flip">
-	<check if="{{@BACK}}"><true><a href="javascript:getCalendar('{{ @BACK }}');" title="back"><span class="fa fa-arrow-circle-left"></span></a></true><false><span class="fa fa-arrow-circle-left"></span></false></check>
-	<check if="{{@BACK}}"><true><a href="javascript:getCalendar('{{ @TODAY }}');"><span class="fa fa-calendar" title="current"></span></a></true><false><span class="fa fa-calendar"></span></false></check>
-	<check if="{{@FORWARD}}"><true><a href="javascript:getCalendar('{{ @FORWARD }}');" title="forward"><span class="fa fa-arrow-circle-right"></span></a></true><false><span class="fa fa-arrow-circle-right"></span></false></check>
+	<check if="{{@data.BACK}}"><true><a href="javascript:getCalendar('{{ @data.BACK }}');" title="back"><span class="fa fa-arrow-circle-left"></span></a></true><false><span class="fa fa-arrow-circle-left"></span></false></check>
+	<check if="{{@data.BACK}}"><true><a href="javascript:getCalendar('{{ @data.TODAY }}');"><span class="fa fa-calendar" title="current"></span></a></true><false><span class="fa fa-calendar"></span></false></check>
+	<check if="{{@data.FORWARD}}"><true><a href="javascript:getCalendar('{{ @data.FORWARD }}');" title="forward"><span class="fa fa-arrow-circle-right"></span></a></true><false><span class="fa fa-arrow-circle-right"></span></false></check>
 </div>
 <table class="calendar">
 	<tr>
-	<repeat group="{{ @cells }}" value="{{ @cell }}" counter="{{ @ctr }}">
+	<repeat group="{{ @data.CELLS }}" value="{{ @cell }}" counter="{{ @ctr }}">
 		<check if="{{isset(@cell.LINK)}}">
 			<true><td>
 				<check if="{{@cell.LINK}}">
-					<true><a href='{{@cell.LINK}}'>{{@cell.I}}</a></true>
+					<true><a href='{{@BASE}}/story/updates/{{@cell.LINK}}'>{{@cell.I}}</a></true>
 					<false>{{@cell.I}}</false>
 				</check></td>
 			</true>

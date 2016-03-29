@@ -37,6 +37,9 @@ class Story extends Base
 			case 'categories':
 				$data = $this->categories($params);
 				break;
+			case 'updates':
+				$data = $this->updates($params);
+				break;
 			case 'archive':
 			default:
 				$data = $this->intro($params);
@@ -95,6 +98,11 @@ class Story extends Base
 		//return print_r($info,1);
 		$stories = \View\Story::viewList($data);
 		return [ $info[0], $stories];
+	}
+	
+	protected function updates($params)
+	{
+		return "stub *cotroller-story-updates*";
 	}
 	
 	protected function categories($params)

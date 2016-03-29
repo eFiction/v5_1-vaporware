@@ -29,7 +29,7 @@ class UserCP extends Base
 			if(isset($data['recipient']))
 			{
 				$ajax_sql = "SELECT U.nickname as name, U.uid as id from `tbl_users`U WHERE U.nickname LIKE :nickname AND U.groups > 0 AND U.uid != {$_SESSION['userID']} ORDER BY U.nickname ASC LIMIT 10";
-				$bind = [ "nickname" =>  "%{$data['recipient']}%" ];
+				$bind = [ ":nickname" =>  "%{$data['recipient']}%" ];
 			}
 		}
 
@@ -73,7 +73,7 @@ class UserCP extends Base
 								INNER JOIN `tbl_users`u1 ON ( m.sender = u1.uid ) 
 								INNER JOIN `tbl_users`u2 ON ( m.recipient = u2.uid ) 
 								WHERE m.mid = :mid AND ( m.sender = {$_SESSION['userID']} OR m.recipient = {$_SESSION['userID']} ) ORDER BY date_sent DESC";
-		$data = $this->exec($sql, ["mid" => $msgID]);
+		$data = $this->exec($sql, [":mid" => $msgID]);
 		if ( empty($data) ) return FALSE;
 
 		/* if unread, set read date and change unread counter in SESSION */
@@ -98,7 +98,7 @@ class UserCP extends Base
 									INNER JOIN `tbl_users`u1 ON ( m.sender = u1.uid ) 
 									INNER JOIN `tbl_users`u2 ON ( m.recipient = u2.uid ) 
 									WHERE m.mid = :mid AND ( m.sender = {$_SESSION['userID']} OR m.recipient = {$_SESSION['userID']} ) ORDER BY date_sent DESC";
-			$data = $this->exec($sql, ["mid" => $msgID]);
+			$data = $this->exec($sql, [":mid" => $msgID]);
 		}
 		
 		if ( empty($data) )
@@ -116,6 +116,26 @@ class UserCP extends Base
 		$data['subject'] = \Base::instance()->get('LN__PM_ReplySubject')." ".$data['subject'];
 
 		return $data;
+	}
+	
+	public function msgSave($save)
+	{
+		$saveSQL = "INSERT INTO `tbl_messaging`
+					(`sender`, `recipient`, `subject`, `message`)
+					VALUES
+					( '".$_SESSION['userID']."', :recipient, :subject, :message );";
+		
+		foreach ( $save['recipient'] as $recipient )
+		{
+			$bind =
+			[
+				":recipient" 	=> $recipient,
+				":subject"		=> $save['subject'],
+				":message"		=> $save['message']
+			];
+			$data = $this->exec($saveSQL, $bind);
+		}
+		return TRUE;
 	}
 	
 }

@@ -104,5 +104,10 @@ class Auth extends Base {
 		
 		$f3->reroute($returnpath, false);
 	}
+	
+	public function register(\Base $f3, $params)
+	{
+		$this->buffer( "stub *controller-auth-register*" );
+	}
 
 }

@@ -39,7 +39,7 @@ if (\Controller\Auth::isLoggedIn())
 	/* --------------------
 		Member routes
 	-------------------- */
-	$f3->route('GET|POST /login', function($f3) { $f3->reroute('/', false); } );
+	$f3->route([ 'GET|POST /login', 'GET|POST /register'] , function($f3) { $f3->reroute('/', false); } );
 
 	$f3->route(
 		[ 'GET /logout', 'GET /logout/*' ],

@@ -598,6 +598,14 @@ hr:after {
   padding: 10px 10px 10px 36px;
   margin: 10px;
 }
+.alert-box-half {
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
+	border-radius: 10px; 
+  padding: 10px 10px 10px 36px;
+  margin: 10px;
+  width: 50%;
+}
 .alert-box span {
   font-weight: bold;
   text-transform: uppercase;

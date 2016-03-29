@@ -88,6 +88,9 @@ class UserCP extends Base
 	
 	public function msgWrite(\Base $f3, $params)
 	{
+		if( isset($_POST['recipient']) )
+			$this->msgSave($f3);
+
 		if ( isset($params[0][1]) AND is_numeric($params[0][1]) )
 			$data = $this->model->msgReply($params[0][1]);
 		else $data = $this->model->msgReply();
@@ -99,6 +102,27 @@ class UserCP extends Base
 		//print_r ( $data);
 	}
 	
+	protected function msgSave(\Base $f3)
+	{
+		$save = $f3->get('POST');
+		if ( sizeof($save)>0 )
+		{
+			if ( $save['recipient']== "" )
+			{
+				$f3->set('msgWriteError', "__noRecipient");
+				return FALSE;
+			}
+			$save['recipient'] = explode(",",$save['recipient']);
+			if ( sizeof($save['recipient'])>1 )
+			{
+				// Build an array of recipients
+			}
+			
+			$status = $this->model->msgSave($save);
+
+			print_r($save);
+		}
+	}
 	
 	protected function showMenu($selected=FALSE)
 	{
