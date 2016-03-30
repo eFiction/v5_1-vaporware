@@ -21,12 +21,6 @@ class Story extends Base
 	
 	protected static function searchForm($terms)
 	{
-		/*
-		$pre = [
-			'tags'				=>	'[]',
-			'authors'			=>	'[]',
-			'categories'	=>	'[]'
-		];*/
 		\Base::instance()->set('searchForm', $terms);
 		
 		return \Template::instance()->render('story/search.html');

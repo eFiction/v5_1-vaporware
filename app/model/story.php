@@ -80,9 +80,18 @@ class Story extends Base
 	
 	public function search ($terms, $return)
 	{
-		$where = [];
-		$bind = [];
-		
+		if ( $terms['rating'][0] == $terms['rating'][1] )
+		{
+			$where[] = "AND Ra.rid = :rating";
+			$bind = [ ":rating" => $terms['rating'][0] ];
+		}
+		else
+		{
+			$where[] = "AND Ra.rid >= :ratingMin";
+			$where[] = "AND Ra.rid <= :ratingMax";
+			$bind = [ ":ratingMin" => $terms['rating'][0], ":ratingMax" => $terms['rating'][1] ];
+		}
+
 		if ( isset($terms['chapters']) )
 		{
 			if ( $terms['chapters'] == "multichapters" )
@@ -125,7 +134,7 @@ class Story extends Base
 			"WHERE"	=> implode(" ", $where),
 			"COMPLETED" => isset($terms['exclude_wip']) ? ">" : ">=",
 		];
-
+//echo $this->storySQL($replacements);exit;
 		$data = $this->exec($this->storySQL($replacements), $bind );
 
 		$this->paginate(
@@ -135,6 +144,11 @@ class Story extends Base
 		);
 		
 		return $data;
+	}
+	
+	public function ratings()
+	{
+		return $this->exec("SELECT rid, rating from `tbl_ratings`");
 	}
 	
 	public function updates(int $year, int $month=0, int $day=0)

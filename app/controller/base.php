@@ -47,11 +47,12 @@ class Base extends \Prefab {
 				if ( isset($x[1]) )
 				{
 					$r[$x[0]] = explode(",",$x[1]);
-					if ( empty($r[$x[0]][1]) ) $r[$x[0]] = $x[1];
+					if ( sizeof($r[$x[0]])==1 ) $r[$x[0]] = $x[1];
 				}
 				else $r[$x[0]] = TRUE;
 			}
 		}
+
 		if(isset($r['page'])) \Base::instance()->set('paginate.page', max(1,$r['page']));
 		return $r;
 	}

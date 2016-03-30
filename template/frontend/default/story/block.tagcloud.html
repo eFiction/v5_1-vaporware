@@ -2,7 +2,7 @@
 	<h3>{{@LN__Tagcloud}}</h3>
 	<repeat group="{{@renderData}}"  value="{{ @tag }}" counter="{{ @ctr }}">
 		<span style='padding:0;position:relative;z-index:{{@tag.z_index}}'>
-			<a title='{{@tag.label}}' href='{{@BASE}}/tags/{{@tag.tid}}' style='font-size: {{@tag.percent}}%;'>{{@tag.label}}</a>
+			<a title='{{@tag.label}}' href='{{@BASE}}/story/search/tag={{@tag.tid}}' style='font-size: {{@tag.percent}}%;'>{{@tag.label}}</a>
 		</span>
 	</repeat>
 </div>

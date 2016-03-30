@@ -129,6 +129,19 @@ class Story extends Base
 		$searchData = ($f3->get('POST'));
 		$searchData = array_filter(array_merge($get, $searchData));
 
+		$ratings = $this->model->ratings();
+		$f3->set('searchRatings', $ratings);
+
+		$ratingMaxID = end($ratings)['rid'];
+		// Add personal search preferences at some point
+		$searchData['rating'][0] = min( (@$searchData['rating'][0] ?: 0), $ratingMaxID);
+
+		// Add personal search preferences at some point
+		$searchData['rating'][1] = min (
+									max ( (@$searchData['rating'][1] ?: end($ratings)['rid']), $searchData['rating'][0] ),
+									$ratingMaxID
+									);
+		
 		$this->view->addTitle($f3->get('LN__Search'));
 		
 		// Author

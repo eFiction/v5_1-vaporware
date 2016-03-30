@@ -35,7 +35,15 @@ __Categories<br /><input type="text" id="category-select" name="category" />
         });
         </script>
     
-<br />(*) __Rating <select name=""><option value="one">select</select>
+<br />(*) __Rating from <select name="rating[0]">
+	<repeat group="{{ @searchRatings }}" value="{{ @rating }}">
+		<option value="{{ @rating.rid }}" <check if="{{@rating.rid==@searchForm.rating.0}}">selected="selected" </check> >{{ @rating.rating }}</option>
+	</repeat>
+</select> to <select name="rating[1]">
+	<repeat group="{{ @searchRatings }}" value="{{ @rating }}">
+		<option value="{{ @rating.rid }}" <check if="{{@rating.rid==@searchForm.rating.1}}">selected="selected" </check> >{{ @rating.rating }}</option>
+	</repeat>
+</select>
 <br /><input type="checkbox" name="exclude_wip" <check if="{{isset(@searchForm.exclude_wip)}}">checked="checked"</check> value="1">__Completed
 <br /><br />
 	<input type="radio" name="chapters" <check if="{{(isset(@searchForm.chapters) AND @searchForm.chapters=='oneshot')}}">checked="checked" </check>value="oneshot"> __Oneshot 
