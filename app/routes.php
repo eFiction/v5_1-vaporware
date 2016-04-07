@@ -70,9 +70,10 @@ if (\Controller\Auth::isLoggedIn())
 
 		// Archive
 		$f3->route(
-			[ 'GET /adminCP/archive', 'GET /adminCP/archive/@module', 'GET /adminCP/archive/@module/*' ],
+			[ 'GET /adminCP/archive', 'GET|POST /adminCP/archive/@module', 'GET|POST /adminCP/archive/@module/*' ],
 			'Controller\AdminCP_Archive->index' );
-		$f3->route( 'POST /adminCP/archive/@module', 'Controller\AdminCP_Archive->save' );
+		//$f3->route( [ 'POST /adminCP/archive/@module', 'POST /adminCP/archive/@module/*' ], 'Controller\AdminCP_Archive->save' );
+		$f3->route( 'POST /adminCP/ajax/archive/@module [ajax]', 'Controller\AdminCP_Archive->ajax' );
 
 		// Home
 		$f3->route(
@@ -115,7 +116,7 @@ else
 
 	$f3->route( 'GET|POST /forgotpw', 'Controller\Auth->forgotpw' );
 
-	$f3->route( 'GET|POST /register', 'Controller\Auth->register' );
+	$f3->route( [ 'GET|POST /register', 'GET|POST /register/@status' ], 'Controller\Auth->register' );
 
 	$f3->route(
 		[ 'GET|POST /logout', 'GET|POST /logout' ],

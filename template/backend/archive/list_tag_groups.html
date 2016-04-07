@@ -1,0 +1,55 @@
+<form method="post" action="{{@BASE}}/adminCP/archive/tags/groups/new">
+	<div class="grid-wrapper">
+		<div class="gb-30"><input class="text-input" type="text" name="newTagGroup"></div>
+		<div class="gb-70"><input class="button" type="submit" value="__NewTagGroup"></div>
+	</div>
+</form>
+<table class="tbody" id="textblockForm">
+	<tr>
+		<th>&nbsp;</th>
+		<th>&nbsp;</th>
+		<th><a href="{{@BASE}}/adminCP/archive/tags/groups/order=id,
+			<check if="{{ @sort['link']!='id' }}">
+				<true>desc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='asc' }}">
+						<true>desc">{ICON:sort-numeric-asc}</true>
+						<false>asc">{ICON:sort-numeric-desc}</false>
+					</check>
+				</false>
+			</check></a> __ID
+		</th>
+		<th><a href="{{@BASE}}/adminCP/archive/tags/groups/order=group,
+			<check if="{{ @sort['link']!='group' }}">
+				<true>desc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='asc' }}">
+						<true>desc">{ICON:sort-alpha-asc}</true>
+						<false>asc">{ICON:sort-alpha-desc}</false>
+					</check>
+				</false>
+			</check></a> __Name
+		</th>
+		<th><a href="{{@BASE}}/adminCP/archive/tags/groups/order=count,
+			<check if="{{ @sort['link']!='count' }}">
+				<true>desc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='asc' }}">
+						<true>desc">{ICON:sort-numeric-asc}</true>
+						<false>asc">{ICON:sort-numeric-desc}</false>
+					</check>
+				</false>
+			</check></a> __Count
+		</th>
+	</tr>
+	<repeat group="{{ @grouplist }}" value="{{ @row }}">
+	<tr>
+		<td><a href="{{@BASE}}/adminCP/archive/tags/groups/edit={{ @row['tgid'] }}">{ICON:edit}</a></td>
+<!--		<td><a href="{{@BASE}}/adminCP/archive/tags/groups,delete&amp;id={{ @row['tgid'] }}">{ICON:trash}</a></td> -->
+		<td>{ICON:trash}</td>
+		<td>{{ @row['tgid'] }}</td>
+		<td>{{ @row['description'] }}</td>
+		<td>{{ @row['count'] }}</td>
+	</tr>
+	</repeat>
+</table>

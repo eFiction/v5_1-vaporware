@@ -1,40 +1,14 @@
 <form method="post" action="{{@BASE}}/story/search/">
 	<fieldset><legend>Advanced Search</legend>
-	__Title<br /><input class="text-input" placeholder="" type="text" name="story_title" value="<check if="{{isset(@searchForm.story_title)}}">{{@searchForm.story_title}}</check>">
-	__Tags<br /><input type="text" id="tag-select" name="tag" />
-        <script type="text/javascript">
-        $(document).ready(function() {
-            $("#tag-select").tokenInput("{{@BASE}}/story/ajax/search",{
-            	method: "post",
-            	queryParam: "tag",
-            	preventDuplicates: true,
-            	prePopulate: {{@prepopulateData.tag|raw}}
-            });
-        });
-        </script>
+	<div class="grid-wrapper">
+	<!-- row #1 -->
+		<div class="gb-half">__Title<br /><input class="text-input" placeholder="" type="text" name="story_title" value="<check if="{{isset(@searchForm.story_title)}}">{{@searchForm.story_title}}</check>"></div>
+		<div class="gb-half">__Text<br /><input class="text-input" placeholder="" type="text" name="story_text" value="<check if="{{isset(@searchForm.story_text)}}">{{@searchForm.story_text}}</check>"></div>
+	<!-- row #2 -->
+		<div class="gb-half">__TagsInclude<br /><input type="text" id="tagIn-select" name="tagIn" /></div>
+		<div class="gb-half">__TagsExclude<br /><input type="text" id="tagOut-select" name="tagOut" /></div>
 __Author<br /><input type="text" id="author-select" name="author" />
-        <script type="text/javascript">
-        $(document).ready(function() {
-            $("#author-select").tokenInput("{{@BASE}}/story/ajax/search/",{
-            	method: "post",
-            	queryParam: "author",
-            	tokenLimit: 1,
-            	prePopulate: {{@prepopulateData.author|raw}}
-            });
-        });
-        </script>
 __Categories<br /><input type="text" id="category-select" name="category" />
-        <script type="text/javascript">
-        $(document).ready(function() {
-            $("#category-select").tokenInput("{{@BASE}}/story/ajax/search/",{
-            	method: "post",
-            	queryParam: "category",
-            	preventDuplicates: true,
-            	prePopulate: {{@prepopulateData.category|raw}}
-            });
-        });
-        </script>
-    
 <br />(*) __Rating from <select name="rating[0]">
 	<repeat group="{{ @searchRatings }}" value="{{ @rating }}">
 		<option value="{{ @rating.rid }}" <check if="{{@rating.rid==@searchForm.rating.0}}">selected="selected" </check> >{{ @rating.rating }}</option>
@@ -53,3 +27,40 @@ __Categories<br /><input type="text" id="category-select" name="category" />
 
 	</fieldset>
 </form>
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#tagIn-select").tokenInput("{{@BASE}}/story/ajax/search",{
+    	method: "post",
+    	queryParam: "tag",
+    	preventDuplicates: true,
+    	prePopulate: {{@prepopulateData.tagIn|raw}}
+    });
+});
+
+$(document).ready(function() {
+    $("#tagOut-select").tokenInput("{{@BASE}}/story/ajax/search",{
+    	method: "post",
+    	queryParam: "tag",
+    	preventDuplicates: true,
+    	prePopulate: {{@prepopulateData.tagOut|raw}}
+    });
+});
+
+$(document).ready(function() {
+    $("#author-select").tokenInput("{{@BASE}}/story/ajax/search/",{
+    	method: "post",
+    	queryParam: "author",
+    	tokenLimit: 1,
+    	prePopulate: {{@prepopulateData.author|raw}}
+    });
+});
+
+$(document).ready(function() {
+    $("#category-select").tokenInput("{{@BASE}}/story/ajax/search/",{
+    	method: "post",
+    	queryParam: "category",
+    	preventDuplicates: true,
+    	prePopulate: {{@prepopulateData.category|raw}}
+    });
+});
+</script>

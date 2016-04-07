@@ -1,4 +1,4 @@
-<form method="post" action="{{@BASE}}/adminCP/settings/{{@form_target}}">
+<form method="post" action="{{@BASE}}/adminCP/{{@form_target}}">
 	<check if="{{ @form_feedback.0 }}">
 	<div class="alert-box success">{{ @form_feedback.0 }} <check if="{{ @form_feedback.0==1 }}"><true>__Entry</true><false>__Entries</false></check> __SuccessfullySaved</div>
 	</check>

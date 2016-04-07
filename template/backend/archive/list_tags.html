@@ -1,0 +1,88 @@
+<form method="post" action="{{@BASE}}/archive,tags,tag,new">
+	<div class="grid-wrapper">
+		<div class="gb-30"><input class="text-input" type="text" name="newTag"></div>
+		<div class="gb-70"><input class="button" type="submit" value="__NewTag"></div>
+	</div>
+</form>
+<form method="post" action="{{@BASE}}/adminCP/archive/tags/edit">
+	<fieldset><legend>__A_SearchTag:</legend>
+	<table>
+	<tr><td><input type="text" id="tag-select" name="tid" />
+        <script type="text/javascript">
+        $(document).ready(function() {
+            $("#tag-select").tokenInput("{{$BASE}}/adminCP/ajax/archive/tags",{
+            	method: "post",
+            	queryParam: "tagname",
+            	hintText: "__A_StartTyping ...",
+              noResultsText: "__A_NoMatches.",
+            	tokenLimit: 1
+            });
+        });
+        </script>
+		</td>
+	</tr>
+	<tr><td><input class="button" type="submit"> <input class="button" type="reset"></td></tr>
+	</table>
+	</fieldset>
+</form>
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
+<table class="tbody" id="textblockForm">
+	<tr>
+		<th>&nbsp;</th>
+		<th>&nbsp;</th>
+		<th><a href="{{@BASE}}/adminCP/archive/tags/edit/order=id,
+			<check if="{{ @sort['link']!='id' }}">
+				<true>desc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='asc' }}">
+						<true>desc">{ICON:sort-numeric-asc}</true>
+						<false>asc">{ICON:sort-numeric-desc}</false>
+					</check>
+				</false>
+			</check></a> __ID
+		</th>
+		<th><a href="{{@BASE}}/adminCP/archive/tags/edit/order=label,
+			<check if="{{ @sort['link']!='label' }}">
+				<true>desc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='asc' }}">
+						<true>desc">{ICON:sort-alpha-asc}</true>
+						<false>asc">{ICON:sort-alpha-desc}</false>
+					</check>
+				</false>
+			</check></a> __Label
+		</th>
+		<th><a href="{{@BASE}}/adminCP/archive/tags/edit/order=group,
+			<check if="{{ @sort['link']!='group' }}">
+				<true>desc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='asc' }}">
+						<true>desc">{ICON:sort-alpha-asc}</true>
+						<false>asc">{ICON:sort-alpha-desc}</false>
+					</check>
+				</false>
+			</check></a> __TagGroup
+		</th>
+		<th><a href="{{@BASE}}/adminCP/archive/tags/edit/order=count,
+			<check if="{{ @sort['link']!='count' }}">
+				<true>desc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='asc' }}">
+						<true>desc">{ICON:sort-numeric-asc}</true>
+						<false>asc">{ICON:sort-numeric-desc}</false>
+					</check>
+				</false>
+			</check></a> __Count
+		</th>
+	</tr>
+	<repeat group="{{ @taglist }}" value="{{ @row }}">
+	<tr>
+		<td><a href="{{@BASE}}/adminCP/archive/tags/edit/id={{ @row['tid'] }}">{ICON:edit}</a></td>
+		<td><a href="{{@BASE}}/adminCP/archive/tags/edit/delete={{ @row['tid'] }}" class="deleteItem" title="#{{ @row['tid'] }}: {{ @row['label'] }}">{ICON:trash}</a></td>
+		<td>{{ @row['tid'] }}</td>
+		<td>{{ @row['label'] }}</td>
+		<td>{{ @row['group'] }}</td>
+		<td>{{ @row['count'] }}</td>
+	</tr>
+	</repeat>
+</table>

@@ -157,10 +157,16 @@ class Story extends Base
 			$f3->set('prepopulateData.category', $this->model->searchPrepopulate( "category", implode(",",$this->searchCleanInput($searchData['category']) ) ) );
 
 		// Tag
-		if ( empty($searchData['tag']) )
-			$f3->set('prepopulateData.tag',"[]");
+		if ( empty($searchData['tagIn']) )
+			$f3->set('prepopulateData.tagIn',"[]");
 		else
-			$f3->set('prepopulateData.tag', $this->model->searchPrepopulate( "tag", implode(",",$this->searchCleanInput($searchData['tag']) ) ) );
+			$f3->set('prepopulateData.tagIn', $this->model->searchPrepopulate( "tag", implode(",",$this->searchCleanInput($searchData['tagIn']) ) ) );
+
+		// excluded Tag
+		if ( empty($searchData['tagOut']) )
+			$f3->set('prepopulateData.tagOut',"[]");
+		else
+			$f3->set('prepopulateData.tagOut', $this->model->searchPrepopulate( "tag", implode(",",$this->searchCleanInput($searchData['tagOut']) ) ) );
 
 		// return string
 		if ( sizeof($searchData)>0 )

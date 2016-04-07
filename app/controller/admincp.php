@@ -26,6 +26,11 @@ class AdminCP extends Base
 		);
 	}
 	
+	protected function showMenuUpper($selected=FALSE)
+	{
+		\Base::instance()->set('menu_upper', $this->model->showMenuUpper($selected));
+	}
+	
 	public function catch(\Base $f3, $params)
 	{
 		$f3->reroute('/adminCP/home', false);

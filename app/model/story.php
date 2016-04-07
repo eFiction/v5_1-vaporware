@@ -106,9 +106,15 @@ class Story extends Base
 			$bind  = array_merge( $bind, [ ":title" => "%{$terms['story_title']}%" ] );
 		}
 
-		if ( isset($terms['tag']) )
+		if ( isset($terms['tagIn']) )
 		{
-			$join[] = "INNER JOIN (SELECT sid FROM `tbl_stories_tags` WHERE tid IN (".implode(",",$terms['tag']).") GROUP BY sid having count(lid)=".count($terms['tag']).") iT ON ( iT.sid = S.sid )";
+			$join[] = "INNER JOIN (SELECT sid FROM `tbl_stories_tags` WHERE tid IN (".implode(",",$terms['tagIn']).") GROUP BY sid having count(lid)=".count($terms['tagIn']).") iT ON ( iT.sid = S.sid )";
+
+		}
+		if ( isset($terms['tagOut']) )
+		{
+			$join[] = "LEFT JOIN (SELECT sid FROM `tbl_stories_tags` WHERE tid IN (".implode(",",$terms['tagOut']).") GROUP BY sid having count(lid)=".count($terms['tagOut']).") iTo ON ( iTo.sid = S.sid )";
+			$where[] = "AND iTo.sid IS NULL";
 
 		}
 		if ( isset($terms['category']) )
@@ -202,6 +208,7 @@ class Story extends Base
 		elseif ( $item == "tag")
 			$sql = "SELECT `label` as name, `tid` as id FROM `tbl_tags` WHERE `tid` IN ({$id})";
 
+		if (empty($sql)) return "[]";
 		return json_encode( $this->exec($sql) );
 	}
 	

@@ -47,12 +47,12 @@ class Auth extends Base {
 
 		if ( isset($session_id) && $user = \Model\Auth::instance()->validateSession($session_id,$ip_db) AND $user['userID']>0 )
 		{
-			$_SESSION['groups'] 			= $user['groups'];
-			$_SESSION['admin_active'] = $user['admin_active'];
+			$_SESSION['groups'] 		= $user['groups'];
+			$_SESSION['admin_active'] 	= $user['admin_active'];
 			$_SESSION['userID']			= $user['userID'];
-			$_SESSION['username']			= $user['nickname'];
-			$_SESSION['mail']					= array($user['mail'],$user['unread']);
-			$_SESSION['tpl']		= [ "default", 1];
+			$_SESSION['username']		= $user['nickname'];
+			$_SESSION['mail']			= array($user['mail'],$user['unread']);
+			$_SESSION['tpl']			= [ "default", 1];
 			
 			return TRUE;
 		}
@@ -60,12 +60,12 @@ class Auth extends Base {
 		{
 			//getStats();
 			//
-			$_SESSION['groups'] 			= bindec('0');
-			$_SESSION['admin_active'] = FALSE;
+			$_SESSION['groups'] 		= bindec('0');
+			$_SESSION['admin_active'] 	= FALSE;
 			$_SESSION['userID']			= FALSE;
-			$_SESSION['username']			= "__Guest";
-			$_SESSION['mail']					= FALSE;
-			$_SESSION['tpl']		= [ "default", 1];
+			$_SESSION['username']		= "__Guest";
+			$_SESSION['mail']			= FALSE;
+			$_SESSION['tpl']			= [ "default", 1];
 			
 			return FALSE;
 		}
@@ -107,7 +107,96 @@ class Auth extends Base {
 	
 	public function register(\Base $f3, $params)
 	{
-		$this->buffer( "stub *controller-auth-register*" );
+		if (isset($params['status']))
+		{
+			$this->registerStatus($params['status']);
+			return TRUE; //  leave function
+		}
+
+		// link config
+		$this->cfg = \Config::instance();
+		
+		// check if configuration is disabled
+		if( $this->cfg['allow_registration'] == "FALSE" )
+			$this->buffer( "stub *controller-auth-register* denied" );
+		
+		// check if user is already logged in
+		elseif ( empty($_SESSION['session_id']) )
+			$this->buffer( "stub *controller-auth-register* registered" );
+		
+		// start registration process
+		else
+		{
+			// check if already agreed to the TOS
+			if ( isset($_POST['agreed']) )
+			{
+				$f3->set('register.step', 'form');
+				// Data sent ?
+				if(empty($_POST['form']))
+				{
+					// No data yet, just create an empty form
+					$this->buffer( \View\Auth::register(). "stub *controller-auth-register* proceed" );
+				}
+				else
+				{
+					// We have received a form, let's work through it
+					$register = $f3->get('POST')['form'];
+					if ( TRUE === $check = $this->model->registerCheckInput($register) )
+					{
+						$f3->set('register.step', 'done');
+						$return = $this->model->addUser($register);
+						
+						
+					}
+					else
+					{
+						if ( isset($check['sfs'])==2 )
+						{
+							$f3->set('register.step', 'failed');
+						}
+						$this->buffer( \View\Auth::register($register, $check) );
+					}
+				}
+			}
+			// Show TOS form
+			else
+			{
+				$f3->set('register.step', 'welcome');
+				$this->buffer( \View\Auth::register(). "stub *controller-auth-register* welcome" );
+				//$this->buffer( "stub *controller-auth-register* welcome" );
+			}
+		}
 	}
 
+	protected function registerStatus($p)
+	{
+		// test: http://dev.efiction.org/mvc/register/status=moderation,91bc4ea33e07bf9a05d60b7c9d968115
+		$parameter = $this->parametric($p);
+		list($reason, $hash) = $parameter['status'];
+
+		$check = $this->model->exec("SELECT U.uid, U.login, U.groups, U.resettoken, U.about as reason FROM `tbl_users`U WHERE MD5(CONCAT(U.uid,U.registered)) = '{$hash}';")[0];
+		if ( $reason == "done" AND $check['groups'] > 0 )
+		{
+			$this->buffer( "** Reg done **");
+		}
+		elseif ( $reason == "email" AND $check['resettoken'] > "" )
+		{
+			$this->buffer( "** Reg email **");
+		}
+		elseif ( $reason == "moderation" AND $check['reason'] > "" )
+		{
+			$this->buffer( "** Reg moderation **");
+		}
+		else
+		{
+			$this->buffer( "** Reg unknown **");
+			// Trigger an admin note
+		}
+		
+		\Logging::addEntry("RG", "Reg user", $check['uid']);
+		/*$log->reset();
+		$log->log_type='AM';
+		$log->save();*/
+		//$this->buffer(print_r($check,1));
+	}
 }

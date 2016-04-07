@@ -26,4 +26,23 @@ class AdminCP extends Base
 		return \Template::instance()->render('home_welcome.html');
 	}
 	
+	public static function listTags($data, $sort)
+	{
+		\Base::instance()->set('sort', $sort);
+		\Base::instance()->set('taglist', $data);
+		return \Template::instance()->render('archive/list_tags.html');
+	}
+
+	public static function listTagGroups($data, $sort)
+	{
+		\Base::instance()->set('sort', $sort);
+		\Base::instance()->set('grouplist', $data);
+		return \Template::instance()->render('archive/list_tag_groups.html');
+	}
+	
+	public static function editTag($data)
+	{
+		\Base::instance()->set('data', $data);
+		return \Template::instance()->render('archive/edit_tag.html');
+	}
 }

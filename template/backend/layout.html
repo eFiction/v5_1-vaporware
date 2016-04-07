@@ -28,16 +28,22 @@
 			</div>
 			<div class="gb-80" id="content">
 
-	<check if="{{ isset(@title_h1) }}">
-		<h1>{{ @title_h1 }}</h1>
-	</check>
-		
-	<check if="{{ isset(@title_h3) }}">
-		<h3>{{ @title_h3 }}</h3>
-	</check>
+			<check if="{{ isset(@title_h1) }}">
+				<h1>{{ @title_h1 }}</h1>
+			</check>
+				
+			<check if="{{ isset(@title_h3) }}">
+				<h3>{{ @title_h3 }}</h3>
+			</check>
 
-		{{@BODY | raw }}
-		</div>
+			<check if="{{ isset(@menu_upper) }}">
+			<div>
+				<repeat group="{{ @menu_upper }}" value="{{ @menu_item }}"><span><span class='tinyicon'>{{ @menu_item['icon'] }}</span> <a href="{{@BASE}}/adminCP/{{ @menu_item['link'] }}">{{ ${@menu_item['label']} }}</a></span></repeat>
+			</div>
+			</check>
+
+				{{@BODY | raw }}
+			</div>
 
 		<div class="grid-wrapper footer">
 			<div class="gb-full">

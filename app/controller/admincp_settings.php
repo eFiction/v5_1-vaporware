@@ -34,7 +34,7 @@ class AdminCP_Settings extends AdminCP
 				$params['module'] = "home";
 				$data['General'] = $this->model->settingsFields('settings_general');
 		}
-		if ($data) $this->buffer( \View\AdminCP::settingsFields($data, $params['module'], $feedback) );
+		if ($data) $this->buffer( \View\AdminCP::settingsFields($data, "settings/".$params['module'], $feedback) );
 	}
 
 	public function save(\Base $f3, $params)

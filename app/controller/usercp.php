@@ -26,6 +26,7 @@ class UserCP extends Base
 	
 	public function ajax(\Base $f3, $params)
 	{
+		$data = [];
 		if ( empty($params['module']) ) return NULL;
 		
 		$post = $f3->get('POST');

@@ -39,4 +39,12 @@ class Auth extends Base
 		return \Template::instance()->render('main/login.html','text/html', $data);
 	}
 	
+	public static function register($data = [], $error = [])
+	{
+		\Base::instance()->set('data', $data);
+		\Base::instance()->set('error', $error);
+
+		return \Template::instance()->render('main/register.html');
+	}
+	
 }

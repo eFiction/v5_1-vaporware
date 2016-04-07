@@ -19,6 +19,28 @@ class Base extends \Prefab {
 		return $this->db->exec(str_replace("`tbl_", "`{$this->prefix}", $cmds), $args,$ttl,$log);
 	}
 	
+	public function userChangePW($uid, $password)
+	{
+		// Load a compatibility wrapper for PHP versions prior to 5.5.0
+		if ( !function_exists("password_hash") ) include ( "app/inc/password_compat.php" );
+
+		$hash = password_hash( $password, PASSWORD_DEFAULT );
+		$this->prepare("updateUser", "UPDATE `tbl_users`U SET U.password = :password WHERE U.uid = :uid");
+		$this->bindValue("updateUser", "password", $hash, \PDO::PARAM_STR);
+		$this->bindValue("updateUser", "uid",	 $uid,	 \PDO::PARAM_INT);
+		$user = $this->execute("updateUser");
+	}
+
+	public function extendConfig()
+	{
+		$configDB = $this->exec("SELECT C.name, C.value FROM `tbl_config`C WHERE C.to_config_file=0 AND C.form_type != 'note';");
+		foreach($configDB as $c)
+		{
+			$config[$c['name']] = $c['value'];
+		}
+		return $config;
+	}
+	
 	protected function prepare($id, $sql)
 	{
 		$this->sqlTmp[$id]['sql'] = $sql;
@@ -32,8 +54,68 @@ class Base extends \Prefab {
 	
 	protected function execute($id)
 	{
-		return $this->exec($this->sqlTmp[$id]['sql'], $this->sqlTmp[$id]['param']);
+		$data = $this->exec($this->sqlTmp[$id]['sql'], $this->sqlTmp[$id]['param']);
+		unset($this->sqlTmp[$id]);
+		return $data;
 	}
+	
+	public function update($table, $data, $where)
+	{
+		$handle = new \DB\SQL\Mapper($this->db,str_replace("tbl_", $this->prefix, $table));
+		$handle->load( $where );
+		foreach( $data as $key => $value )
+		{
+			$handle->{$key} = $value;
+		}
+		$handle->save();
+		unset($handle);
+	}
+	
+	public function insertArray	($table, $kvpair, $replace=FALSE)
+	{
+		$keys = array();
+		$values = array();
+//		preprint($kvpair);
+		while (list($key, $value) = each($kvpair))
+		{
+			$keys[] 	= $key;
+			if ($value===NULL)
+			{
+				$values[] = "NULL";
+				unset($kvpair[$key]);
+			}
+			elseif( $value=="NOW()" )
+			{
+				$values[] = "NOW()";
+				unset($kvpair[$key]);
+			}
+			// ???
+			elseif ( is_array($value) )
+			{
+				$values[] = "{$value[0]}( :{$key} )";
+				$kvpair[$key] = $value[1];
+			}
+			else
+			{
+				$values[] = ":{$key}";
+			}
+		}
+		
+		if(sizeof($keys)>0)
+		{
+			$sql_query = (($replace===TRUE)?"REPLACE":"INSERT")." INTO `{$table}` (".implode(", ", $keys).") VALUES ( ".implode(", ", $values).")";
+			$this->prepare("insertArray", $sql_query);
+
+			foreach($kvpair as $key => $value)
+			{
+				$this->bindValue("insertArray", $key, $value, \PDO::PARAM_STR);
+			}
+			if ( 1 == $result = $this->execute("insertArray") )
+				return (int)$this->db->lastInsertId();
+		}
+		return NULL;
+	}
+
 	
 	protected function paginate(int $total, $route, int $limit=10)
 	{
