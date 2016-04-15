@@ -1,9 +1,10 @@
-<form method="post" action="{{@BASE}}/adminCP/archive/tags/groups/new">
+<form method="post" action="{{@BASE}}/adminCP/archive/tags/groups">
 	<div class="grid-wrapper">
 		<div class="gb-30"><input class="text-input" type="text" name="newTagGroup"></div>
 		<div class="gb-70"><input class="button" type="submit" value="__NewTagGroup"></div>
 	</div>
 </form>
+<check if="{{ isset(@form_error) }}"><div class="gb-90 alert-box error">{{ @form_error }}</div></check>
 <table class="tbody" id="textblockForm">
 	<tr>
 		<th>&nbsp;</th>
@@ -44,9 +45,15 @@
 	</tr>
 	<repeat group="{{ @grouplist }}" value="{{ @row }}">
 	<tr>
-		<td><a href="{{@BASE}}/adminCP/archive/tags/groups/edit={{ @row['tgid'] }}">{ICON:edit}</a></td>
-<!--		<td><a href="{{@BASE}}/adminCP/archive/tags/groups,delete&amp;id={{ @row['tgid'] }}">{ICON:trash}</a></td> -->
-		<td>{ICON:trash}</td>
+		<td><a href="{{@BASE}}/adminCP/archive/tags/groups/id={{ @row['tgid'] }}">{ICON:edit}</a></td>
+		<check if="{{ @row['count'] == 0 }}">
+			<true>
+				<td><a href="{{@BASE}}/adminCP/archive/tags/groups/delete={{ @row['tgid'] }}" class="deleteItem" title="#{{ @row['tgid'] }}: {{ @row['description'] }}">{ICON:trash}</a></td>
+			</true>
+			<false>
+				<td>{ICON:trash}</td>
+			</false>
+		</check>
 		<td>{{ @row['tgid'] }}</td>
 		<td>{{ @row['description'] }}</td>
 		<td>{{ @row['count'] }}</td>

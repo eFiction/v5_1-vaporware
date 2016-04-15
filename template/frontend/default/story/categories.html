@@ -11,8 +11,8 @@ Go back <a href="{{@BASE}}/story/categories/{{@categoriesData['parent'][0]['pare
 		</false>
 	</check>
 	{{@element['description'] |raw }}<br />
-	<check if="{{@element['count']>0}}">{{@element['count'] }} stories in this category. [ <a href="{{@BASE}}/story/categories/{{@element['stats']['cid']}}/view">View</a> ]<br /></check>
-	<check if="{{@element['count'] < @element['stats']['count'] }}">{{@element['stats']['count'] - @element['count']}} stories in these sub-categories:<br /></check>
+	<check if="{{@element['counter']>0}}">{{@element['counter'] }} stories in this category. [ <a href="{{@BASE}}/story/categories/{{@element['stats']['cid']}}/view">View</a> ]<br /></check>
+	<check if="{{@element['counter'] < @element['stats']['count'] }}">{{@element['stats']['count'] - @element['counter']}} stories in these sub-categories:<br /></check>
 	<check if="{{sizeof(@element['stats']['sub'])}}">
 		<table>
 		<repeat group="{{ @element['stats']['sub'] }}" key="{{@name}}" value="{{ @count }}" counter="{{@line}}">

@@ -8,8 +8,20 @@ return array(
 'PM_Inbox' => 'Inbox',
 'PM_Outbox' => 'Outbox',
 'PM_Write' => 'Write',
+'PM_Outbox_Items' => '{0, plural,'.
+	'zero	{Your Outbox is empty!},'.
+	'one	{One message:},'.
+	'other	{# messages:}
+}',
 'PM_Outbox_empty' => 'Your Outbox is empty',
+
 'PM_Inbox_empty' => 'Your Inbox is empty',
+'PM_Inbox_Items' => '{0, plural,'.
+	'zero	{Your Inbox is empty!},'.
+	'one	{One message:},'.
+	'other	{# messages:}
+}',
+
 'PM_Subject' => 'Subject',
 'PM_Sender' => 'Sender',
 'PM_Sent' => 'Sent',
@@ -118,6 +130,12 @@ return array(
 'AS_Guests' => 'Guests',
 'AS_Users' => 'Users',
 'AS_LatestMember' => 'Latest Member',
+
+'Status_Changes' => '{0, plural,'.
+	'zero	{No changes.},'.
+	'one	{One element changed.},'.
+	'other	{# elements changed.}
+}',
 );
 
 ?>

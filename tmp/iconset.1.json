@@ -1,7 +1,9 @@
 {
-    "56787852d5fc77.08698212": {
+    "5706ef6781bc05.01416002": {
         "_name": "Font Awesome CSS Icons",
         "archive": "<span class=\"fa fa-university\"><\/span>",
+        "arrow-down": "<span class=\"fa fa-long-arrow-down\"><\/span>",
+        "arrow-up": "<span class=\"fa fa-long-arrow-up\"><\/span>",
         "bars": "<span class=\"fa fa-bars\"><\/span>",
         "blank": "<span class=\"fa fa-square-o\"><\/span>",
         "book": "<span class=\"fa fa-book\"><\/span>",
@@ -23,6 +25,7 @@
         "keyboard": "<span class=\"fa fa-keyboard-o\"><\/span>",
         "language": "<span class=\"fa fa-language\"><\/span>",
         "layout": "<span class=\"fa fa-eye\"><\/span>",
+        "lock": "<span class=\"fa fa-lock\"><\/span>",
         "mail": "<span class=\"fa fa-envelope\"><\/span>",
         "manual": "<span class=\"fa fa-info\"><\/span>",
         "member": "<span class=\"fa fa-user\"><\/span>",
@@ -48,6 +51,7 @@
         "text": "<span class=\"fa fa-file-text-o\"><\/span>",
         "time": "<span class=\"fa fa-clock-o\"><\/span>",
         "trash": "<span class=\"fa fa-trash-o\"><\/span>",
+        "unlock": "<span class=\"fa fa-unlock\"><\/span>",
         "visible": "<span class=\"fa fa-eye\"><\/span>",
         "waiting": "<span class=\"fa fa-spin fa-spinner\"><\/span>",
         "wrench": "<span class=\"fa fa-wrench\"><\/span>"

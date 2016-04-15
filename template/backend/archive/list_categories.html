@@ -1,0 +1,21 @@
+<check if="{{ isset(@errors) }}"><div class="gb-90 alert-box error">{{ @errors }}</div></check>
+<check if="{{ isset(@changes) }}"><div class="gb-90 alert-box success">{{ @changes }}</div></check>
+<set level="1" />
+<div><table style="border: 1px solid blue;">
+<repeat group="{{ @categories }}" value="{{ @row }}">
+	<loop from="{{ @i=@level }}" to="{{ @i > (@row['leveldown']+1) }}" step="{{ @i-- }}"></table></div></td></tr></loop>
+	<loop from="{{ @i=@level }}" to="{{ @i < (@row['leveldown']+1) }}" step="{{ @i++ }}"><tr><td colspan=8><div style="padding: 3px 3px 3px 40px;" class="level{{@row['leveldown']}}"><table width="100%" style="border: 1px solid red;"></loop>
+	<tr>
+		<td style="padding: 1px 10px 1px 10px;"><a href="{{@BASE}}/adminCP/archive/categories/id={{ @row['cid'] }}">{ICON:edit}</a></td>
+		<td style="padding: 1px 10px 1px 10px;"><check if="{{@row['inorder']>1}}"><a href="{{@BASE}}/adminCP/archive/categories/move=up,{{ @row['cid'] }}" title="__MoveUp {{@row['category']}}">{ICON:arrow-up}</a></check>&nbsp;</td>
+		<td style="padding: 1px 10px 1px 10px;"><check if="{{@row['inorder']<@row['counter']}}"><a href="{{@BASE}}/adminCP/archive/categories/move=down,{{ @row['cid'] }}" title="__MoveDown {{@row['category']}}">{ICON:arrow-down}</a></check>&nbsp;</td>
+		<td style="padding: 1px 10px 1px 10px;"><check if="{{@row['locked']}}"><true>{ICON:lock}</true><false>{ICON:unlock}</false></check></td>
+		<td style="padding: 1px 10px 1px 10px;">{{@row['category']}}</td>
+		<td style="padding: 1px 10px 1px 10px;">{ICON:trash}</td>
+		<td style="padding: 1px 10px 1px 10px;"><a href="{{@BASE}}/adminCP/archive/categories/add={{ @row['cid'] }}" title="__AddSubcategory to {{@row['category']}}">{ICON:plus}</a></td>
+		<td style="padding: 1px 10px 1px 10px;">&nbsp;</td>
+	</tr>
+	<set level="{{ @row['leveldown']+1 }}" />
+</repeat>
+<loop from="{{ @i=@level }}" to="{{ @i > 0 }}" step="{{ @i-- }}"></table></div></loop>
+<a href="{{@BASE}}/adminCP/archive/categories/add" title="__AddSubcategory to {{@row['category']}}">{ICON:plus} __AddMainCategory</a>

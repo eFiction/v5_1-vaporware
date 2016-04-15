@@ -45,4 +45,37 @@ class AdminCP extends Base
 		\Base::instance()->set('data', $data);
 		return \Template::instance()->render('archive/edit_tag.html');
 	}
+
+	public static function editTagGroup($data)
+	{
+		\Base::instance()->set('data', $data);
+		return \Template::instance()->render('archive/edit_tag_group.html');
+	}
+
+	public static function listCategories($data)
+	{
+		\Base::instance()->set('categories', $data);
+		return \Template::instance()->render('archive/list_categories.html');
+	}
+	
+	public static function addCategory( $f3, $data )
+	{
+		$data = array_merge (
+		[
+			"job"			=> "add",
+			"category"		=> $f3->get('POST.form_data.category'),
+			"description"	=> $f3->get('POST.form_data.description'),
+			"locked"		=> TRUE,
+		], $data );
+		\Base::instance()->set('data', $data);
+		return \Template::instance()->render('archive/form_category.html');
+	}
+	
+	public static function editCategory($data)
+	{
+		if(empty($data['job'])) $data['job'] = "id";
+		\Base::instance()->set('data', $data);
+		return \Template::instance()->render('archive/form_category.html');
+	}
+
 }

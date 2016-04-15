@@ -318,7 +318,7 @@ class Story extends Base
 		}
 		else
 		{
-			$sql = "SELECT C.cid, C.category, C.description, C.image, C.count, C.stats, C.parent_cid
+			$sql = "SELECT C.cid, C.category, C.description, C.image, C.counter, C.stats, C.parent_cid
 							FROM `tbl_categories`C 
 							WHERE C.parent_cid ='{$cid}' 
 						GROUP BY C.cid 
