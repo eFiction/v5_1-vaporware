@@ -1,4 +1,5 @@
 <?php
+
 namespace Controller;
 
 class AdminCP_Archive extends AdminCP
@@ -13,7 +14,7 @@ class AdminCP_Archive extends AdminCP
 		switch( @$params['module'] )
 		{
 			case "featured":
-				$this->buffer( \View\Base::stub() );
+				$this->featured($f3, $params, $feedback);
 				break;
 			case "tags":
 				$this->tagsIndex($f3, $params, $feedback);
@@ -44,6 +45,11 @@ class AdminCP_Archive extends AdminCP
 	protected function home()
 	{
 		$this->buffer( \View\Base::stub() );
+	}
+	
+	protected function featured(\Base $f3, $params, $feedback)
+	{
+		
 	}
 	
 	protected function tagsIndex(\Base $f3, $params, $feedback)
@@ -237,7 +243,21 @@ class AdminCP_Archive extends AdminCP
 		}
 		elseif ( isset($params['delete']) )
 		{
-			$this->categoriesDelete($params['delete']);
+			$data = $this->model->loadCategory((int)$params['delete']);
+			$data['stats'] = unserialize($data['stats']);
+
+			if ( $data['stats']['sub']===NULL AND $data['stats']['count']==0 )
+			{
+				if ( FALSE === $this->model->deleteCategory( (int)$params['delete'] ) )
+					$errors = '__failDeleteCategory: '.$data['category'];
+				else
+					$changes = '__deletedCategory: '.$data['category'];
+			}
+			else
+			{
+				$errors = '__failDeleteCategory: '.$data['category'];
+			}
+			//$this->categoriesDelete($params['delete']);
 		}
 		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
 		{
@@ -268,8 +288,10 @@ class AdminCP_Archive extends AdminCP
 		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 		
 		$data = $this->model->categoriesListFlat();
+		$feedback['errors'] = @$errors;
+		$feedback['changes'] = @$changes;
 
-		$this->buffer ( \View\AdminCP::listCategories($data) );
+		$this->buffer ( \View\AdminCP::listCategories($data, $feedback) );
 	}
 	
 	protected function categoriesDelete($cid)
@@ -279,16 +301,17 @@ class AdminCP_Archive extends AdminCP
 		if ( $data['stats']['sub']==NULL )
 		{
 			// Has no sub-category
-			
+			$this->buffer ( "__CanDelete" );
 		}
 		else
 		{
 			// Still has sub-categories
-			
+			$this->buffer ( "__CannotDelete" );
 		}
-		print_r($data);
-		var_dump($data['stats']['sub']);
+		$this->buffer ( "<br>".print_r($data,1) );
+		//var_dump($data['stats']['sub']);
 		//$parent = $this->model->moveCategory( NULL,NULL,1 );
 		//  \Model\Routines::instance()->cacheCategories();
 	}
+
 }

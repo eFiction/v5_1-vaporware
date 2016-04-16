@@ -1,5 +1,5 @@
-<check if="{{ isset(@errors) }}"><div class="gb-90 alert-box error">{{ @errors }}</div></check>
-<check if="{{ isset(@changes) }}"><div class="gb-90 alert-box success">{{ @changes }}</div></check>
+<check if="{{ isset(@feedback.errors) }}"><div class="gb-90 alert-box error">{{ @feedback.errors }}</div></check>
+<check if="{{ isset(@feedback.changes) }}"><div class="gb-90 alert-box success">{{ @feedback.changes }}</div></check>
 <set level="1" />
 <div><table style="border: 1px solid blue;">
 <repeat group="{{ @categories }}" value="{{ @row }}">
@@ -11,7 +11,12 @@
 		<td style="padding: 1px 10px 1px 10px;"><check if="{{@row['inorder']<@row['counter']}}"><a href="{{@BASE}}/adminCP/archive/categories/move=down,{{ @row['cid'] }}" title="__MoveDown {{@row['category']}}">{ICON:arrow-down}</a></check>&nbsp;</td>
 		<td style="padding: 1px 10px 1px 10px;"><check if="{{@row['locked']}}"><true>{ICON:lock}</true><false>{ICON:unlock}</false></check></td>
 		<td style="padding: 1px 10px 1px 10px;">{{@row['category']}}</td>
-		<td style="padding: 1px 10px 1px 10px;">{ICON:trash}</td>
+		<td style="padding: 1px 10px 1px 10px;">
+			<check if="{{@row.stats.count==0 AND @row.stats.sub===NULL}}">
+				<true><a href="{{@BASE}}/adminCP/archive/categories/delete={{ @row['cid'] }}" class="deleteItem" title="#{{ @row['cid'] }}: {{ @row['category'] }}">{ICON:trash}</a></true>
+				<false>X</false>
+			</check>
+		</td>
 		<td style="padding: 1px 10px 1px 10px;"><a href="{{@BASE}}/adminCP/archive/categories/add={{ @row['cid'] }}" title="__AddSubcategory to {{@row['category']}}">{ICON:plus}</a></td>
 		<td style="padding: 1px 10px 1px 10px;">&nbsp;</td>
 	</tr>

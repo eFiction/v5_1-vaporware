@@ -188,7 +188,7 @@ class AdminCP extends Base {
 		return $taggroup->get('_id');
 	}
 
-	public function saveTag(int $tid, $data)
+	public function saveTag(int $tid, array $data)
 	{
 		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'tags');
 		$tag->load(array('tid=?',$tid));
@@ -203,7 +203,7 @@ class AdminCP extends Base {
 		return $i;
 	}
 	
-	public function saveTagGroup(int $tgid, $data)
+	public function saveTagGroup(int $tgid, array $data)
 	{
 		$taggroup=new \DB\SQL\Mapper($this->db, $this->prefix.'tag_groups');
 		$taggroup->load(array('tgid=?',$tgid));
@@ -244,24 +244,23 @@ class AdminCP extends Base {
 	
 	public function categoriesListFlat()
 	{
-//		$sql = "SELECT cid, parent_cid, category, locked, leveldown, inorder FROM `tbl_categories`C ORDER BY C.parent_cid DESC, C.inorder ASC";
 		$sql = "SELECT 
-					C.cid, C.parent_cid, C.category, C.locked, C.leveldown, C.inorder, 
+					C.cid, C.parent_cid, C.category, C.locked, C.leveldown, C.inorder, C.stats,
 					COUNT(C1.cid) as counter 
 				FROM `tbl_categories`C 
 				INNER JOIN `tbl_categories`C1 ON C.parent_cid=C1.parent_cid 
 				GROUP BY C.cid 
-				ORDER BY C.parent_cid DESC, C.inorder ASC";
+				ORDER BY C.leveldown DESC, C.inorder ASC";
 		$data = $this->exec($sql);
-		
+
 		if ( sizeof($data) == 0 ) return NULL;
 		
 		foreach ( $data as $item )
 		{
+			$item['stats'] = unserialize($item['stats']);
 			$temp[$item['parent_cid']][] = $item;
 			if ( isset($temp[$item['cid']]) ) $temp[$item['parent_cid']] = array_merge ( $temp[$item['parent_cid']], $temp[$item['cid']]);
 		}
-		
 		return $temp[0];
 	}
 
@@ -327,7 +326,7 @@ class AdminCP extends Base {
 		return $i;
 	}
 	
-	protected function adjustCategoryLevel($cid, $level)
+	protected function adjustCategoryLevel( int $cid, int $level)
 	{
 		$category=new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
 		$category->load(array('cid=?',$cid));
@@ -375,11 +374,7 @@ class AdminCP extends Base {
 			$sql = "SELECT C.parent_cid 
 						FROM `tbl_categories`C 
 						WHERE C.`cid`= :catID";
-			/*
-			$sql = "SELECT C.cid, C.category, C.inorder 
-						FROM `tbl_categories`C 
-						INNER JOIN `tbl_categories`C2 ON ( C.parent_cid = C2.parent_cid AND C2.`cid`= :catID ) ORDER BY C.inorder ".(($direction=="up") ? "DESC" : "ASC");
-			*/
+
 			$data = $this->exec ( $sql, [ ":catID" => $catID ] );
 			if ( empty($data[0]) OR !is_numeric($data[0]['parent_cid']) ) return FALSE;
 			$parent = $data[0]['parent_cid'];
@@ -409,33 +404,42 @@ class AdminCP extends Base {
 			{
 				if ( $direction == "up" )
 					$categories->inorder = max(1,($i-1));
-					// echo "<br>cid: {$categories->cid} {$categories->category} new:".max(1,($i-1));
+
 				else
 					$categories->inorder = min($elements,($i+1));
-					//echo "<br>cid: {$categories->cid} {$categories->category} new:".min($elements,($i+1));
+
 				// remember the vacant spot
 				$vacant = $i;
 			}
 			elseif ( $direction == "down" AND $i == $vacant+1 )
-			{
 				$categories->inorder = ($i-1);
-				// echo "<br>cid: {$categories->cid} {$categories->category} new:".($i-1);
-			}
+
 			elseif ( $direction == "up" AND $i == $vacant-1 )
-			{
 				$categories->inorder = ($i+1);
-				//echo "<br>cid: {$categories->cid} {$categories->category} new:".($i+1);
-			}
+
 			else 
 				$categories->inorder = $i;
-				//echo "<br>cid: {$categories->cid} {$categories->category} new:".$i;
 
 			$categories->save();
 			// moves forward even when the internal pointer is on last record
 			$categories->next();
 		}
-//		print_r($data);
 		return $parent;
+	}
+	
+	public function deleteCategory( int $cid )
+	{
+		$delete = new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
+		$delete->load( ["cid = ?", $cid ] );
+		$stats = unserialize( $delete->stats );
+		if ( $stats['sub']===NULL AND $stats['count']==0 )
+		{
+			$parent = $delete->parent_cid;
+			$delete->erase( ["cid = ?", $cid ] );
+			\Model\Routines::instance()->cacheCategories($parent);
+			return TRUE;
+		}
+		else return FALSE;
 	}
 
 }

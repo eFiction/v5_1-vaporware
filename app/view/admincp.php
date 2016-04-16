@@ -52,9 +52,10 @@ class AdminCP extends Base
 		return \Template::instance()->render('archive/edit_tag_group.html');
 	}
 
-	public static function listCategories($data)
+	public static function listCategories($data, $feedback)
 	{
 		\Base::instance()->set('categories', $data);
+		\Base::instance()->set('feedback', $feedback);
 		return \Template::instance()->render('archive/list_categories.html');
 	}
 	
