@@ -86,6 +86,10 @@ return array(
 'AdminMenu_Taggroups' => 'Groups',
 'AdminMenu_Tagcloud' => 'Cloud',
 'AdminMenu_Categories' => 'Categories',
+'ACP_Categories_Success_Deleted' => 'Category "{0}" successfully deleted!',
+'ACP_Categories_Error_notEmpty' => 'Could not delete category "{0}", because it is not empty!',
+'ACP_Categories_Error_DBError' => 'Could not delete category "{0}", database error occured!',
+'ACP_Categories_Error_badID' => 'Could not delete category, ID not found in database!',
 
 'AdminMenu_Stories' => 'Stories',
 'AdminMenu_Pending' => 'Pending',

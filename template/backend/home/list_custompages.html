@@ -1,0 +1,72 @@
+<form method="post" action="{{@BASE}}/adminCP/home/custompages">
+	<check if="{{ isset(@form_error) }}"><div class="grid-wrapper"><div class="gb-50 alert-box error">{{ @form_error }}</div><div class="gb-10">&nbsp;</div></div></check>
+	<div class="grid-wrapper">
+		<div class="gb-30"><input class="text-input" type="text" name="newPage"></div>
+		<div class="gb-70"><input class="button" type="submit" value="__NewPageBlock"></div>
+	</div>
+</form>
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
+<table class="tbody" id="textblockForm">
+	<tr>
+		<th>&nbsp;</th>
+		<th>&nbsp;</th>
+		<th>__CanLinkPage</th>
+		<th><a href="{{@BASE}}/adminCP/home/custompages/order=id,
+			<check if="{{ @sort['link']!='id' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-numeric-desc}</true>
+						<false>desc">{ICON:sort-numeric-asc}</false>
+					</check>
+				</false>
+			</check></a> __ID
+		</th>
+		<th><a href="{{@BASE}}/adminCP/home/custompages/order=label,
+			<check if="{{ @sort['link']!='label' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-alpha-desc}</true>
+						<false>desc">{ICON:sort-alpha-asc}</false>
+					</check>
+				</false>
+			</check></a> __Label
+		</th>
+		<th><a href="{{@BASE}}/adminCP/home/custompages/order=title,
+			<check if="{{ @sort['link']!='title' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-alpha-desc}</true>
+						<false>desc">{ICON:sort-alpha-asc}</false>
+					</check>
+				</false>
+			</check></a> __Title
+		</th>
+	</tr>
+	<repeat group="{{ @pages }}" value="{{ @row }}">
+	<tr>
+		<td><a href="{{@BASE}}/adminCP/home/custompages/id={{ @row['id'] }}">{ICON:edit}</a></td>
+		<td><a href="{{@BASE}}/adminCP/home/custompages/delete={{ @row['id'] }}" class="deleteItem" title="#{{ @row['id'] }}: {{ @row['label'] }}">{ICON:trash}</a></td>
+		<td><check if="{{ @row['as_page']==1 }}"><true>{ICON:check}</true><false>{ICON:remove}</false></check></td>
+		<td>{{ @row['id'] }}</td>
+		<td>{{ @row['label'] }}</td>
+		<td>{{ @row['title'] }}</td>
+	</tr>
+	</repeat>
+</table>
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
+{*
+<script type="text/javascript">
+$('input:radio').change(function() {
+	$.ajax
+	({
+			url: "index.php",	
+			type: "GET",		
+			data: {ajax : "controlpanel", textblocks: this.name, visibility: this.value},
+			cache: false
+	});
+});
+</script>
+*}

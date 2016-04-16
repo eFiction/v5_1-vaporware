@@ -8,8 +8,20 @@ return array(
 'PM_Inbox' => 'Posteingang',
 'PM_Outbox' => 'Postausgang',
 'PM_Write' => 'Verfassen',
+'PM_Outbox_Items' => '{0, plural,'.
+	'zero	{Your Outbox is empty!},'.
+	'one	{One message:},'.
+	'other	{# messages:}
+}',
 'PM_Outbox_empty' => 'Dein Postausgang ist leer',
+
+'PM_Inbox_Items' => '{0, plural,'.
+	'zero	{Your Inbox is empty!},'.
+	'one	{One message:},'.
+	'other	{# messages:}
+}',
 'PM_Inbox_empty' => 'Dein Posteingang ist leer',
+
 'PM_Subject' => 'Betreff',
 'PM_Sender' => 'Absender',
 'PM_Sent' => 'Gesendet',
@@ -74,6 +86,10 @@ return array(
 'AdminMenu_Taggroups' => 'Groups',
 'AdminMenu_Tagcloud' => 'Cloud',
 'AdminMenu_Categories' => 'Categories',
+'ACP_Categories_Success_Deleted' => 'Kategories "{0}" wurde erfolgreich gelöscht!',
+'ACP_Categories_Error_notEmpty' => 'Kann Kategories "{0}" nicht löschen, da sie nicht leer ist!',
+'ACP_Categories_Error_DBError' => 'Konnte Kategories "{0}" wegen Datenbankfehler nicht löschen!',
+'ACP_Categories_Error_badID' => 'Kann die Kategories nicht löschen, keine gültige ID gefunden!',
 
 'AdminMenu_Stories' => 'Stories',
 'AdminMenu_Pending' => 'Pending',

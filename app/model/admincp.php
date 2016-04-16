@@ -431,6 +431,7 @@ class AdminCP extends Base {
 	{
 		$delete = new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
 		$delete->load( ["cid = ?", $cid ] );
+		if ( 1 != $delete->count( ["cid = ?", $cid ] ) ) return FALSE;
 		$stats = unserialize( $delete->stats );
 		if ( $stats['sub']===NULL AND $stats['count']==0 )
 		{
@@ -442,4 +443,84 @@ class AdminCP extends Base {
 		else return FALSE;
 	}
 
+	public function listCustompages(int $page, array $sort)
+	{
+		$limit = 10;
+		$textblocks = new \DB\SQL\Mapper($this->db, $this->prefix.'textblocks');
+		$data = $textblocks->paginate(
+					$page-1,
+					$limit,
+					NULL,
+					array('order'=>"{$sort['order']} {$sort['direction']}")
+		);
+
+		$this->paginate(
+			$data['total'],	//$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/adminCP/home/custompages/order={$sort['link']},{$sort['direction']}",
+			$limit
+		);
+
+		return $data['subset'];
+	}
+
+	public function loadCustompage(int $id)
+	{
+		$sql = "SELECT TB.* FROM `tbl_textblocks`TB WHERE TB.id = :id";
+		$data = $this->exec($sql, [":id" => $id ]);
+		if (sizeof($data)==1) return $data[0];
+		return NULL;
+	}
+
+	public function saveCustompage(int $id, array $data)
+	{
+		if( empty($data['label']) )
+		{
+			\Base::instance()->set('form_error', "__EmptyLabel");
+			return FALSE;
+		}
+		$textblock=new \DB\SQL\Mapper($this->db, $this->prefix.'textblocks');
+		if( $textblock->count(array('id!=? AND label=?',$id,$data['label'])) > 0 )
+		{
+			\Base::instance()->set('form_error', "__DuplicateLabel");
+			return FALSE;
+		}
+		$textblock->load(array('id=?',$id));
+		$textblock->copyfrom( 
+			[ 
+				"label"		=> $data['label'], 
+				"title"		=> $data['title'],
+				"content"	=> $data['content'],
+				"as_page"	=> isset($data['page']) ? : 0,
+			]
+		);
+
+		$i  = $textblock->changed("label");
+		$i += $textblock->changed("title");
+		$i += $textblock->changed("content");
+		$i += $textblock->changed("as_page");
+		
+		$textblock->save();
+
+		return $i;
+	}
+	
+	public function addCustompage( string $label )
+	{
+		$textblock=new \DB\SQL\Mapper($this->db, $this->prefix.'textblocks');
+		$conflicts = (int)$textblock->count(array('label=?',$label));
+		if($conflicts>0) return FALSE;
+		$textblock->reset();
+		$textblock->label = $label;
+		$textblock->save();
+		return $textblock->_id;
+	}
+
+	public function deleteCustompage( int $id )
+	{
+		$delete = new \DB\SQL\Mapper($this->db, $this->prefix.'textblocks');
+		if ( $delete->count( ["id = ?", $id ] ) == 0 ) return FALSE;
+		$delete->erase( ["id = ?", $id ] );
+		return TRUE;
+	}
+	
 }

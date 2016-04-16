@@ -77,9 +77,8 @@ if (\Controller\Auth::isLoggedIn())
 
 		// Home
 		$f3->route(
-			[ 'GET /adminCP/home', 'GET /adminCP/home/@module', 'GET /adminCP/home/@module/*' ],
+			[ 'GET /adminCP/home', 'GET|POST /adminCP/home/@module', 'GET|POST /adminCP/home/@module/*' ],
 			'Controller\AdminCP_Home->index' );
-		$f3->route( 'POST /adminCP/home/@module', 'Controller\AdminCP_Home->save' );
 
 		// Members
 		$f3->route(

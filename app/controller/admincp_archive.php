@@ -146,6 +146,12 @@ class AdminCP_Archive extends AdminCP
 				$f3->reroute('/adminCP/archive/tags/groups/id='.$newID, false);
 			}
 		}
+		elseif ( isset($params['delete']) )
+		{
+			if ( $this->model->deleteTagGroup( (int)$params['delete'] ) )
+				$f3->reroute('/adminCP/archive/tags/groups', false);
+			else $f3->set('form_error', "__failedDelete");
+		}
 
 		if( isset ($params['id']) )
 		{
@@ -154,12 +160,6 @@ class AdminCP_Archive extends AdminCP
 			$data['changes'] = @$changes;
 			$this->buffer( \View\AdminCP::editTagGroup($data) );
 			return TRUE;
-		}
-		elseif ( isset($params['delete']) )
-		{
-			if ( $this->model->deleteTagGroup( (int)$params['delete'] ) )
-				$f3->reroute('/adminCP/archive/tags/groups', false);
-			else $f3->set('form_error', "__failedDelete");
 		}
 
 		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
@@ -244,20 +244,22 @@ class AdminCP_Archive extends AdminCP
 		elseif ( isset($params['delete']) )
 		{
 			$data = $this->model->loadCategory((int)$params['delete']);
-			$data['stats'] = unserialize($data['stats']);
-
-			if ( $data['stats']['sub']===NULL AND $data['stats']['count']==0 )
+			if ( isset($data['category']) )
 			{
-				if ( FALSE === $this->model->deleteCategory( (int)$params['delete'] ) )
-					$errors = '__failDeleteCategory: '.$data['category'];
+				$data['stats'] = unserialize($data['stats']);
+
+				if ( $data['stats']['sub']===NULL AND $data['stats']['count']==0 )
+				{
+					if ( FALSE === $this->model->deleteCategory( (int)$params['delete'] ) )
+						$errors = $f3->get('ACP_Categories_Error_DBError', $data['category']);
+					else
+						$changes = $f3->get('ACP_Categories_Success_Deleted', $data['category']);
+				}
 				else
-					$changes = '__deletedCategory: '.$data['category'];
+					$errors = $f3->get('ACP_Categories_Error_notEmpty', $data['category']);
 			}
 			else
-			{
-				$errors = '__failDeleteCategory: '.$data['category'];
-			}
-			//$this->categoriesDelete($params['delete']);
+				$errors = $f3->get('ACP_Categories_Error_badID');
 		}
 		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
 		{
@@ -294,24 +296,4 @@ class AdminCP_Archive extends AdminCP
 		$this->buffer ( \View\AdminCP::listCategories($data, $feedback) );
 	}
 	
-	protected function categoriesDelete($cid)
-	{
-		$data = $this->model->loadCategory($cid);
-		$data['stats'] = unserialize($data['stats']);
-		if ( $data['stats']['sub']==NULL )
-		{
-			// Has no sub-category
-			$this->buffer ( "__CanDelete" );
-		}
-		else
-		{
-			// Still has sub-categories
-			$this->buffer ( "__CannotDelete" );
-		}
-		$this->buffer ( "<br>".print_r($data,1) );
-		//var_dump($data['stats']['sub']);
-		//$parent = $this->model->moveCategory( NULL,NULL,1 );
-		//  \Model\Routines::instance()->cacheCategories();
-	}
-
 }

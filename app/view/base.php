@@ -35,7 +35,7 @@ abstract class Base {
 		{
 			$this->JS[$location][] = (strpos($string,"//")===0)
 																? "<script src=\"{$string}\"></script>"
-																: "<script src=\"".$f3->get('BASE')."/app/inc/{$string}\"></script>";
+																: "<script src=\"".$f3->get('BASE')."/app/js/{$string}\"></script>";
 		}
 		else $this->JS[$location][] = "<script type=\"text/javascript\">{$string}</script>";
 	}

@@ -23,7 +23,7 @@ class AdminCP extends Base
 	{
 		\Base::instance()->set('script_versions', $v);
 		\Base::instance()->set('versions_compare', $c);
-		return \Template::instance()->render('home_welcome.html');
+		return \Template::instance()->render('home/welcome.html');
 	}
 	
 	public static function listTags($data, $sort)
@@ -59,7 +59,7 @@ class AdminCP extends Base
 		return \Template::instance()->render('archive/list_categories.html');
 	}
 	
-	public static function addCategory( $f3, $data )
+	public static function addCategory( \Base $f3, array $data )
 	{
 		$data = array_merge (
 		[
@@ -72,11 +72,25 @@ class AdminCP extends Base
 		return \Template::instance()->render('archive/form_category.html');
 	}
 	
-	public static function editCategory($data)
+	public static function editCategory(array $data)
 	{
 		if(empty($data['job'])) $data['job'] = "id";
 		\Base::instance()->set('data', $data);
 		return \Template::instance()->render('archive/form_category.html');
 	}
+
+	public static function listCustompages(array $data, array $sort)
+	{
+		\Base::instance()->set('pages', $data);
+		\Base::instance()->set('sort', $sort);
+		return \Template::instance()->render('home/list_custompages.html');
+	}
+
+	public static function editCustompage(array $data)
+	{
+		\Base::instance()->set('data', $data);
+		return \Template::instance()->render('home/edit_custompage.html');
+	}
+
 
 }
