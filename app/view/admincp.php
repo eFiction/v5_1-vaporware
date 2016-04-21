@@ -88,9 +88,35 @@ class AdminCP extends Base
 
 	public static function editCustompage(array $data)
 	{
+		if(!isset($data['raw']))
+		{
+			\Registry::get('VIEW')->javascript( 'head', TRUE, "//cdn.tinymce.com/4/tinymce.min.js" );
+			\Registry::get('VIEW')->javascript( 'head', TRUE, "editor.js" );
+		}
 		\Base::instance()->set('data', $data);
 		return \Template::instance()->render('home/edit_custompage.html');
 	}
 
+	public static function listNews(array $data, array $sort)
+	{
+		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 
+		\Base::instance()->set('newsEntries', $data);
+		\Base::instance()->set('sort', $sort);
+		return \Template::instance()->render('home/list_news.html');
+	}
+
+	public static function editNews(array $data)
+	{
+		if(!isset($data['raw']))
+		{
+			\Registry::get('VIEW')->javascript( 'head', TRUE, "//cdn.tinymce.com/4/tinymce.min.js" );
+			\Registry::get('VIEW')->javascript( 'head', TRUE, "editor.js" );
+		}
+		\Registry::get('VIEW')->javascript( 'head', TRUE, "jquery.datetimepicker.js" );
+
+		\Base::instance()->set('data', $data);
+		return \Template::instance()->render('home/edit_news.html');
+	}
+	
 }

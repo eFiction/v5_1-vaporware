@@ -115,6 +115,18 @@ class Base extends \Prefab {
 		}
 		return NULL;
 	}
+	
+	protected function timeToUser($dbTime, string $formatOut="Y-m-d H:i", bool $timestamp = FALSE)
+	{
+		$date = new \DateTime($dbTime);
+		$tz_server = timezone_name_get($date->getTimezone());
+
+		if ( empty($tz_user) OR $tz_user == $tz_server )
+			return $date->format($formatOut);
+		
+		$date->setTimezone( new \DateTimeZone($tz_user) );
+		return $date->format($formatOut);
+	}
 
 	
 	protected function paginate(int $total, $route, int $limit=10)

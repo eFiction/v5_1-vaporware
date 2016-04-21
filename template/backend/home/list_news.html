@@ -1,0 +1,78 @@
+<form method="post" action="{{@BASE}}/adminCP/home/news">
+	<div class="grid-wrapper">
+		<div class="gb-30"><input class="text-input" type="text" name="newHeadline"></div>
+		<div class="gb-70"><input class="button" type="submit" value="__NewHeadline"></div>
+	</div>
+</form>
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
+<table class="tbody">
+	<tr>
+		<th>&nbsp;</th>
+		<th>&nbsp;</th>
+		<th>&nbsp;</th>
+		<th><a href="{{@BASE}}/adminCP/home/news/order=id,
+			<check if="{{ @sort['link']!='id' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-numeric-desc}</true>
+						<false>desc">{ICON:sort-numeric-asc}</false>
+					</check>
+				</false>
+			</check></a> __ID
+		</th>
+		<th><a href="{{@BASE}}/adminCP/home/news/order=date,
+			<check if="{{ @sort['link']!='date' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-alpha-desc}</true>
+						<false>desc">{ICON:sort-alpha-asc}</false>
+					</check>
+				</false>
+			</check></a> __Date
+		</th>
+		<th><a href="{{@BASE}}/adminCP/home/news/order=title,
+			<check if="{{ @sort['link']!='title' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-alpha-desc}</true>
+						<false>desc">{ICON:sort-alpha-asc}</false>
+					</check>
+				</false>
+			</check></a> __Headline
+		</th>
+		<th><a href="{{@BASE}}/adminCP/home/news/order=author,
+			<check if="{{ @sort['link']!='author' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-alpha-desc}</true>
+						<false>desc">{ICON:sort-alpha-asc}</false>
+					</check>
+				</false>
+			</check></a> __Author
+	</tr>
+	<repeat group="{{ @newsEntries }}" value="{{ @row }}">
+	<tr>
+		<td><a href="{{@BASE}}/adminCP/home/news/id={{ @row['nid'] }}">{ICON:edit}</a></td>
+		<td><a href="{{@BASE}}/adminCP/home/news/delete={{ @row['nid'] }}" class="deleteItem" title="#{{ @row['nid'] }}: {{ @row['headline'] }}">{ICON:trash}</a></td>
+		<td>
+			<check if="{{ @row['timestamp'] == NULL }}">
+				<true>{ICON:remove}</true>
+				<false>
+					<check if="{{ @row['timestamp'] <= time() }}">
+						<true>{ICON:visible}</true>
+						<false>{ICON:time}</false>
+					</check>
+				</false>
+			</check>
+		</td>
+		<td>{{ @row['nid'] }}</td>
+		<td>{{ @row['date'] }}</td>
+		<td>{{ @row['headline'] }}</td>
+		<td>{{ @row['author'] }}</td>
+	</tr>
+	</repeat>
+</table>

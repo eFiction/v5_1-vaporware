@@ -19,7 +19,7 @@ class AdminCP_Home extends AdminCP
 				$this->custompages( $f3, $params );
 				break;
 			case "news":
-				$this->buffer( \View\Base::stub() );
+				$this->news( $f3, $params );
 				break;
 			case "modules":
 				$this->buffer( \View\Base::stub() );
@@ -62,7 +62,13 @@ class AdminCP_Home extends AdminCP
 
 		if ( isset($params[2]) ) $params = $this->parametric($params[2]);
 
-		if  ( isset($_POST) AND sizeof($_POST)>0 )
+		if ( isset($params['delete']) )
+		{
+			if ( $this->model->deleteCustompage( (int)$params['delete'] ) )
+				$f3->reroute('/adminCP/home/custompages', false);
+			else $f3->set('form_error', "__failedDelete");
+		}
+		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
 		{
 			if ( isset($_POST['form_data']) )
 			{
@@ -77,26 +83,18 @@ class AdminCP_Home extends AdminCP
 					$f3->reroute('/adminCP/home/custompages/id='.$newID, false);
 			}
 		}
-		elseif ( isset($params['delete']) )
-		{
-			if ( $this->model->deleteCustompage( (int)$params['delete'] ) )
-				$f3->reroute('/adminCP/home/custompages', false);
-			else $f3->set('form_error', "__failedDelete");
-		}
 		
 		if( isset ($params['id']) )
 		{
-			if(!isset($params['raw']))
+			if ( NULL !== $data = $this->model->loadCustompage($params['id']) )
 			{
-				\Registry::get('VIEW')->javascript( 'head', TRUE, "//cdn.tinymce.com/4/tinymce.min.js" );
-				\Registry::get('VIEW')->javascript( 'head', TRUE, "editor.js" );
+				$data['raw'] = @$params['raw'];
+				$data['errors'] = @$errors;
+				$data['changes'] = @$changes;
+				$this->buffer( \View\AdminCP::editCustompage($data) );
+				return TRUE;
 			}
-			$data = $this->model->loadCustompage($params['id']);
-			$data['raw'] = @$params['raw'];
-			$data['errors'] = @$errors;
-			$data['changes'] = @$changes;
-			$this->buffer( \View\AdminCP::editCustompage($data) );
-			return TRUE;
+			else $f3->set('form_error', "__failedLoad");
 		}
 
 		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
@@ -118,6 +116,67 @@ class AdminCP_Home extends AdminCP
 		$data = $this->model->listCustompages($page, $sort);
 
 		$this->buffer ( \View\AdminCP::listCustompages($data, $sort) );
+	}
+	
+	protected function news(\Base $f3, array $params)
+	{
+		$this->response->addTitle( $f3->get('LN__AdminMenu_News') );
+		$f3->set('title_h3', $f3->get('LN__AdminMenu_News') );
+
+		if ( isset($params[2]) ) $params = $this->parametric($params[2]);
+
+		if ( isset($params['delete']) )
+		{
+			if ( $this->model->deleteNews( (int)$params['delete'] ) )
+				$f3->reroute('/adminCP/home/news', false);
+			else $f3->set('form_error', "__failedDelete");
+		}
+		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
+		{
+			if ( isset($_POST['form_data']) )
+			{
+				//$changes = $this->model->saveCustompage($params['id'], $f3->get('POST.form_data') );
+			}
+			elseif ( isset($_POST['newHeadline']) )
+			{
+				$newID = $this->model->addNews( $f3->get('POST.newHeadline') );
+				if ( $newID !== FALSE )
+					$f3->reroute('/adminCP/home/news/id='.$newID, false);
+			}
+		}
+		
+		if( isset ($params['id']) )
+		{
+			if ( NULL !== $data = $this->model->loadNews($params['id']) )
+			{
+				$data['raw'] = @$params['raw'];
+				$data['errors'] = @$errors;
+				$data['changes'] = @$changes;
+				$this->buffer( \View\AdminCP::editNews($data) );
+				return TRUE;
+			}
+			else $f3->set('form_error', "__failedLoad");
+		}
+
+		// page will always be an integer > 0
+		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
+
+		// search/browse
+		$allow_order = array (
+				"id"		=>	"nid",
+				"date"		=>	"date",
+				"title"		=>	"headline",
+				"author"	=>	"author",
+		);
+
+		// sort order
+		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "date";
+		$sort["order"]		= $allow_order[$sort["link"]];
+		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
+		
+		$data = $this->model->listNews($page, $sort);
+
+		$this->buffer ( \View\AdminCP::listNews($data, $sort) );
 	}
 	
 }

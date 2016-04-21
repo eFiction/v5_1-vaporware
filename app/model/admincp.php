@@ -522,5 +522,78 @@ class AdminCP extends Base {
 		$delete->erase( ["id = ?", $id ] );
 		return TRUE;
 	}
+
+	public function listNews(int $page, array $sort)
+	{
+		/*
+		$tags = new \DB\SQL\Mapper($this->db, $this->prefix.'tags' );
+		$data = $tags->paginate($page, 10, NULL, [ 'order' => "{$sort['order']} {$sort['direction']}", ] );
+		*/
+		$limit = 20;
+		$pos = $page - 1;
+
+		$sql = "SELECT SQL_CALC_FOUND_ROWS N.nid, N.headline, U.nickname AS author, DATE(N.datetime) as date, UNIX_TIMESTAMP(N.datetime) as timestamp
+				FROM `tbl_news`N
+				LEFT JOIN `tbl_users`U ON (N.uid=U.uid)
+				ORDER BY {$sort['order']} {$sort['direction']}
+				LIMIT ".(max(0,$pos*$limit)).",".$limit;
+
+		$data = $this->exec($sql);
+				
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/adminCP/home/news/order={$sort['link']},{$sort['direction']}",
+			$limit
+		);
+				
+		return $data;
+	}
+
+	public function loadNews(int $id)
+	{
+		$sql = "SELECT N.nid as id, N.headline, N.newstext, N.datetime, UNIX_TIMESTAMP(N.datetime) as timestamp FROM `tbl_news`N WHERE `nid` = :nid";
+		$data = $this->exec($sql, [":nid" => $id ]);
+		if (sizeof($data)!=1) 
+			return NULL;
+
+		$data[0]['date_format_short'] = \Config::instance()->date_format_short;
+		$data[0]['datetime'] = $this->timeToUser($data[0]['datetime'], $data[0]['date_format_short']." H:i");
+
+		return $data[0];
+	}
+
+	public function addNews( string $headline )
+	{
+		$news=new \DB\SQL\Mapper($this->db, $this->prefix.'news');
+		$news->uid = $_SESSION['userID'];
+		$news->headline = $headline;
+		$news->datetime = NULL;
+		$news->save();
+		return $news->_id;
+	}
+
+	public function deleteNews( int $id )
+	{
+		$delete = new \DB\SQL\Mapper($this->db, $this->prefix.'news');
+		if ( $delete->count( ["nid = ?", $id ] ) == 0 ) return FALSE;
+		$delete->erase( ["nid = ?", $id ] );
+		return TRUE;
+	}
+
+	public function listStoryFeatured ( int $status = 1 )
+	{
+		/*
+		active:
+		SELECT * FROM `efi5_stories_featured` WHERE status=1 OR ( start < NOW() AND end > NOW() )
+		*/
+		/*
+		past:
+		SELECT * FROM `efi5_stories_featured` WHERE status=2 OR end < NOW()
+		*/
+		/*
+		future:
+		SELECT * FROM `efi5_stories_featured` WHERE start > NOW()
+		*/
+	}
 	
 }

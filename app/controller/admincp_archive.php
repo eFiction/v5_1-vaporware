@@ -23,7 +23,7 @@ class AdminCP_Archive extends AdminCP
 				$this->categories($f3, $params);
 				break;
 			default:
-				$this->home();
+				$this->home($f3);
 		}
 	}
 
@@ -42,9 +42,16 @@ class AdminCP_Archive extends AdminCP
 		exit;
 	}
 
-	protected function home()
+	protected function home(\Base $f3, $feedback = [ NULL, NULL ])
 	{
-		$this->buffer( \View\Base::stub() );
+		if ( isset($_POST['form_data']) )
+		{
+			$feedback = $this->model->saveKeys($f3->get('POST.form_data'));
+		}
+		$this->response->addTitle( $f3->get('LN__AdminMenu_Archive') );
+		$data['General'] = $this->model->settingsFields('archive_general');
+		$data['Intro'] = $this->model->settingsFields('archive_intro');
+		if ($data) $this->buffer( \View\AdminCP::settingsFields($data, "archive/home", $feedback) );
 	}
 	
 	protected function featured(\Base $f3, $params, $feedback)
@@ -80,7 +87,12 @@ class AdminCP_Archive extends AdminCP
 	{
 		if ( isset($params[2]) ) $params = $this->parametric($params[2]);
 
-		if  ( isset($_POST) AND sizeof($_POST)>0 )
+		if ( isset($params['delete']) )
+		{
+			$this->model->deleteTag( (int)$params['delete'] );
+			$f3->reroute('/adminCP/archive/tags/edit', false);
+		}
+		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
 		{
 			if ( isset($_POST['form_data']) )
 			{
@@ -102,11 +114,6 @@ class AdminCP_Archive extends AdminCP
 			$data['changes'] = @$changes;
 			$this->buffer( \View\AdminCP::editTag($data) );
 			return TRUE;
-		}
-		elseif ( isset($params['delete']) )
-		{
-			$this->model->deleteTag( (int)$params['delete'] );
-			$f3->reroute('/adminCP/archive/tags/edit', false);
 		}
 
 		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
@@ -134,7 +141,13 @@ class AdminCP_Archive extends AdminCP
 	{
 		if ( isset($params[2]) ) $params = $this->parametric($params[2]);
 
-		if  ( isset($_POST) AND sizeof($_POST)>0 )
+		if ( isset($params['delete']) )
+		{
+			if ( $this->model->deleteTagGroup( (int)$params['delete'] ) )
+				$f3->reroute('/adminCP/archive/tags/groups', false);
+			else $f3->set('form_error', "__failedDelete");
+		}
+		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
 		{
 			if ( isset($_POST['form_data']) )
 			{
@@ -145,12 +158,6 @@ class AdminCP_Archive extends AdminCP
 				$newID = $this->model->addTagGroup( $f3->get('POST.newTagGroup') );
 				$f3->reroute('/adminCP/archive/tags/groups/id='.$newID, false);
 			}
-		}
-		elseif ( isset($params['delete']) )
-		{
-			if ( $this->model->deleteTagGroup( (int)$params['delete'] ) )
-				$f3->reroute('/adminCP/archive/tags/groups', false);
-			else $f3->set('form_error', "__failedDelete");
 		}
 
 		if( isset ($params['id']) )
@@ -264,10 +271,7 @@ class AdminCP_Archive extends AdminCP
 		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
 		{
 			if ( isset($_POST['form_data']) )
-			{
 				$changes = $this->model->saveCategory($params['id'], $f3->get('POST.form_data') );
-			}
-			
 		}
 
 		if ( isset($params['id']) )
