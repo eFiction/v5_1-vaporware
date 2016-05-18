@@ -1,0 +1,10 @@
+		<h6>__Chapters</h6>
+		<small>__Dragdropsort</small>
+		<br /><br />
+		<ul id="chapter-sort">
+		<repeat group="{{ @chapterList }}" value="{{ @row }}">
+			<li id="{{ @row.chapid }}"><a href="{{@BASE}}/adminCP/stories/edit/story={{ @row.sid }};chapter={{ @row.chapid }}" class="fa fa-pencil-square-o"></a> {{ @row.title }}</li>
+		</repeat>
+		</ul>
+		 <a class="button" href="{{@BASE}}/adminCP/stories/edit/story={{ @row.sid }}">__editHeader</a> <br />
+		 <a class="button" href="{{@BASE}}/adminCP/stories/edit/story={{ @row.sid }};chapter=new">__addChapter</a>

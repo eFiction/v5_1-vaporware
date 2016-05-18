@@ -3,14 +3,15 @@ namespace Controller;
 
 class AdminCP_Home extends AdminCP
 {
+	var $moduleBase = "home";
+	var $submodules = [ "manual", "custompages", "news", "modules", "shoutbox" ];
 
 	public function index(\Base $f3, $params)
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Home') );
 		$f3->set('title_h1', $f3->get('LN__AdminMenu_Home') );
-		$this->showMenu("home");
 
-		switch( @$params['module'] )
+		switch( $this->moduleInit(@$params['module']) )
 		{
 			case "manual":
 				$this->buffer( \View\Base::stub() );
@@ -24,8 +25,14 @@ class AdminCP_Home extends AdminCP
 			case "modules":
 				$this->buffer( \View\Base::stub() );
 				break;
+			case "shoutbox":
+				$this->buffer( \View\Base::stub() );
+				break;
+			case "home":
+				$this->home($f3);
+				break;
 			default:
-				$this->home();
+				$this->buffer(\Template::instance()->render('access.html'));
 		}
 	}
 	
@@ -34,7 +41,7 @@ class AdminCP_Home extends AdminCP
 		
 	}
 
-	protected function home()
+	protected function home(\Base $f3)
 	{
 		// silently attempt to get version information
 		$ch = @curl_init("http://efiction.org/version.php");
@@ -42,7 +49,7 @@ class AdminCP_Home extends AdminCP
 		$versions = @curl_exec($ch);
 		@curl_close($ch);
 		
-		$compare['base'] = \Base::instance()->get('APP_VERSION');
+		$compare['base'] = $f3->get('APP_VERSION');
 
 		if ($versions)
 		{

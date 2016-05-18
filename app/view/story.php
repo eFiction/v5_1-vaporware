@@ -29,16 +29,17 @@ class Story extends Base
 	protected static function dataProcess(&$item, $key=NULL)
 	{
 		if (isset($item['published']))	$item['published']	= date(\Base::instance()->get('CONFIG')['date_format_short'],$item['published']);
-		if (isset($item['modified']))		$item['modified']		= date(\Base::instance()->get('CONFIG')['date_format_short'],$item['modified']);
-																		$item['number']			= isset($item['inorder']) ? "{$item['inorder']}&nbsp;" : "";
+		if (isset($item['modified']))	$item['modified']	= date(\Base::instance()->get('CONFIG')['date_format_short'],$item['modified']);
+										$item['number']		= isset($item['inorder']) ? "{$item['inorder']}&nbsp;" : "";
 		if (isset($item['wordcount'])) 	$item['wordcount']	= number_format($item['wordcount'], 0, '','.');
-		if (isset($item['count'])) 			$item['count']			= number_format($item['count'], 0, '','.');
-																		$item['authors'] 		= $item['authorblock'] = unserialize($item['authorblock']);
+		if (isset($item['count'])) 		$item['count']		= number_format($item['count'], 0, '','.');
+										$item['authors'] 	= $item['authorblock'] = unserialize($item['authorblock']);
 
 		array_walk($item['authors'], function (&$v, $k){ $v = $v[1];} );
 
-		if (isset($item['categoryblock'])) 	$item['categoryblock']= unserialize($item['categoryblock']);
-		if (isset($item['tagblock'])) 			$item['tagblock']		= unserialize($item['tagblock']);
+		if (isset($item['categoryblock'])) 	$item['categoryblock']	= unserialize($item['categoryblock']);
+		if (isset($item['tagblock'])) 		$item['tagblock']		= unserialize($item['tagblock']);
+		if (isset($item['characterblock'])) $item['characterblock']	= unserialize($item['characterblock']);
 	}
 
 	public static function buildTOC($tocData, $storyData)
@@ -58,6 +59,7 @@ class Story extends Base
 	{
 		$storyData['categoryblock'] = unserialize($storyData['categoryblock']);
 		$storyData['tagblock'] = unserialize($storyData['tagblock']);
+		$storyData['characterblock'] = unserialize($storyData['characterblock']);
 
 		\Base::instance()->set('storyData', $storyData);
 
@@ -95,6 +97,7 @@ class Story extends Base
 												"content" => $content,
 												"dropdown" => $dropdown,
 												"groups" => $_SESSION['groups'],
+												"infoblock" => ( $storyData['chapters'] > 1 ) ? "" : \View\Story::buildInfoblock($storyData),
 												]);
 		
 		return \Template::instance()->render('story/single.html');

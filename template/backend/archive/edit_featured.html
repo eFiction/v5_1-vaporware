@@ -1,0 +1,28 @@
+<h1>__A_TagGroups:</h1>
+<form action="{{@BASE}}/adminCP/archive/featured/sid={{ @data['sid'] }}" method="post">
+	<div class="grid-wrapper">
+		<check if="{{ @data['errors'] }}"><div class="gb-90 alert-box error">{{ @data['errors'] }}</div></check>
+		<check if="{{ @data['changes'] }}"><div class="gb-90 alert-box success">__StatusUpdated</div></check>
+		<div class="gb-20">__Story_Title</div><div class="gb-80">{{ @data['title'] }}</div>
+		<div class="gb-20">__StoryBy</div><div class="gb-80"><repeat group="{{ @data['authorblock'] }}" value="{{ @author }}" counter="{{ @count }}"><check if="{{@count >1}}">, </check>{{ @author.1 }}</repeat></div>
+		<check if="{{ @data.status == NULL AND @data.start == NULL }}">
+			<true><div class="gb-90 alert-box warning">__No featured data yet</div></true>
+			<false><div class="gb-20">__Changedby:</div><div class="gb-80">{{ @data['nickname'] }}&nbsp;</div></false>
+		</check>
+		<div class="gb-20">__Status:</div>
+			<div class="gb-80"><input type="radio" id="curr" name="form_data[status]" value="1" <check if="{{@data.status==1}}">checked="checked" </check>/><label for="curr"> Current</label></div>
+		<div class="gb-20">&nbsp;</div>
+			<div class="gb-80"><input type="radio" id="past" name="form_data[status]" value="2" <check if="{{@data.status==2}}">checked="checked" </check>/><label for="past"> Past</label></div>
+		<div class="gb-20">&nbsp;</div>
+			<div class="gb-80"><input type="radio" id="futu" name="form_data[status]" value="3" <check if="{{@data.status==3}}">checked="checked" </check>/><label for="futu"> Future (not active, merely serves as a note)</label></div>
+{*
+		<div class="gb-20">&nbsp;</div>
+			<div class="gb-80"><input type="radio" id="auto" name="form_data[status]" value="-1" <check if="{{@data.status==NULL}}">checked="checked" </check>/><label for="auto"> Auto</label></div>
+		<div class="gb-20">__Timer (only when status=auto)</div>
+			<div class="gb-80">Start</div>
+		<div class="gb-20">&nbsp;</div>
+			<div class="gb-80">End</div>
+*}
+		<div class="gb-40" align="right"><input type="submit"></div><div class="gb-60"><input type="reset"></div>
+	</div>
+</form>

@@ -24,15 +24,15 @@ class Auth extends Base {
 		/*
 		Session mask (bit-wise)
 
-		- admin						 128
-		- super mod					64
-		- story mod 				32
-		- lector						16
+		- admin			   128
+		- super mod			64
+		- story mod 		32
+		- lector			16
 		- author (trusted)	 8
 		- author (regular)	 4
-		- user (trusted)		 2
-		- user (active)			 1
-		- guest							 0
+		- user (trusted)	 2
+		- user (active)		 1
+		- guest				 0
 		*/
 
 		if ( $f3->exists('SESSION.session_id') )

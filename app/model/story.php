@@ -17,7 +17,7 @@ class Story extends Base
 		$data = $this->exec($this->storySQL($replacements));
 
 		$this->paginate(
-			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			(int)$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
 			"/story/archive",
 			$limit
 		);
@@ -25,9 +25,10 @@ class Story extends Base
 		return $data;
 	}
 	
-	public function author(int $id)
+//	public function author(int $id)
+	public function author($id)
 	{
-		$limit = $this->config['story_intro_items'];
+		$limit = $this->config['stories_per_page'];
 		$author = "SELECT SQL_CALC_FOUND_ROWS U.uid, U.nickname as name, COUNT(rSA.sid) as counter FROM `tbl_stories_authors`rSA INNER JOIN `tbl_users`U ON ( rSA.aid = U.uid AND rSA.aid = :aid ) GROUP BY rSA.aid";
 		$info = $this->exec( $author, ["aid" => $id] );
 		
@@ -129,7 +130,7 @@ class Story extends Base
 
 		}
 		
-		$limit = $this->config['story_intro_items'];
+		$limit = $this->config['stories_per_page'];
 		$pos = (int)\Base::instance()->get('paginate.page') - 1;
 		
 		$replacements =
@@ -157,7 +158,8 @@ class Story extends Base
 		return $this->exec("SELECT rid, rating from `tbl_ratings`");
 	}
 	
-	public function updates(int $year, int $month=0, int $day=0)
+//	public function updates(int $year, $month=0, $day=0)
+	public function updates($year, $month=0, $day=0)
 	{
 		if ( $year > 0 )
 		{
@@ -466,8 +468,8 @@ class Story extends Base
 		else $sort = 'S.featured DESC';
 		return $this->exec("SELECT S.title, S.sid, S.summary, Cache.authorblock, Cache.rating
 				FROM `tbl_stories`S
+					INNER JOIN `tbl_stories_featured`F ON ( F.sid = S.sid AND F.status=1 OR ( F.status IS NULL AND F.start < NOW() AND F.end > NOW() ))
 					INNER JOIN `tbl_stories_blockcache`Cache ON ( S.sid = Cache.sid  )
-			WHERE ( S.featured = 1 OR (S.featured > 2 AND S.featured < UNIX_TIMESTAMP(NOW())) )
 			ORDER BY {$sort} 
 			LIMIT 0,".$items);
 		// 1 = aktuell, 2, ehemals

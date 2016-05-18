@@ -75,16 +75,20 @@ return array(
 'AdminMenu_Language' => 'Language',
 
 'AdminMenu_Members' => 'Members',
-'AdminMenu_Search' => 'Search',
-'AdminMenu_Pending' => 'Pending',
-'AdminMenu_Groups' => 'Groups',
+	'AdminMenu_Search' => 'Search',
+	'AdminMenu_Pending' => 'Pending',
+	'AdminMenu_Groups' => 'Groups',
 
 'AdminMenu_Archive' => 'Archive',
 'AdminMenu_Featured' => 'Featured',
+	'AdminMenu_Future' => 'Future',
+	'AdminMenu_Current' => 'Current',
+	'AdminMenu_Past' => 'Past',
+'AdminMenu_Characters' => 'Characters',
 'AdminMenu_Tags' => 'Tags',
-'AdminMenu_Edit' => 'Edit',
-'AdminMenu_Taggroups' => 'Groups',
-'AdminMenu_Tagcloud' => 'Cloud',
+	'AdminMenu_Edit' => 'Edit',
+	'AdminMenu_Taggroups' => 'Groups',
+	'AdminMenu_Tagcloud' => 'Cloud',
 'AdminMenu_Categories' => 'Categories',
 'ACP_Categories_Success_Deleted' => 'Category "{0}" successfully deleted!',
 'ACP_Categories_Error_notEmpty' => 'Could not delete category "{0}", because it is not empty!',
@@ -100,6 +104,7 @@ return array(
 'Welcome' => 'Welcome',
 'Shoutbox' => 'Shoutbox',
 
+// Story view'
 'Stories' => 'Stories',
 'St_NewStories' => 'New Stories',
 'St_RandomStory' => 'Random Story',
@@ -109,14 +114,32 @@ return array(
 
 'St_NoTags' => 'No tags defined',
 'St_Published' => 'Published',
+'St_Updated'	=> 'Last update',
 'St_Chapters' => 'Chapters',
 'St_Words' => 'Words',
 'St_Status' => 'Status',
 'St_WIP' => 'Work in progress',
 'St_Completed' => 'Completed',
+'Characters' => 'Characters',
+'Author_Notes' => 'Author notes',
+'Summary'	=> 'Summary',
+
+'Review_Link' => '{0, plural,'.
+	'zero	{None yet! Be the first to write one ...},'.
+	'one	{One review},'.
+	'other	{# reviews}
+}',
+'Review_Link_TOC' => '{0, plural,'.
+	'zero	{No reviews},'.
+	'one	{One review},'.
+	'other	{# reviews}
+}',
 
 'Search' => 'Search',
 'Tagcloud' => 'Tagcloud',
+
+// Feedback
+'Feedback_Not_Logged_In' => 'You need to be logged in to write a review or comment',
 
 // Archive News
 'News_Box' => 'Archive News',

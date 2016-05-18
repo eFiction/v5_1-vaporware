@@ -5,5 +5,5 @@
 			<input type="hidden" name="returnpath" value="{{ @PATH }}">
 		</form>
 	</true>
-	<false>{{ @LN__Welcome }} {{ @SESSION['username'] }} | {{ @SESSION['mail'][0] }} <a href="{{ @BASE }}/userCP/messaging/inbox">{ICON:mail}</a> ({{ @SESSION['mail'][1] }} {{@LN__PM_unread}})  *** <span class="fa fa-power-off"></span> <a href="{{ @BASE }}/logout/returnpath={{ @PATH }}">__Logout</a> | <a href="{{ @BASE }}/userCP">__UCP</a><check if="{{ @SESSION['groups'] & 64 }}"> | <a href="{{ @BASE }}/adminCP">__ACP</a></check></false>
+	<false>{{ @LN__Welcome }} {{ @SESSION['username'] }} | {{ @SESSION['mail'][0] }} <a href="{{ @BASE }}/userCP/messaging/inbox">{ICON:mail}</a> ({{ @SESSION['mail'][1] }} {{@LN__PM_unread}})  *** <span class="fa fa-power-off"></span> <a href="{{ @BASE }}/logout/returnpath={{ @PATH }}">__Logout</a> | <a href="{{ @BASE }}/userCP">__UCP</a><check if="{{ @SESSION['groups'] & 32 }}"> | <a href="{{ @BASE }}/adminCP">__ACP</a></check></false>
 </check>

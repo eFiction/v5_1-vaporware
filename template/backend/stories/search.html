@@ -1,0 +1,25 @@
+<div class="form-wrapper">
+<form>
+	<fieldset><legend>__Search</legend>
+	Type <b>title</b> or story <b>id</b>
+	<input type="text" id="story-select" name="story" />
+		<input id="search" class="button" type="submit"> <input class="button" type="reset">
+	</fieldset>
+</form>
+</div>
+<script type="text/javascript">
+$(document).ready(function() {
+	$("#story-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/search",{
+		method: "post",
+		queryParam: "storyID",
+		hintText: "__A_StartTyping ...",
+		noResultsText: "__A_NoMatches.",
+		tokenLimit: 1
+	});
+	$('#search').click(function(event) {
+		event.preventDefault();
+		story = $("#story-select" ).val();
+		window.location = '{{@BASE}}/adminCP/stories/edit/story='+story;
+	});
+});
+</script>

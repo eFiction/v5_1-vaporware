@@ -1,8 +1,26 @@
-@page { margin-bottom: 5pt; margin-top: 5pt; }
-h1 { vertical-align:middle }
-span.title { display:inline-block; vertical-align:middle }
+@page {
+	margin: 2em 0;
+	}
+
+h1 { 
+	vertical-align: middle;
+	text-align: center;
+	}
+h2 {
+	text-align: center;
+	}
+	
+p {
+	text-indent: 3em;
+	}
+
+span.title {
+	display: inline-block;
+	vertical-align: middle;
+	}
+
 div.container { 
    min-height: 10em; 
    display: table-cell; 
    vertical-align: middle;
-}
+	}

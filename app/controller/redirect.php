@@ -18,7 +18,11 @@ class Redirect extends Base
 				$params['a'] = $params['b'];
 				$params['b'] = $params['c'];
 			}
-			else $f3->reroute("/redirect/{$params['b']}/{$params['c']}", false);
+			else
+			{
+				$params['c'] = urldecode($params['c']);
+				$f3->reroute("/redirect/{$params['b']}/{$params['c']}", false);
+			}
 		}
 
 		$query = explode ( "&", $params['b'] );
@@ -44,6 +48,53 @@ class Redirect extends Base
 		{
 			if ( isset($old_data['uid']) && is_numeric($old_data['uid']) )
 				$redirect = "/authors/".$old_data['uid'];
+		}
+		elseif ( $params['a']=="browse" )
+		{
+			print_r($old_data);
+			// Browse is best handled by a search type
+			$redirect = "/story/search";
+
+			if ( isset($old_data['type']) AND $old_data['type']=="categories" )
+			{
+				if ( isset($old_data['catid']) && is_numeric($old_data['catid']) )
+					$parameters[] = "category=".$old_data['catid'];
+				
+				/*
+					Tags (former classes), type by type
+				*/
+				/*
+				serious to-do
+				- load tag_groups.label ( classtype name ) without characters
+				- check $old_data[$label] and find in tags
+				*/
+				
+				/* convert offset to page number */
+				if ( isset($old_data['offset']) && is_numeric($old_data['offset']) )
+				{
+					$items = \Config::instance()->stories_per_page;
+					$parameters[] = "page=".(int)($old_data['offset']/$items);
+				}
+			}
+			elseif ( isset($old_data['type']) AND $old_data['type']=="class" )
+			{
+				if ( isset($old_data['classid']) && is_numeric($old_data['classid']) )
+					$tags[] = $old_data['classid'];
+				
+			}
+			elseif ( isset($old_data['type']) AND $old_data['type']=="characters" )
+			{
+				if ( isset($old_data['charid']) && is_numeric($old_data['charid']) )
+				{
+					$c = $old_data['charid'];
+					// load tag with old character id from database
+				}
+				$tags[] = $old_data['charid'];
+				
+			}
+			
+			if(isset($tags)) $parameters[] = "tagIn=".implode(",",$tags);
+			if(isset($parameters)) $redirect .= "/".implode(";",$parameters);
 		}
 		
 		if ( isset($COOKIE['redirect_seen'] ) ) $f3->reroute($redirect, false);

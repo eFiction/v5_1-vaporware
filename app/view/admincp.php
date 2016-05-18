@@ -28,6 +28,8 @@ class AdminCP extends Base
 	
 	public static function listTags($data, $sort)
 	{
+		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+
 		\Base::instance()->set('sort', $sort);
 		\Base::instance()->set('taglist', $data);
 		return \Template::instance()->render('archive/list_tags.html');
@@ -35,6 +37,8 @@ class AdminCP extends Base
 
 	public static function listTagGroups($data, $sort)
 	{
+		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+
 		\Base::instance()->set('sort', $sort);
 		\Base::instance()->set('grouplist', $data);
 		return \Template::instance()->render('archive/list_tag_groups.html');
@@ -54,6 +58,8 @@ class AdminCP extends Base
 
 	public static function listCategories($data, $feedback)
 	{
+		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+
 		\Base::instance()->set('categories', $data);
 		\Base::instance()->set('feedback', $feedback);
 		return \Template::instance()->render('archive/list_categories.html');
@@ -119,4 +125,34 @@ class AdminCP extends Base
 		return \Template::instance()->render('home/edit_news.html');
 	}
 	
+	public static function listFeatured(array $data, array $sort, string $select)
+	{
+		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+
+		\Base::instance()->set('featured', $data);
+		\Base::instance()->set('sort', $sort);
+		\Base::instance()->set('select', $select);
+		return \Template::instance()->render('archive/list_featured.html');
+	}
+
+	public static function editFeatured(array $data)
+	{
+		\Base::instance()->set('data', $data);
+		return \Template::instance()->render('archive/edit_featured.html');
+	}
+
+	public static function searchStoryForm()
+	{
+		return \Template::instance()->render('stories/search.html');
+	}
+	
+	public static function storyMetaEdit(array $storyData, array $chapterList, array $prePop)
+	{
+		\Base::instance()->set('prePop', $prePop);
+		\Base::instance()->set('data', $storyData);
+		\Base::instance()->set('chapterList', $chapterList);
+		
+		return \Template::instance()->render('stories/edit_meta.html');
+	}
+
 }

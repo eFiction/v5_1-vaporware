@@ -4,17 +4,21 @@ namespace Controller;
 
 class AdminCP_Archive extends AdminCP
 {
+	var $moduleBase = "archive";
+	var $submodules = [ "featured", "characters", "tags", "categories" ];
 
 	public function index(\Base $f3, $params, $feedback = [ NULL, NULL ] )
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Archive') );
 		$f3->set('title_h1', $f3->get('LN__AdminMenu_Archive') );
-		$this->showMenu("archive");
 
-		switch( @$params['module'] )
+		switch( $this->moduleInit(@$params['module']) )
 		{
 			case "featured":
 				$this->featured($f3, $params, $feedback);
+				break;
+			case "characters":
+				$this->characters($f3, $params, $feedback);
 				break;
 			case "tags":
 				$this->tagsIndex($f3, $params, $feedback);
@@ -22,8 +26,11 @@ class AdminCP_Archive extends AdminCP
 			case "categories":
 				$this->categories($f3, $params);
 				break;
-			default:
+			case "home":
 				$this->home($f3);
+				break;
+			default:
+				$this->buffer(\Template::instance()->render('access.html'));
 		}
 	}
 
@@ -37,6 +44,10 @@ class AdminCP_Archive extends AdminCP
 		if ( $params['module']=="tags" )
 		{
 			$data = $this->model->ajax("tags", $post);
+		}
+		elseif ( $params['module']=="featured" )
+		{
+			$data = $this->model->ajax("storySearch", $post);
 		}
 		echo json_encode($data);
 		exit;
@@ -54,16 +65,70 @@ class AdminCP_Archive extends AdminCP
 		if ($data) $this->buffer( \View\AdminCP::settingsFields($data, "archive/home", $feedback) );
 	}
 	
+	
 	protected function featured(\Base $f3, $params, $feedback)
 	{
+		$this->response->addTitle( $f3->get('LN__AdminMenu_Featured') );
+		$allowedSubs = $this->showMenuUpper("archive/featured");
 		
+		if ( isset($params[2]) ) $params = $this->parametric($params[2]);
+
+		if ( isset( $_POST['sid'] ) )
+		{
+			$params['sid'] = (int)$_POST['sid'];
+		}
+
+		if ( isset ($params['select']) )
+		{
+			$allow_order = array (
+				"id"		=>	"S.sid",
+				"title"		=>	"S.title",
+			);
+
+			// sort order
+			$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "title";
+			$sort["order"]		= $allow_order[$sort["link"]];
+			$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="desc") ?	"desc" : "asc";
+			
+			$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
+
+			$data = $this->model->listStoryFeatured($page, $sort, $params['select']);
+			$this->buffer( \View\AdminCP::listFeatured($data, $sort, $params['select']) );
+			
+			return TRUE;
+		}
+		elseif (isset($_POST['form_data']))
+		{
+			$this->buffer( print_r($f3->get('POST.form_data'),1) );
+			$changes = $this->model->saveFeatured($params['sid'], $f3->get('POST.form_data') );
+		}
+
+		if( isset ($params['sid']) )
+		{
+			$data = $this->model->loadFeatured($params['sid']);
+			$data['errors'] = @$errors;
+			$data['changes'] = @$changes;
+			$this->buffer( \View\AdminCP::editFeatured($data) );
+			// return TRUE;
+		}
+		else
+		{
+			$this->buffer( \View\Base::stub() );
+		}
+
+
+	}
+
+	protected function characters(\Base $f3, $params, $feedback)
+	{
+		$this->buffer( \View\Base::stub() );
 	}
 	
 	protected function tagsIndex(\Base $f3, $params, $feedback)
 	{
 		$p = [];
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Tags') );
-		$this->showMenuUpper("archive/tags");
+		$allowedSubs = $this->showMenuUpper("archive/tags");
 
 		if ( isset($params[2]) ) $p = $this->parametric($params[2]);
 		
@@ -116,7 +181,6 @@ class AdminCP_Archive extends AdminCP
 			return TRUE;
 		}
 
-		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 		// page will always be an integer > 0
 		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
 
@@ -139,6 +203,9 @@ class AdminCP_Archive extends AdminCP
 	
 	protected function tagsGroups(\Base $f3, $params)
 	{
+		//$segment = "archive/tags/groups";
+		//if(!$this->model->checkAccess($segment)) return FALSE;
+		
 		if ( isset($params[2]) ) $params = $this->parametric($params[2]);
 
 		if ( isset($params['delete']) )
@@ -169,7 +236,6 @@ class AdminCP_Archive extends AdminCP
 			return TRUE;
 		}
 
-		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 		// page will always be an integer > 0
 		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
 
@@ -233,19 +299,7 @@ class AdminCP_Archive extends AdminCP
 			else
 			{
 				$f3->set('changes', 1);
-
-				// build category stats
-				// \Model\Routines::instance()->cacheCategories($newID);
-				// rebuild parent stats
-				// \Model\Routines::instance()->cacheCategories($parent_cid);
 			}
-			// add category
-			
-			
-			// re-align order
-			//$parent = $this->model->moveCategory( $params['move'][1] );
-			
-			// determine parent_cid
 			
 		}
 		elseif ( isset($params['delete']) )
@@ -291,8 +345,6 @@ class AdminCP_Archive extends AdminCP
 			return TRUE;
 		}
 
-		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
-		
 		$data = $this->model->categoriesListFlat();
 		$feedback['errors'] = @$errors;
 		$feedback['changes'] = @$changes;

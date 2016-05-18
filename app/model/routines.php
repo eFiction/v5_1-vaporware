@@ -5,7 +5,8 @@ namespace Model;
 */
 class Routines extends Base {
 	
-	public function cacheCategories(int $catID=0)
+//	public function cacheCategories(int $catID=0)
+	public function cacheCategories($catID=0)
 	{
 		// clear stats of affected categories
 		$sql = "UPDATE `tbl_categories` SET `stats` = NULL";

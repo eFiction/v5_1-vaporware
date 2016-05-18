@@ -1,0 +1,87 @@
+<form method="post" action="{{@BASE}}/adminCP/archive/featured/add">
+	<fieldset><legend>__A_SearchStory:</legend>
+	<table>
+	<tr><td><input type="text" id="add-featured" name="sid" />
+        <script type="text/javascript">
+        $(document).ready(function() {
+            $("#add-featured").tokenInput("{{$BASE}}/adminCP/ajax/archive/featured",{
+            	method: "post",
+            	queryParam: "storyID",
+				hintText: "__A_StartTyping ...",
+				noResultsText: "__A_NoMatches.",
+				tokenLimit: 1
+            });
+        });
+        </script>
+		</td>
+	</tr>
+	<tr><td><input class="button" type="submit"> <input class="button" type="reset"></td></tr>
+	</table>
+	</fieldset>
+</form>
+<check if="{{ sizeof(@featured)>0 }}"><true>
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
+<table class="tbody" id="textblockForm">
+	<tr>
+		<th>&nbsp;</th>
+		<th>&nbsp;</th>
+		<th><a href="{{@BASE}}/adminCP/archive/featured/{{@select}}/order=id,
+			<check if="{{ @sort['link']!='id' }}">
+				<true>desc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='asc' }}">
+						<true>desc">{ICON:sort-numeric-asc}</true>
+						<false>asc">{ICON:sort-numeric-desc}</false>
+					</check>
+				</false>
+			</check></a> __ID
+		</th>
+		<th><a href="{{@BASE}}/adminCP/archive/featured/{{@select}}/order=label,
+			<check if="{{ @sort['link']!='label' }}">
+				<true>desc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='asc' }}">
+						<true>desc">{ICON:sort-alpha-asc}</true>
+						<false>asc">{ICON:sort-alpha-desc}</false>
+					</check>
+				</false>
+			</check></a> __Label
+		</th>
+		<th><a href="{{@BASE}}/adminCP/archive/featured/{{@select}}/order=group,
+			<check if="{{ @sort['link']!='group' }}">
+				<true>desc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='asc' }}">
+						<true>desc">{ICON:sort-alpha-asc}</true>
+						<false>asc">{ICON:sort-alpha-desc}</false>
+					</check>
+				</false>
+			</check></a> __TagGroup
+		</th>
+		<th><a href="{{@BASE}}/adminCP/archive/featured/{{@select}}/order=count,
+			<check if="{{ @sort['link']!='count' }}">
+				<true>desc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='asc' }}">
+						<true>desc">{ICON:sort-numeric-asc}</true>
+						<false>asc">{ICON:sort-numeric-desc}</false>
+					</check>
+				</false>
+			</check></a> __Count
+		</th>
+	</tr>
+	<repeat group="{{ @featured }}" value="{{ @row }}">
+	<tr>
+		<td><a href="{{@BASE}}/adminCP/archive/featured/sid={{ @row['sid'] }}">{ICON:edit}</a></td>
+		<td><a href="{{@BASE}}/adminCP/archive/featured/delete={{ @row['sid'] }}" class="deleteItem" title="#{{ @row['sid'] }}: {{ @row['title'] }}">{ICON:trash}</a></td>
+		<td>{{ @row['sid'] }}</td>
+		<td>{{ @row['title'] }}</td>
+		<td>*</td>
+		<td>*</td>
+	</tr>
+	</repeat>
+</table>
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
+</true><false>
+__NoEntries
+</false></check>

@@ -75,16 +75,20 @@ return array(
 'AdminMenu_Language' => 'Sprachen',
 
 'AdminMenu_Members' => 'Members',
-'AdminMenu_Search' => 'Suchen',
-'AdminMenu_Pending' => 'Pending',
-'AdminMenu_Groups' => 'Groups',
+	'AdminMenu_Search' => 'Suchen',
+	'AdminMenu_Pending' => 'Pending',
+	'AdminMenu_Groups' => 'Groups',
 
 'AdminMenu_Archive' => 'Archive',
 'AdminMenu_Featured' => 'Featured',
+	'AdminMenu_Future' => 'Zukünftige',
+	'AdminMenu_Current' => 'Current',
+	'AdminMenu_Past' => 'Past',
+'AdminMenu_Characters' => 'Characters',
 'AdminMenu_Tags' => 'Tags',
-'AdminMenu_Edit' => 'Edit',
-'AdminMenu_Taggroups' => 'Groups',
-'AdminMenu_Tagcloud' => 'Cloud',
+	'AdminMenu_Edit' => 'Edit',
+	'AdminMenu_Taggroups' => 'Groups',
+	'AdminMenu_Tagcloud' => 'Cloud',
 'AdminMenu_Categories' => 'Categories',
 'ACP_Categories_Success_Deleted' => 'Kategories "{0}" wurde erfolgreich gelöscht!',
 'ACP_Categories_Error_notEmpty' => 'Kann Kategories "{0}" nicht löschen, da sie nicht leer ist!',
@@ -100,6 +104,7 @@ return array(
 'Welcome' => 'Willkommen',
 'Shoutbox' => 'Shoutbox',
 
+// Story view'
 'Stories' => 'Stories',
 'St_NewStories' => 'Neue Geschichten',
 'St_RandomStory' => 'Zufällige Geschichte',
@@ -109,14 +114,32 @@ return array(
 
 'St_NoTags' => 'Keine Tags gesetzt',
 'St_Published' => 'Veröffentlicht',
+'St_Updated'	=> 'Zuletzt überarbeitet',
 'St_Chapters' => 'Kapitel',
 'St_Words' => 'Wörter',
 'St_Status' => 'Status',
 'St_WIP' => 'Work in progress',
 'St_Completed' => 'Abgeschlossen',
+'Characters' => 'Charaktere',
+'Author_Notes' => 'Anmerkungen des Autors',
+'Summary'	=> 'Zusammenfassung',
+
+'Review_Link' => '{0, plural,'.
+	'zero	{Noch keine ... schreibe die erste!},'.
+	'one	{Eine Review},'.
+	'other	{# Reviews}
+}',
+'Review_Link_TOC' => '{0, plural,'.
+	'zero	{Keine Reviews},'.
+	'one	{Eine Review},'.
+	'other	{# Reviews}
+}',
 
 'Search' => 'Suche',
 'Tagcloud' => 'Tagcloud',
+
+// Feedback
+'Feedback_Not_Logged_In' => 'Du musst angemeldet sein, um eine Review oder einen Kommentar zu verfassen.',
 
 // Archiv News'
 'News_Box' => 'Archiv News',
@@ -134,6 +157,12 @@ return array(
 'AS_Guests' => 'Gäste',
 'AS_Users' => 'Mitglieder',
 'AS_LatestMember' => 'Neuestes Mitglied',
+
+'Status_Changes' => '{0, plural,'.
+	'zero	{Keine Änderungen.},'.
+	'one	{Ein Element geändert.},'.
+	'other	{# Elemente geändert.}
+}',
 );
 
 ?>

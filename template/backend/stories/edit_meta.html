@@ -1,0 +1,92 @@
+<div class="grid-wrapper">
+	<div class="gb-3qrt">
+		<form method="post" action="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}}">
+			<div class="ym-grid">
+				<div class="gb-1qrt"></div>
+				<div class="gb-full"><h6>__Title</h6><input class="text-input-story" placeholder="Your story title goes here" type="text" name="form[story_title]" value="{{@data.title}}"></div>
+
+				<div class="gb-full"><h6>__Categories</h6><input type="text" id="category-select" name="form[category]" /></div>
+
+				<div class="gb-half"><h6>__Author</h6><input type="text" id="author-select" name="form[author]" /></div>
+				<div class="gb-half"><h6>__CoAuthor</h6><input type="text" id="coauthor-select" name="form[coauthor]" /></div>
+				<div class="gb-full"><h6>__Tags <a class="contextual-popup" href="#info"><i class="fa fa-info-circle"></i><span> <b>Info:</b><br />Simply start typing what you are looking for.</span></a></h6><input type="text" id="tag-select" name="form[tags]" /></div>
+				<div class="gb-full"><h6>__Characters </h6><input type="text" id="character-select" name="form[tags]" /></div>
+
+				<div class="gb-full"><h6>__Notes</h6><textarea class="text-input-story" placeholder="Notes and dedications go here" name="form[story_notes]">{{@data.storynotes}}</textarea></div>
+
+				<div class="gb-full"><h6>__Summary</h6><textarea class="text-input-story" placeholder="Your story summary goes here" name="form[story_summary]">{{@data.summary}}</textarea></div>
+
+				<div class="gb-full"><h6>__Rating</h6><select id="rid" name="form[rid]">{RATING}</select></div>
+
+				<div class="gb-full"><h6>__Status</h6>**radios**</div>
+				<div align="right"><check if="{{ @@delete_button }}"><a class="delete" href="__baseURL?action=controlpanel&amp;module=author,story,delete&amp;uid={UID}&amp;story={SID}"><span class="fa fa-times"></span> __Delete</a></check>
+				<input class="button" type="reset"> <input class="button" type="submit"></div>
+			</div>
+		</form>
+	</div>
+	<div class="gb-1qrt">
+		<include href="stories/chapterlist.html" />
+	</div>
+</div>
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#category-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "category",
+    	preventDuplicates: true,
+    	prePopulate: {{@prePop.cat | raw}}
+    });
+});
+
+$(document).ready(function() {
+    $("#author-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "author",
+    	preventDuplicates: true,
+    	prePopulate: {{@prePop.auth | raw}}
+    });
+});
+
+$(document).ready(function() {
+    $("#coauthor-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "author",
+    	preventDuplicates: true,
+    	prePopulate: {{@prePop.coauth | raw}}
+    });
+});
+
+$(document).ready(function() {
+    $("#tag-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "tag",
+    	preventDuplicates: true,
+    	prePopulate: {{@prePop.tag | raw}}
+    });
+});
+
+$(document).ready(function() {
+    $("#character-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "character",
+    	preventDuplicates: true,
+    	prePopulate: {{@prePop.char | raw}}
+    });
+});
+
+$(function () {
+	$("#chapter-sort").sortable({
+		cursor: "move",
+		containment: "parent",
+		update: function () {
+			var neworder = $('#chapter-sort').sortable('toArray');
+			$.ajax({
+				type: "post",
+				url: "{{@BASE}}/adminCP/ajax/stories/chaptersort",
+				data: { story: {{@data.sid}}, neworder: neworder },
+				dataType: "html"
+			});
+		}
+	});
+});
+</script>

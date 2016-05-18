@@ -232,28 +232,12 @@ class Story extends Base
 			$this->buffer($view);
 		}
 		else $this->buffer("Error, not found");
-		/*
-		if( isset($id[1]) AND is_numeric($id[1]) )
-		{
-			$data = $this->model->getStory($id);
-		}
-		else
-		{
-			$data = $this->model->getTOC($id[0]);
-		}
-		return ( $data );
-		*/
 	}
 	
 	public function storyBlocks($select)
 	{
 		$select = explode(".",$select);
-/*
-		if ( empty($select) OR $select == ".home" )
-		{
-			return \View\Story::storyHome();
-		}
-*/
+
 		if ( $select[1] == "stats" )
 		{
 			$statsCache = $this->model->blockStats();
@@ -299,7 +283,7 @@ class Story extends Base
 		{
 			$items = (isset($select[2]) AND is_numeric($select[2])) ? $select[2] : 15;
 			$data = $this->model->blockTagcloud($items);
-			
+
 			return \View\Story::blockTagcloud($data);
 		}
 		return "";

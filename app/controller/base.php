@@ -31,9 +31,12 @@ class Base extends \Prefab {
 		\Registry::set('VIEW',$this->response);
 	}
 	
-	protected function buffer($content, $section="BODY")
+	protected function buffer($content, $section="BODY", $destroy = FALSE)
 	{
-		$this->data[$section] .= $content;
+		if ( $destroy )
+			$this->data[$section]  = $content;
+		else
+			$this->data[$section] .= $content;
 	}
 	
 	protected function parametric($params=NULL)
