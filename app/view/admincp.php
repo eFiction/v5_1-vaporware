@@ -148,11 +148,34 @@ class AdminCP extends Base
 	
 	public static function storyMetaEdit(array $storyData, array $chapterList, array $prePop)
 	{
+		$storyData['storynotes'] = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $storyData['storynotes']);
+		$storyData['summary'] = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $storyData['summary']);
+
 		\Base::instance()->set('prePop', $prePop);
 		\Base::instance()->set('data', $storyData);
 		\Base::instance()->set('chapterList', $chapterList);
 		
 		return \Template::instance()->render('stories/edit_meta.html');
+	}
+
+	public static function storyChapterEdit(array $chapterData, array $chapterList, $plain = FALSE)
+	{
+		if ($plain)
+		{
+			$chapterData['notes']		= preg_replace("/<br\\s*\\/>\\s*/i", "\n", $chapterData['notes']);
+			$chapterData['chaptertext']	= html_entity_decode(preg_replace("/<br\\s*\\/>\\s*/i", "\n", $chapterData['chaptertext']));
+			$chapterData['editmode']	= "plain";
+		}
+		else
+		{
+			\Registry::get('VIEW')->javascript( 'head', TRUE, "ckeditor/ckeditor.js" );
+			$chapterData['editmode']	= "visual";
+		}
+
+		\Base::instance()->set('data', $chapterData);
+		\Base::instance()->set('chapterList', $chapterList);
+
+		return \Template::instance()->render('stories/edit_chapter.html');
 	}
 
 }

@@ -251,28 +251,7 @@ class Story extends Base
 	
 	public function getChapter( $story, $chapter, $counting = TRUE )
 	{
-		$location = \Config::instance()->chapter_data_location;
-
-		if ( $location == "local" )
-		{
-			$db = \storage::instance()->localChapterDB();
-			$chapterLoad= @$db->exec('SELECT "chaptertext" FROM "chapters" WHERE "sid" = :sid AND "inorder" = :inorder', array(':sid' => $story, ':inorder' => $chapter ))[0];
-		}
-		else
-		{
-			$chapterLoad = $this->exec("SELECT C.chaptertext FROM `tbl_chapters`C WHERE C.sid=:sid AND C.inorder=:inorder", array(':sid' => $story, ':inorder' => $chapter ))[0];
-		}
-		if ( sizeof($chapterLoad)>0 ) $chapterText = $chapterLoad['chaptertext'];
-		else return FALSE;
-		
-		if ( $counting AND \Base::instance()->get('SESSION')['userID'] > 0 )
-		{
-			$sql_tracker = "INSERT INTO `tbl_tracker` (sid,uid,last_chapter) VALUES (".(int)$story.", ".\Base::instance()->get('SESSION')['userID'].",".(int)$chapter.") 
-											ON DUPLICATE KEY
-											UPDATE last_read=NOW(),last_chapter=".(int)$chapter.";";
-			$this->exec($sql_tracker);
-		}
-		return nl2br($chapterText);
+		return parent::getChapter( $story, $chapter, $counting );
 	}
 	
 	public function storySQL($replacements=[])

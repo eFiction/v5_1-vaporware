@@ -61,20 +61,6 @@ class AdminCP extends Base {
 					$chapters->save();
 				}
 			}
-				
-
-				
-				//	$queries[] = "UPDATE `tbl_chapters` SET inorder = ".($order+1)." WHERE `chapid` = {$id} AND `sid` = {$data["story"]};";
-//			echo "{$id} is now ".($order+1)."<br>";
-/*			$sql = str_replace (
-								array ( "@ORDER@", "@ID@" ),
-								array ( ($order+1), $id ),
-								"UPDATE `tbl_chapters` SET inorder = @ORDER@ WHERE `chapid` = @ID@;"
-								);
-			$eFI->db_query ( $sql );*/
-		//}
-		//$DB->multiQuery($queries);
-
 		}
 
 		if ( isset($ajax_sql) ) return $this->exec($ajax_sql, $bind);
@@ -824,7 +810,12 @@ class AdminCP extends Base {
 				WHERE S.sid = :sid",
 			[":sid" => $sid ]
 		);
-		if (sizeof($data)==1) return $data[0];
+		if (sizeof($data)==1)
+		{
+			$data[0]['states']  = $this->storyStates();
+			$data[0]['ratings'] = $this->exec("SELECT rid, rating, ratingwarning FROM `tbl_ratings`");
+			return $data[0];
+		}
 		return FALSE;
 	}
 	
@@ -863,6 +854,271 @@ class AdminCP extends Base {
 		if (sizeof($data)>0) return $data;
 		return FALSE;
 
+	}
+	
+	public function loadStoryMapper($sid)
+	{
+		$story=new \DB\SQL\Mapper($this->db, $this->prefix.'stories');
+		$story->load(array('sid=?',$sid));
+		return $story;
+	}
+	
+	public function getChapter( $story, $chapter, $counting = FALSE )
+	{
+		$data = $this->exec
+		(
+			"SELECT Ch.sid,Ch.chapid,Ch.inorder,Ch.title,Ch.notes,Ch.validated,Ch.rating
+				FROM `tbl_chapters`Ch
+			WHERE Ch.sid = :sid AND Ch.chapid = :chapter",
+			[":sid" => $story, ":chapter" => $chapter ]
+		);
+		if (empty($data)) return FALSE;
+		$data = $data[0];
+		$data['chaptertext'] = parent::getChapter( $story, $data['inorder'], $counting );
+		
+		return $data;
+	}
+	
+	public function saveChapterChanges( $chapterID, array $post )
+	{
+		$chapter=new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
+		$chapter->load(array('chapid=?',$chapterID));
+		
+		$chapter->title = $post['chapter_title'];
+		$chapter->save();
+		
+		// plain and visual return different newline versions, this will bring things to standard.
+		$post['chapter_text'] = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $post['chapter_text']);
+		
+		$this->saveChapter($chapterID, $post['chapter_text']);
+	}
+	
+	public function saveChapter( $chapterID, $chapterText )
+	{
+		return parent::saveChapter( $chapterID, $chapterText );
+	}
+	
+	public function addChapter ( $storyID, $post )
+	{
+		$location = \Config::instance()->chapter_data_location;
+		
+		// Get current chapter count and raise
+		if ( FALSE == $chapterCount = @$this->exec("SELECT COUNT(chapid) as chapters FROM `tbl_chapters` WHERE `sid` = :sid ", [ ":sid" => $storyID ])[0]['chapters'] )
+			return FALSE;
+		$chapterCount++;
+		
+		$kv = [
+			'title'			=> $post['chapter_title'],
+			'inorder'		=> $chapterCount,
+			'notes'			=> $post['chapter_notes'],
+			//'workingtext'
+			//'workingdate'
+			//'endnotes'
+			'validated'		=> "1",
+			'wordcount'		=> $this->str_word_count_utf8($post['chapter_text']),
+			'rating'		=> "0", // allow rating later
+			'sid'			=> $storyID,
+		];
+		if ( $location != "local" )
+			$kv['chaptertext'] = $post['chapter_text'];
+
+		//print_r($kv);
+		$chapterID = $this->insertArray($this->prefix.'chapters', $kv );
+		//$chapterID = 4259;
+		//echo $chapterID;exit;
+		
+		if ( $location == "local" )
+		{
+			$db = \storage::instance()->localChapterDB();
+			$chapterAdd= @$db->exec('INSERT INTO "chapters" ("chapid","sid","inorder","chaptertext") VALUES ( :chapid, :sid, :inorder, :chaptertext )', 
+								[
+									':chapid' 		=> $chapterID,
+									':sid' 			=> $storyID,
+									':inorder' 		=> $chapterCount,
+									':chaptertext'	=> $post['chapter_text'],
+								]
+			);
+		}
+		
+		$this->rebuildStoryCache($storyID);
+		
+		return $chapterID;
+	}
+
+	public function addChapterText( $chapterData )
+	{
+		return parent::addChapterText( $chapterData );
+	}
+
+	public function saveStoryChanges(\DB\SQL\Mapper $current, array $post)
+	{
+		// Step one: save the plain data
+		$current->title			= $post['story_title'];
+		$current->summary		= str_replace("\n","<br />",$post['story_summary']);
+		$current->storynotes	= str_replace("\n","<br />",$post['story_notes']);
+		$current->rid			= $post['rid'];
+		$current->completed		= $post['completed'];
+		$current->validated 	= $post['validated'];
+		$current->save();
+		
+		// Step two: check for changes in relation tables
+
+		// Check tags:
+		$post['tags'] = explode(",",$post['tags']);
+		$tags = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_tags');
+
+		foreach ( $tags->find(array('`sid` = ? AND `character` = ?',$current->sid,0)) as $X )
+		{
+			$temp=array_search($X['tid'], $post['tags']);
+			if ( $temp===FALSE )
+			{
+				// Excess relation, drop from table
+				$tags->erase(['lid=?',$X['lid']]);
+			}
+			else unset($post['tags'][$temp]);
+		}
+		
+		// Insert any tag IDs not already present
+		if ( sizeof($post['tags'])>0 )
+		{
+			foreach ( $post['tags'] as $temp)
+			{
+				// Add relation to table
+				$tags->reset();
+				$tags->sid = $current->sid;
+				$tags->tid = $temp;
+				$tags->character = 0;
+				$tags->save();
+			}
+		}
+		unset($tags);
+		
+		// Check Characters:
+		$post['characters'] = explode(",",$post['characters']);
+		$characters = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_tags');
+
+		foreach ( $characters->find(array('`sid` = ? AND `character` = ?',$current->sid,1)) as $X )
+		{
+			$temp=array_search($X['tid'], $post['characters']);
+			if ( $temp===FALSE )
+			{
+				// Excess relation, drop from table
+				$characters->erase(['lid=?',$X['lid']]);
+			}
+			else unset($post['characters'][$temp]);
+		}
+		
+		// Insert any character IDs not already present
+		if ( sizeof($post['characters'])>0 )
+		{
+			foreach ( $post['characters'] as $temp)
+			{
+				// Add relation to table
+				$characters->reset();
+				$characters->sid = $current->sid;
+				$characters->tid = $temp;
+				$characters->character = 1;
+				$characters->save();
+			}
+		}
+		unset($characters);
+		
+		// Check Categories:
+		$post['category'] = explode(",",$post['category']);
+		$categories = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_categories');
+
+		foreach ( $categories->find(array('`sid` = ?',$current->sid)) as $X )
+		{
+			$temp=array_search($X['cid'], $post['category']);
+			if ( $temp===FALSE )
+			{
+				// Excess relation, drop from table
+				$categories->erase(['lid=?',$X['lid']]);
+			}
+			else unset($post['category'][$temp]);
+		}
+		
+		// Insert any character IDs not already present
+		if ( sizeof($post['category'])>0 )
+		{
+			foreach ( $post['category'] as $temp)
+			{
+				// Add relation to table
+				$categories->reset();
+				$categories->sid = $current->sid;
+				$categories->cid = $temp;
+				$categories->save();
+			}
+		}
+		unset($categories);
+		
+		// Author and co-Author preparation:
+		$post['author'] = explode(",",$post['author']);		
+		$post['coauthor'] = explode(",",$post['coauthor']);
+		// remove co-authors, that are already in the author field
+		$post['coauthor'] = array_diff($post['coauthor'], $post['author']);
+
+		// Check Authors:
+		$author = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors');
+
+		foreach ( $author->find(array('`sid` = ? AND `ca` = ?',$current->sid,0)) as $X )
+		{
+			$temp=array_search($X['aid'], $post['author']);
+			if ( $temp===FALSE )
+			{
+				// Excess relation, drop from table
+				$author->erase(['lid=?',$X['lid']]);
+			}
+			else unset($post['author'][$temp]);
+		}
+
+		// Insert any character IDs not already present
+		if ( sizeof($post['author'])>0 )
+		{
+			foreach ( $post['author'] as $temp)
+			{
+				// Add relation to table
+				$author->reset();
+				$author->sid = $current->sid;
+				$author->aid = $temp;
+				$author->ca = 0;
+				$author->save();
+			}
+		}
+		unset($author);
+		
+		// Check co-Authors:
+		$coauthor = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors');
+
+		foreach ( $coauthor->find(array('`sid` = ? AND `ca` = ?',$current->sid,1)) as $X )
+		{
+			$temp=array_search($X['aid'], $post['coauthor']);
+			if ( $temp===FALSE )
+			{
+				// Excess relation, drop from table
+				$coauthor->erase(['lid=?',$X['lid']]);
+			}
+			else unset($post['coauthor'][$temp]);
+		}
+
+		// Insert any character IDs not already present
+		if ( sizeof($post['coauthor'])>0 )
+		{
+			foreach ( $post['coauthor'] as $temp)
+			{
+				// Add relation to table
+				$coauthor->reset();
+				$coauthor->sid = $current->sid;
+				$coauthor->aid = $temp;
+				$coauthor->ca = 1;
+				$coauthor->save();
+			}
+		}
+		unset($coauthor);
+		
+		$this->rebuildStoryCache($current->sid);
+		
+		return TRUE;
 	}
 	
 }

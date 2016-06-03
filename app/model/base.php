@@ -129,7 +129,10 @@ class Base extends \Prefab {
 		return $date->format($formatOut);
 	}
 
-	
+	public function str_word_count_utf8($str) {
+		return count(preg_split("/\p{L}[\p{L}\p{Mn}\p{Pd}'\x{2019}]{1,}/u",$str));
+	}
+
 //	protected function paginate(int $total, $route, int $limit=10)
 	protected function paginate($total, $route, $limit=10)
 	{
@@ -206,5 +209,136 @@ class Base extends \Prefab {
 		}
 		return $menu;
 	}
+	
+	protected function storyStates()
+	{
+		$state['completed'] =
+		[
+			-2 => "__deleted",
+			-1 => "__draft",
+			 0 => "__wip",
+			 1 => "__completed",
+		];
+		
+		$state['validated'] =
+		[
+			 0 => "__pending",
+			 1 => "__selfvalidated",
+			 2 => "__admin",
+		];
+		return $state;
+	}
+	
+	public function getChapter( $story, $chapter, $counting = TRUE )
+	{
+		$location = \Config::instance()->chapter_data_location;
 
+		if ( $location == "local" )
+		{
+			$db = \storage::instance()->localChapterDB();
+			$chapterLoad= @$db->exec('SELECT "chaptertext" FROM "chapters" WHERE "sid" = :sid AND "inorder" = :inorder', array(':sid' => $story, ':inorder' => $chapter ))[0];
+		}
+		else
+		{
+			$chapterLoad = $this->exec("SELECT C.chaptertext FROM `tbl_chapters`C WHERE C.sid=:sid AND C.inorder=:inorder", array(':sid' => $story, ':inorder' => $chapter ))[0];
+		}
+		if ( sizeof($chapterLoad)>0 ) $chapterText = $chapterLoad['chaptertext'];
+		else return FALSE;
+		
+		if ( $counting AND \Base::instance()->get('SESSION')['userID'] > 0 )
+		{
+			$sql_tracker = "INSERT INTO `tbl_tracker` (sid,uid,last_chapter) VALUES (".(int)$story.", ".\Base::instance()->get('SESSION')['userID'].",".(int)$chapter.") 
+											ON DUPLICATE KEY
+											UPDATE last_read=NOW(),last_chapter=".(int)$chapter.";";
+			$this->exec($sql_tracker);
+		}
+		return nl2br($chapterText);
+	}
+
+	public function saveChapter( $chapterID, $chapterText )
+	{
+		$location = \Config::instance()->chapter_data_location;
+
+		if ( $location == "local" )
+		{
+			$db = \storage::instance()->localChapterDB();
+			$chapterSave= @$db->exec('UPDATE "chapters" SET "chaptertext" = :chaptertext WHERE "chapid" = :chapid', array(':chapid' => $chapterID, ':chaptertext' => $chapterText ));
+		}
+		else
+		{
+			$chapterSave = $this->exec('UPDATE `tbl_chapters` SET `chaptertext` = :chaptertext WHERE `chapid` = :chapid', array(':chapid' => $chapterID, ':chaptertext' => $chapterText ));
+		}
+
+		return $chapterSave;
+	}
+
+	public function rebuildStoryCache($sid)
+	{
+		$sql = "SELECT SELECT_OUTER.sid,
+					GROUP_CONCAT(DISTINCT tid,',',tag,',',description ORDER BY `order`,tgid,tag ASC SEPARATOR '||') AS tagblock,
+					GROUP_CONCAT(DISTINCT charid,',',charname ORDER BY charname ASC SEPARATOR '||') AS characterblock,
+					GROUP_CONCAT(DISTINCT uid,',',nickname ORDER BY nickname ASC SEPARATOR '||' ) as authorblock,
+					GROUP_CONCAT(DISTINCT cid,',',category ORDER BY category ASC SEPARATOR '||' ) as categoryblock,
+					GROUP_CONCAT(DISTINCT rid,',',rating_name,',',rating_image SEPARATOR '||' ) as rating,
+					COUNT(DISTINCT fid) AS reviews,
+					COUNT(DISTINCT chapid) AS chapters
+					FROM
+					(
+						SELECT S.sid,C.chapid,UNIX_TIMESTAMP(S.date) as published, UNIX_TIMESTAMP(S.updated) as modified,
+								F.fid,
+								S.rid, Ra.rating as rating_name, IF(Ra.rating_image,Ra.rating_image,'') as rating_image,
+								U.uid, U.nickname,
+								Cat.cid, Cat.category,
+								TG.description,TG.order,TG.tgid,T.label as tag,T.tid,
+								Ch.charid, Ch.charname
+							FROM `tbl_stories` S
+								LEFT JOIN `tbl_ratings` Ra ON ( Ra.rid = S.rid )
+								LEFT JOIN `tbl_stories_authors`rSA ON ( rSA.sid = S.sid )
+									LEFT JOIN `tbl_users` U ON ( rSA.aid = U.uid )
+								LEFT JOIN `tbl_stories_tags`rST ON ( rST.sid = S.sid )
+									LEFT JOIN `tbl_tags` T ON ( T.tid = rST.tid AND rST.character = 0 )
+										LEFT JOIN `tbl_tag_groups` TG ON ( TG.tgid = T.tgid )
+									LEFT JOIN `tbl_characters` Ch ON ( Ch.charid = rST.tid AND rST.character = 1 )
+								LEFT JOIN `tbl_stories_categories`rSC ON ( rSC.sid = S.sid )
+									LEFT JOIN `tbl_categories` Cat ON ( rSC.cid = Cat.cid )
+								LEFT JOIN `tbl_chapters` C ON ( C.sid = S.sid )
+								LEFT JOIN `tbl_feedback` F ON ( F.reference = S.sid AND F.type='ST' )
+							WHERE S.sid = :sid
+					)AS SELECT_OUTER
+				GROUP BY sid ORDER BY sid ASC";
+		
+		$item = $this->exec($sql, ['sid' => $sid] );
+		
+		if ( empty($item) ) return FALSE;
+		
+		$item = $item[0];
+
+		$this->update
+		(
+			'tbl_stories_blockcache',
+			[
+				'tagblock'			=> serialize($this->cleanResult($item['tagblock'])),
+				'characterblock'	=> serialize($this->cleanResult($item['characterblock'])),
+				'authorblock'		=> serialize($this->cleanResult($item['authorblock'])),
+				'categoryblock'		=> serialize($this->cleanResult($item['categoryblock'])),
+				'rating'			=> serialize(explode(",",$item['rating'])),
+				'reviews'			=> $item['reviews'],
+				'chapters'			=> $item['chapters'],
+			],
+			['sid=?',$sid]
+		);
+
+	}
+
+	private static function cleanResult($messy)
+	{
+		$mess = explode("||",$messy);
+		$mess = (array_unique($mess));
+		foreach ( $mess as $element )
+		{
+			$elements[] = explode(",",$element );
+		}
+		return($elements);
+	}
+	
 }

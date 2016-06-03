@@ -75,7 +75,7 @@ if (\Controller\Auth::isLoggedIn())
 		$f3->route(
 			[ 'GET /adminCP/stories', 'GET /adminCP/stories/@module', 'GET /adminCP/stories/@module/*' ],
 			'Controller\AdminCP_Stories->index' );
-		$f3->route( 'POST /adminCP/stories/@module', 'Controller\AdminCP_Stories->save' );
+		$f3->route( 'POST /adminCP/stories/@module/*', 'Controller\AdminCP_Stories->save' );
 		$f3->route( 'POST /adminCP/ajax/stories/@module [ajax]', 'Controller\AdminCP_Stories->ajax' );
 		
 	}
