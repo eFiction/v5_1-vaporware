@@ -4,8 +4,8 @@
 			<div class="ym-grid">
 				<div class="gb-2thrd"><h6>__Title</h6><input class="text-input-story" placeholder="Your story title goes here" type="text" name="form[story_title]" value="{{@data.title}}"></div>
 				<div class="gb-1thrd"><h6>__Rating</h6>
-					<select id="rid" name="form[rid]">
-					<repeat group="{{ @data.ratings }}" value="{{ @rating }}"><option value="{{ @rating.rid }}"<check if="{{@rating.rid==@data.rid}}"> selected="selected"</check>>{{ @rating.rating }}</option></repeat>
+					<select id="ratingid" name="form[ratingid]">
+					<repeat group="{{ @data.ratings }}" value="{{ @rating }}"><option value="{{ @rating.rid }}"<check if="{{@rating.rid==@data.ratingid}}"> selected="selected"</check>>{{ @rating.rating }}</option></repeat>
 					</select>
 				</div>
 

@@ -5,6 +5,9 @@ return array(
 'UserCP' => 'User Panel',
 'AdminCP' => 'Admin Panel',
 
+'Sort_Date'	=> 'Datum',
+'Sort_ID'	=> 'ID',
+
 'PM_Inbox' => 'Posteingang',
 'PM_Outbox' => 'Postausgang',
 'PM_Write' => 'Verfassen',
@@ -77,7 +80,9 @@ return array(
 'AdminMenu_Members' => 'Members',
 	'AdminMenu_Search' => 'Suchen',
 	'AdminMenu_Pending' => 'Pending',
-	'AdminMenu_Groups' => 'Groups',
+	'AdminMenu_Groups' => 'Gruppen',
+	'AdminMenu_Profile' => 'Profil',
+	'AdminMenu_Team' => 'Team',
 
 'AdminMenu_Archive' => 'Archive',
 'AdminMenu_Featured' => 'Featured',

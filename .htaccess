@@ -12,7 +12,7 @@ RewriteCond %{HTTPS}s ^on(s)|off
 RewriteCond http%1://%{HTTP_HOST} ^(https?://)(www\.)?(.+)$
 RewriteRule ^ %1%3%{REQUEST_URI} [R=301,L]
 
-RewriteRule ^(dict|ns|cfg|tmp)\/|\.ini$ - [R=404]
+RewriteRule ^(data|tmp)\/|\.ini$ - [R=404]
 
 RewriteCond %{REQUEST_URI}~%{QUERY_STRING} ^(.*?\/*)?(modules/challenges/)?(browse|viewpage|viewuser|viewstory|viewseries|reviews|challenges|news)\.php~?(.+)$ [NC]
 RewriteRule ^(.+).php$ /special-rewrite-here?/redirect/$1/%4 [B]

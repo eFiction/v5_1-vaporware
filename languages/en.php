@@ -5,6 +5,9 @@ return array(
 'UserCP' => 'User Panel',
 'AdminCP' => 'Admin Panel',
 
+'Sort_Date'	=> 'Date',
+'Sort_ID'	=> 'ID',
+
 'PM_Inbox' => 'Inbox',
 'PM_Outbox' => 'Outbox',
 'PM_Write' => 'Write',
@@ -44,6 +47,14 @@ return array(
 'Menu_Reviews' => 'Reviews',
 'Menu_Preferences' => 'Preferences',
 
+// User elements
+'UserField_Type1'	=> 'URL',			// _FIELDURL
+'UserField_Type2'	=> 'Select box',	// _FIELDSELECT
+'UserField_Type3'	=> 'Yes/No',		// _FIELDYESNO
+'UserField_Type4'	=> 'ID with URL',	// _FIELDIDURL
+'UserField_Type5'	=> 'Custom Code',	// _FIELDCUSTOM
+'UserField_Type6'	=> 'Text',			// _TEXT
+
 // UserCP elements
 'UserMenu_Profile' => 'Profile',
 'UserMenu_Message' => 'Messaging',
@@ -78,6 +89,8 @@ return array(
 	'AdminMenu_Search' => 'Search',
 	'AdminMenu_Pending' => 'Pending',
 	'AdminMenu_Groups' => 'Groups',
+	'AdminMenu_Profile' => 'Profile',
+	'AdminMenu_Team' => 'Team',
 
 'AdminMenu_Archive' => 'Archive',
 'AdminMenu_Featured' => 'Featured',

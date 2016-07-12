@@ -1,0 +1,85 @@
+<F3:check if="{{ sizeof(@shoutEntries) > 0}}">
+<true>
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
+<table class="tbody">
+	<tr>
+		<th>&nbsp;</th>
+		<th>&nbsp;</th>
+		<th><a href="{{@BASE}}/adminCP/home/shoutbox/order=id,
+			<check if="{{ @sort['link']!='id' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-numeric-desc}</true>
+						<false>desc">{ICON:sort-numeric-asc}</false>
+					</check>
+				</false>
+			</check></a> {{@LN__Sort_ID}}
+		</th>
+		<th><a href="{{@BASE}}/adminCP/home/shoutbox/order=date,
+			<check if="{{ @sort['link']!='date' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-alpha-desc}</true>
+						<false>desc">{ICON:sort-alpha-asc}</false>
+					</check>
+				</false>
+			</check></a> {{@LN__Sort_Date}}
+		</th>
+		<th><a href="{{@BASE}}/adminCP/home/shoutbox/order=author,
+			<check if="{{ @sort['link']!='author' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-alpha-desc}</true>
+						<false>desc">{ICON:sort-alpha-asc}</false>
+					</check>
+				</false>
+			</check></a> __Author
+		</th>
+		<th><a href="{{@BASE}}/adminCP/home/shoutbox/order=message,
+			<check if="{{ @sort['link']!='message' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-alpha-desc}</true>
+						<false>desc">{ICON:sort-alpha-asc}</false>
+					</check>
+				</false>
+			</check></a> __Message
+		</th>
+	</tr>
+	<repeat group="{{ @shoutEntries }}" value="{{ @row }}">
+	<tr>
+		<td><a href="{{@BASE}}/adminCP/home/shoutbox/id={{ @row['id'] }}/order={{@sort.order}},{{@sort.direction}}/page={{@paginate.page}}">{ICON:edit}</a></td>
+		<td><a href="{{@BASE}}/adminCP/home/shoutbox/delete={{ @row['id'] }}/order={{@sort.order}},{{@sort.direction}}/page={{@paginate.page}}" class="deleteItem" title="#{{ @row['id'] }}: {{ @row['message'] }}">{ICON:trash}</a></td>
+		<td>{{ @row['id'] }}</td>
+		<td>{{ @row['date'] }}</td>
+		<td>{{ @row['author'] }}</td>
+		<td>
+			<check if="{{@changes.0 == @row.id }}">
+				<true>
+					<check if="{{@changes.1 == TRUE }}">
+						<true>
+							<div class="alert-box success">
+						</true>
+						<false>
+							<div class="alert-box warning">
+						</false>
+					</check>
+					{{ @row['message'] }}</div>
+				</true>
+				<false>
+					{{ @row['message'] }}
+				</false>
+			</check>
+		</td>
+	</tr>
+	</repeat>
+</table>
+</true>
+<false>
+	No items found
+</false>
+</check>

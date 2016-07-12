@@ -1,0 +1,23 @@
+<form method="post" action="{{@BASE}}/adminCP/members/profile">
+	<div class="grid-wrapper">
+		<div class="gb-30"><input class="text-input" type="text" name="newMemberField"></div>
+		<div class="gb-70"><input class="button" type="submit" value="__newMemberField"></div>
+	</div>
+</form>
+<check if="{{ isset(@form_error) }}"><div class="gb-90 alert-box error">{{ @form_error }}</div></check>
+
+<repeat group="{{ @data }}" key="{{ @group }}" value="{{ @fields }}">
+<fieldset>
+	<legend>{{ ${"LN__UserField_Type".@group} }}</legend>
+	<repeat group="{{ @fields }}" value="{{ @row }}">
+		<div class="grid-wrapper">
+			<div class="gb-05"><a href="{{@BASE}}/adminCP/members/profile/edit={{ @row['field_id'] }}">{ICON:edit}</a></div>
+			<div class="gb-05"><a href="{{@BASE}}/adminCP/members/profile/delete={{ @row['field_id'] }}" class="deleteItem" title="#{{ @row['field_id'] }}: {{ @row['field_name'] }}">{ICON:trash}</a></div>
+			<div class="gb-10">{{ @row['field_id'] }}</div>
+			<div class="gb-20">{{ @row['field_name'] }}</div>
+			<div class="gb-30">{{ @row['field_title'] }}</div>
+			<div class="gb-20"><check if="{{ @row.field_on == 1}}"><true>{ICON:plus}</true><false>{ICON:minus}</false></check></div>
+		</div>
+	</repeat>
+</fieldset>
+</repeat>

@@ -177,5 +177,30 @@ class AdminCP extends Base
 
 		return \Template::instance()->render('stories/edit_chapter.html');
 	}
+	
+	public static function listUserFields(array $fieldData)
+	{
+		\Base::instance()->set('data', $fieldData);
+		return \Template::instance()->render('members/list_fields.html');
+	}
+
+	public static function listShoutbox(array $data, array $sort, array $changes)
+	{
+		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+
+		\Base::instance()->set('shoutEntries', $data);
+		\Base::instance()->set('sort', $sort);
+		\Base::instance()->set('changes', $changes);
+		return \Template::instance()->render('home/list_shoutbox.html');
+	}
+	
+	public static function editShout(array $data, array $sort, $page)
+	{
+		\Base::instance()->set('data', $data);
+		\Base::instance()->set('sort', $sort);
+		\Base::instance()->set('page', $page);
+		
+		return \Template::instance()->render('home/edit_shout.html');
+	}
 
 }

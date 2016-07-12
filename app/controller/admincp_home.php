@@ -26,7 +26,7 @@ class AdminCP_Home extends AdminCP
 				$this->buffer( \View\Base::stub() );
 				break;
 			case "shoutbox":
-				$this->buffer( \View\Base::stub() );
+				$this->shoutbox( $f3, $params );
 				break;
 			case "home":
 				$this->home($f3);
@@ -123,6 +123,62 @@ class AdminCP_Home extends AdminCP
 		$data = $this->model->listCustompages($page, $sort);
 
 		$this->buffer ( \View\AdminCP::listCustompages($data, $sort) );
+	}
+
+	protected function shoutbox(\Base $f3, array $params)
+	{
+		$this->response->addTitle( $f3->get('LN__AdminMenu_Shoutbox') );
+		$f3->set('title_h3', $f3->get('LN__AdminMenu_Shoutbox') );
+
+		if ( isset($params[2]) ) $params = $this->parametric($params[2]);
+
+		// search/browse
+		$allow_order = array (
+				"id"		=>	"id",
+				"date"		=>	"date",
+				"message"	=>	"message",
+				"author"	=>	"author",
+		);
+
+		// page will always be an integer > 0
+		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
+
+		// sort order
+		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "id";
+		$sort["order"]		= $allow_order[$sort["link"]];
+		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
+
+		if ( isset($params['delete']) )
+		{
+			if ( $this->model->deleteShout( (int)$params['delete'] ) )
+				$f3->reroute("/adminCP/home/shoutbox/order={$sort['order']},{$sort['direction']}/page={$page}", false);
+			else $f3->set('form_error', "__failedDelete");
+		}
+		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
+		{
+			if ( isset($_POST['form_data']) )
+			{
+				$changes = $this->model->saveShout($params['id'], $f3->get('POST.form_data') );
+			}
+		}
+
+		if( isset ($params['id']) AND !isset($changes) )
+		{
+			if ( NULL !== $data = $this->model->loadShoutbox($params['id']) )
+			{
+				$data['raw'] = @$params['raw'];
+				$data['errors'] = @$errors;
+				$data['changes'] = @$changes;
+				$this->buffer( \View\AdminCP::editShout($data, $sort, $page) );
+				return TRUE;
+			}
+			else $f3->set('form_error', "__failedLoad");
+		}
+		
+		$data = $this->model->listShoutbox($page, $sort);
+		$changes = [ @$params['id'], @$changes ];
+
+		$this->buffer ( \View\AdminCP::listShoutbox($data, $sort, $changes) );
 	}
 	
 	protected function news(\Base $f3, array $params)

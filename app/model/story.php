@@ -260,14 +260,15 @@ class Story extends Base
 				Cache.*,
 				S.title, S.summary, S.storynotes, S.completed, S.wordcount, UNIX_TIMESTAMP(S.date) as published, UNIX_TIMESTAMP(S.updated) as modified, 
 				S.count,GROUP_CONCAT(rSC.chalid) as contests,GROUP_CONCAT(Ser.seriesid,',',rSS.inorder,',',Ser.title ORDER BY Ser.title DESC SEPARATOR '||') as in_series @EXTRA@,
-				Ra.rating as rating_name
+				Ra.rating as rating_name, Edit.uid as can_edit
 			FROM `tbl_stories`S
 				@JOIN@
 			LEFT JOIN `tbl_stories_blockcache`Cache ON ( S.sid = Cache.sid )
 			LEFT JOIN `tbl_contest_relation`rSC ON ( rSC.relid = S.sid AND rSC.type = 'story' )
 			LEFT JOIN `tbl_series_stories`rSS ON ( rSS.sid = S.sid )
 				LEFT JOIN `tbl_series`Ser ON ( Ser.seriesid=rSS.seriesid )
-			LEFT JOIN `tbl_ratings`Ra ON ( Ra.rid = S.rid )
+			LEFT JOIN `tbl_ratings`Ra ON ( Ra.rid = S.ratingid )
+			LEFT JOIN `tbl_users`Edit ON ( ".(int)$_SESSION['userID']." = Edit.uid OR ".(int)$_SESSION['userID']." = Edit.curator )
 			WHERE S.completed @COMPLETED@ 0 AND S.validated > 0 @WHERE@
 			GROUP BY S.sid
 			@ORDER@

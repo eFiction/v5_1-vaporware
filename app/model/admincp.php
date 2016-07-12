@@ -90,6 +90,18 @@ class AdminCP extends Base {
 		return [ "section" => $select, "fields" => $data];
 	}
 	
+	public function listTeam()
+	{
+		$sql = "SELECT `uid`, `nickname`, `realname`, `groups` FROM `tbl_users` WHERE `groups` > 16";
+		return $this->exec($sql);
+	}
+	
+	public function listUserFields()
+	{
+		$sql = "SELECT `field_id`, `field_type`, `field_name`, `field_title`, `field_on` FROM `tbl_user_fields` ORDER BY `field_type` ASC";
+		return $this->exec($sql);
+	}
+	
 	public function saveKeys($data)
 	{
 		$affected=0;
@@ -885,9 +897,10 @@ class AdminCP extends Base {
 		$chapter->load(array('chapid=?',$chapterID));
 		
 		$chapter->title = $post['chapter_title'];
+		$chapter->notes = $post['chapter_notes'];
 		$chapter->save();
 		
-		// plain and visual return different newline versions, this will bring things to standard.
+		// plain and visual return different newline representations, this will bring things to standard.
 		$post['chapter_text'] = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $post['chapter_text']);
 		
 		$this->saveChapter($chapterID, $post['chapter_text']);
@@ -922,10 +935,7 @@ class AdminCP extends Base {
 		if ( $location != "local" )
 			$kv['chaptertext'] = $post['chapter_text'];
 
-		//print_r($kv);
 		$chapterID = $this->insertArray($this->prefix.'chapters', $kv );
-		//$chapterID = 4259;
-		//echo $chapterID;exit;
 		
 		if ( $location == "local" )
 		{
@@ -956,7 +966,7 @@ class AdminCP extends Base {
 		$current->title			= $post['story_title'];
 		$current->summary		= str_replace("\n","<br />",$post['story_summary']);
 		$current->storynotes	= str_replace("\n","<br />",$post['story_notes']);
-		$current->rid			= $post['rid'];
+		$current->ratingid		= $post['ratingid'];
 		$current->completed		= $post['completed'];
 		$current->validated 	= $post['validated'];
 		$current->save();
@@ -1121,4 +1131,62 @@ class AdminCP extends Base {
 		return TRUE;
 	}
 	
+	public function listShoutbox($page, array $sort)
+	{
+		$limit = 20;
+		$pos = $page - 1;
+
+		$sql = "SELECT SQL_CALC_FOUND_ROWS S.id, S.message, IF(S.guest_name IS NULL,U.nickname,S.guest_name) AS author, S.uid, DATE(S.date) as date, UNIX_TIMESTAMP(S.date) as timestamp
+				FROM `tbl_shoutbox`S
+				LEFT JOIN `tbl_users`U ON (S.uid=U.uid)
+				ORDER BY {$sort['order']} {$sort['direction']}
+				LIMIT ".(max(0,$pos*$limit)).",".$limit;
+
+		$data = $this->exec($sql);
+
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/adminCP/home/shoutbox/order={$sort['link']},{$sort['direction']}",
+			$limit
+		);
+				
+		return $data;
+	}
+	
+	public function deleteShout($id)
+	{
+		$delete = new \DB\SQL\Mapper($this->db, $this->prefix.'shoutbox');
+		if ( $delete->count( ["id = ?", $id ] ) == 0 ) return FALSE;
+		$delete->erase( ["id = ?", $id ] );
+		return TRUE;
+	}
+
+	public function loadShoutbox($id)
+	{
+		/*
+		$sql = "SELECT S.id, S.message, IF(S.guest_name IS NULL,U.nickname,S.guest_name) AS author, S.uid, S.date, UNIX_TIMESTAMP(S.date) as timestamp
+				FROM `tbl_shoutbox`S
+				LEFT JOIN `tbl_users`U ON (S.uid=U.uid)
+				WHERE `id` = :id";
+		*/
+		$sql = "SELECT S.id, S.message FROM `tbl_shoutbox`S WHERE `id` = :id";
+		$data = $this->exec($sql, [":id" => $id ]);
+		if (sizeof($data)!=1) 
+			return NULL;
+
+		return $data[0];
+	}
+
+	public function saveShout($id, array $data)
+	{
+		$shout=new \DB\SQL\Mapper($this->db, $this->prefix.'shoutbox');
+		$shout->load(array('id=?',$id));
+		$shout->copyfrom( [ "message" => $data['message'] ]);
+
+		$i = $shout->changed("message");
+
+		$shout->save();
+		return $i;
+	}
+
 }

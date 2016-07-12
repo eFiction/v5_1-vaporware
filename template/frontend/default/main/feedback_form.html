@@ -5,7 +5,7 @@
 			<form class="write_review" method="post" action="{{@BASE.@PATH}}">
 				<check if="{{@_SESSION.userID}}">
 					<true>
-						<legend>{TITLE}</legend>
+<!--						<legend>{TITLE}</legend>-->
 						<div class="user-icon"><span class="fa fa-user fa-lg"></span>{{@_SESSION.username}}</div>
 					</true>
 					<false>

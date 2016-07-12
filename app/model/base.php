@@ -279,20 +279,20 @@ class Base extends \Prefab {
 					GROUP_CONCAT(DISTINCT charid,',',charname ORDER BY charname ASC SEPARATOR '||') AS characterblock,
 					GROUP_CONCAT(DISTINCT uid,',',nickname ORDER BY nickname ASC SEPARATOR '||' ) as authorblock,
 					GROUP_CONCAT(DISTINCT cid,',',category ORDER BY category ASC SEPARATOR '||' ) as categoryblock,
-					GROUP_CONCAT(DISTINCT rid,',',rating_name,',',rating_image SEPARATOR '||' ) as rating,
+					GROUP_CONCAT(DISTINCT ratingid,',',rating_name,',',rating_image SEPARATOR '||' ) as rating,
 					COUNT(DISTINCT fid) AS reviews,
 					COUNT(DISTINCT chapid) AS chapters
 					FROM
 					(
 						SELECT S.sid,C.chapid,UNIX_TIMESTAMP(S.date) as published, UNIX_TIMESTAMP(S.updated) as modified,
 								F.fid,
-								S.rid, Ra.rating as rating_name, IF(Ra.rating_image,Ra.rating_image,'') as rating_image,
+								S.ratingid, Ra.rating as rating_name, IF(Ra.rating_image,Ra.rating_image,'') as rating_image,
 								U.uid, U.nickname,
 								Cat.cid, Cat.category,
 								TG.description,TG.order,TG.tgid,T.label as tag,T.tid,
 								Ch.charid, Ch.charname
 							FROM `tbl_stories` S
-								LEFT JOIN `tbl_ratings` Ra ON ( Ra.rid = S.rid )
+								LEFT JOIN `tbl_ratings` Ra ON ( Ra.rid = S.ratingid )
 								LEFT JOIN `tbl_stories_authors`rSA ON ( rSA.sid = S.sid )
 									LEFT JOIN `tbl_users` U ON ( rSA.aid = U.uid )
 								LEFT JOIN `tbl_stories_tags`rST ON ( rST.sid = S.sid )
