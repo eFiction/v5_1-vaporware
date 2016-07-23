@@ -105,6 +105,7 @@ return array(
 	'AdminMenu_Team' => 'Team',
 
 'AdminMenu_Archive' => 'Archive',
+	'AdminMenu_Intro' => 'Intro',
 'AdminMenu_Featured' => 'Featured',
 	'AdminMenu_Future' => 'Zukünftige',
 	'AdminMenu_Current' => 'Current',

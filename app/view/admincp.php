@@ -125,7 +125,8 @@ class AdminCP extends Base
 		return \Template::instance()->render('home/edit_news.html');
 	}
 	
-	public static function listFeatured(array $data, array $sort, string $select)
+//	public static function listFeatured(array $data, array $sort, string $select)
+	public static function listFeatured(array $data, array $sort, $select)
 	{
 		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 

@@ -23,12 +23,12 @@ return array(
 }',
 'PM_Outbox_empty' => 'Your Outbox is empty',
 
-'PM_Inbox_empty' => 'Your Inbox is empty',
 'PM_Inbox_Items' => '{0, plural,'.
 	'zero	{Your Inbox is empty!},'.
 	'one	{One message:},'.
 	'other	{# messages:}
 }',
+'PM_Inbox_empty' => 'Your Inbox is empty',
 
 'PM_Subject' => 'Subject',
 'PM_Sender' => 'Sender',
@@ -105,6 +105,7 @@ return array(
 	'AdminMenu_Team' => 'Team',
 
 'AdminMenu_Archive' => 'Archive',
+	'AdminMenu_Intro' => 'Intro',
 'AdminMenu_Featured' => 'Featured',
 	'AdminMenu_Future' => 'Future',
 	'AdminMenu_Current' => 'Current',

@@ -62,7 +62,7 @@ class AdminCP_Archive extends AdminCP
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Archive') );
 		$data['General'] = $this->model->settingsFields('archive_general');
 		$data['Intro'] = $this->model->settingsFields('archive_intro');
-		if ($data) $this->buffer( \View\AdminCP::settingsFields($data, "archive/home", $feedback) );
+		$this->buffer( \View\AdminCP::settingsFields($data, "archive/home", $feedback) );
 	}
 	
 	
@@ -141,7 +141,7 @@ class AdminCP_Archive extends AdminCP
 			{
 				$feedback = $this->model->saveKeys($f3->get('POST.form_data'));
 			}
-			$data['TagsCloud'] = $this->model->settingsFields('archive_tags_cloud');
+			$data['Settings'] = $this->model->settingsFields('archive_tags_cloud');
 			$this->buffer( \View\AdminCP::settingsFields($data, "archive/tags/cloud", $feedback ) );
 		}
 		else
