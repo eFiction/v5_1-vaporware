@@ -203,13 +203,21 @@ class AdminCP extends Base
 		return \Template::instance()->render('home/edit_shout.html');
 	}
 	
-	public static function language(array $data, array $config, array $feedback)
+	public static function language(array $data, array $config)
 	{
 		\Base::instance()->set('data',			$data);
 		\Base::instance()->set('config',		$config);
-		\Base::instance()->set('form_feedback', $feedback);
 		
-		return \Template::instance()->render('settings/languages.html');
+		return \Template::instance()->render('settings/language.html');
+	}
+
+	public static function layout(array $data, array $config)
+	{
+		// Array ( [0] => Array ( [folder] => default [name] => eFiction 5 default [author] => Rainer "the sheep" [email] => papaschaf@hotmail.com [url] => efiction.org [active] => ) ) 
+		\Base::instance()->set('data',			$data);
+		\Base::instance()->set('config',		$config);
+		
+		return \Template::instance()->render('settings/layout.html');
 	}
 
 }

@@ -77,6 +77,8 @@ return array(
 'UserMenu_Curator' => 'Betreuer',
 
 // AdminCP Home elements
+'AdminMenu_General' => 'Allgemeine Einstellungen',
+
 'AdminMenu_Home' => 'Home',
 'AdminMenu_Manual' => 'Handbuch',
 'AdminMenu_CustomPages' => 'Custom Pages',
@@ -86,7 +88,9 @@ return array(
 
 'AdminMenu_Settings' => 'Einstellungen',
 'AdminMenu_Server' => 'Server',
-'AdminMenu_Registration' => 'Registration',
+	'AdminMenu_DateTime'	=> 'Datum und Uhrzeit',
+'AdminMenu_Registration' => 'Registrierung',
+	'AdminMenu_AntiSpam'	=> 'Spam-Schutz',
 'AdminMenu_Security'	=> 'Sicherheit',
 'AdminMenu_Layout' => 'Layout',
 'AdminMenu_Themes' => 'Themes',

@@ -104,7 +104,6 @@ class AdminCP extends Base {
 	
 	public function saveKeys($data)
 	{
-		print_r($data);
 		$affected=0;
 		$sqlUpdate = "UPDATE `tbl_config` SET `value` = :value WHERE `name` = :key and `admin_module` = :section;";
 		$sqlFile = "SELECT 1 from `tbl_config` WHERE `name`= :key and `admin_module`= :section and `to_config_file`=1";
@@ -1202,6 +1201,8 @@ class AdminCP extends Base {
 			$config[$dat['name']] = $dat['value'];
 
 		$config['language_available'] = unserialize($config['language_available']);
+		if ( $config['language_available'] === FALSE ) $config['language_available'] = [];
+
 		return $config;
 	}
 	
@@ -1225,10 +1226,41 @@ class AdminCP extends Base {
 		return $this->saveKeys($post);
 	}
 
+	public function getLayoutConfig()
+	{
+		$sql = "SELECT `name`, `value`, `comment`, `form_type`
+					FROM `tbl_config` 
+					WHERE 
+						`admin_module` LIKE 'settings_layout_file'";
+		$data = $this->exec($sql);
+		
+		foreach ( $data as $dat )
+			$config[$dat['name']] = $dat['value'];
+
+		$config['layout_available'] = unserialize($config['layout_available']);
+		if ( $config['layout_available'] === FALSE ) $config['layout_available'] = [];
+
+		return $config;
+	}
+	
 	public function saveLayout($data)
 	{
+		$default = $data['lay_default'];
+		unset($data['lay_default']);
 		
-		return [ FALSE, FALSE, 5 ];
+		foreach ( $data as $key => &$dat )
+		{
+			if ( $key == $default ) $dat['available'] = TRUE;
+			if ( $dat['available'] == TRUE ) $available[$key] = $dat['name'];
+		}
+		
+		$post["settings_layout_file"] =
+			[
+				"layout_available" 	=> serialize($available),
+				"layout_default"	=> $default,
+			];
+			
+		return $this->saveKeys($post);
 	}
 
 }

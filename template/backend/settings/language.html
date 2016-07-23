@@ -1,8 +1,9 @@
+<br />
+<br />
 <form method="post" action="{{@BASE}}/adminCP/settings/language">
 <table class="tbody">
 	<tr>
 		<th>__default</th>
-		<th>&nbsp;</th>
 		<th>__locale</th>
 		<th colspan="2">__available</th>
 		<th>__name</th>
@@ -19,7 +20,6 @@
 				<check if="{{ @row.locale == @config.language_default }}">checked="checked"</check> 
 			/>
 		</td>
-		<td>-		</td>
 		<td>{{ @row['locale'] }}</td>
 		<td>{ICON:visible}<input
 				type="radio" 

@@ -8,7 +8,7 @@
 	
 	<repeat group="{{ @form_elements }}" key="{{@title }}" value="{{ @elements }}" counter="{{ @ctr }}">
 		<dl class="settings">
-		<dt class="settings_title">{{ @title }}</dt>
+		<dt class="settings_title">{{ ${'LN__AdminMenu_'.@title} }}</dt>
 		<repeat group="{{ @elements.fields }}" value="{{ @element }}" counter="{{ @ctr }}">
 			<dt>{{ @element.comment |raw}}<check if="{{ @element.comment_small }}"><br /><small>{{ @element.comment_small | raw }}</small></check></dt>
 			<switch expr="{{ @element['type'] }}">

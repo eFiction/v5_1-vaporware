@@ -8,6 +8,11 @@ return array(
 'Sort_Date'	=> 'Date',
 'Sort_ID'	=> 'ID',
 
+'yes'	=>	'yes',
+'Yes'	=>	'Yes',
+'no'	=>	'no',
+'No'	=>	'No',
+
 'PM_Inbox' => 'Inbox',
 'PM_Outbox' => 'Outbox',
 'PM_Write' => 'Write',
@@ -71,7 +76,9 @@ return array(
 'UserMenu_AddStory' => 'Add Story',
 'UserMenu_Curator' => 'Curator',
 
-// AdminCP Home elements	
+// AdminCP Home elements
+'AdminMenu_General' => 'General settings',
+
 'AdminMenu_Home' => 'Home',
 'AdminMenu_Manual' => 'Manual',
 'AdminMenu_CustomPages' => 'Custom Pages',
@@ -81,7 +88,9 @@ return array(
 
 'AdminMenu_Settings' => 'Settings',
 'AdminMenu_Server' => 'Server',
+	'AdminMenu_DateTime'	=> 'Date and time',
 'AdminMenu_Registration' => 'Registration',
+	'AdminMenu_AntiSpam'	=> 'Spam protection',
 'AdminMenu_Security'	=> 'Security',
 'AdminMenu_Layout' => 'Layout',
 'AdminMenu_Themes' => 'Themes',

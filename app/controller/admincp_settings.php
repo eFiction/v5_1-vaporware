@@ -9,6 +9,7 @@ class AdminCP_Settings extends AdminCP
 	public function index(\Base $f3, $params, $feedback = [ NULL, NULL ] )
 	{
 		$data = NULL;
+		$extra = NULL;
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Settings') );
 
 		switch( $this->moduleInit(@$params['module']) )
@@ -23,15 +24,17 @@ class AdminCP_Settings extends AdminCP
 				break;
 			case "layout":
 				$this->response->addTitle( $f3->get('LN__AdminMenu_Layout') );
-				$this->buffer( \View\Base::stub() );
+				$data['Layout'] = $this->model->settingsFields('settings_layout');
+				$extra = $this->layout($f3, $params);
 				break;
 			case "security":
 				$this->response->addTitle( $f3->get('LN__AdminMenu_Security') );
 				$this->buffer( \View\Base::stub() );
 				break;
 			case "language":
+				$this->response->addTitle( $f3->get('LN__AdminMenu_Language') );
 				$data['Language'] = $this->model->settingsFields('settings_language');
-				$this->language($f3, $params, $feedback);
+				$extra = $this->language($f3, $params);
 				break;
 			case "home":
 				$params['module'] = "home";
@@ -41,6 +44,7 @@ class AdminCP_Settings extends AdminCP
 				$this->buffer(\Template::instance()->render('access.html'));
 		}
 		if ($data) $this->buffer( \View\AdminCP::settingsFields($data, "settings/".$params['module'], $feedback) );
+		if ($extra)$this->buffer( $extra );
 	}
 	
 /* 	protected function home(\Base $f3, &$data)
@@ -88,9 +92,8 @@ class AdminCP_Settings extends AdminCP
 			return $this->model->saveLayout($f3->get('POST.form_special'));
 	}
 
- 	protected function language(\Base $f3, $params, $feedback)
+ 	protected function language(\Base $f3, $params)
 	{
-		$this->response->addTitle( $f3->get('LN__AdminMenu_Language') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Language') );
 
 		$languageConfig = $this->model->getLanguageConfig();
@@ -103,7 +106,28 @@ class AdminCP_Settings extends AdminCP
 			$languageFiles[] = $data;
 		}
 		
-		$this->buffer( \View\AdminCP::language($languageFiles, $languageConfig, $feedback) );
+		return \View\AdminCP::language($languageFiles, $languageConfig);
 	}
 
+ 	protected function layout(\Base $f3, $params)
+	{
+		$f3->set('title_h3', $f3->get('LN__AdminMenu_Layout') );
+		
+		$layoutConfig = $this->model->getLayoutConfig();
+		
+		// Folder list with ***x cleanup - anyone with a windows server, is this working?
+		$entries = array_diff(scandir("./template/frontend"), array('..', '.'));
+		foreach ( $entries as $entry )
+		{
+			if ( is_dir("./template/frontend/{$entry}") )
+			{
+				$data = (array)simplexml_load_file("./template/frontend/{$entry}/info.xml");
+				$data['active'] = array_key_exists($data['folder'], $layoutConfig['layout_available']);
+				$layoutFiles[] = $data;
+			}
+		}
+
+		return \View\AdminCP::layout($layoutFiles, $layoutConfig);
+	}
+		
 }

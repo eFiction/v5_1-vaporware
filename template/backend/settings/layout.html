@@ -1,0 +1,46 @@
+<br />
+<br />
+<form method="post" action="{{@BASE}}/adminCP/settings/layout">
+<table class="tbody">
+	<tr>
+		<th>__default</th>
+		<th>__folder</th>
+		<th colspan="2">__available</th>
+		<th>__name</th>
+	</tr>
+	<repeat group="{{ @data }}" value="{{ @row }}">
+	<tr>
+		<td>
+			<input
+				type="radio" 
+				id="{{ @row.folder }}"
+				value="{{ @row.folder }}" 
+				name="form_special[lay_default]" 
+				<check if="{{ @row.folder == @config.layout_default }}">checked="checked"</check> 
+			/>
+		</td>
+		<td>{{ @row['folder'] }}</td>
+		<td>{ICON:visible}<input
+				type="radio" 
+				id="{{ @row.folder }}_available"
+				value="1" 
+				name="form_special[{{ @row.folder }}][available]" 
+				<check if="{{ array_key_exists(@row.folder, @config.layout_available) }}">checked="checked"</check> 
+			/>
+		</td>
+		<td>{ICON:invisible}<input
+				type="radio" 
+				id="{{ @row.folder }}_available"
+				value="0" 
+				name="form_special[{{ @row.folder }}][available]" 
+				<check if="{{ !array_key_exists(@row.folder, @config.layout_available) }}">checked="checked"</check> 
+			/>
+		</td>
+		<td><input class="text-input" type="text" value="{{ @row.name }}" name="form_special[{{ @row.folder }}][name]" readonly="readonly" /></td>
+	</tr>
+	</repeat>
+</table>
+<input class="button" type="submit"> <input class="button" type="reset">
+</form>
+<br />
+To change the name of a layout, edit the info.xml file in its folder, reload this page and save the layout settings again.
