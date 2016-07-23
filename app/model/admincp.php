@@ -104,6 +104,7 @@ class AdminCP extends Base {
 	
 	public function saveKeys($data)
 	{
+		print_r($data);
 		$affected=0;
 		$sqlUpdate = "UPDATE `tbl_config` SET `value` = :value WHERE `name` = :key and `admin_module` = :section;";
 		$sqlFile = "SELECT 1 from `tbl_config` WHERE `name`= :key and `admin_module`= :section and `to_config_file`=1";
@@ -1187,6 +1188,50 @@ class AdminCP extends Base {
 
 		$shout->save();
 		return $i;
+	}
+	
+	public function getLanguageConfig()
+	{
+		$sql = "SELECT `name`, `value`, `comment`, `form_type`
+					FROM `tbl_config` 
+					WHERE 
+						`admin_module` LIKE 'settings_language_file'";
+		$data = $this->exec($sql);
+		
+		foreach ( $data as $dat )
+			$config[$dat['name']] = $dat['value'];
+
+		$config['language_available'] = unserialize($config['language_available']);
+		return $config;
+	}
+	
+	public function saveLanguage($data)
+	{
+		$default = $data['lang_default'];
+		unset($data['lang_default']);
+
+		foreach ( $data as $key => &$dat )
+		{
+			if ( $key == $default ) $dat['available'] = TRUE;
+			if ( $dat['available'] == TRUE ) $available[$key] = $dat['localname'];
+		}
+		
+		$post["settings_language_file"] =
+			[
+				"language_available" 	=> serialize($available),
+				"language_default"		=> $default,
+			];
+			
+		return $this->saveKeys($post);
+		//var_dump($data);
+		//print_r($available);
+		//return [ FALSE, FALSE, FALSE ];
+	}
+
+	public function saveLayout($data)
+	{
+		
+		return [ FALSE, FALSE, 5 ];
 	}
 
 }

@@ -15,7 +15,7 @@ class AdminCP extends Base
 		\Base::instance()->set('form_target', $target);
 		\Base::instance()->set('form_elements', $data);
 		\Base::instance()->set('form_feedback', $feedback);
-		$html = \Template::instance()->render('form_blocks.html');
+		$html = \Template::instance()->resolve(\Template::instance()->render('form_blocks.html'));
 		return $html;
 	}
 
@@ -201,6 +201,15 @@ class AdminCP extends Base
 		\Base::instance()->set('page', $page);
 		
 		return \Template::instance()->render('home/edit_shout.html');
+	}
+	
+	public static function language(array $data, array $config, array $feedback)
+	{
+		\Base::instance()->set('data',			$data);
+		\Base::instance()->set('config',		$config);
+		\Base::instance()->set('form_feedback', $feedback);
+		
+		return \Template::instance()->render('settings/languages.html');
 	}
 
 }

@@ -8,6 +8,11 @@ return array(
 'Sort_Date'	=> 'Datum',
 'Sort_ID'	=> 'ID',
 
+'yes'	=>	'ja',
+'Yes'	=>	'Ja',
+'no'	=>	'nein',
+'No'	=>	'Nein',
+
 'PM_Inbox' => 'Posteingang',
 'PM_Outbox' => 'Postausgang',
 'PM_Write' => 'Verfassen',
@@ -38,7 +43,9 @@ return array(
 'PM_WritePM' => 'Nachricht verfassen',
 'PM_Messaging' => 'Nachrichten',
 
+// using php strftime
 'Month_Calendar' => '{0,date,custom,%B %Y}',
+'Weekday' => '{0,date,custom,%A}',
 
 'Menu_Profile' => 'Profil',
 'Menu_Messaging' => 'Nachrichten (PM)',
@@ -46,6 +53,14 @@ return array(
 'Menu_MyLibrary' => 'Mein Archiv',
 'Menu_Reviews' => 'Bewertungen',
 'Menu_Preferences' => 'Preferences',
+
+// User elements
+'UserField_Type1'	=> 'URL',			// _FIELDURL
+'UserField_Type2'	=> 'Auswahlfeld',	// _FIELDSELECT
+'UserField_Type3'	=> 'Ja/Nein',		// _FIELDYESNO
+'UserField_Type4'	=> 'ID mit URL',	// _FIELDIDURL
+'UserField_Type5'	=> 'Custom Code',	// _FIELDCUSTOM
+'UserField_Type6'	=> 'Text',			// _TEXT
 
 // UserCP elements
 'UserMenu_Profile' => 'Profil',
@@ -72,6 +87,7 @@ return array(
 'AdminMenu_Settings' => 'Einstellungen',
 'AdminMenu_Server' => 'Server',
 'AdminMenu_Registration' => 'Registration',
+'AdminMenu_Security'	=> 'Sicherheit',
 'AdminMenu_Layout' => 'Layout',
 'AdminMenu_Themes' => 'Themes',
 'AdminMenu_Icons' => 'Icons',

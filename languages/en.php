@@ -1,5 +1,5 @@
 <?php
-@define('__transLocale', 'en_EN');
+@define('__transLocale', 'en_GB');
 
 return array(
 'UserCP' => 'User Panel',
@@ -38,7 +38,9 @@ return array(
 'PM_WritePM' => 'Writing message',
 'PM_Messaging' => 'Messaging',
 
+// using php strftime
 'Month_Calendar' => '{0,date,custom,%B %Y}',
+'Weekday' => '{0,date,custom,%A}',
 
 'Menu_Profile' => 'Profile',
 'Menu_Messaging' => 'Messaging',
@@ -80,6 +82,7 @@ return array(
 'AdminMenu_Settings' => 'Settings',
 'AdminMenu_Server' => 'Server',
 'AdminMenu_Registration' => 'Registration',
+'AdminMenu_Security'	=> 'Security',
 'AdminMenu_Layout' => 'Layout',
 'AdminMenu_Themes' => 'Themes',
 'AdminMenu_Icons' => 'Icons',
