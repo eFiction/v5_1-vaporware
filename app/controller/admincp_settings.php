@@ -103,10 +103,7 @@ class AdminCP_Settings extends AdminCP
 			$languageFiles[] = $data;
 		}
 		
-		//print_r($languageFiles);
-		//print_r($languageConfig);
 		$this->buffer( \View\AdminCP::language($languageFiles, $languageConfig, $feedback) );
-
 	}
 
 }

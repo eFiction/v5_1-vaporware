@@ -1223,9 +1223,6 @@ class AdminCP extends Base {
 			];
 			
 		return $this->saveKeys($post);
-		//var_dump($data);
-		//print_r($available);
-		//return [ FALSE, FALSE, FALSE ];
 	}
 
 	public function saveLayout($data)
