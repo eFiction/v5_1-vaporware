@@ -236,13 +236,16 @@ class Story extends Base
 		return NULL;
 	}
 	
-	public function getStory($story)
+	public function getStory($story, $chapter=0)
 	{
 		$replacements =
 		[
-			"WHERE" => "AND S.sid = :sid"
+			"WHERE" => "AND S.sid = :sid",
+			"EXTRA"	=> ", C.chapid",
+			"JOIN"	=> "LEFT JOIN `efi5_chapters`C ON ( S.sid = C.sid and C.inorder = :chapter )"
 		];
-		$data = $this->exec($this->storySQL($replacements), [ ":sid" => $story ]);
+
+		$data = $this->exec($this->storySQL($replacements), [ ":sid" => $story, ":chapter" => $chapter ]);
 
 		if ( sizeof($data)==1 )
 			return $data[0];
@@ -321,7 +324,7 @@ class Story extends Base
 		return $data;
 	}
 	
-	public function loadReviews($storyID)
+	public function loadReviews($storyID,$chapter=NULL)
 	{
 		$limit=5;
 		$sql = "SELECT 
@@ -342,14 +345,18 @@ class Story extends Base
 							F.writer_uid as review_writer_uid 
 						FROM `tbl_feedback`F 
 							JOIN `tbl_users`U ON ( F.writer_uid = U.uid )
-						WHERE F.reference = :storyid AND F.type='ST' 
+						WHERE F.reference = :storyid @CHAPTER@ AND F.type='ST' 
 						ORDER BY F.datetime 
 						DESC LIMIT 0,".$limit."
 					) F1
-				JOIN `tbl_feedback`F2  ON (F1.review_id = F2.reference AND F2.type='C')
-					JOIN `tbl_users`U2 ON ( F2.writer_uid = U2.uid )
+				LEFT JOIN `tbl_feedback`F2  ON (F1.review_id = F2.reference AND F2.type='C')
+					LEFT JOIN `tbl_users`U2 ON ( F2.writer_uid = U2.uid )
 				ORDER BY F2.datetime ASC";
-		$flat = $this->exec( $sql, [':storyid' => $storyID] );
+
+		if ( $chapter )
+			$flat = $this->exec( str_replace("@CHAPTER@", "AND F.reference_sub = :chapter", $sql), [':storyid' => $storyID, ':chapter' => $chapter] );
+
+		else $flat = $this->exec( str_replace("@CHAPTER@", "", $sql), [':storyid' => $storyID] );
 		
 		if ( sizeof($flat) == 0 ) return FALSE;
 		

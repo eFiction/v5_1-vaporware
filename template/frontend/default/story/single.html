@@ -15,6 +15,13 @@
 			<a name="rev"></a>
 			{{@data.infoblock | raw}}
 			{{@data.content | raw }}
-			<include href="{{ 'main/feedback_form.html' }}" >
+			<br />
+			<br />
+			<a name="review"></a>
+			
+			<check if="{{ is_array(@data.story.reviews) }}">
+				<include href="story/reviews.html" with="story_reviews={{@data.story.reviews}}" />
+			</check>
+			<include href="main/feedback_form.html" with="element={{@data.story.chapid}},childof={{@data.story.sid}}" />
 		</div>
 	</div>

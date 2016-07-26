@@ -17,7 +17,7 @@ $f3->route(
   ],
   'Controller\Story->index' );
 $f3->route(
-  [ 'POST /story', 'POST /story/@action' ], 'Controller\Story->save' );
+  [ 'POST /story', 'POST /story/@action' , 'POST /story/@action/*' ], 'Controller\Story->save' );
 
 $f3->route(
   [ 'GET /story/search', 'GET /story/search/*', 'POST /story/search' ],

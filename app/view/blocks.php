@@ -47,7 +47,7 @@ class Blocks extends Base
 				"TITLE"		=> "__Calendar",
 				"CONTENT"	=> "Loading ...",
 		);
-		return \Template::instance()->render('blocks/cell.html',NULL, $tmpHive);
+		return parent::render('blocks/cell.html',NULL, $tmpHive);
 	}
 
 	public static function calendar($data)

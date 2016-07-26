@@ -14,11 +14,11 @@
 						<div class="field"><span class="fa fa-envelope fa-fw icon"></span><input class="field input" placeholder="email"  type="text" name="email"></div>
 					</false>
 				</check>
-				<div class="field textarea"><textarea class="message" placeholder="please leave a comment/review"></textarea></div>
+				<div class="field textarea"><textarea class="message" name="write[text]" placeholder="please leave a comment/review"></textarea></div>
 				{FULL}{BUTTON}
 				<input class="button" type="submit" value="__Submit">
-				<input type="hidden" name="write[chapid]" value="{CHAPID}">
-				<input type="hidden" name="write[childof]" value="{CHILDOF}">
+				<input type="hidden" name="write[element]" value="{{@element}}">
+				<input type="hidden" name="write[childof]" value="{{@childof}}">
 			</form>
 		</fieldset>
 	</true>

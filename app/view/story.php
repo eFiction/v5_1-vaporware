@@ -10,7 +10,7 @@ class Story extends Base
 		
 		\Base::instance()->set('stories', $data);
 		
-		return \Template::instance()->render( 'story/listing.html' );
+		return parent::render( 'story/listing.html' );
 	}
 	
 	public static function searchPage($terms=array(), $data=array())
@@ -23,7 +23,7 @@ class Story extends Base
 	{
 		\Base::instance()->set('searchForm', $terms);
 		
-		return \Template::instance()->render('story/search.html');
+		return parent::render('story/search.html');
 	}
 	
 	protected static function dataProcess(&$item, $key=NULL)
@@ -52,7 +52,7 @@ class Story extends Base
 		\Base::instance()->set('tocData', $tocData);
 		\Base::instance()->set('storyID', $storyData['sid']);
 		
-		return $infoblock.\Template::instance()->render('story/toc.html');
+		return $infoblock.parent::render('story/toc.html');
 	}
 	
 	public static function buildInfoblock($storyData)
@@ -63,24 +63,24 @@ class Story extends Base
 
 		\Base::instance()->set('storyData', $storyData);
 
-		return \Template::instance()->render('story/information.html');
+		return parent::render('story/information.html');
 	}
 
 	public static function buildReviews($reviewData)
 	{
 		\Base::instance()->set('story_reviews', $reviewData);
 
-		return \Template::instance()->render('story/reviews.html');
+		return parent::render('story/reviews.html');
 	}
 
 	public static function commentForm($storyID, $parentID)
 	{
-		return \Template::instance()->render('main/feedback_form.html');
+		return parent::render('main/feedback_form.html');
 	}
 
 	public static function reviewForm($storyID, $parentID)
 	{
-		return \Template::instance()->render('main/feedback_form.html');
+		return parent::render('main/feedback_form.html');
 	}
 
 	public static function buildStory($storyData,$content,$dropdown)
@@ -103,7 +103,7 @@ class Story extends Base
 												"infoblock" => ( $storyData['chapters'] > 1 ) ? "" : \View\Story::buildInfoblock($storyData),
 												]);
 		
-		return \Template::instance()->render('story/single.html');
+		return parent::render('story/single.html');
 	}
 
 	public static function dropdown($data,$chapter)
@@ -122,7 +122,7 @@ class Story extends Base
 	{
 		\Base::instance()->set('categoriesData', $data);
 		
-		return \Template::instance()->render('story/categories.html');
+		return parent::render('story/categories.html');
 	}
 	
 	public static function epubXMLtag()
@@ -132,17 +132,17 @@ class Story extends Base
 
 	public static function epubContainer()
 	{
-		return \Template::instance()->render('container.xml');
+		return parent::render('container.xml');
 	}
 
 	public static function epubCSS()
 	{
-		return \Template::instance()->render('epub.css');
+		return parent::render('epub.css');
 	}
 
 	public static function epubPage($body, $title, $language)
 	{
-		return \Template::instance()->render('base.xhtml', 'text/html', [ 	"BODY" => $body, 
+		return parent::render('base.xhtml', 'text/html', [ 	"BODY" => $body, 
 																										"TITLE" => $title,
 																										"LANGUAGE" => $language
 																									]
@@ -154,7 +154,7 @@ class Story extends Base
 		$ebook = \Base::instance()->get('EPUB');
 		if ( $ebook['version']==3 )
 		{
-			return \Template::instance()->render('chapter_v3.xhtml',
+			return parent::render('chapter_v3.xhtml',
 																	'text/html',
 																	[ 	"CONTENT" => $content, 
 																		"CHAPTER_TITLE" => $title,
@@ -165,7 +165,7 @@ class Story extends Base
 		}
 		elseif ( $ebook['version']==2 )
 		{
-			return \Template::instance()->render('chapter_v2.xhtml',
+			return parent::render('chapter_v2.xhtml',
 																	'text/html',
 																	[ 	"CONTENT" => $content, 
 																		"CHAPTER_TITLE" => $title,
@@ -178,7 +178,7 @@ class Story extends Base
 	{
 		$ebook = \Base::instance()->get('EPUB');
 		$file = "title".($ebook['version']==3 ?"_v3":"_v2").".xhtml";
-		return \Template::instance()->render($file, 'application/xhtml+xml', [ "STORY_TITLE"	=>	$ebook['title'],
+		return parent::render($file, 'application/xhtml+xml', [ "STORY_TITLE"	=>	$ebook['title'],
 																							"AUTHOR"			=>	$ebook['authors'],
 		    																				"NOTES"			=>	$ebook['storynotes']
 																							]
@@ -194,7 +194,7 @@ class Story extends Base
 		}
 		elseif ( $ebook['version']==2 )
 		{
-			return \Template::instance()->render('root_v2.opf', 'application/xhtml+xml',
+			return parent::render('root_v2.opf', 'application/xhtml+xml',
 																		[
 																			"pages" => $chapterTOC,
 																			"ebook" => $ebook,
@@ -208,7 +208,7 @@ class Story extends Base
 		$ebook = \Base::instance()->get('EPUB');
 		if ( $version==3 )
 		{
-			return \Template::instance()->render('toc.xhtml', 'application/xhtml+xml',
+			return parent::render('toc.xhtml', 'application/xhtml+xml',
 																		[
 																			"pages" => $chapterTOC,
 																			"ebook" => $ebook,
@@ -217,7 +217,7 @@ class Story extends Base
 		}
 		else
 		{
-			return \Template::instance()->render('toc.ncx', 'application/xhtml+xml',
+			return parent::render('toc.ncx', 'application/xhtml+xml',
 																		[
 																			"pages" => $chapterTOC,
 																			"ebook" => $ebook,

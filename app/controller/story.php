@@ -48,6 +48,13 @@ class Story extends Base
 		$this->buffer ($data);
 	}
 	
+	public function save(\Base $f3, $params)
+	{
+		print_r($params);
+		print_r($_POST);
+		exit;
+	}
+	
 	public function ajax(\Base $f3, $params)
 	{
 		if ( isset($params['segment']) && $params['segment']=="search" )
@@ -200,7 +207,7 @@ class Story extends Base
 	{
 		$id = explode(",",$id);
 
-		if($storyData = $this->model->getStory($id[0]))
+		if($storyData = $this->model->getStory($id[0],@$id[1]))
 		{
 			$story = $id[0];
 			if ( empty($id[1]) AND $storyData['chapters']>1 ) $id[1] = "toc";
@@ -209,7 +216,6 @@ class Story extends Base
 			{
 				$content = "*No reviews found";
 				$tocData = $this->model->getMiniTOC($story);
-				//$offset = isset((int)@$id[2]) ? 1:2;
 				if ( $reviewData = $this->model->loadReviews($story) )
 					$content = \View\Story::buildReviews($reviewData);
 			}
@@ -225,6 +231,8 @@ class Story extends Base
 				$tocData = $this->model->getMiniTOC($story);
 				\Base::instance()->set('bigscreen',TRUE);
 				$content = ($content = $this->model->getChapter( $story, $chapter )) ? : "Error";
+
+				$storyData['reviews'] = $this->model->loadReviews($story,$storyData['chapid']);
 			}
 
 			$dropdown = \View\Story::dropdown($tocData,$id[1]);
