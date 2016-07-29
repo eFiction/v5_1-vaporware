@@ -104,6 +104,7 @@ class Base extends \Prefab {
 		if(sizeof($keys)>0)
 		{
 			$sql_query = (($replace===TRUE)?"REPLACE":"INSERT")." INTO `{$table}` (".implode(", ", $keys).") VALUES ( ".implode(", ", $values).")";
+			//echo $sql_query;exit;
 			$this->prepare("insertArray", $sql_query);
 
 			foreach($kvpair as $key => $value)
@@ -113,7 +114,8 @@ class Base extends \Prefab {
 				else
 					$this->bindValue("insertArray", $key, $value, \PDO::PARAM_STR);
 			}
-			if ( 1 == $result = $this->execute("insertArray") )
+
+			if ( 1 <= $result = $this->execute("insertArray") )
 				return (int)$this->db->lastInsertId();
 			return FALSE;
 		}

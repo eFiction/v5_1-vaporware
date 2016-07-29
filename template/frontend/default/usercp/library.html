@@ -51,7 +51,7 @@
 	<repeat group="{{ @libraryEntries }}" value="{{ @row }}">
 	<tr>
 		<td><a href="{{@BASE}}/userCP/library/{{@extra.sub}}/edit/id={{@extra.type}},{{ @row['id'] }};returnpath=/userCP/library/{{@extra.sub}}/{{@extra.type}}/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
-		<td><a href="{{@BASE}}/userCP/library/{{@extra.sub}}/toggle/id={{@extra.type}},{{ @row['id'] }};returnpath=/userCP/library/{{@extra.sub}}/{{@extra.type}}/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}" class="deleteItem" title="{{ @row['name'] }}">{ICON:trash}</a></td>
+		<td><a href="{{@BASE}}/userCP/library/{{@extra.sub}}/delete/id={{@extra.type}},{{ @row['id'] }};returnpath=/userCP/library/{{@extra.sub}}/{{@extra.type}}/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}" class="deleteItem" title="{{ @row['name'] }}">{ICON:trash}</a></td>
 		<td>{{ @row['id'] }}</td>
 		<td>{{ @row['visibility'] }}</td>
 		<td>{{ @row['name'] }}</td>

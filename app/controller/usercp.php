@@ -17,10 +17,28 @@ class UserCP extends Base
 
 	public function index(\Base $f3, $params)
 	{
-		
-		$this->showMenu();
-	}
+		$modules =
+		[
+			"library"		=> "library",
+			"messaging"		=> "messaging",
+			"author"		=> "authoring",
+			"reviews"		=> "reviews",
+			"preferences"	=> "preferences",
+			"profile"		=> "profile",
+		];
 	
+		$p = array_pad(explode("/",$params[1]),2,NULL);
+		$mod = array_shift($p);
+
+		if(@array_key_exists($mod,$modules))
+		{
+			$this->$modules[$mod]($f3, [ $p[0], implode("/",$p)] );
+		}
+		// Just show default menu
+		else
+			$this->showMenu();
+	}
+
 	public function ajax(\Base $f3, $params)
 	{
 		$data = [];
@@ -36,24 +54,55 @@ class UserCP extends Base
 		exit;
 	}
 	
+	public function authoring(\Base $f3, $params)
+	{
+		$this->response->addTitle( $f3->get('LN__UserMenu_MyLibrary') );
+		$this->buffer ( \View\Base::stub("authoring") );
+		$this->showMenu("authoring");
+	}
+
+	public function reviews(\Base $f3, $params)
+	{
+		$this->response->addTitle( $f3->get('LN__UserMenu_Reviews') );
+		$this->buffer ( \View\Base::stub("reviews") );
+		$this->showMenu("reviews");
+	}
+
+	public function preferences(\Base $f3, $params)
+	{
+		$this->response->addTitle( $f3->get('LN__UserMenu_Preferences') );
+		$this->buffer ( \View\Base::stub("preferences") );
+		$this->showMenu("preferences");
+	}
+
+	public function profile(\Base $f3, $params)
+	{
+		$this->response->addTitle( $f3->get('LN__UserMenu_Profile') );
+		$this->buffer ( \View\Base::stub("profile") );
+		$this->showMenu("profile");
+	}
+
 	public function library(\Base $f3, $params)
 	{
-		//$this->response->addTitle( $f3->get('LN__UserCP') );
 		$this->response->addTitle( $f3->get('LN__UserMenu_MyLibrary') );
 
-		if ( isset($params[1]) )
-		{
-			list($params, $returnpath) = array_pad(explode(";returnpath=",$params[1]), 2, '');
-			$params = $this->parametric($params);
-			$params['returnpath'] = $returnpath;
-		}
+		list($params, $returnpath) = array_pad(explode(";returnpath=",$params[1]), 2, '');
+		$params = $this->parametric($params);
+		$params['returnpath'] = $returnpath;
+
 		$sub = [ "bookmark", "favourite", "recommendation" ];
 		if ( !in_array($params[0], $sub) ) $params[0] = "";
 		
 		// delete function get's accompanied by a pseudo-post, this doesn't count here. Sorry dude
-		if( (NULL != $post = $f3->get('POST')) AND !array_key_exists("confirmed",$post))
+		if( NULL != $post = $f3->get('POST') )
 		{
-			if ( $params[0] == "recommendation" )
+			if ( array_key_exists("confirmed",$post) )
+			{
+				$this->model->libraryBookFavDelete($params);
+				$f3->reroute($params['returnpath'], false);
+				exit;
+			}
+			elseif ( $params[0] == "recommendation" )
 			{
 				//
 				
@@ -63,7 +112,7 @@ class UserCP extends Base
 				if ( FALSE === $result = $this->model->saveBookFav($post, $params) )
 				{
 					$params['error'] = "saving";
-					$this->libraryBookFavAdd($f3, $params);
+					$this->libraryBookFavEdit($f3, $params);
 				}
 				else
 				{
@@ -99,31 +148,24 @@ class UserCP extends Base
 	
 	private function libraryBookFav(\Base $f3, $params)
 	{
-		if(array_key_exists("toggle",$params))
-		{
-			$deleted = $this->model->toggleBookFav($params);
-			if ( $deleted === TRUE )
-			{
-				// bookmark was deleted, let's go back to where we came from
-				$f3->reroute($params['returnpath'], false);
-				exit;
-			}
-			// show the add form, skip the menu
-			$this->libraryBookFavAdd($f3, $params);
-			return TRUE;
-		}
-		
-		$menu_upper =
-		[
-			[ "link" => "AU", "label" => "Author" ],
-			[ "link" => "RC", "label" => "Recomm" ],
-			[ "link" => "SE", "label" => "Series" ],
-			[ "link" => "ST", "label" => "Stories" ],
-		];
-
+		// Build upper micro-menu
 		$counter = $this->counter[$params[0]]['details'];
 
-		if ( is_array($counter) ) $this->buffer ( \View\UserCP::libraryBookFavMenu($menu_upper, $counter, $params[0]) );
+		if ( is_array($counter) )
+		{
+			$menu_upper =
+			[
+				[ "link" => "AU", "label" => "Author" ],
+				[ "link" => "RC", "label" => "Recomm" ],
+				[ "link" => "SE", "label" => "Series" ],
+				[ "link" => "ST", "label" => "Stories" ],
+			];
+			$this->buffer ( \View\UserCP::libraryBookFavMenu($menu_upper, $counter, $params[0]) );
+		}
+		// End of menu
+
+		if(array_key_exists("edit",$params))
+			$this->libraryBookFavEdit($f3, $params);
 		
 		if ( isset($params[1]) AND isset($counter[$params[1]]) )
 		{
@@ -155,14 +197,12 @@ class UserCP extends Base
 		
 	}
 	
-	private function libraryBookFavAdd(\Base $f3, $params)
+	private function libraryBookFavEdit(\Base $f3, $params)
 	{
 		if ( FALSE !== $data = $this->model->loadBookFav($params) )
 		{
-			//print_r($params);
-			$this->buffer ( \View\UserCP::libraryBookFavAdd($data, $params) );
+			$this->buffer ( \View\UserCP::libraryBookFavEdit($data, $params) );
 		}
-		//print_r($data);
 	}
 	
 	public function messaging(\Base $f3, $params)

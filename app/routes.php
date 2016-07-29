@@ -44,20 +44,10 @@ if (\Controller\Auth::isLoggedIn())
 		[ 'GET /logout', 'GET /logout/*' ],
 		'Controller\Auth->logout' );
 
-	$f3->route( 'GET|POST /panel', 'Controller\Panel->main' );
-
 	$f3->route(
 		[ 'GET|POST /userCP', 'GET|POST /userCP/*' ],
 		'Controller\UserCP->index' );
-	
-	$f3->route(
-		[ 'GET|POST /userCP/library', 'GET|POST /userCP/library/*' ],
-		'Controller\UserCP->library' );
-	
-	$f3->route(
-		[ 'GET|POST /userCP/messaging', 'GET|POST /userCP/messaging/*' ],
-		'Controller\UserCP->messaging' );
-	
+
 	// Ajax routes
 	$f3->route( 'POST /userCP/ajax/@module [ajax]', 'Controller\UserCP->ajax' );
 

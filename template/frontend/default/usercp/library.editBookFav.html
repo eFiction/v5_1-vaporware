@@ -1,13 +1,17 @@
 <check if="{{isset(@saveError)}}"><div class="note alert-box-half error">Error: {{@saveError}}</div></check>
 <div class="form-wrapper">
-<form method="post" action="{{@BASE}}/userCP/library/{{@block}}/save/id={{@data.type}},{{@data.sid}};returnpath={{@returnpath}}">
+<form method="post" action="{{@BASE}}/userCP/library/{{@block}}/save/id={{@data.type}},{{@data.id}};returnpath={{@returnpath}}">
+<check if="{{@data.fid}}">
+	<span class="alert-box error">__Check to delete: <input type="checkbox" name="delete" value="yes" /></span>
+	<br /><br />
+</check>
 <fieldset>
 	<check if="{{ @block=='bookmark' }}">
 		<true><legend>{{@LN__AddBookmark}}</legend></true>
 		<false><legend>{{@LN__AddFavourite}}</legend></false>
 	</check>
 	<table>
-		<tr><td colspan="2"><h6>{{@data.title}}:</h6></td></tr>
+		<tr><td colspan="2"><h6>{{@data.name}}:</h6></td></tr>
 		<tr><td colspan="2"><textarea class="textarea" name="comments">{{@data.comments}}</textarea></td></tr>
 		<tr><td>__Notification</td><td><input type="checkbox" name="notify" value="yes" <check if="{{@data.notify}}">checked="checked"</check> />
 		<tr>
@@ -30,3 +34,9 @@
 </fieldset>
 </form>
 </div>
+<script type="text/javascript">
+$(function() {
+    // With a custom message
+   $('form').areYouSure();
+})
+</script>

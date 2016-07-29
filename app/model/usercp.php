@@ -15,7 +15,10 @@ class UserCP extends Base
 	{
 		if ( $selected )
 		{
-			$this->menu[$selected]["sub"] = $this->panelMenu($selected, $data);
+			if ( $selected == "author")
+				$this->menu[$selected]["sub"] = $this->panelMenu($selected, $data);
+			else
+				$this->menu[$selected]["sub"] = $this->panelMenu($selected, $data);
 		}
 		return $this->menu;
 	}
@@ -170,7 +173,7 @@ class UserCP extends Base
 		return TRUE;
 	}
 	
-	public function toggleBookFav($params)
+	public function libraryBookFavDelete($params)
 	{
 		if ( empty($params['id'][0]) OR empty($params['id'][1]) ) return FALSE;
 		if ( in_array($params["id"][0],["AU","RC","SE","ST"]) )
@@ -191,19 +194,30 @@ class UserCP extends Base
 	{
 		// ?
 		if ( empty($params['id'][0]) OR empty($params['id'][1]) ) return FALSE;
-		if ( $params['id'][0]=="ST" )
-		{
-			$sql = "SELECT 'ST' as type, S.sid, S.title, Cache.authorblock, Fav.comments, Fav.visibility, Fav.notify
-						FROM `tbl_stories`S 
-						INNER JOIN `tbl_stories_blockcache`Cache ON ( S.sid = Cache.sid )
-						LEFT JOIN `tbl_user_favourites`Fav ON ( S.sid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='ST' AND Fav.bookmark =".(($params[0]=="bookmark")?1:0).")
-					WHERE S.sid = :id ";
-		}
 
-		$data = $this->exec($sql,[":id"=>$params['id'][1]]);
+		if ( $params['id'][0]=="AU" )
+		{
+			$sql = $this->sqlBookFav("AU") . 
+				"WHERE U.uid = :id ";
+		}
+		elseif ( $params['id'][0]=="SE" )
+		{
+			$sql = $this->sqlBookFav("SE") . 
+				"WHERE Ser.seriesid = :id ";
+		}
+		elseif ( $params['id'][0]=="ST" )
+		{
+			$sql = $this->sqlBookFav("ST") . 
+				"WHERE S.sid = :id ";
+		}
+		else return FALSE;
+
+		$data = $this->exec($sql,[":bookmark" => (($params[0]=="bookmark")?1:0), ":id"=>$params['id'][1]]);
 		if ( sizeof($data)==1 )
 		{
-			$data[0]['authorblock'] = unserialize($data[0]['authorblock']);
+			if ( isset($data[0]['authorblock']) )
+				$data[0]['authorblock'] = unserialize($data[0]['authorblock']);
+
 			return $data[0];
 		}
 		return FALSE;
@@ -214,35 +228,15 @@ class UserCP extends Base
 		$limit = 10;
 		$pos = $page - 1;
 		
-		if ( $params[1]=="ST" )
+		if ( in_array($params[1],["AU","RC","SE","ST"]) )
 		{
-			$sql = "SELECT SQL_CALC_FOUND_ROWS 'ST' as type, S.sid as id, S.title as name, Cache.authorblock, Fav.comments, Fav.visibility, Fav.notify
-						FROM `tbl_stories`S 
-						INNER JOIN `tbl_stories_blockcache`Cache ON ( S.sid = Cache.sid )
-						INNER JOIN `tbl_user_favourites`Fav ON ( S.sid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='ST' AND Fav.bookmark =".(($params[0]=="bookmark")?1:0).")
-					ORDER BY {$sort['order']} {$sort['direction']}
-					LIMIT ".(max(0,$pos*$limit)).",".$limit;
-		}
-		elseif ( $params[1]=="SE" )
-		{
-			$sql = "SELECT SQL_CALC_FOUND_ROWS 'SE' as type, Ser.seriesid as id, Ser.title as name, Cache.authorblock, Fav.comments, Fav.visibility, Fav.notify
-						FROM `tbl_series`Ser
-						INNER JOIN `tbl_series_blockcache`Cache ON ( Ser.seriesid = Cache.seriesid )
-						INNER JOIN `tbl_user_favourites`Fav ON ( Ser.seriesid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='SE' AND Fav.bookmark =".(($params[0]=="bookmark")?1:0).")
-					ORDER BY {$sort['order']} {$sort['direction']}
-					LIMIT ".(max(0,$pos*$limit)).",".$limit;
-		}
-		elseif ( $params[1]=="AU" )
-		{
-			$sql = "SELECT SQL_CALC_FOUND_ROWS 'ST' as type, U.uid as id, U.nickname as name, Fav.comments, Fav.visibility, Fav.notify
-						FROM `tbl_users`U 
-						INNER JOIN `tbl_user_favourites`Fav ON ( U.uid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='AU' AND Fav.bookmark =".(($params[0]=="bookmark")?1:0).")
-					ORDER BY {$sort['order']} {$sort['direction']}
+			$sql = $this->sqlBookFav($params[1]) . 
+					"ORDER BY {$sort['order']} {$sort['direction']}
 					LIMIT ".(max(0,$pos*$limit)).",".$limit;
 		}
 		else return FALSE;
 
-		$data = $this->exec($sql);
+		$data = $this->exec($sql,[":bookmark" => (($params[0]=="bookmark")?1:0) ] );
 
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
@@ -252,22 +246,50 @@ class UserCP extends Base
 		return $data;
 	}
 	
+	protected function sqlBookFav($type)
+	{
+		$sql =
+		[
+			"AU"
+				=>	"SELECT SQL_CALC_FOUND_ROWS 'AU' as type, U.uid as id, U.nickname as name, Fav.comments, Fav.visibility, Fav.notify, Fav.fid
+						FROM `tbl_users`U 
+						INNER JOIN `tbl_user_favourites`Fav ON ( U.uid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='AU' AND Fav.bookmark = :bookmark ) ",
+			"ST"
+				=>	"SELECT SQL_CALC_FOUND_ROWS 'ST' as type, S.sid as id, S.title as name, Cache.authorblock, Fav.comments, Fav.visibility, Fav.notify, Fav.fid
+						FROM `tbl_stories`S 
+						INNER JOIN `tbl_stories_blockcache`Cache ON ( S.sid = Cache.sid )
+						INNER JOIN `tbl_user_favourites`Fav ON ( S.sid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='ST' AND Fav.bookmark = :bookmark ) ",
+			"SE"
+				=>	"SELECT SQL_CALC_FOUND_ROWS 'SE' as type, Ser.seriesid as id, Ser.title as name, Cache.authorblock, Fav.comments, Fav.visibility, Fav.notify, Fav.fid
+						FROM `tbl_series`Ser
+						INNER JOIN `tbl_series_blockcache`Cache ON ( Ser.seriesid = Cache.seriesid )
+						INNER JOIN `tbl_user_favourites`Fav ON ( Ser.seriesid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='SE' AND Fav.bookmark = :bookmark ) ",
+		];
+		return $sql[$type];
+	}
+	
 	public function saveBookFav($post, $params)
 	{
-		if ( $params['id'][0]=="ST" )
+		if ( isset($post['delete'] ) )
+		{
+			$this->libraryBookFavDelete($params);
+			return TRUE;
+		}
+
+		if ( in_array($params['id'][0],["AU","RC","SE","ST"]) )
 		{
 			$insert = 
 			[
 				"uid"			=>	$_SESSION['userID'],
 				"item"			=>	$params['id'][1],
-				"type"			=>	"ST",
+				"type"			=>	$params['id'][0],
 				"bookmark"		=>	(($params[0]=="bookmark") ? 1 : 0),
 				"notify"		=>	(int)@isset($post['notify']),
 				"visibility"	=>	(isset($post['visibility'])) ? (int)$post['visibility'] : 0,
 				"comments"		=>	$post['comments'],
 			];
-			//var_dump($insert);return FALSE;
 			return $this->insertArray('tbl_user_favourites', $insert, TRUE);
 		}
+		return FALSE;
 	}
 }

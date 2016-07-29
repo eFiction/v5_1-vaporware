@@ -52,14 +52,15 @@ class UserCP extends Base
 		return \Template::instance()->render('usercp/messaging.write.html');
 	}
 	
-	public static function libraryBookFavAdd($data, $params)
+	public static function libraryBookFavEdit($data, $params)
 	{
+		\Registry::get('VIEW')->javascript( 'head', TRUE, "jquery.are-you-sure.js" );
 		\Base::instance()->set('data', $data);
 		\Base::instance()->set('block', $params[0]);
 		\Base::instance()->set('returnpath', $params['returnpath']);
 		\Base::instance()->set('saveError', @$params['error']);
 		
-		return \Template::instance()->render('usercp/library.addBookFav.html');
+		return \Template::instance()->render('usercp/library.editBookFav.html');
 	}
 	
 	public static function libraryListBookFav(array $data, array $sort, array $extra)
