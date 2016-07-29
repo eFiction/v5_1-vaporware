@@ -44,15 +44,20 @@ class Base extends \Prefab {
 		$r = [];
 		if ( $pArray = explode(";", str_replace("/",";",$params) ) )
 		{
-			foreach ( $pArray as $pElement )
+			foreach ( $pArray as $pKey => $pElement )
 			{
 				$x = explode ( "=", $pElement );
 				if ( isset($x[1]) )
 				{
 					$r[$x[0]] = explode(",",$x[1]);
 					if ( sizeof($r[$x[0]])==1 ) $r[$x[0]] = $x[1];
+					//$r[$pKey] = $r[$x[0]];
 				}
-				else $r[$x[0]] = TRUE;
+				else
+				{
+					$r[$x[0]] = TRUE;
+					$r[$pKey] = $x[0];
+				}
 			}
 		}
 

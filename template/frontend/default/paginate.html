@@ -1,0 +1,17 @@
+<ul class="pagination">
+	<F3:check if="{{@paginate.firstPage}}">
+        <li><a href="{{@BASE, @paginate.route, @paginate.prefix.@paginate.firstPage}}"><i class="fa fa-fast-backward"></i> First</a></li>
+    </F3:check>
+	<F3:check if="{{@paginate.page>1}}">
+        <li><a href="{{@BASE, @paginate.route, @paginate.prefix.(@paginate.page-1)}}"><i class="fa fa-step-backward"></i></a></li>
+    </F3:check>
+	<F3:repeat group="{{@paginate.rangePages}}" value="{{@page}}">
+        <li><a {{@page == @paginate.page ? 'class="disabled"':'' }} href="{{@BASE, @paginate.route, @paginate.prefix.@page}}">{{@page}}</a></li>
+	</F3:repeat>
+	<F3:check if="{{@paginate.page<@paginate.count}}">
+        <li><a href="{{@BASE, @paginate.route, @paginate.prefix.(@paginate.page+1)}}"><i class="fa fa-step-forward"></i></a></li>
+    </F3:check>
+	<F3:check if="{{@paginate.lastPage}}">
+        <li><a href="{{@BASE, @paginate.route, @paginate.prefix.@paginate.count}}">Last [{{ @paginate.count }}] <i class="fa fa-fast-forward"></i></a></li>
+    </F3:check>
+</ul>

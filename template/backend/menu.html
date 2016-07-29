@@ -3,14 +3,14 @@
 		<repeat group="{{ @panel_menu }}" value="{{ @line }}" key="{{ @link }}">
 		<li><a href="{{@BASE}}/adminCP/{{@link}}">{{@line.icon}}&nbsp;
 			<check if="{{@line.requires==2}}">
-				<true><i>{{ ${@line.label} }} (limited)</i></true>
-				<false>{{ ${@line.label} }}</false>
+				<true><i>{{ ${'LN__AdminMenu_'.@line.label} }} (limited)</i></true>
+				<false>{{ ${'LN__AdminMenu_'.@line.label} }}</false>
 			</check>
 		</a></li>
 		<check if="{{isset(@line.sub)}}">
 			<ul class="cp-sub-menu">
 				<repeat group="{{ @line.sub }}" value="{{ @sub }}" key="{{ @sublink }}">
-				<li><a href="{{@BASE}}/adminCP/{{@sublink}}">{{@sub.icon}}&nbsp;{{ ${@sub.label} }}</a></li>
+				<li><a href="{{@BASE}}/adminCP/{{@sublink}}">{{@sub.icon}}&nbsp;{{ ${'LN__AdminMenu_'.@sub.label} }}</a></li>
 				</repeat>
 			</ul>
 		</check>

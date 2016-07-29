@@ -51,5 +51,34 @@ class UserCP extends Base
 		\Base::instance()->set('write_data', $data);
 		return \Template::instance()->render('usercp/messaging.write.html');
 	}
+	
+	public static function libraryBookFavAdd($data, $params)
+	{
+		\Base::instance()->set('data', $data);
+		\Base::instance()->set('block', $params[0]);
+		\Base::instance()->set('returnpath', $params['returnpath']);
+		\Base::instance()->set('saveError', @$params['error']);
+		
+		return \Template::instance()->render('usercp/library.addBookFav.html');
+	}
+	
+	public static function libraryListBookFav(array $data, array $sort, array $extra)
+	{
+		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+
+		\Base::instance()->set('libraryEntries', $data);
+		\Base::instance()->set('sort', $sort);
+		\Base::instance()->set('extra', $extra);
+		return \Template::instance()->render('usercp/library.html');
+	}
+	
+	public static function libraryBookFavMenu(array $menu, array $counter, $sub)
+	{
+		\Base::instance()->set('menu_upper', $menu);
+		\Base::instance()->set('counter', $counter);
+		\Base::instance()->set('sub', $sub);
+
+		return \Template::instance()->render('usercp/menu_upper.html');
+	}
 
 }

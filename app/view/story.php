@@ -73,15 +73,21 @@ class Story extends Base
 		return parent::render('story/reviews.html');
 	}
 
-	public static function commentForm($storyID, $parentID)
+	public static function commentForm($parentID)
 	{
+		\Base::instance()->set('childof', $parentID);
+		\Base::instance()->set('element', NULL);
+		\Base::instance()->set('data', [ "cancel" => TRUE, "feedback_form_label" => "__Comment" ]);
+		
 		return parent::render('main/feedback_form.html');
 	}
 
+	/*
 	public static function reviewForm($storyID, $parentID)
 	{
 		return parent::render('main/feedback_form.html');
 	}
+	*/
 
 	public static function buildStory($storyData,$content,$dropdown)
 	{
@@ -101,6 +107,7 @@ class Story extends Base
 												"dropdown" 	=> $dropdown,
 												"can_edit" 	=> $can_edit,
 												"infoblock" => ( $storyData['chapters'] > 1 ) ? "" : \View\Story::buildInfoblock($storyData),
+												"feedback_form_label" => "__Review",
 												]);
 		
 		return parent::render('story/single.html');

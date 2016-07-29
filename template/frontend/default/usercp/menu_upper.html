@@ -1,0 +1,7 @@
+<check if="{{ isset(@menu_upper) }}">
+	<repeat group="{{ @menu_upper }}" value="{{ @menu_item }}">
+		<check if="{{ isset(@counter[@menu_item['link']]) }}"><span>{ICON:{{@sub}}} <a href="{{@BASE}}/userCP/library/{{@sub}}/{{ @menu_item['link'] }}">{{ ${'LN__'.@menu_item['label']} }}</a> ({{@counter[@menu_item['link']]}})</span>&nbsp;&nbsp;
+	</repeat>
+</check>
+<br />
+<br />

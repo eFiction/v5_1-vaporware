@@ -248,7 +248,15 @@ class Story extends Base
 		$data = $this->exec($this->storySQL($replacements), [ ":sid" => $story, ":chapter" => $chapter ]);
 
 		if ( sizeof($data)==1 )
+		{
+			$favs = $this->cleanResult($data[0]['is_favourite']);
+			$data[0]['is_favourite'] = [];
+			if(empty($favs)) return $data[0];
+			foreach ( $favs as $value )
+				if ( isset($value[1]) ) $data[0]['is_favourite'][$value[0]] = $value[1];
+
 			return $data[0];
+		}
 		else return FALSE;
 	}
 	
@@ -263,6 +271,7 @@ class Story extends Base
 				Cache.*,
 				S.title, S.summary, S.storynotes, S.completed, S.wordcount, UNIX_TIMESTAMP(S.date) as published, UNIX_TIMESTAMP(S.updated) as modified, 
 				S.count,GROUP_CONCAT(rSC.chalid) as contests,GROUP_CONCAT(Ser.seriesid,',',rSS.inorder,',',Ser.title ORDER BY Ser.title DESC SEPARATOR '||') as in_series @EXTRA@,
+				GROUP_CONCAT(Fav.bookmark,',',Fav.fid SEPARATOR '||') as is_favourite,
 				Ra.rating as rating_name, Edit.uid as can_edit
 			FROM `tbl_stories`S
 				@JOIN@
@@ -272,6 +281,7 @@ class Story extends Base
 				LEFT JOIN `tbl_series`Ser ON ( Ser.seriesid=rSS.seriesid )
 			LEFT JOIN `tbl_ratings`Ra ON ( Ra.rid = S.ratingid )
 			LEFT JOIN `tbl_users`Edit ON ( ".(int)$_SESSION['userID']." = Edit.uid OR ".(int)$_SESSION['userID']." = Edit.curator )
+			LEFT JOIN `tbl_user_favourites`Fav ON ( Fav.item = S.sid AND Fav. TYPE = 'ST' AND Fav.uid = ".(int)$_SESSION['userID'].")
 			WHERE S.completed @COMPLETED@ 0 AND S.validated > 0 @WHERE@
 			GROUP BY S.sid
 			@ORDER@
@@ -383,6 +393,7 @@ class Story extends Base
 			else
 				$depth[$item['comment_id']] = 2;
 			
+			if ( $item['comment_id'] != NULL )
 			$data[] =
 			[
 				"level"	=> min ($depth[$item['comment_id']], 3),

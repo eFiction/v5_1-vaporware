@@ -69,6 +69,15 @@ class Story extends Base
 
 			exit;
 		}
+		elseif ( isset($params['segment']) && $params['segment']=="review_comment_form" )
+		{
+			$id = $f3->get('POST.childof');
+			$view = \View\Story::commentForm($id);
+			//echo json_encode(print_r($query,1));
+			echo $view;
+
+			exit;
+		}
 	}
 
 	protected function intro($params)
@@ -232,7 +241,7 @@ class Story extends Base
 				\Base::instance()->set('bigscreen',TRUE);
 				$content = ($content = $this->model->getChapter( $story, $chapter )) ? : "Error";
 
-				$storyData['reviews'] = $this->model->loadReviews($story,$storyData['chapid']);
+				$storyData['reviewData'] = $this->model->loadReviews($story,$storyData['chapid']);
 			}
 
 			$dropdown = \View\Story::dropdown($tocData,$id[1]);

@@ -6,7 +6,7 @@
 			{{ @toc.wordcount }} {{@LN__St_Words}}  &bull;  <a href="{{@BASE}}/story/read/{{@storyID}},{{ @toc.chapter }}#review">{{ @LN__Review_Link_TOC, @toc.reviews | format }}</a>
 			<!-- <check if="{{ @toc['reviews'] }}>0" >  &bull;  <a href="{{@BASE}}/story/read/{{@storyID}},reviews">{{ @toc['reviews'] }} <check if="{{ @toc['reviews'] }}>1"><true>__Reviews</true><false>__Review</false></check></a> -->
 			<!-- </check> -->
-			<check if="{{ @toc.notes>'' }}"><br>{{@toc['notes']}}</check>
+			<check if="{{ @toc.notes>'' }}"><br>{{@toc['notes'] | raw}}</check>
 		</div>
   </div>
   </repeat>

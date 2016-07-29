@@ -5,9 +5,41 @@
 	<loop from="{{ @i=@last_level }}" to="{{ @i >= @item.level }}" step="{{ @i-- }}"></div></loop>
 	<div class="review review-level-{{@item.level}}">
 		{{@item.name}}:
-		{{@item.text | raw}} <br /><div align="right"><check if="{{ @_SESSION.userID OR TRUE===\Config::instance()->allow_guest_reviews }}"><span id="{{@item.id}}" class="openform"><input class="button" type="submit" value="__Comment"></span></check></div>
+		{{@item.text | raw}} <br />
+		<div align="right">
+			<check if="{{ @item.level == 1 AND ( @_SESSION.userID OR TRUE===\Config::instance()->allow_guest_reviews ) }}">
+				<span id="{{@item.id}}" class="openform"><input class="button" type="submit" value="__Comment"></span>
+			</check>
+		</div>
 		<set last_level="{{@item.level}}">
 		<div class="ajaxform"></div>
 </repeat>
 <loop from="{{ @k=@last_level }}" to="{{ @k > 0 }}" step="{{ @k-- }}"></div></loop>
 </span>
+<!--
+<script type="text/javascript">
+		$('#cancelreview').click(function (c) {
+			$(this).parents('.ajaxform').hide('slow').html('');
+			c.preventDefault();
+		});
+    var frm = $('.write_review');
+    var url = '__baseURL?ajax=story&write_review&view={STORY}&page={RETURN}';
+    $('.write_review').submit(function (ev) {
+    	str = $('.write_review').closest("form").serialize();
+    	alert( str );
+//        $.ajax({
+//            type: "POST",
+//            url: url,
+//            data: $(this).( "form" ).serialize(),
+//						success: function (html) {	
+							//add the content retrieved from ajax and put it in the #content div
+//							$('#main_content').html(html);
+							//hide the progress bar
+//							$('#loading').hide();	
+//						}		
+//        });
+
+        ev.preventDefault();
+    });
+</script>
+-->

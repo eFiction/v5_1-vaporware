@@ -11,15 +11,21 @@ $('#story-container').on("click", ".openform", function(e) {
 	{
 		//clear all old forms
 		$(this).parents('.review_container').find('.ajaxform').hide('slow').html('');
-		var ajaxurl = url + 'commentform,' + $(this).attr('id');
+		var ajaxurl = base + '/story/ajax/review_comment_form';
+		var data = { childof: $(this).attr('id') };
 		$.ajax({
-            type: "GET",
+            type: "POST",
             url: ajaxurl,
-            data: '',
-						success: function (html) {	
-							//create the new form
-							form.nextAll('.ajaxform:first').hide().html(html).show('slow');
-						}		
+            data: data,
+			success: function (html) {	
+				//create the new form
+				form.nextAll('.ajaxform:first').hide().html(html).show('slow');
+			}		
         });
 	}
+});
+
+$('#cancelreview').click(function (c) {
+	$(this).parents('.ajaxform').hide('slow').html('');
+	c.preventDefault();
 });

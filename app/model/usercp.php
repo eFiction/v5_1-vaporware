@@ -11,13 +11,45 @@ class UserCP extends Base
 		$this->menu = $this->panelMenu();
 	}
 
-	public function showMenu($selected=FALSE)
+	public function showMenu($selected=FALSE, array $data=[])
 	{
 		if ( $selected )
 		{
-			$this->menu[$selected]["sub"] = $this->panelMenu($selected);
+			$this->menu[$selected]["sub"] = $this->panelMenu($selected, $data);
 		}
 		return $this->menu;
+	}
+	
+	public function getCount($module="")
+	{
+		if ( $module = "library" )
+		{
+			$sql[]= "SET @bms  := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_user_favourites`F WHERE F.uid={$_SESSION['userID']} AND F.bookmark=1 GROUP BY F.type) AS F1);";
+			$sql[]= "SET @favs := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_user_favourites`F WHERE F.uid={$_SESSION['userID']} AND F.bookmark=0 GROUP BY F.type) AS F1);";
+			if(array_key_exists("recommendations", $this->config['modules_enabled']))
+			{
+				$sql[]= "SET @recs := (SELECT COUNT(1) FROM `tbl_recommendations` WHERE `uid` = {$_SESSION['userID']});";
+			}
+			else $sql[]= "SET @recs := NULL";
+			$sql[]= "SELECT @bms as bookmark,@favs as favourite,@recs as recommendation;";
+
+			$data = $this->exec($sql)[0];
+
+			foreach( $data as $key => $count )
+				list($counter[$key]['sum'], $counter[$key]['details']) = array_pad(explode("//",$count), 2, '');
+
+			foreach ( $counter as &$count )
+			{
+				$cc = $this->cleanResult($count['details']);
+				if(is_array($cc))
+				{
+					$count['details'] = [];
+					foreach ( $cc as $c ) $count['details'][$c[0]] = $c[1];
+				}
+				else $count['details'] = "";
+			}
+			return $counter;
+		}
 	}
 	
 	public function ajax($key, $data)
@@ -138,4 +170,104 @@ class UserCP extends Base
 		return TRUE;
 	}
 	
+	public function toggleBookFav($params)
+	{
+		if ( empty($params['id'][0]) OR empty($params['id'][1]) ) return FALSE;
+		if ( in_array($params["id"][0],["AU","RC","SE","ST"]) )
+		{
+			$mapper=new \DB\SQL\Mapper($this->db, $this->prefix.'user_favourites');
+			$mapper->load(array("uid=? AND item=? AND type=? AND bookmark=?",$_SESSION['userID'], $params["id"][1], $params["id"][0], (array_key_exists("bookmark",$params))?1:0 ));
+			if ( NULL !== $fid = $mapper->get('fid') )
+			{
+				$mapper->erase();
+				return TRUE;
+			}
+			unset($mapper);
+			return FALSE;
+		}
+	}
+	
+	public function loadBookFav($params)
+	{
+		// ?
+		if ( empty($params['id'][0]) OR empty($params['id'][1]) ) return FALSE;
+		if ( $params['id'][0]=="ST" )
+		{
+			$sql = "SELECT 'ST' as type, S.sid, S.title, Cache.authorblock, Fav.comments, Fav.visibility, Fav.notify
+						FROM `tbl_stories`S 
+						INNER JOIN `tbl_stories_blockcache`Cache ON ( S.sid = Cache.sid )
+						LEFT JOIN `tbl_user_favourites`Fav ON ( S.sid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='ST' AND Fav.bookmark =".(($params[0]=="bookmark")?1:0).")
+					WHERE S.sid = :id ";
+		}
+
+		$data = $this->exec($sql,[":id"=>$params['id'][1]]);
+		if ( sizeof($data)==1 )
+		{
+			$data[0]['authorblock'] = unserialize($data[0]['authorblock']);
+			return $data[0];
+		}
+		return FALSE;
+	}
+	
+	public function listBookFav($page, $sort, $params)
+	{
+		$limit = 10;
+		$pos = $page - 1;
+		
+		if ( $params[1]=="ST" )
+		{
+			$sql = "SELECT SQL_CALC_FOUND_ROWS 'ST' as type, S.sid as id, S.title as name, Cache.authorblock, Fav.comments, Fav.visibility, Fav.notify
+						FROM `tbl_stories`S 
+						INNER JOIN `tbl_stories_blockcache`Cache ON ( S.sid = Cache.sid )
+						INNER JOIN `tbl_user_favourites`Fav ON ( S.sid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='ST' AND Fav.bookmark =".(($params[0]=="bookmark")?1:0).")
+					ORDER BY {$sort['order']} {$sort['direction']}
+					LIMIT ".(max(0,$pos*$limit)).",".$limit;
+		}
+		elseif ( $params[1]=="SE" )
+		{
+			$sql = "SELECT SQL_CALC_FOUND_ROWS 'SE' as type, Ser.seriesid as id, Ser.title as name, Cache.authorblock, Fav.comments, Fav.visibility, Fav.notify
+						FROM `tbl_series`Ser
+						INNER JOIN `tbl_series_blockcache`Cache ON ( Ser.seriesid = Cache.seriesid )
+						INNER JOIN `tbl_user_favourites`Fav ON ( Ser.seriesid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='SE' AND Fav.bookmark =".(($params[0]=="bookmark")?1:0).")
+					ORDER BY {$sort['order']} {$sort['direction']}
+					LIMIT ".(max(0,$pos*$limit)).",".$limit;
+		}
+		elseif ( $params[1]=="AU" )
+		{
+			$sql = "SELECT SQL_CALC_FOUND_ROWS 'ST' as type, U.uid as id, U.nickname as name, Fav.comments, Fav.visibility, Fav.notify
+						FROM `tbl_users`U 
+						INNER JOIN `tbl_user_favourites`Fav ON ( U.uid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='AU' AND Fav.bookmark =".(($params[0]=="bookmark")?1:0).")
+					ORDER BY {$sort['order']} {$sort['direction']}
+					LIMIT ".(max(0,$pos*$limit)).",".$limit;
+		}
+		else return FALSE;
+
+		$data = $this->exec($sql);
+
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/userCP/library/{$params[0]}/{$params[1]}/order={$sort['link']},{$sort['direction']}",
+			$limit
+		);
+		return $data;
+	}
+	
+	public function saveBookFav($post, $params)
+	{
+		if ( $params['id'][0]=="ST" )
+		{
+			$insert = 
+			[
+				"uid"			=>	$_SESSION['userID'],
+				"item"			=>	$params['id'][1],
+				"type"			=>	"ST",
+				"bookmark"		=>	(($params[0]=="bookmark") ? 1 : 0),
+				"notify"		=>	(int)@isset($post['notify']),
+				"visibility"	=>	(isset($post['visibility'])) ? (int)$post['visibility'] : 0,
+				"comments"		=>	$post['comments'],
+			];
+			//var_dump($insert);return FALSE;
+			return $this->insertArray('tbl_user_favourites', $insert, TRUE);
+		}
+	}
 }

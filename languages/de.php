@@ -41,18 +41,20 @@ return array(
 'PM_ReplySubject' => 'Aw:',
 'PM_ReplyMessageHeader' => 'Am {0} schrieb {1}:',
 'PM_WritePM' => 'Nachricht verfassen',
-'PM_Messaging' => 'Nachrichten',
+//'PM_Messaging' => 'Nachrichten',
 
 // using php strftime
 'Month_Calendar' => '{0,date,custom,%B %Y}',
 'Weekday' => '{0,date,custom,%A}',
 
+/*
 'Menu_Profile' => 'Profil',
 'Menu_Messaging' => 'Nachrichten (PM)',
 'Menu_Authoring' => 'Authoring',
 'Menu_MyLibrary' => 'Mein Archiv',
 'Menu_Reviews' => 'Bewertungen',
 'Menu_Preferences' => 'Preferences',
+*/
 
 // User elements
 'UserField_Type1'	=> 'URL',			// _FIELDURL
@@ -62,6 +64,14 @@ return array(
 'UserField_Type5'	=> 'Custom Code',	// _FIELDCUSTOM
 'UserField_Type6'	=> 'Text',			// _TEXT
 
+
+
+
+
+
+
+
+
 // UserCP elements
 'UserMenu_Profile' => 'Profil',
 'UserMenu_Message' => 'Nachrichten',
@@ -70,6 +80,17 @@ return array(
 'UserMenu_PMWrite' => 'Verfassen',
 'UserMenu_Authoring' => 'Authoring',
 'UserMenu_MyLibrary' => 'My Library',
+	'Library_Favourites' => '{0, plural,'.
+		'other	{Favourites (#)}
+	}',
+	'AddFavourite'	=>	'Add favourite',
+	'Library_Bookmarks' => '{0, plural,'.
+		'other	{Bookmarks (#)}
+	}',
+	'AddBookmark'	=> 'Add bookmark',
+	'Library_Recommendations' => '{0, plural,'.
+		'other	{Recommendations (#)}
+	}',
 'UserMenu_Reviews' => 'Reviews',
 'UserMenu_Preferences' => 'Preferences',
 
@@ -137,6 +158,15 @@ return array(
 'St_RandomStories' => 'Zufällige Geschichten',
 'St_FeaturedStory' => 'Featured Story',
 'St_FeaturedStories' => 'Featured Stories',
+
+'St_BookmarkAdd'		=> 'Diese Geschichte hat kein Lesezeichen.
+Hier clicken um eines zu setzen.',
+'St_BookmarkRemove'		=> 'Diese Geschichte hat ein Lesezeichen.
+Hier clicken um es zu entfernen.',
+'St_FavouriteAdd'		=> 'Diese Geschichte gehört nicht zu den Favoriten.
+Hier clicken um hinzuzufügen.',
+'St_FavouriteRemove'	=> 'Diese Geschichte gehört zu den Favoriten.
+Hier clicken um zu entfernen.',
 
 'St_NoTags' => 'Keine Tags gesetzt',
 'St_Published' => 'Veröffentlicht',

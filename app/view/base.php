@@ -3,7 +3,7 @@ namespace View;
 abstract class Base {
 	
     public $data = array();
-	public $JS = [];
+	public $JS = [ ];
     public $modules = [];
 	protected $title = [];
 
@@ -25,6 +25,7 @@ abstract class Base {
 		$f3->set('SELF', rawurlencode($_SERVER["QUERY_STRING"]));
 
 		\View\Base::javascript('body', TRUE, 'global.js' );
+		\View\Base::javascript('body', FALSE, "var base='{$f3->get('BASE')}'" );
 		//$this->css[] = "styles.css";
 	}
 	

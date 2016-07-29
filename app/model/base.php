@@ -75,7 +75,7 @@ class Base extends \Prefab {
 	{
 		$keys = array();
 		$values = array();
-//		preprint($kvpair);
+
 		while (list($key, $value) = each($kvpair))
 		{
 			$keys[] 	= $key;
@@ -84,7 +84,7 @@ class Base extends \Prefab {
 				$values[] = "NULL";
 				unset($kvpair[$key]);
 			}
-			elseif( $value=="NOW()" )
+			elseif( $value==="NOW()" )
 			{
 				$values[] = "NOW()";
 				unset($kvpair[$key]);
@@ -100,7 +100,7 @@ class Base extends \Prefab {
 				$values[] = ":{$key}";
 			}
 		}
-		
+
 		if(sizeof($keys)>0)
 		{
 			$sql_query = (($replace===TRUE)?"REPLACE":"INSERT")." INTO `{$table}` (".implode(", ", $keys).") VALUES ( ".implode(", ", $values).")";
@@ -108,10 +108,14 @@ class Base extends \Prefab {
 
 			foreach($kvpair as $key => $value)
 			{
-				$this->bindValue("insertArray", $key, $value, \PDO::PARAM_STR);
+				if ( is_int($value) )
+					$this->bindValue("insertArray", $key, $value, \PDO::PARAM_INT);
+				else
+					$this->bindValue("insertArray", $key, $value, \PDO::PARAM_STR);
 			}
 			if ( 1 == $result = $this->execute("insertArray") )
 				return (int)$this->db->lastInsertId();
+			return FALSE;
 		}
 		return NULL;
 	}
@@ -193,19 +197,28 @@ class Base extends \Prefab {
 		]);
 	}
 
-	protected function panelMenu($selected=FALSE)
+	protected function panelMenu($selected=FALSE, array $data=[])
 	{
-		$sql = "SELECT M.label, M.link, M.icon, M.evaluate FROM ";
+		$f3 = \Base::instance();
+		$sql = "SELECT M.label, M.link, M.icon, M.evaluate FROM `tbl_menu_userpanel`M WHERE M.child_of ";
 
 		if ( $selected )
-			$sql .= "`tbl_menu_userpanel`M WHERE M.child_of = :selected;";
+			$sql .= "= :selected;";
 		else
-			$sql .= "`tbl_menu_userpanel`M WHERE M.child_of IS NULL;";
+			$sql .= "IS NULL;";
 
-		$data = $this->exec($sql, [":selected"=> $selected]);
-		foreach ( $data as $item )
+		$menuItems = $this->exec($sql, [":selected"=> $selected]);
+		foreach ( $menuItems as $item )
 		{
-			$menu[$item["link"]] = [ "label" => $item["label"], "icon" => $item["icon"] ];
+			$item["label"] = explode("%%",$item["label"]);
+			if ( empty($item["label"][1]) OR $data[$item["label"][1]]!== FALSE )
+			{
+				if ( isset($item["label"][1]) )
+					$label = $f3->get('LN__'.$item["label"][0],$data[$item["label"][1]]);
+				else $label = $f3->get('LN__'.$item["label"][0]);
+
+				$menu[$item["link"]] = [ "label" => $label, "icon" => $item["icon"] ];
+			}
 		}
 		return $menu;
 	}
@@ -330,8 +343,9 @@ class Base extends \Prefab {
 
 	}
 
-	private static function cleanResult($messy)
+	protected static function cleanResult($messy)
 	{
+		if ( $messy == "" ) return "";
 		$mess = explode("||",$messy);
 		$mess = (array_unique($mess));
 		foreach ( $mess as $element )

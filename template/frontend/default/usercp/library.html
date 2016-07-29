@@ -1,0 +1,62 @@
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
+<table class="tbody">
+	<tr>
+		<th>&nbsp;</th>
+		<th>&nbsp;</th>
+		<th><a href="{{@BASE}}/userCP/library/{{@extra.sub}}/{{@extra.type}}/order=id,
+			<check if="{{ @sort['link']!='id' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-numeric-desc}</true>
+						<false>desc">{ICON:sort-numeric-asc}</false>
+					</check>
+				</false>
+			</check></a> __StoryID
+		</th>
+		<th><a href="{{@BASE}}/userCP/library/{{@extra.sub}}/{{@extra.type}}/order=visibility,
+			<check if="{{ @sort['link']!='visibility' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-alpha-desc}</true>
+						<false>desc">{ICON:sort-alpha-asc}</false>
+					</check>
+				</false>
+			</check></a> __Visibility
+		</th>
+		<th><a href="{{@BASE}}/userCP/library/{{@extra.sub}}/{{@extra.type}}/order=name,
+			<check if="{{ @sort['link']!='name' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-alpha-desc}</true>
+						<false>desc">{ICON:sort-alpha-asc}</false>
+					</check>
+				</false>
+			</check></a> __Name/Title
+		</th>
+		<th><a href="{{@BASE}}/userCP/library/{{@extra.sub}}/{{@extra.type}}/order=comments,
+			<check if="{{ @sort['link']!='comments' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-alpha-desc}</true>
+						<false>desc">{ICON:sort-alpha-asc}</false>
+					</check>
+				</false>
+			</check></a> __Comment
+		</th>
+	</tr>
+	<repeat group="{{ @libraryEntries }}" value="{{ @row }}">
+	<tr>
+		<td><a href="{{@BASE}}/userCP/library/{{@extra.sub}}/edit/id={{@extra.type}},{{ @row['id'] }};returnpath=/userCP/library/{{@extra.sub}}/{{@extra.type}}/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
+		<td><a href="{{@BASE}}/userCP/library/{{@extra.sub}}/toggle/id={{@extra.type}},{{ @row['id'] }};returnpath=/userCP/library/{{@extra.sub}}/{{@extra.type}}/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}" class="deleteItem" title="{{ @row['name'] }}">{ICON:trash}</a></td>
+		<td>{{ @row['id'] }}</td>
+		<td>{{ @row['visibility'] }}</td>
+		<td>{{ @row['name'] }}</td>
+		<td>{{ @row['comments'] }}</td>
+	</tr>
+	</repeat>
+</table>
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>

@@ -51,6 +51,10 @@ if (\Controller\Auth::isLoggedIn())
 		'Controller\UserCP->index' );
 	
 	$f3->route(
+		[ 'GET|POST /userCP/library', 'GET|POST /userCP/library/*' ],
+		'Controller\UserCP->library' );
+	
+	$f3->route(
 		[ 'GET|POST /userCP/messaging', 'GET|POST /userCP/messaging/*' ],
 		'Controller\UserCP->messaging' );
 	

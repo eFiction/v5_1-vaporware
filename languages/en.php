@@ -41,18 +41,20 @@ return array(
 'PM_ReplySubject' => 'Re:',
 'PM_ReplyMessageHeader' => 'On {0}, {1} wrote:',
 'PM_WritePM' => 'Writing message',
-'PM_Messaging' => 'Messaging',
+//'PM_Messaging' => 'Messaging',
 
 // using php strftime
 'Month_Calendar' => '{0,date,custom,%B %Y}',
 'Weekday' => '{0,date,custom,%A}',
 
+/*
 'Menu_Profile' => 'Profile',
 'Menu_Messaging' => 'Messaging',
 'Menu_Authoring' => 'Authoring',
 'Menu_MyLibrary' => 'My Library',
 'Menu_Reviews' => 'Reviews',
 'Menu_Preferences' => 'Preferences',
+*/
 
 // User elements
 'UserField_Type1'	=> 'URL',			// _FIELDURL
@@ -62,6 +64,14 @@ return array(
 'UserField_Type5'	=> 'Custom Code',	// _FIELDCUSTOM
 'UserField_Type6'	=> 'Text',			// _TEXT
 
+'Author'	=> 'Author',
+'Authors'	=> 'Authors',
+'Recomm'	=> 'Recommendation',
+'Recomms'	=> 'Recommendations',
+'Series'	=> 'Series',
+'Story'		=> 'Story',
+'Stories'	=> 'Stories',
+
 // UserCP elements
 'UserMenu_Profile' => 'Profile',
 'UserMenu_Message' => 'Messaging',
@@ -70,6 +80,17 @@ return array(
 'UserMenu_PMWrite' => 'Write',
 'UserMenu_Authoring' => 'Authoring',
 'UserMenu_MyLibrary' => 'My Library',
+	'Library_Favourites' => '{0, plural,'.
+		'other	{Favourites (#)}
+	}',
+	'AddFavourite'	=>	'Add favourite',
+	'Library_Bookmarks' => '{0, plural,'.
+		'other	{Bookmarks (#)}
+	}',
+	'AddBookmark'	=> 'Add bookmark',
+	'Library_Recommendations' => '{0, plural,'.
+		'other	{Recommendations (#)}
+	}',
 'UserMenu_Reviews' => 'Reviews',
 'UserMenu_Preferences' => 'Preferences',
 
@@ -131,12 +152,21 @@ return array(
 'Shoutbox' => 'Shoutbox',
 
 // Story view'
-'Stories' => 'Stories',
-'St_NewStories' => 'New Stories',
-'St_RandomStory' => 'Random Story',
-'St_RandomStories' => 'Random Stories',
-'St_FeaturedStory' => 'Featured Story',
-'St_FeaturedStories' => 'Featured Stories',
+'Stories'				=> 'Stories',
+'St_NewStories'			=> 'New Stories',
+'St_RandomStory'		=> 'Random Story',
+'St_RandomStories'		=> 'Random Stories',
+'St_FeaturedStory'		=> 'Featured Story',
+'St_FeaturedStories'	=> 'Featured Stories',
+
+'St_BookmarkAdd'		=> 'This story has no bookmark.
+Click here to add one now.',
+'St_BookmarkRemove'		=> 'This story has a bookmark.
+Click here to remove it.',
+'St_FavouriteAdd'		=> 'This story is not a favourite.
+Click here to set.',
+'St_FavouriteRemove'	=> 'This story is a favourite.
+Click here to unset.',
 
 'St_NoTags' => 'No tags defined',
 'St_Published' => 'Published',

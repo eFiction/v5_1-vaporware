@@ -5,7 +5,7 @@
 			<form class="write_review" method="post" action="{{@BASE.@PATH}}">
 				<check if="{{@_SESSION.userID}}">
 					<true>
-<!--						<legend>{TITLE}</legend>-->
+						<legend>{{@data.feedback_form_label}}</legend>
 						<div class="user-icon"><span class="fa fa-user fa-lg"></span>{{@_SESSION.username}}</div>
 					</true>
 					<false>
@@ -14,8 +14,20 @@
 						<div class="field"><span class="fa fa-envelope fa-fw icon"></span><input class="field input" placeholder="email"  type="text" name="email"></div>
 					</false>
 				</check>
-				<div class="field textarea"><textarea class="message" name="write[text]" placeholder="please leave a comment/review"></textarea></div>
-				{FULL}{BUTTON}
+				<div class="field textarea"><textarea class="message" name="write[text]" placeholder="enter text here"></textarea></div>
+				<check if="{{@element}}"><true>
+					__reviewChapter</true>
+					<false>__reviewStory</false>
+				</check>
+				<check if="{{isset(@data.cancel)}}">
+					<input class="button" type="submit" value="__Cancel" id="cancelreview">
+					<script type="text/javascript">
+						$('#cancelreview').click(function (c) {
+							$(this).parents('.ajaxform').hide('slow').html('');
+							c.preventDefault();
+						});
+					</script>
+				</check>
 				<input class="button" type="submit" value="__Submit">
 				<input type="hidden" name="write[element]" value="{{@element}}">
 				<input type="hidden" name="write[childof]" value="{{@childof}}">
