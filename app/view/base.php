@@ -97,7 +97,17 @@ class Iconset extends \DB\Jig\Mapper {
 				if ( $item["name"]=="#name" )
 					$icon->_name = $item['value'];
 			}
-			else $icon->{$item['name']} = str_replace("@1@",$item["value"],$pattern);
+			else
+			{
+				if(strpos($item["name"],",")!==0)
+				{
+					$names = explode(",",$item['name']);
+					foreach ( $names as $name )
+						$icon->{$name} = str_replace("@1@",$item["value"],$pattern);
+				}
+				else
+					$icon->{$item['name']} = str_replace("@1@",$item["value"],$pattern);
+			}
 		}
 		$icon->save();
 		return $icon;

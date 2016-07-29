@@ -1,5 +1,5 @@
 {
-    "5799fdc039cc54.57975690": {
+    "579b722ce532d5.92728979": {
         "_name": "Font Awesome CSS Icons",
         "archive": "<span class=\"fa fa-university\"><\/span>",
         "bars": "<span class=\"fa fa-bars\"><\/span>",
@@ -15,6 +15,7 @@
         "document-new": "<span class=\"fa fa-file-o\"><\/span>",
         "edit": "<span class=\"fa fa-pencil-square-o\"><\/span>",
         "favourite": "<span class=\"fa fa-heart\"><\/span>",
+        "heart": "<span class=\"fa fa-heart\"><\/span>",
         "favourite-off": "<span class=\"fa fa-heart-o\"><\/span>",
         "folder": "<span class=\"fa fa-folder-open\"><\/span>",
         "home": "<span class=\"fa fa-home\"><\/span>",
@@ -24,6 +25,7 @@
         "keyboard": "<span class=\"fa fa-keyboard-o\"><\/span>",
         "language": "<span class=\"fa fa-language\"><\/span>",
         "layout": "<span class=\"fa fa-eye\"><\/span>",
+        "visible": "<span class=\"fa fa-eye\"><\/span>",
         "lock": "<span class=\"fa fa-lock\"><\/span>",
         "mail": "<span class=\"fa fa-envelope\"><\/span>",
         "manual": "<span class=\"fa fa-info\"><\/span>",
@@ -33,7 +35,6 @@
         "modules": "<span class=\"fa fa-cubes\"><\/span>",
         "news": "<span class=\"fa fa-rss\"><\/span>",
         "plus": "<span class=\"fa fa-plus-square\"><\/span>",
-        "recommendation": "<span class=\"fa fa-star\"><\/span>",
         "recommendation-off": "<span class=\"fa fa-star-o\"><\/span>",
         "register": "<span class=\"fa fa-sign-in\"><\/span>",
         "remove": "<span class=\"fa fa-remove\"><\/span>",
@@ -47,13 +48,13 @@
         "sort-size-asc": "<span class=\"fa fa-sort-amount-asc\"><\/span>",
         "sort-size-desc": "<span class=\"fa fa-sort-amount-desc\"><\/span>",
         "star": "<span class=\"fa fa-star\"><\/span>",
+        "recommendation": "<span class=\"fa fa-star\"><\/span>",
         "tag": "<span class=\"fa fa-tag\"><\/span>",
         "tags": "<span class=\"fa fa-tags\"><\/span>",
         "text": "<span class=\"fa fa-file-text-o\"><\/span>",
         "time": "<span class=\"fa fa-clock-o\"><\/span>",
         "trash": "<span class=\"fa fa-trash-o\"><\/span>",
         "unlock": "<span class=\"fa fa-unlock\"><\/span>",
-        "visible": "<span class=\"fa fa-eye\"><\/span>",
         "waiting": "<span class=\"fa fa-spin fa-spinner\"><\/span>",
         "wrench": "<span class=\"fa fa-wrench\"><\/span>"
     }

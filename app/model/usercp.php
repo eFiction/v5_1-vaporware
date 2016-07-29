@@ -197,17 +197,17 @@ class UserCP extends Base
 
 		if ( $params['id'][0]=="AU" )
 		{
-			$sql = $this->sqlBookFav("AU") . 
+			$sql = $this->sqlBookFav("AU", FALSE) . 
 				"WHERE U.uid = :id ";
 		}
 		elseif ( $params['id'][0]=="SE" )
 		{
-			$sql = $this->sqlBookFav("SE") . 
+			$sql = $this->sqlBookFav("SE", FALSE) . 
 				"WHERE Ser.seriesid = :id ";
 		}
 		elseif ( $params['id'][0]=="ST" )
 		{
-			$sql = $this->sqlBookFav("ST") . 
+			$sql = $this->sqlBookFav("ST", FALSE) . 
 				"WHERE S.sid = :id ";
 		}
 		else return FALSE;
@@ -246,24 +246,25 @@ class UserCP extends Base
 		return $data;
 	}
 	
-	protected function sqlBookFav($type)
+	protected function sqlBookFav($type, $inner = TRUE)
 	{
+		$join = $inner ? "INNER" : "LEFT";
 		$sql =
 		[
 			"AU"
 				=>	"SELECT SQL_CALC_FOUND_ROWS 'AU' as type, U.uid as id, U.nickname as name, Fav.comments, Fav.visibility, Fav.notify, Fav.fid
 						FROM `tbl_users`U 
-						INNER JOIN `tbl_user_favourites`Fav ON ( U.uid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='AU' AND Fav.bookmark = :bookmark ) ",
+						{$join} JOIN `tbl_user_favourites`Fav ON ( U.uid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='AU' AND Fav.bookmark = :bookmark ) ",
 			"ST"
 				=>	"SELECT SQL_CALC_FOUND_ROWS 'ST' as type, S.sid as id, S.title as name, Cache.authorblock, Fav.comments, Fav.visibility, Fav.notify, Fav.fid
 						FROM `tbl_stories`S 
 						INNER JOIN `tbl_stories_blockcache`Cache ON ( S.sid = Cache.sid )
-						INNER JOIN `tbl_user_favourites`Fav ON ( S.sid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='ST' AND Fav.bookmark = :bookmark ) ",
+						{$join} JOIN `tbl_user_favourites`Fav ON ( S.sid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='ST' AND Fav.bookmark = :bookmark ) ",
 			"SE"
 				=>	"SELECT SQL_CALC_FOUND_ROWS 'SE' as type, Ser.seriesid as id, Ser.title as name, Cache.authorblock, Fav.comments, Fav.visibility, Fav.notify, Fav.fid
 						FROM `tbl_series`Ser
 						INNER JOIN `tbl_series_blockcache`Cache ON ( Ser.seriesid = Cache.seriesid )
-						INNER JOIN `tbl_user_favourites`Fav ON ( Ser.seriesid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='SE' AND Fav.bookmark = :bookmark ) ",
+						{$join} JOIN `tbl_user_favourites`Fav ON ( Ser.seriesid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='SE' AND Fav.bookmark = :bookmark ) ",
 		];
 		return $sql[$type];
 	}

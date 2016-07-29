@@ -53,8 +53,17 @@
 		<td><a href="{{@BASE}}/userCP/library/{{@extra.sub}}/edit/id={{@extra.type}},{{ @row['id'] }};returnpath=/userCP/library/{{@extra.sub}}/{{@extra.type}}/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
 		<td><a href="{{@BASE}}/userCP/library/{{@extra.sub}}/delete/id={{@extra.type}},{{ @row['id'] }};returnpath=/userCP/library/{{@extra.sub}}/{{@extra.type}}/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}" class="deleteItem" title="{{ @row['name'] }}">{ICON:trash}</a></td>
 		<td>{{ @row['id'] }}</td>
-		<td>{{ @row['visibility'] }}</td>
-		<td>{{ @row['name'] }}</td>
+		<td>
+			<check if="{{ @row['visibility']==0 }}">{ICON:member}</check>
+			<check if="{{ @row['visibility']==1 }}">{ICON:members}</check>
+			<check if="{{ @row['visibility']==2 }}">{ICON:visible}</check>
+		</td>
+		<td><a href="{{@BASE}}/
+			<check if="{{ @extra.type == 'AU' }}">member/profile/{{ @row['id'] }}"></check>
+			<check if="{{ @extra.type == 'RC' }}">story/read/{{ @row['id'] }}"></check>
+			<check if="{{ @extra.type == 'SE' }}">story/read/{{ @row['id'] }}"></check>
+			<check if="{{ @extra.type == 'ST' }}">story/read/{{ @row['id'] }}"></check>
+			{{ @row['name'] }}</a></td>
 		<td>{{ @row['comments'] }}</td>
 	</tr>
 	</repeat>
