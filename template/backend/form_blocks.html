@@ -10,7 +10,7 @@
 		<dl class="settings">
 		<dt class="settings_title">{{ ${'LN__AdminMenu_'.@title} }}</dt>
 		<repeat group="{{ @elements.fields }}" value="{{ @element }}" counter="{{ @ctr }}">
-			<dt>{{ @element.comment |raw}}<check if="{{ @element.comment_small }}"><br /><small>{{ @element.comment_small | raw }}</small></check></dt>
+			<dt>{{ nl2br(@element.comment) |raw}}<check if="{{ @element.comment_small }}"><br /><small>{{ nl2br(@element.comment_small) | raw }}</small></check></dt>
 			<switch expr="{{ @element['type'] }}">
 				<case value="{{ 'text' }}" break="{{ TRUE }}">
 				<!-- TEXT (not TEXTAREA) -->

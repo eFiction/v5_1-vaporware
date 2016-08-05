@@ -58,6 +58,10 @@ else {
 /** Add the configuration to the framework **/
 $f3->set('CONFIG', $cfg);
 
+/** We have DB and Config, let's check for bad ppl **/
+if ( TRUE === $cfg->bb2_enabled )
+	require('bad-behaviour.php');
+
 /** Load routes **/
 require('app/routes.php');
 

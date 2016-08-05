@@ -16,6 +16,7 @@
 		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
 		<script src="{{ @BASE }}/app/js/jquery.tokeninput.js"></script>
 		<check if="{{ isset(@JS_HEAD)}}">{{ @JS_HEAD | raw }}</check>
+		<check if="{{ isset(@bb2_javascript)}}">{{ @bb2_javascript | raw }}</check>
 	</head>
 <body>
 	{{ @BODY | raw }}

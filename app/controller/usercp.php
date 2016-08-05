@@ -65,14 +65,15 @@ class UserCP extends Base
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Reviews') );
 		$this->buffer ( \View\Base::stub("reviews") );
-		$this->showMenu("reviews");
+		$this->showMenu();
 	}
 
 	public function preferences(\Base $f3, $params)
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Preferences') );
 		$this->buffer ( \View\Base::stub("preferences") );
-		$this->showMenu("preferences");
+		$this->showMenu();
+		//$this->showMenu("preferences");
 	}
 
 	public function profile(\Base $f3, $params)

@@ -4,7 +4,7 @@ namespace Controller;
 class AdminCP_Settings extends AdminCP
 {
 	var $moduleBase = "settings";
-	var $submodules = [ "server", "registration", "security", "language", "layout" ];
+	var $submodules = [ "server", "registration", "security", "screening", "language", "layout" ];
 
 	public function index(\Base $f3, $params, $feedback = [ NULL, NULL ] )
 	{
@@ -29,7 +29,14 @@ class AdminCP_Settings extends AdminCP
 				break;
 			case "security":
 				$this->response->addTitle( $f3->get('LN__AdminMenu_Security') );
-				$this->buffer( \View\Base::stub() );
+				$f3->set('title_h3', $f3->get('LN__AdminMenu_Security') );
+				break;
+			case "screening":
+				$this->response->addTitle( $f3->get('LN__AdminMenu_Screening') );
+				$f3->set('title_h3', $f3->get('LN__AdminMenu_Screening') );
+				$data['BadBevaviour'] = $this->model->settingsFields('bad_behaviour');
+				$data['BadBevaviour_Ext'] = $this->model->settingsFields('bad_behaviour_ext');
+				$data['BadBevaviour_Rev'] = $this->model->settingsFields('bad_behaviour_rev');
 				break;
 			case "language":
 				$this->response->addTitle( $f3->get('LN__AdminMenu_Language') );

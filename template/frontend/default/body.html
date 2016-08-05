@@ -59,6 +59,7 @@
 			<div class="gb-full">
 				{PAGE:footer}<br />
 				{{ \Base::instance()->format('eFiction v{0}, using {1}, page rendered in {2} msecs / Memory usage {3} KB',@APP_VERSION,@CONFIG->ACTIVE_DB,round(1e3*(microtime(TRUE)-$TIME),2),round(memory_get_usage(TRUE)/1e3,1)) }}
+				<check if="{{isset(@bb2_stats)}}">BB block {{@bb2_stats}}</check>
 			</div>
 		</div> <!-- end footer -->
 	</div> <!-- end container -->

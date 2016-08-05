@@ -117,7 +117,20 @@ class AdminCP extends Base {
 				{
 					if ( $this->exec($sqlFile,[ ":key" => $key, ":section" => $section ]) )
 					{
-						$mapper->{$key} = $value;
+						/* experimental */
+						if ( $value == "TRUE") $value = TRUE;
+						elseif ( $value == "FALSE") $value = FALSE;
+						
+						$key = explode("__", $key);
+
+						if ( isset($key[1]) )
+						{	
+							// nested key structures, like bb2__verbose -> bb2[verbose]
+							if ( empty( $mapper->{$key[0]} ) ) $mapper->{$key[0]} = [];
+							$mapper->{$key[0]}[$key[1]] = $value;
+						}
+						else
+							$mapper->{$key[0]} = $value;
 					}
 					$affected++;	
 				}
