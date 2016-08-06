@@ -27,7 +27,7 @@ class UserCP extends Base
 			"profile"		=> "profile",
 		];
 	
-		$p = array_pad(explode("/",$params[1]),2,NULL);
+		$p = array_pad(@explode("/",$params[1]),2,NULL);
 		$mod = array_shift($p);
 
 		if(@array_key_exists($mod,$modules))

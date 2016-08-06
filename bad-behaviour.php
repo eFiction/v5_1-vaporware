@@ -28,28 +28,6 @@ http://bad-behavior.ioerror.us/
 
 define('BB2_CWD', dirname(__FILE__));
 
-// Settings you can adjust for Bad Behavior.
-// Most of these are unused in non-database mode.
-// DO NOT EDIT HERE; instead make changes in settings.ini.
-// These settings are used when settings.ini is not present.
-/*
-$bb2_settings_defaults = array(
-	'log_table' => 'bad_behavior',
-	'display_stats' => false,
-	'strict' => false,
-	'verbose' => false,
-	'logging' => true,
-	'httpbl_key' => '',
-	'httpbl_threat' => '25',
-	'httpbl_maxage' => '30',
-	'offsite_forms' => false,
-	'eu_cookie' => false,
-	'reverse_proxy' => false,
-	'reverse_proxy_header' => 'X-Forwarded-For',
-	'reverse_proxy_addresses' => array(),
-);
-*/
-
 // Bad Behavior callback functions.
 
 // Return current time in the format preferred by your database.
@@ -145,12 +123,9 @@ function bb2_read_whitelist() {
 }
 
 // retrieve settings from database
-// Settings are hard-coded for non-database use
 function bb2_read_settings() {
-	global $cfg; //, $bb2_settings_defaults;
+	global $cfg;
 	$bb_settings = $cfg->bb2;
-	//if (!$bb_settings) $bb_settings = array();
-	//$bb_settings = array_merge($bb2_settings_defaults, $bb_settings);
 	$bb_settings['log_table'] = $cfg->prefix . 'bad_behavior';
 	return $bb_settings;
 }

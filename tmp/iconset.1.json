@@ -1,7 +1,9 @@
 {
-    "579b722ce532d5.92728979": {
+    "57a6557a56b023.33949025": {
         "_name": "Font Awesome CSS Icons",
         "archive": "<span class=\"fa fa-university\"><\/span>",
+        "arrow-down": "<span class=\"fa fa-arrow-down\"><\/span>",
+        "arrow-up": "<span class=\"fa fa-arrow-up\"><\/span>",
         "bars": "<span class=\"fa fa-bars\"><\/span>",
         "blank": "<span class=\"fa fa-square-o\"><\/span>",
         "book": "<span class=\"fa fa-book\"><\/span>",

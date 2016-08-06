@@ -37,7 +37,7 @@
 
 			<check if="{{ isset(@menu_upper) }}">
 			<div>
-				<repeat group="{{ @menu_upper }}" value="{{ @menu_item }}"><span><span class='tinyicon'>{{ @menu_item['icon'] }}</span> <a href="{{@BASE}}/adminCP/{{ @menu_item['link'] }}">{{ ${@menu_item['label']} }}</a></span></repeat>
+				<repeat group="{{ @menu_upper }}" value="{{ @menu_item }}"><span><span class='tinyicon'>{{ @menu_item['icon'] }}</span> <a href="{{@BASE}}/adminCP/{{ @menu_item['link'] }}">{{ ${'LN__AdminMenu_'.@menu_item['label']} }}</a></span></repeat>
 			</div>
 			</check>
 

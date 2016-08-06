@@ -1250,7 +1250,7 @@ class AdminCP extends Base {
 		foreach ( $data as $dat )
 			$config[$dat['name']] = $dat['value'];
 
-		$config['layout_available'] = unserialize($config['layout_available']);
+		$config['layout_available'] = @unserialize($config['layout_available']);
 		if ( $config['layout_available'] === FALSE ) $config['layout_available'] = [];
 
 		return $config;

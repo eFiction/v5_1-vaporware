@@ -15,15 +15,19 @@ class AdminCP_Settings extends AdminCP
 		switch( $this->moduleInit(@$params['module']) )
 		{
 			case "server":
+				$this->response->addTitle( $f3->get('LN__AdminMenu_Server') );
+				$f3->set('title_h3', $f3->get('LN__AdminMenu_Server') );
 				$this->server($f3, $data);
 				break;
 			case "registration":
 				$this->response->addTitle( $f3->get('LN__AdminMenu_Registration') );
+				$f3->set('title_h3', $f3->get('LN__AdminMenu_Registration') );
 				$data['Registration'] = $this->model->settingsFields('settings_registration');
 				$data['AntiSpam'] = $this->model->settingsFields('settings_registration_sfs');
 				break;
 			case "layout":
 				$this->response->addTitle( $f3->get('LN__AdminMenu_Layout') );
+				$f3->set('title_h3', $f3->get('LN__AdminMenu_Layout') );
 				$data['Layout'] = $this->model->settingsFields('settings_layout');
 				$extra = $this->layout($f3, $params);
 				break;
@@ -40,10 +44,13 @@ class AdminCP_Settings extends AdminCP
 				break;
 			case "language":
 				$this->response->addTitle( $f3->get('LN__AdminMenu_Language') );
+				$f3->set('title_h3', $f3->get('LN__AdminMenu_Language') );
 				$data['Language'] = $this->model->settingsFields('settings_language');
 				$extra = $this->language($f3, $params);
 				break;
 			case "home":
+				$this->response->addTitle( $f3->get('LN__AdminMenu_Home') );
+				$f3->set('title_h3', $f3->get('LN__AdminMenu_Home') );
 				$params['module'] = "home";
 				$data['General'] = $this->model->settingsFields('settings_general');
 				break;
