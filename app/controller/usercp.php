@@ -6,6 +6,7 @@ class UserCP extends Base
 	public function __construct()
 	{
 		$this->model = \Model\UserCP::instance();
+		$this->config = \Base::instance()->get('CONFIG');
 		\Base::instance()->set('systempage', TRUE);
 	}
 	
@@ -57,8 +58,37 @@ class UserCP extends Base
 	public function authoring(\Base $f3, $params)
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_MyLibrary') );
-		$this->buffer ( \View\Base::stub("authoring") );
-		$this->showMenu("authoring");
+
+		list($params, $returnpath) = array_pad(explode(";returnpath=",$params[1]), 2, '');
+		$params = $this->parametric($params);
+		$params['returnpath'] = $returnpath;
+		
+		$buffer = NULL;
+		
+		if ( $_SESSION['groups']&5 OR TRUE === $this->config->author_self )
+		{
+			if ( array_key_exists("curator", $params) )
+				$buffer = $this->authoringCurator($f3, $params);
+			
+			elseif ( array_key_exists("uid", $params) AND isset ($params[1]) )
+			{
+				$buffer = print_r($params,1);
+			}
+		}
+		
+		$this->buffer ( ($buffer) ?: $this->authoringHome( $f3, $params) );
+
+		$this->showMenu("author", $params);
+	}
+	
+	protected function authoringCurator(\Base $f3, $params)
+	{
+		return "curator";
+	}
+
+	protected function authoringHome(\Base $f3, $params)
+	{
+		return \View\Base::stub("home");
 	}
 
 	public function reviews(\Base $f3, $params)

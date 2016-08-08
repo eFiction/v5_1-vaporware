@@ -16,7 +16,42 @@ class UserCP extends Base
 		if ( $selected )
 		{
 			if ( $selected == "author")
-				$this->menu[$selected]["sub"] = $this->panelMenu($selected, $data);
+			{
+				// get associated author and curator data
+				$authorData = $this->exec("SELECT U.uid, CONCAT(U.nickname, ' (',COUNT(DISTINCT SA.lid), ')') as label FROM `tbl_users`U LEFT JOIN `tbl_stories_authors`SA ON ( U.uid = SA.aid ) WHERE U.uid = {$_SESSION['userID']} OR U.curator = {$_SESSION['userID']} GROUP BY U.uid");
+				foreach ( $authorData as $aD ) $authors["AUTHORS"][$aD["uid"]] = $aD["label"];
+				$authors["ID"] = @$data['uid'];
+
+				$sub = $this->panelMenu($selected, $authors);
+
+				if ( isset($data['uid']) AND isset($authors["AUTHORS"][$data['uid']]) )
+				{
+					// create an empty array
+					$status = [ 'id' => $data['uid'], -1 => 0, 0 => 0, 1 => 0 ];
+
+					// get story count by completion status
+					$authorData = $this->exec("SELECT S.completed, COUNT(DISTINCT S.sid) as count FROM `tbl_stories`S INNER JOIN `tbl_stories_authors`SA ON (S.sid = SA.sid AND SA.aid = :aid) GROUP BY S.completed", [ ":aid" => $data['uid'] ]);
+					foreach ( $authorData as $aD ) $status[$aD["completed"]] = $aD["count"];
+
+					// get second sub menu segment and place under selected author
+					$sub2 = $this->panelMenu('author_sub', $status);
+					
+//					$menu = [];
+					foreach ( $sub as $sKey => $sData )
+					{
+						if ( $sKey == "sub" ) $menu = array_merge($menu, $sub2);
+						else $menu[$sKey] = $sData;
+					}
+//					print_r($menu);
+				}
+				else
+				{
+					unset ($sub["sub"]);
+					$menu = $sub;
+				}
+
+				$this->menu[$selected]["sub"] = $menu;
+			}
 			else
 				$this->menu[$selected]["sub"] = $this->panelMenu($selected, $data);
 		}

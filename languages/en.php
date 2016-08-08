@@ -13,6 +13,10 @@ return array(
 'no'	=>	'no',
 'No'	=>	'No',
 
+'CookieText'	=> 'This website uses cookies to ensure you get the best experience on our website.',
+'CookieInfo'	=> 'More info on cookies',
+'CookieAccept'	=> 'Accept cookies',
+
 'PM_Inbox' => 'Inbox',
 'PM_Outbox' => 'Outbox',
 'PM_Write' => 'Write',
@@ -79,6 +83,13 @@ return array(
 'UserMenu_PMOutbox' => 'Outbox',
 'UserMenu_PMWrite' => 'Write',
 'UserMenu_Authoring' => 'Authoring',
+	'Authoring_Finished' => '{0, plural,'.
+		'other	{Finished (#)}}',
+	'Authoring_Unfinished' => '{0, plural,'.
+		'other	{Unfinished (#)}}',
+	'Authoring_Drafts' => '{0, plural,'.
+		'other	{Drafts (#)}}',
+
 'UserMenu_MyLibrary' => 'My Library',
 	'Library_Favourites' => '{0, plural,'.
 		'other	{Favourites (#)}

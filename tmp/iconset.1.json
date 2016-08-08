@@ -1,5 +1,5 @@
 {
-    "57a6557a56b023.33949025": {
+    "57a885ce0c9986.41349793": {
         "_name": "Font Awesome CSS Icons",
         "archive": "<span class=\"fa fa-university\"><\/span>",
         "arrow-down": "<span class=\"fa fa-arrow-down\"><\/span>",
@@ -20,6 +20,7 @@
         "heart": "<span class=\"fa fa-heart\"><\/span>",
         "favourite-off": "<span class=\"fa fa-heart-o\"><\/span>",
         "folder": "<span class=\"fa fa-folder-open\"><\/span>",
+        "following": "<span class=\"fa fa fa-reply fa-rotate-180\"><\/span>",
         "home": "<span class=\"fa fa-home\"><\/span>",
         "inbox": "<span class=\"fa fa-inbox\"><\/span>",
         "invisible": "<span class=\"fa fa-eye-slash\"><\/span>",

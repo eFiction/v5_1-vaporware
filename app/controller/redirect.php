@@ -96,6 +96,11 @@ class Redirect extends Base
 			if(isset($tags)) $parameters[] = "tagIn=".implode(",",$tags);
 			if(isset($parameters)) $redirect .= "/".implode(";",$parameters);
 		}
+		elseif ( $params['a']=="viewpage" )
+		{
+			$page = explode("=",$params['b']);
+			$redirect = "/page/".@$page[1];
+		}
 		
 		if ( isset($COOKIE['redirect_seen'] ) ) $f3->reroute($redirect, false);
 		else $this->buffer( \View\Redirect::inform($redirect) );

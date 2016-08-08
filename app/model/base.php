@@ -215,11 +215,26 @@ class Base extends \Prefab {
 			$item["label"] = explode("%%",$item["label"]);
 			if ( empty($item["label"][1]) OR $data[$item["label"][1]]!== FALSE )
 			{
-				if ( isset($item["label"][1]) )
-					$label = $f3->get('LN__'.$item["label"][0],$data[$item["label"][1]]);
-				else $label = $f3->get('LN__'.$item["label"][0]);
-
-				$menu[$item["link"]] = [ "label" => $label, "icon" => $item["icon"] ];
+				if ( $item["label"][0] == "" )
+				{
+					foreach ( $data[$item["label"][1]] as $id => $label )
+					{
+						$link = str_replace("%ID%", $id, $item["link"]);
+						$menu[$link] = [ "label" => $label, "icon" => $item["icon"] ];
+						if ( $data['ID'] == $id ) $menu['sub'] = FALSE;
+					}	
+				}
+				else
+				{
+					if ( isset($item["label"][1]) )
+					{
+						$label = $f3->get('LN__'.$item["label"][0],$data[$item["label"][1]]);
+					}
+					else $label = $f3->get('LN__'.$item["label"][0]);
+					
+					if ( isset ( $data['id']) ) $item["link"] = str_replace('%ID%', $data['id'], $item["link"]);
+					$menu[$item["link"]] = [ "label" => $label, "icon" => $item["icon"] ];
+				}
 			}
 		}
 		return $menu;

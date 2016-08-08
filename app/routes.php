@@ -3,7 +3,7 @@
 	Common routes
 -------------------- */
 
-$f3->route( [ 'GET /', 'GET /*' ], 'Controller\Page->getMain' );
+$f3->route( [ 'GET /', 'GET /page/*', 'GET /*' ], 'Controller\Page->getMain' );
 
 $f3->route(
   [ 'GET /?/redirect/@b/@c', 'GET /redirect/@a/@b', ],
