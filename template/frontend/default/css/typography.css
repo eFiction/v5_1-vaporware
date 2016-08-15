@@ -1,6 +1,7 @@
 /* import fonts */
 @import url(http://fonts.googleapis.com/css?family=Open+Sans+Condensed:300|Maven+Pro:400,700|Bree+Serif|Overlock:400,400italic,700,900);
-@import url(font-awesome.min.css);
+@import url(http://netdna.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.css); 
+/*@import url(font-awesome.min.css);*/
 
 body, p {
 	font-family: 'Maven Pro', sans-serif;

@@ -20,7 +20,8 @@ $f3->route(
   [ 'POST /story', 'POST /story/@action' , 'POST /story/@action/*' ], 'Controller\Story->save' );
 
 $f3->route(
-  [ 'GET /story/search', 'GET /story/search/*', 'POST /story/search' ],
+  [ 'GET /story/search', 'GET /story/search/*', 'POST /story/search',
+	'GET /story/browse', 'GET /story/browse/*', 'POST /story/browse' ],
   'Controller\Story->search' );
 
 $f3->route(

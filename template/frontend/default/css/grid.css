@@ -55,7 +55,11 @@
 }
 
 .gb-50, .gb-half, .gb-2qrt {
+	clear: left;
 	width: 50%;
+}
+.gb-50:nth-child(2n), .gb-half:nth-child(2n), .gb-2qrt:nth-child(2n) {
+	clear: none;
 }
 
 .gb-40 {

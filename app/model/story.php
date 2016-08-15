@@ -304,33 +304,52 @@ class Story extends Base
 		return str_replace(array_keys($replace), array_values($replace), $sql_StoryConstruct);
 	}
 	
-	public function categories( $cid, $list=FALSE )
+	public function categories( $cid )
 	{
 		// $cid is safe
-		if($list)
+		// Get categories below selected category
+		$sql = "SELECT C.cid, C.category, C.description, C.image, C.stats, C.parent_cid
+						FROM `tbl_categories`C 
+						WHERE C.parent_cid ='{$cid}' 
+					GROUP BY C.cid 
+					ORDER BY C.inorder ASC";
+		$data['elements'] = $this->exec($sql);
+		if ( sizeof($data) )
 		{
-			
-		}
-		else
-		{
-			$sql = "SELECT C.cid, C.category, C.description, C.image, C.counter, C.stats, C.parent_cid
-							FROM `tbl_categories`C 
-							WHERE C.parent_cid ='{$cid}' 
-						GROUP BY C.cid 
-						ORDER BY C.inorder ASC";
-			$data['elements'] = $this->exec($sql);
 			foreach ( $data['elements'] as &$entry ) $entry['stats'] = unserialize($entry['stats']);
 		}
+		else return FALSE;
 		
-		if ( $list OR $cid > 0 )
+		// If not in root, get parent category information
+		if ( $cid > 0 )
 		{
 			$sql = "SELECT C.category, C.description, C.image, C.stats, C.parent_cid
 							FROM `tbl_categories`C 
 							WHERE C.cid ='{$cid}' ";
-			$data['parent'] = $this->exec($sql);
-			if ( sizeof($data['parent'])==1 )
-				$data['parent'][0]['stats'] = unserialize($data['parent'][0]['stats']);
+			$parent = $this->exec($sql);
+
+			if ( sizeof($parent)==1 )
+			{
+				$data['parent'] = $parent[0];
+				$data['parent']['stats'] = unserialize($data['parent']['stats']);
+			}
+			else return FALSE;
+			
+			// subtract child stories from parent count
+			$data['parent']['counter'] = $data['parent']['stats']['count'];
+			foreach ( $data['elements'] as $E )
+				$data['parent']['counter'] -= $E['stats']['count'];
 		}
+		
+		foreach ( $data['elements'] as &$entry )
+		{
+			if ( is_array($entry['stats']['sub']) )
+			foreach ( $entry['stats']['sub'] as $name => $count )
+			{
+				$entry['stats']['count'] -= $count;
+			}
+		}
+		
 		return $data;
 	}
 	

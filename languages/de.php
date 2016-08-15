@@ -201,6 +201,8 @@ return array(
 'Reviews' =>	'Reviews',
 'Foreword' =>	'Vorwort',
 'Summary' =>	'Klappentext',
+'Tags' =>	'Tags',
+'by' => 'by',
 'Stories' => 'Stories',
 'NewStories' => 'Neue Geschichten',
 'RandomStory' => 'Zufällige Geschichte',
@@ -227,7 +229,10 @@ Hier klicken um zu entfernen.',
 'St_Completed' => 'Abgeschlossen',
 'Characters' => 'Charaktere',
 'Author_Notes' => 'Anmerkungen des Autors',
-'Summary'	=> 'Klappentext',
+'BrowseStories' => '{0, plural,'.
+	'one	{Eine Geschichte anzeigen},'.
+	'other	{# Geschichten durschstöbern}
+}',
 
 'Review_Link' => '{0, plural,'.
 	'zero	{Noch keine ... schreibe die erste!},'.

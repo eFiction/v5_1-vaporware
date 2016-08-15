@@ -1,25 +1,27 @@
-	<check if="{{isset(@categoriesData['parent'])}}">
-		Browsing: {{@categoriesData['parent'][0]['category']}}<br />
-		Go back <a href="{{@BASE}}/story/categories/{{@categoriesData['parent'][0]['parent_cid']}}">up</a><br />
-	</check>
-<repeat group="{{ @categoriesData['elements'] }}" value="{{ @element }}">
-	<check if="{{sizeof(@element['stats']['sub'])}}">
-		<true>
-			<h4><a href="{{@BASE}}/story/categories/{{@element['cid']}}">{{ @element['category']}}</a></h4>
-		</true>
-		<false>
-			<div class="grid-wrapper"><div class="gb-half"><h5><span class="fa fa-folder-open" aria-hidden="true"></span> {{ @element['category']}}</h5></div></div>
-		</false>
-	</check>
+<check if="{{isset(@categoriesData['parent'])}}">
+		<h1>{{@categoriesData['parent']['category']}}</h1>
+		{{@categoriesData['parent']['description']}}
+		Go back <a href="{{@BASE}}/story/categories/{{@categoriesData['parent']['parent_cid']}}">up</a><br />
+</check>
+<div class="grid-wrapper">
 
-	<small>{{@element['description'] |raw }}</small><br />
-	<check if="{{@element['counter']>0}}">{{@element['counter'] }} stories in this category. [ <a href="{{@BASE}}/story/categories/{{@element['stats']['cid']}}/view">View</a> ]<br /></check>
-	<check if="{{@element['counter'] < @element['stats']['count'] }}">{{@element['stats']['count'] - @element['counter']}} stories in these sub-categories:<br /></check>
-	<check if="{{sizeof(@element['stats']['sub'])}}">
-		<table>
-		<repeat group="{{ array_splice(@element['stats']['sub'],0,3) }}" key="{{@name}}" value="{{ @count }}" counter="{{@line}}">
-			<tr><td><check if="{{@line==1}}">Sub-categories:</check>&nbsp;</td><td><span class="fa fa-folder-open" aria-hidden="true"></span> {{@name}} [{{ @count }}]</td></tr>
-		</repeat>
-		</table>
-	</check>
+<repeat group="{{ @categoriesData['elements'] }}" value="{{ @element }}">
+	<div class="gb-half">
+		<check if="{{ sizeof(@element.stats.sub)}}">
+			<true><h3><a href="{{@BASE}}/story/categories/{{@element.cid}}">{{@element.category}}</a></h3></true>
+			<false><h3>{{@element.category}}</h3></false>
+		</check>
+		{{@element.description | raw}}<br />
+		<check if="{{@element.stats.count}}"><a href="{{@BASE}}/story/browse/category={{@element.cid}}">{{ @LN__BrowseStories, @element.stats.count | format }}</a><br /></check>
+		<check if="{{ sizeof(@element.stats.sub)}}">
+			<repeat group="{{ @leftover = array_splice(@element['stats']['sub'],0,3) }}" key="{{@name}}" value="{{ @count }}" counter="{{@line}}">
+				{ICON:folder} {{@name}} [{{ @count }}]<br />
+			</repeat>
+			<check if="{{ sizeof(@leftover) }}">and {{ sizeof(@leftover) }} more subs</check>
+		</check>
+	</div>
+
 </repeat>
+
+
+</div>

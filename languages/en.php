@@ -229,7 +229,10 @@ Click here to unset.',
 'St_Completed' => 'Completed',
 'Characters' => 'Characters',
 'Author_Notes' => 'Author notes',
-
+'BrowseStories' => '{0, plural,'.
+	'one	{Browse # story},'.
+	'other	{Browse # stories}
+}',
 
 'Review_Link' => '{0, plural,'.
 	'zero	{None yet! Be the first to write one ...},'.
