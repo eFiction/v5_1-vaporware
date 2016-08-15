@@ -40,6 +40,7 @@ $f3->set('APP_VERSION', '5.0.0-dev.0');
 
 //new Session();
 /** define debugging and error reporting options **/
+
 ini_set('display_errors', 1);
 error_reporting(1);
 error_reporting(defined('E_STRICT') ? E_ALL | E_STRICT : E_ALL );

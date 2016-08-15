@@ -2,50 +2,74 @@
 @define('__transLocale', 'en_GB');
 
 return array(
-'UserCP' => 'User Panel',
-'AdminCP' => 'Admin Panel',
+// General stuff
+'UserCP'	=> 'User Panel',
+'AdminCP'	=> 'Admin Panel',
+'yes'		=>	'yes',
+'Yes'		=>	'Yes',
+'no'		=>	'no',
+'No'		=>	'No',
+
+// Login related
+'Login'			=> 'Login',
+'Logout'		=> 'Logout',
+'Username'		=> 'Username',
+'Password'		=> 'Password',
+'Email'			=> 'e-Mail',
+'Guest'			=> 'Guest',
+'ForgotPW'		=> 'Forgot you password',
+'ResetPW'		=> 'Reset my password',
+'Login_NoMatch'	=> 'Failed to log in, invalid username or password!',
+'Login_NoData'	=> 'Failed to log in, data error!',
+
+// User registration
+'Registration'					=> 'Registration',
+'RegisterNow'					=> 'Register now',
+'Registration_AcceptTOS'		=> 'I accept these terms!',
+'Registration_AcceptTOS_Error'	=> 'You have to accept the terms of use',
+'Registration_UsernameEmpty'	=> 'No login name provided!',
+'Registration_UsernameTaken'	=> 'Login name already in use.',
+'Registration_EmailEmpty'		=> 'No e-mail adress provided!',
+'Registration_EmailTaken'		=> 'Login name adress in use.',
+'Registration_AlreadyMember'	=> 'A user with this data already exists.',
+'Registration_PasswordRepeat'	=> 'Repeat password',
+'Registration_PasswordTwice'	=> 'Enter your password twice',
+'Registration_PasswordMismatch'	=> 'Your passwords do not match',
+'Registration_PasswordCriteria'	=> 'Your desired password does not match the requirements',
+
 
 'Sort_Date'	=> 'Date',
 'Sort_ID'	=> 'ID',
 
-'yes'	=>	'yes',
-'Yes'	=>	'Yes',
-'no'	=>	'no',
-'No'	=>	'No',
 
 'CookieText'	=> 'This website uses cookies to ensure you get the best experience on our website.',
 'CookieInfo'	=> 'More info on cookies',
 'CookieAccept'	=> 'Accept cookies',
 
-'PM_Inbox' => 'Inbox',
-'PM_Outbox' => 'Outbox',
-'PM_Write' => 'Write',
-'PM_Outbox_Items' => '{0, plural,'.
-	'zero	{Your Outbox is empty!},'.
-	'one	{One message:},'.
-	'other	{# messages:}
-}',
-'PM_Outbox_empty' => 'Your Outbox is empty',
-
-'PM_Inbox_Items' => '{0, plural,'.
-	'zero	{Your Inbox is empty!},'.
-	'one	{One message:},'.
-	'other	{# messages:}
-}',
-'PM_Inbox_empty' => 'Your Inbox is empty',
-
-'PM_Subject' => 'Subject',
-'PM_Sender' => 'Sender',
-'PM_Sent' => 'Sent',
-'PM_Received' => 'Received',
-'PM_Recipient' => 'Recipient',
-'PM_question_Delete' => 'Delete message',
-'PM_confirm_Delete' => 'Message will be deleted, sure?',
-'PM_unread' => 'unread',
-'PM_ReplySubject' => 'Re:',
-'PM_ReplyMessageHeader' => 'On {0}, {1} wrote:',
-'PM_WritePM' => 'Writing message',
-//'PM_Messaging' => 'Messaging',
+'PM_Inbox'				=> 'Inbox',
+'PM_Outbox'				=> 'Outbox',
+'PM_Write'				=> 'Write',
+'PM_Outbox_Items'		=> '{0, plural,'.
+							'zero	{Your Outbox is empty!},'.
+							'one	{One message:},'.
+							'other	{# messages:} }',
+'PM_Outbox_empty' 		=> 'Your Outbox is empty',
+'PM_Inbox_Items' 		=> '{0, plural,'.
+							'zero	{Your Inbox is empty!},'.
+							'one	{One message:},'.
+							'other	{# messages:} }',
+'PM_Inbox_empty' 		=> 'Your Inbox is empty',
+'PM_Subject'			=> 'Subject',
+'PM_Sender'				=> 'Sender',
+'PM_Sent'				=> 'Sent',
+'PM_Received'			=> 'Received',
+'PM_Recipient'			=> 'Recipient',
+'PM_question_Delete'	=> 'Delete message',
+'PM_confirm_Delete'		=> 'Message will be deleted, sure?',
+'PM_unread'				=> 'unread',
+'PM_ReplySubject'		=> 'Re:',
+'PM_ReplyMessageHeader'	=> 'On {0}, {1} wrote:',
+'PM_WritePM'			=> 'Writing message',
 
 // using php strftime
 'Month_Calendar' => '{0,date,custom,%B %Y}',
@@ -89,7 +113,6 @@ return array(
 		'other	{Unfinished (#)}}',
 	'Authoring_Drafts' => '{0, plural,'.
 		'other	{Drafts (#)}}',
-
 'UserMenu_MyLibrary' => 'My Library',
 	'Library_Favourites' => '{0, plural,'.
 		'other	{Favourites (#)}
@@ -167,12 +190,25 @@ return array(
 'Shoutbox' => 'Shoutbox',
 
 // Story view'
+'Title' =>	'Title',
+'Author' =>	'Author',
+'Categories' =>	'Categories',
+'Characters' =>	'Characters',
+'Rating' =>	'Rating',
+'TagsInclude'	=>	'Tags included',
+'TagsExclude'	=>	'Tags excluded',
+'Status' =>	'Status',
+'Reviews' =>	'Reviews',
+'Foreword' =>	'Foreword',
+'Summary' =>	'Summary',
+'Tags' =>	'Tags',
+'by' => 'by',
 'Stories'				=> 'Stories',
-'St_NewStories'			=> 'New Stories',
-'St_RandomStory'		=> 'Random Story',
-'St_RandomStories'		=> 'Random Stories',
-'St_FeaturedStory'		=> 'Featured Story',
-'St_FeaturedStories'	=> 'Featured Stories',
+'NewStories'			=> 'New Stories',
+'RandomStory'		=> 'Random Story',
+'RandomStories'		=> 'Random Stories',
+'FeaturedStory'		=> 'Featured Story',
+'FeaturedStories'	=> 'Featured Stories',
 
 'St_BookmarkAdd'		=> 'This story has no bookmark.
 Click here to add one now.',
@@ -193,7 +229,7 @@ Click here to unset.',
 'St_Completed' => 'Completed',
 'Characters' => 'Characters',
 'Author_Notes' => 'Author notes',
-'Summary'	=> 'Summary',
+
 
 'Review_Link' => '{0, plural,'.
 	'zero	{None yet! Be the first to write one ...},'.

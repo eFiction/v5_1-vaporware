@@ -6,7 +6,7 @@ class Auth extends Base {
 	public function __construct()
 	{
 		$this->model = \Model\Auth::instance();
-		//$this->view = new \View\Story;
+		$this->cfg = \Config::instance();
 	}
 
     protected $response;
@@ -15,10 +15,8 @@ class Auth extends Base {
      * check login state
      * @return bool
      */
-    static public function isLoggedIn()
+    static public function isLoggedIn(\Base $f3)
 	{
-        /** @var Base $f3 */
-        $f3 = \Base::instance();
 		$ip_db = sprintf("%u", ip2long($_SERVER['REMOTE_ADDR']));
 
 		/*
@@ -73,7 +71,7 @@ class Auth extends Base {
 	
 	public function login($f3,$params)
 	{
-		\Registry::get('VIEW')->addTitle('__Login');
+		\Registry::get('VIEW')->addTitle( $f3->get('LN__Login') );
 		if( $f3->exists('POST.login') && $f3->exists('POST.password') )
 		{
 			if ( $userID = $this->model->userLoad($f3->get('POST.login'), $f3->get('POST.password') ) )
@@ -113,11 +111,8 @@ class Auth extends Base {
 			return TRUE; //  leave function
 		}
 
-		// link config
-		$this->cfg = \Config::instance();
-		
 		// check if configuration is disabled
-		if( $this->cfg['allow_registration'] == "FALSE" )
+		if( $this->cfg['allow_registration'] == FALSE )
 			$this->buffer( "stub *controller-auth-register* denied" );
 		
 		// check if user is already logged in
@@ -127,43 +122,31 @@ class Auth extends Base {
 		// start registration process
 		else
 		{
-			// check if already agreed to the TOS
-			if ( isset($_POST['agreed']) )
-			{
-				$f3->set('register.step', 'form');
+			$f3->set('register.step', 'form');
 				// Data sent ?
-				if(empty($_POST['form']))
+			if(empty($_POST['form']))
+			{
+				// No data yet, just create an empty form
+				$this->buffer( \View\Auth::register(). "stub *controller-auth-register* proceed" );
+			}
+			else
+			{
+				// We have received a form, let's work through it
+				$register = $f3->get('POST')['form'];
+				if ( TRUE === $check = $this->model->registerCheckInput($register) )
 				{
-					// No data yet, just create an empty form
-					$this->buffer( \View\Auth::register(). "stub *controller-auth-register* proceed" );
+					$f3->set('register.step', 'done');
+					$return = $this->model->addUser($register);
 				}
 				else
 				{
-					// We have received a form, let's work through it
-					$register = $f3->get('POST')['form'];
-					if ( TRUE === $check = $this->model->registerCheckInput($register) )
+					// check if already agreed to the TOS
+					if ( isset($check['sfs'])==2 )
 					{
-						$f3->set('register.step', 'done');
-						$return = $this->model->addUser($register);
-						
-						
+						$f3->set('register.step', 'failed');
 					}
-					else
-					{
-						if ( isset($check['sfs'])==2 )
-						{
-							$f3->set('register.step', 'failed');
-						}
-						$this->buffer( \View\Auth::register($register, $check) );
-					}
+					$this->buffer( \View\Auth::register($register, $check) );
 				}
-			}
-			// Show TOS form
-			else
-			{
-				$f3->set('register.step', 'welcome');
-				$this->buffer( \View\Auth::register(). "stub *controller-auth-register* welcome" );
-				//$this->buffer( "stub *controller-auth-register* welcome" );
 			}
 		}
 	}
@@ -198,5 +181,15 @@ class Auth extends Base {
 		$log->log_type='AM';
 		$log->save();*/
 		//$this->buffer(print_r($check,1));
+	}
+	
+	public function captcha(\Base $f3)
+	{
+		unset($_SESSION['captcha']);
+
+		\View\Auth::captchaEfiction();
+		//\View\Auth::captchaF3();
+
+		exit;
 	}
 }

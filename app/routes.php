@@ -29,11 +29,16 @@ $f3->route(
 
 $f3->route( 'GET /shoutbox/@action/@sub', 'Controller\Blocks->shoutbox' );
 
+
+$f3->route( 
+		[ 'GET /captcha', 'GET /captcha/*' ],
+		'Controller\Auth->captcha' );
+
 // Ajax routes
 $f3->route( 'GET /blocks/calendar/* [ajax]', 'Controller\Blocks->calendar' );
 $f3->route( 'POST /story/ajax/@segment [ajax]', 'Controller\Story->ajax' );
 
-if (\Controller\Auth::isLoggedIn())
+if (\Controller\Auth::isLoggedIn($f3))
 {
 	/* --------------------
 		Member routes

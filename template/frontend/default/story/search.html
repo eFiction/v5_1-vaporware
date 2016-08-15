@@ -2,18 +2,22 @@
 	<fieldset><legend>Advanced Search</legend>
 	<div class="grid-wrapper">
 	<!-- row #1 -->
-		<div class="gb-half">__Title<br /><input class="text-input" placeholder="" type="text" name="story_title" value="<check if="{{isset(@searchForm.story_title)}}">{{@searchForm.story_title}}</check>"></div>
-		<div class="gb-half">__Text<br /><input class="text-input" placeholder="" type="text" name="story_text" value="<check if="{{isset(@searchForm.story_text)}}">{{@searchForm.story_text}}</check>"></div>
+		<div class="gb-half">{{@LN__Title}}<br /><input placeholder="" type="text" name="story_title" value="<check if="{{isset(@searchForm.story_title)}}">{{@searchForm.story_title}}</check>"></div>
+		<div class="gb-half">{{@LN__Author}}<br /><input type="text" id="author-select" name="author" /></div>
 	<!-- row #2 -->
-		<div class="gb-half">__TagsInclude<br /><input type="text" id="tagIn-select" name="tagIn" /></div>
-		<div class="gb-half">__TagsExclude<br /><input type="text" id="tagOut-select" name="tagOut" /></div>
-__Author<br /><input type="text" id="author-select" name="author" />
-__Categories<br /><input type="text" id="category-select" name="category" />
-<br />(*) __Rating from <select name="rating[0]">
+		<div class="gb-half">{{@LN__Categories}}<br /><input type="text" id="category-select" name="category" /></div>
+		<div class="gb-half">{{@LN__Characters}}<br /><input type="text" id="characters-select" name="characters" /></div>
+	<!-- row #3 -->
+		<div class="gb-half">{{@LN__TagsInclude}}<br /><input type="text" id="tagIn-select" name="tagIn" /></div>
+		<div class="gb-half">{{@LN__TagsExclude}}<br /><input type="text" id="tagOut-select" name="tagOut" /></div>
+	</div>
+	<!-- misc -->	
+	<div class="grid-wrapper">
+<br /><br />(*) {{@LN__Rating}} from <select class="search" name="rating[0]">
 	<repeat group="{{ @searchRatings }}" value="{{ @rating }}">
 		<option value="{{ @rating.rid }}" <check if="{{@rating.rid==@searchForm.rating.0}}">selected="selected" </check> >{{ @rating.rating }}</option>
 	</repeat>
-</select> to <select name="rating[1]">
+</select> to <select class="search" name="rating[1]">
 	<repeat group="{{ @searchRatings }}" value="{{ @rating }}">
 		<option value="{{ @rating.rid }}" <check if="{{@rating.rid==@searchForm.rating.1}}">selected="selected" </check> >{{ @rating.rating }}</option>
 	</repeat>
@@ -23,7 +27,7 @@ __Categories<br /><input type="text" id="category-select" name="category" />
 	<input type="radio" name="chapters" <check if="{{(isset(@searchForm.chapters) AND @searchForm.chapters=='oneshot')}}">checked="checked" </check>value="oneshot"> __Oneshot 
 	<input type="radio" name="chapters" <check if="{{(isset(@searchForm.chapters) AND @searchForm.chapters=='multichapters')}}">checked="checked" </check>value="multichapters"> __MultiChapters 
 	<input type="radio" name="chapters" <check if="{{(empty(@searchForm.chapters) OR @searchForm.chapters=='both')}}">checked="checked" </check>value="both"> __Both
-<br /><br /><button type="submit">submit</button> <button type="reset">reset</button>
+<br /><br /><input class="button" type="reset"> <input class="button" type="submit">
 
 	</fieldset>
 </form>
@@ -64,3 +68,4 @@ $(document).ready(function() {
     });
 });
 </script>
+<br />

@@ -1,28 +1,41 @@
-<check if="{{@register.step=='welcome'}}">
-{PAGE:registration}
-<form method="post" action="{{@BASE}}/register">
-	<div class="grid-wrapper">
-		<div class="gb-half">__AcceptTOU</div><div class="gb-half"><input class="field input" type="checkbox" name="agreed"></div>
-		<div class="gb-full"><input class="button" type="submit" value="__Register"></div>
-	</div>
-</form>
-</check>
 <check if="{{@register.step=='form'}}">
 <form method="post" action="{{@BASE}}/register">
 	<fieldset>
-		<legend>__Register</legend>
+		<legend>{{@LN__Registration}}</legend>
 		<div class="grid-wrapper">
-			<check if="{{ @@error.login }}"><div class="grid-wrapper"><div class="note alert-box error">{{ @@error.login }}</div></div></check>
-			<div class="gb-1qrt">__Login</div><div class="gb-3qrt"><input type="text" name="form[login]" value="{{ @@data['login'] }}"></div>
-			<check if="{{ @@error.email }}"><div class="grid-wrapper"><div class="note alert-box error">{{ @@error.email }}<br />__Restore</div></check>
-			<div class="gb-1qrt">__EMail</div><div class="gb-3qrt"><input type="text" name="form[email]" value="{{ @@data['email'] }}"></div>
-			<check if="{{ @@error.password }}"><div class="grid-wrapper"><div class="note alert-box error">{{ @@error.password }}</div></div></check>
-			<div class="gb-1qrt">__Password</div><div class="gb-3qrt"><input type="password" name="form[password1]" value=""></div>
-			<div class="gb-1qrt">__PasswordRepeat</div><div class="gb-3qrt"><input type="password" name="form[password2]" value=""></div>
+				<div class="gb-full">{PAGE:tos}</div>
+				<check if="{{ isset(@error.accept) }}">
+					<div class="grid-wrapper"><div class="note alert-box error">{{ @LN__Registration_AcceptTOS_Error }}</div></div>
+				</check>
+				<div class="gb-full"><input class="field input" type="checkbox" name="form[accept]" <check if="{{ isset(@_POST.form.accept) }}">checked="checked" </check>/>  {{ @LN__Registration_AcceptTOS }}</div>
+			<check if="{{ isset(@error.login) }}">
+				<div class="grid-wrapper"><div class="note alert-box
+					<check if="{{ @error.login == 'missing' }}"> error">{{ @LN__Registration_UsernameEmpty }}</check>
+					<check if="{{ @error.login == 'taken' }}"> warning">{{ @LN__Registration_UsernameTaken }}</check>
+					<check if="{{ @error.login == 'member' }}"> info">{{ @LN__Registration_AlreadyMember }}</check>
+				</div></div>
+			</check>
+			<div class="gb-1qrt">{{@LN__Username}}</div><div class="gb-3qrt"><input class="half" type="text" name="form[login]" value="{{ @@data['login'] }}"></div>
+			<check if="{{ isset(@error.email) }}">
+				<div class="grid-wrapper"><div class="note alert-box
+					<check if="{{ @error.email == 'missing' }}"> error">{{ @LN__Registration_EmailEmpty }}</check>
+					<check if="{{ @error.email == 'taken' }}"> warning">{{ @LN__Registration_EmailTaken }}</check>
+				</div></div>
+			</check>
+			<div class="gb-1qrt">{{@LN__Email}}</div><div class="gb-3qrt"><input class="half" type="text" name="form[email]" value="{{ @@data['email'] }}"></div>
+			<check if="{{ isset(@error.password) }}">
+				<div class="grid-wrapper"><div class="note alert-box
+					<check if="{{ @error.password == 'missing' }}"> error">{{ @LN__Registration_PasswordTwice }}!</check>
+					<check if="{{ @error.password == 'mismatch' }}"> error">{{ @LN__Registration_PasswordMismatch }}</check>
+					<check if="{{ @error.password == 'criteria' }}"> error">{{ @LN__Registration_PasswordCriteria }}</check>
+				</div></div>
+			</check>
+			<div class="gb-1qrt">{{@LN__Password}}</div><div class="gb-3qrt"><input class="half" type="password" name="form[password1]" value=""></div>
+			<div class="gb-1qrt">{{@LN__Registration_PasswordRepeat}}</div><div class="gb-3qrt"><input class="half" type="password" name="form[password2]" value=""></div>
+			<div class="full"><img src="http://dev.efiction.org/mvc/captcha/c.png" /></div>
 			<div class="gb-full"><input class="button" type="submit" value="__Register"></div>
 		</div>
 	</fieldset>
-	<input type="hidden" name="agreed" value="on">
 </form>
 </check>
 <check if="{{@register.step=='done'}}">

@@ -62,4 +62,9 @@ class Blocks extends Base
 		return \View\Blocks::pageMenu($main, $sub, isset($menuSelect[2]) );//$menuSelect.$pageSelect;
 	}
 	
+	public function categories()
+	{
+		$data = $this->model->categories();
+		return \View\Blocks::categories($data);
+	}
 }

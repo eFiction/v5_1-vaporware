@@ -42,12 +42,13 @@ class Blocks extends Base
 	{
 		\Registry::get('VIEW')->javascript( 'body', TRUE, "calendar.js.php?base=".\Base::instance()->get('BASE') );
 		
-		$tmpHive = array ( 
+		$cell = array ( 
 				"ID"		=> "sb_cell_calendar",
 				"TITLE"		=> "__Calendar",
 				"CONTENT"	=> "Loading ...",
 		);
-		return parent::render('blocks/cell.html',NULL, $tmpHive);
+		\Base::instance()->set('cell', $cell);
+		return parent::render('blocks/cell.html');
 	}
 
 	public static function calendar($data)
@@ -114,5 +115,17 @@ class Blocks extends Base
 		\Base::instance()->set('data', $data);
 
 		return utf8_encode(parent::render('blocks/calendar.html'));
+	}
+	
+	public static function categories($data)
+	{
+		
+		$cell = array ( 
+				"ID"		=> "sb_cell_categories",
+				"TITLE"		=> \Base::instance()->get("LN__Categories"),
+				"CONTENT"	=> $data,
+		);
+		\Base::instance()->set('cell', $cell);
+		return parent::render('blocks/categories.html');
 	}
 }

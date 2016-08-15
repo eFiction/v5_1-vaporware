@@ -13,6 +13,7 @@ $this->modules =
 						"tagcloud"		=> [ "\\Controller\Blocks", "tagcloud" ],
 						"story"			=> [ "\\Controller\Story", "storyBlocks" ],
 						"news"			=> [ "\\Controller\News", "blocks" ],
+						"categories"	=> [ "\\Controller\Blocks", "categories" ],
 					];
 
 

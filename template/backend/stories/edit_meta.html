@@ -2,7 +2,7 @@
 	<div class="gb-3qrt">
 		<form method="post" action="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}}">
 			<div class="ym-grid">
-				<div class="gb-2thrd"><h6>__Title</h6><input class="text-input-story" placeholder="Your story title goes here" type="text" name="form[story_title]" value="{{@data.title}}"></div>
+				<div class="gb-2thrd"><h6>__Title</h6><input placeholder="Your story title goes here" type="text" name="form[story_title]" value="{{@data.title}}"></div>
 				<div class="gb-1thrd"><h6>__Rating</h6>
 					<select id="ratingid" name="form[ratingid]">
 					<repeat group="{{ @data.ratings }}" value="{{ @rating }}"><option value="{{ @rating.rid }}"<check if="{{@rating.rid==@data.ratingid}}"> selected="selected"</check>>{{ @rating.rating }}</option></repeat>
@@ -17,8 +17,8 @@
 				<div class="gb-full"><h6>__Characters </h6><input type="text" id="character-select" name="form[characters]" /></div>
 		<!-- end of special fields -->
 
-				<div class="gb-full"><h6>__Notes</h6><textarea class="text-input-story" placeholder="Notes and dedications go here" name="form[story_notes]">{{@data.storynotes}}</textarea></div>
-				<div class="gb-full"><h6>__Summary</h6><textarea class="text-input-story" placeholder="Your story summary goes here" name="form[story_summary]">{{@data.summary}}</textarea></div>
+				<div class="gb-full"><h6>__Notes</h6><textarea placeholder="Notes and dedications go here" name="form[story_notes]">{{@data.storynotes}}</textarea></div>
+				<div class="gb-full"><h6>__Summary</h6><textarea placeholder="Your story summary goes here" name="form[story_summary]">{{@data.summary}}</textarea></div>
 
 				<div class="gb-half">
 					<h6>__StatusCompleted: {{ @data['states']['completed'][@data.completed] }}</h6>

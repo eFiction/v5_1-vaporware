@@ -2,46 +2,74 @@
 @define('__transLocale', 'de_DE');
 
 return array(
-'UserCP' => 'User Panel',
-'AdminCP' => 'Admin Panel',
+// Allgemeines
+'UserCP'	=> 'User Panel',
+'AdminCP'	=> 'Admin Panel',
+'yes'		=>	'ja',
+'Yes'		=>	'Ja',
+'no'		=>	'nein',
+'No'		=>	'Nein',
+
+// Login
+'Login'			=> 'Anmelden',
+'Logout'		=> 'Abmelden',
+'Username'		=> 'Benutzername',
+'Password'		=> 'Passwort',
+'Email'			=> 'E-Mail',
+'Guest'			=> 'Gast',
+'ForgotPW'		=> 'Passwort vergessen',
+'ResetPW'		=> 'Passwort zurücksetzen',
+'Login_NoMatch'	=> 'Anmeldung nicht möglich, Benutzername oder Passwort ungültig!',
+'Login_NoData'	=> 'Anmeldung nicht möglich, keine Daten!',
+
+// Registrierung
+'Registration'					=> 'Registrierung',
+'RegisterNow'					=> 'Jetzt registrieren',
+'Registration_AcceptTOS'		=> 'I accept these terms!',
+'Registration_AcceptTOS_Error'	=> 'You have to accept the terms of use',
+'Registration_UsernameEmpty'	=> 'No login name provided!',
+'Registration_UsernameTaken'	=> 'Benutzername wird bereits verwendet.',
+'Registration_EmailEmpty'		=> 'No E-Mail adress provided!',
+'Registration_EmailTaken'		=> 'E-Mail wird bereits verwendet.',
+'Registration_AlreadyMember'	=> 'Ein Benutzer mit diesen Daten existiert bereits.',
+'Registration_PasswordRepeat'	=> 'Passwort wiederholen',
+'Registration_PasswordTwice'	=> 'Passwort bitte zwei mal eingeben',
+'Registration_PasswordMismatch'	=> 'Die eingegebenen Passwörter stimmen nicht miteinander überein',
+'Registration_PasswordCriteria'	=> 'Dein gewünschtes Passwort erfüllt nicht die Voraussetzungen',
+
 
 'Sort_Date'	=> 'Datum',
 'Sort_ID'	=> 'ID',
 
-'yes'	=>	'ja',
-'Yes'	=>	'Ja',
-'no'	=>	'nein',
-'No'	=>	'Nein',
 
-'PM_Inbox' => 'Posteingang',
-'PM_Outbox' => 'Postausgang',
-'PM_Write' => 'Verfassen',
-'PM_Outbox_Items' => '{0, plural,'.
-	'zero	{Your Outbox is empty!},'.
-	'one	{One message:},'.
-	'other	{# messages:}
-}',
-'PM_Outbox_empty' => 'Dein Postausgang ist leer',
+'CookieText'	=> 'Diese Website benutzt Cookies, um das Krümelmonster zu füttern.',
+'CookieInfo'	=> 'Mehr über die echten Gründe.',
+'CookieAccept'	=> 'Akzeptiert!',
 
-'PM_Inbox_Items' => '{0, plural,'.
-	'zero	{Your Inbox is empty!},'.
-	'one	{One message:},'.
-	'other	{# messages:}
-}',
-'PM_Inbox_empty' => 'Dein Posteingang ist leer',
-
-'PM_Subject' => 'Betreff',
-'PM_Sender' => 'Absender',
-'PM_Sent' => 'Gesendet',
-'PM_Received' => 'Empfangen',
-'PM_Recipient' => 'Empfänger',
-'PM_question_Delete' => 'Nachricht löschen?',
-'PM_confirm_Delete' => 'Nachricht wird gelöscht, sicher?',
-'PM_unread' => 'ungelesen',
-'PM_ReplySubject' => 'Aw:',
-'PM_ReplyMessageHeader' => 'Am {0} schrieb {1}:',
-'PM_WritePM' => 'Nachricht verfassen',
-//'PM_Messaging' => 'Nachrichten',
+'PM_Inbox'				=> 'Posteingang',
+'PM_Outbox'				=> 'Postausgang',
+'PM_Write'				=> 'Verfassen',
+'PM_Outbox_Items'		=> '{0, plural,'.
+							'zero	{Your Outbox is empty!},'.
+							'one	{One message:},'.
+							'other	{# messages:} }',
+'PM_Outbox_empty'		=> 'Dein Postausgang ist leer',
+'PM_Inbox_Items' 		=> '{0, plural,'.
+							'zero	{Your Inbox is empty!},'.
+							'one	{One message:},'.
+							'other	{# messages:} }',
+'PM_Inbox_empty' 		=> 'Dein Posteingang ist leer',
+'PM_Subject'			=> 'Betreff',
+'PM_Sender'				=> 'Absender',
+'PM_Sent'				=> 'Gesendet',
+'PM_Received'			=> 'Empfangen',
+'PM_Recipient'			=> 'Empfänger',
+'PM_question_Delete'	=> 'Nachricht löschen?',
+'PM_confirm_Delete'		=> 'Nachricht wird gelöscht, sicher?',
+'PM_unread'				=> 'ungelesen',
+'PM_ReplySubject'		=> 'Aw:',
+'PM_ReplyMessageHeader'	=> 'Am {0} schrieb {1}:',
+'PM_WritePM'			=> 'Nachricht verfassen',
 
 // using php strftime
 'Month_Calendar' => '{0,date,custom,%B %Y}',
@@ -79,22 +107,28 @@ return array(
 'UserMenu_PMOutbox' => 'Postausgang',
 'UserMenu_PMWrite' => 'Verfassen',
 'UserMenu_Authoring' => 'Authoring',
+	'Authoring_Finished' => '{0, plural,'.
+		'other	{Abgeschlossen (#)}}',
+	'Authoring_Unfinished' => '{0, plural,'.
+		'other	{In Arbeit (#)}}',
+	'Authoring_Drafts' => '{0, plural,'.
+		'other	{Entwürfe (#)}}',
 'UserMenu_MyLibrary' => 'My Library',
 	'Library_Favourites' => '{0, plural,'.
-		'other	{Favourites (#)}
+		'other	{Favoriten (#)}
 	}',
 	'AddFavourite'	=>	'Add favourite',
 	'Library_Bookmarks' => '{0, plural,'.
-		'other	{Bookmarks (#)}
+		'other	{Lesezeichen (#)}
 	}',
 	'AddBookmark'	=> 'Add bookmark',
 	'Library_Recommendations' => '{0, plural,'.
-		'other	{Recommendations (#)}
+		'other	{Empfehlungen (#)}
 	}',
-'UserMenu_Reviews' => 'Reviews',
+'UserMenu_Reviews' => 'Bewertungen',
 'UserMenu_Preferences' => 'Preferences',
 
-'UserMenu_AddStory' => 'Add Story',
+'UserMenu_AddStory' => 'Hinzufügen',
 'UserMenu_Curator' => 'Betreuer',
 
 // AdminCP Home elements
@@ -113,6 +147,10 @@ return array(
 'AdminMenu_Registration' => 'Registrierung',
 	'AdminMenu_AntiSpam'	=> 'Spam-Schutz',
 'AdminMenu_Security'	=> 'Sicherheit',
+'AdminMenu_Screening'	=> 'Screening',
+	'AdminMenu_BadBevaviour'	=> 'Grundeinstellungen',
+	'AdminMenu_BadBevaviour_Ext'	=> 'Erweiterte Einstellungen',
+	'AdminMenu_BadBevaviour_Rev'	=> 'Reverse Proxy',
 'AdminMenu_Layout' => 'Layout',
 'AdminMenu_Themes' => 'Themes',
 'AdminMenu_Icons' => 'Icons',
@@ -152,21 +190,32 @@ return array(
 'Shoutbox' => 'Shoutbox',
 
 // Story view'
+'Title' =>	'Titel',
+'Author' =>	'Autor',
+'Categories' =>	'Kategorien',
+'Characters' =>	'Charaktere',
+'Rating' =>	'Einstufung',
+'TagsInclude'	=>	'Tags miteinbeziehen',
+'TagsExclude'	=>	'Tags nicht miteinbeziehen',
+'Status' =>	'Status',
+'Reviews' =>	'Reviews',
+'Foreword' =>	'Vorwort',
+'Summary' =>	'Klappentext',
 'Stories' => 'Stories',
-'St_NewStories' => 'Neue Geschichten',
-'St_RandomStory' => 'Zufällige Geschichte',
-'St_RandomStories' => 'Zufällige Geschichten',
-'St_FeaturedStory' => 'Featured Story',
-'St_FeaturedStories' => 'Featured Stories',
+'NewStories' => 'Neue Geschichten',
+'RandomStory' => 'Zufällige Geschichte',
+'RandomStories' => 'Zufällige Geschichten',
+'FeaturedStory' => 'Empfohlene Geschichte',
+'FeaturedStories' => 'Empfohlene Geschichten',
 
 'St_BookmarkAdd'		=> 'Diese Geschichte hat kein Lesezeichen.
-Hier clicken um eines zu setzen.',
+Hier klicken um eines zu setzen.',
 'St_BookmarkRemove'		=> 'Diese Geschichte hat ein Lesezeichen.
-Hier clicken um es zu entfernen.',
+Hier klicken um es zu entfernen.',
 'St_FavouriteAdd'		=> 'Diese Geschichte gehört nicht zu den Favoriten.
-Hier clicken um hinzuzufügen.',
+Hier klicken um hinzuzufügen.',
 'St_FavouriteRemove'	=> 'Diese Geschichte gehört zu den Favoriten.
-Hier clicken um zu entfernen.',
+Hier klicken um zu entfernen.',
 
 'St_NoTags' => 'Keine Tags gesetzt',
 'St_Published' => 'Veröffentlicht',
@@ -178,7 +227,7 @@ Hier clicken um zu entfernen.',
 'St_Completed' => 'Abgeschlossen',
 'Characters' => 'Charaktere',
 'Author_Notes' => 'Anmerkungen des Autors',
-'Summary'	=> 'Zusammenfassung',
+'Summary'	=> 'Klappentext',
 
 'Review_Link' => '{0, plural,'.
 	'zero	{Noch keine ... schreibe die erste!},'.

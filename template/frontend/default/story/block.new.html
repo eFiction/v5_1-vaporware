@@ -1,6 +1,6 @@
-<h1>{{@LN__St_NewStories}}</h1>
+<h1>{{@LN__NewStories}}</h1>
 <repeat group="{{@renderData.data}}"  value="{{ @story }}" counter="{{ @ctr }}">
-	<h4><a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a></h4>
+	<h5><a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a></h5>
 	<check if="{{@renderData.size=='large'}}">
 		<true>
 			<div class="index-box">

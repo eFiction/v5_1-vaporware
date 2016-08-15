@@ -27,7 +27,6 @@ body {
 }
 
 .header {
-
 	margin: 0;
 	}
 
@@ -65,7 +64,7 @@ body {
 	}
 
 @media handheld, only screen and (max-width: 825px) {
-	.header_img {
+.header_img {
 	background-image: url(../images/logo.png);
 	background-repeat: no-repeat;
  	height: 0;
@@ -121,7 +120,7 @@ img {
 	text-align: center;
 }
 
-.spotlight, .sbarstats {
+.feature, .sbarstats {
 	margin: 10px 0;
 	padding: 10px;
 }

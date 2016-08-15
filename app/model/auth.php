@@ -108,6 +108,13 @@ class Auth extends Base {
 
 	public function registerCheckInput(&$register )
 	{
+		// check if registrar has agreed to the TOS
+		if ( !isset($register['accept']) )
+		{
+			// no further checks happening if not accepted
+			return [ 'accept' => 1 ];
+		}
+		
 		$this->configExt = $this->extendConfig();
 		/*
 		 	$register: registration form data
@@ -120,39 +127,72 @@ class Auth extends Base {
 		if(empty($register['login']) OR trim($register['login'])=="" )
 		{
 			$error['count']++;
-			$error['nologin'] = 1;
+			$error['login'] = "missing";
 		}
+		else
+		{
+			$sql = "SELECT U.uid,U.login,U.email FROM `tbl_users`U WHERE U.login LIKE :login";
+			$data = $this->exec( $sql, [ ":login" => $register['login'] ] );
+			if ( sizeof($data) == 1 )
+			{
+				$data = $data[0];
+				$error['count']++;
+				$error['login'] = "taken";
+			}
+		}
+		
 		if(empty($register['email']) OR trim($register['email'])=="" )
 		{
 			$error['count']++;
-			$error['noemail'] = 1;
+			$error['email'] = "missing";
 		}
-		
-		if ( $error['count']==0 )
+		else
 		{
-			// Check name and email against DB
-			$sql = "SELECT U.login,U.email FROM `tbl_users`U WHERE U.login LIKE :login OR U.email LIKE :email ;";
-			$data = $this->exec( $sql, [ ":login" => $register['login'], ":email" => $register['email'] ] );
-			/*
-			$this->DB->bindValue($lookup, "login", $register['login'], PDO::PARAM_STR);
-			$this->DB->bindValue($lookup, "email", $register['email'], PDO::PARAM_STR);
-			$this->DB->execute();*/
-			if ( sizeof($data) > 0 )
+			if ( isset($data['email']) AND $register['email'] == $data['email'] )
 			{
+				// email matches user lookup from above
 				$error['count']++;
-				$oldUser = $data[0];
-				if ( $oldUser['email'] == $register['email'] )
+				$error['login'] = "member";
+			}
+			else
+			{
+				$sql = "SELECT U.login,U.email FROM `tbl_users`U WHERE U.email LIKE :email";
+				$data = $this->exec( $sql, [ ":email" => $register['email'] ] );
+
+				if ( sizeof($data) == 1 )
 				{
-					$error['email'] = "__RegEmailTaken";
-					$register['email'] = "";
-				}
-				if ( $oldUser['login'] == $register['login'] )
-				{
-					$error['login'] = "__RegNameTaken";
-					$register['login'] = "";
+					$error['count']++;
+					$error['email'] = "taken";
 				}
 			}
+			
+		}
+		
+		/*
+			Password check
+		*/
+		$this->password_regex = '/^(?=^.{'.$this->configExt['reg_min_password'].',}$)(?:.*?(?>((?(1)(?!))[a-z]+)|((?(2)(?!))[A-Z]+)|((?(3)(?!))[0-9]+)|((?(4)(?!))[^a-zA-Z0-9\s]+))){'.$this->configExt['reg_password_complexity'].'}.*$/s';
+		
+		// Passwords match?
+		if( $register['password1'] == "" OR $register['password2'] == "" )
+		{
+			$error['count']++;
+			$error['password'] = "missing";
+		}
+		elseif ( $register['password1'] != $register['password2'] )
+		{
+			$error['count']++;
+			$error['password'] = "mismatch";
+		}
+		// Passwords meets the criteria required?
+		elseif ( preg_match( $this->password_regex, $register['password1'], $matches) != 1 )
+		{
+			$error['count']++;
+			$error['password'] = "criteria";
+		}
 
+		if ( $error['count']==0 )
+		{
 			// Check with SFS database
 			if ( $this->configExt['reg_sfs_usage'] == TRUE )
 			{
@@ -169,28 +209,7 @@ class Auth extends Base {
 					$this->regModeration = $check['reason'];
 				}
 				$error['sfsreason'] = $check['reason'];
-//				print_r($check);
 			}
-		}
-		
-		$this->password_regex = '/^(?=^.{'.$this->configExt['reg_min_password'].',}$)(?:.*?(?>((?(1)(?!))[a-z]+)|((?(2)(?!))[A-Z]+)|((?(3)(?!))[0-9]+)|((?(4)(?!))[^a-zA-Z0-9\s]+))){'.$this->configExt['reg_password_complexity'].'}.*$/s';
-		
-		// Passwords match?
-		if ( $register['password1'] != $register['password2'] )
-		{
-			$error['count']++;
-			$error['password'] = "__RegPasswordMismatch";
-		}
-		elseif( $register['password1'] == "" )
-		{
-			$error['count']++;
-			$error['password'] = "__RegPasswordMissing";
-		}
-		// Passwords meets the criteria required?
-		elseif ( preg_match( $this->password_regex, $register['password1'], $matches) != 1 )
-		{
-			$error['count']++;
-			$error['password'] = "__RegPasswordCriteria";
 		}
 
 		// Check if fields have been filled
@@ -209,13 +228,29 @@ class Auth extends Base {
 		if ( $this->configExt['reg_sfs_check_mail'] 		== TRUE ) $url .= "&email=".$data['email'];
 		if ( $this->configExt['reg_sfs_check_ip'] 			== TRUE ) $url .= "&ip=".$data['ip'];
 		if ( $this->configExt['reg_sfs_check_username'] == TRUE ) $url .= "&username=".$data['login'];
+		
+		$context = stream_context_create( array(
+			'http'=>array(
+			'timeout' => 1.0
+			)
+		));
+		$handle=FALSE; $i=0;
 
-		if ($handle = fopen($url, "r"))
+		/*
+			Sometimes the api server may not respond on the first attempt (depends on webserver configuration)
+			So the timeout was set to one second and we will try up to 5 times
+		*/
+		
+		while( !$handle AND $i++ < 5 )
 		{
-			$sfs = unserialize(stream_get_contents($handle));
+			$handle = @fopen($url, 'r', false, $context);
+			if ( !$handle ) {
+			  $sfs['success'] = 0;
+			}
+			else {
+			  $sfs = unserialize(stream_get_contents($handle));
+			}
 		}
-		// Needs better error handling
-		else $sfs['success'] = 0;
 
 		if ( $sfs['success'] == 1 )
 		{

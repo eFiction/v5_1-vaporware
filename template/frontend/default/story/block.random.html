@@ -1,6 +1,6 @@
-<div class="spotlight">
-<h3><check if="{{sizeof(@renderData)>1}}"><true>{{@LN__St_RandomStories}}</true><false>{{@LN__St_RandomStory}}</false></check></h3>
+<div class="feature">
+<h3><check if="{{sizeof(@renderData)>1}}"><true>{{@LN__RandomStories}}</true><false>{{@LN__RandomStory}}</false></check></h3>
 <repeat group="{{@renderData}}"  value="{{ @story }}" counter="{{ @ctr }}">
-	<div class='spotlight'><a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a><br /> __by {{implode(', ',@story.authors)}}<br />__Rating: {RATING}<br />{SHORT}</div>
+	<div class='feature'><a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a> {{@LN__by}} {{implode(', ',@story.authors)}}<br />{{@LN__Rating}}: {RATING}<br />{SHORT}</div>
 </repeat>
 </div>

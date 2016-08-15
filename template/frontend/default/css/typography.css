@@ -91,10 +91,10 @@ h4 {
 	border-radius: 5px 5px 0 0;
 	}
 	
-	/* i.e. updated & recent stories */
+/* i.e. updated & recent stories */
 h5 {
 	font-size: 14pt;
-	font-weight: normal;
+	font-weight: 300;
 	font-style: normal;
 	text-align: left;
 	text-shadow: 0 1px 0 #fff;
@@ -102,7 +102,7 @@ h5 {
 	border-width: 0 0 1px 0;
 	border-style: solid;
 	border-color: #dcdcdc;
-	margin: 0;
+	margin: 20px 0 0 0;
 	padding: 0;
 	}
 	

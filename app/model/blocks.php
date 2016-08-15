@@ -120,4 +120,12 @@ class Blocks extends Base
 		}
 		return $menu;
 	}
+	
+	public function categories()
+	{
+		$data = $this->exec("SELECT C.cid as id, C.category as name, C.stats FROM `tbl_categories`C WHERE C.leveldown = 0");
+		if ( sizeof($data)==0 ) return NULL;
+		foreach( $data as &$dat ) $dat['stats'] = unserialize($dat['stats']);
+		return $data;
+	}
 }
