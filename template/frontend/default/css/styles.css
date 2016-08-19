@@ -52,7 +52,6 @@ body {
 	border-width: 0 1px;
 	border-style: dashed;
 	border-color: #dcdcdc;
-	text-align: justify;
 	}
 
 .header_img {
@@ -286,7 +285,7 @@ span.count {
 	float: right;
 	}
 
-/*-----------------  AUTHORS INDEX  -----------------*/
+/*-----------------  AUTHOR'S INDEX  -----------------*/
 
 .author-grid-wrapper {
 	background-color: #f4f4f4;
@@ -325,6 +324,12 @@ span.count {
 	margin: 1px;
 }
 
+/*----------------- CATEGORIES -----------------*/
+
+.category-description {
+	text-align: justify;
+}
+
 /*-----------------  DASHBOARD/FANDOMS  -----------------*/
 
 .groupings ul {	}
@@ -355,8 +360,8 @@ span.count {
 	padding: 5px;
 }
 #story-container {
-	background-color: #f4f4f4;
-	border: 1px solid #dcdcdc;	
+	background-color: transparent;
+	border: 0;	
 	-webkit-border-radius: 4px;
 	-moz-border-radius: 4px;
 	border-radius: 4px;
@@ -407,41 +412,7 @@ span.count {
 	margin: 5px;
 }
 	
-.story-groupings li {
-	list-style-type: none;
-	list-style-position: inside;
-	display: inline;
-	white-space: nowrap;
-}
-.story-groupings a {
-	background-color: #e5a50c;
-	-webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
-	padding: 2px 4px;
-	margin: 1px;
-  text-decoration: none;
-  color: #fafafa;
-}
-.story-groupings a:hover {
-	color: #1d5d81;
-}
-
-/*----------------- GROUPINGS / FANDOMS -----------------*/
-
-.grouping-main {
-	margin: 5px 0;
-	padding: 5px;
-	background-color: transparent;
-	border: 1px solid #dcdcdc;
-	-webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
-}
-.grouping-sub {
-	padding: 5px;
-}
-
+	
 /*-----------------  REVIEWS  -----------------*/
 .review
 {

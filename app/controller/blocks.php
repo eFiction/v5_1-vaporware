@@ -13,33 +13,80 @@ class Blocks extends Base
 
 	public function shoutbox(\Base $f3, $params)
 	{
-		//$this->model = \Model\Page::instance();
-		if ( $params['action'] == "load" )
+		$params = $this->parametric( $params[1] ); 
+		//print_r($params);exit;
+		if ( $params[0] == "load" )
 		{
-			$subs = explode(",",$params['sub']);
+			$subs = explode(",",$params[1]);
 			if ( isset($subs[1])  AND $subs[0]=="down" ) $offset = $subs[1] + \Base::instance()->get('CONFIG')['shoutbox_entries'];
 			elseif ( isset($subs[1])  AND $subs[0]=="up" )  $offset = max ( ($subs[1] - \Base::instance()->get('CONFIG')['shoutbox_entries']), 0);
 			else $offset = 0;
 			
 			$data = $this->model->shoutboxLines($offset);
 			$tpl = \View\Blocks::shoutboxLines($data);
-			echo json_encode ( array ( $tpl, "", $offset, 0 ) );
+			$this->buffer( array ( $tpl, "", $offset, 0 ) , "BODY", TRUE );
 		}
-		if ( $params['action'] == "form" )
+		elseif ( $params[0] == "form" )
 		{
 			if($_SESSION['userID']!=0 || \Base::instance()->get('CONFIG')['shoutbox_guest'] )
-			//if( \Base::instance()->get('CONFIG')['shoutbox_guest'] )
 			{
 				$form = \View\Blocks::shoutboxForm();
-				echo json_encode ( array ( "", $form, 0, 0 ) );
+				$this->buffer( array ( "", $form, 0, 0 ) , "BODY", TRUE );
 			}
 			else
 			{
 				// Denied
-				echo json_encode ( array ( "", "Denied", 0, 0 ) );
+				$this->buffer( array ( "", "Denied", 0, 0 ) , "BODY", TRUE );
 			}
 		}
-		exit;		
+		elseif ( $params[0] == "shout" )
+		{
+			/*
+				note: even on error notes, the function has to return a non-FALSE value
+				otherwise, the jQuery counterpart will assume a technical error
+			*/
+			
+			if($_SESSION['userID']!=0 || \Base::instance()->get('CONFIG')['shoutbox_guest'] )
+			{
+				// un-serialize the javascript serialized form data
+				parse_str($f3->get('POST.data'),$data);
+				/*
+					$data = array
+					(
+						@name
+						@message
+						@captcha
+					)
+				*/
+
+				if($_SESSION['userID'])
+				{
+					if ( 1 == $this->model->addShout($data, TRUE) )
+					// tell the shoutbox to reload and go to top
+						$this->buffer( array ( "", "", 0, 1 ) , "BODY", TRUE );
+					// Drop error
+					else
+						$this->buffer( array ( "", "__saveError", 0, 2 ) , "BODY", TRUE );
+				}
+				else
+				{
+					if ( empty($_SESSION['captcha']) OR !password_verify(strtoupper($data['captcha']),$_SESSION['captcha']) )
+					{
+						// Drop error
+						$this->buffer( array ( "", "__badCaptcha", 0, 2 ) , "BODY", TRUE );
+					}
+					else
+					{
+						if ( 1 == $this->model->addShout($data) )
+						// tell the shoutbox to reload and go to top
+							$this->buffer( array ( "", "", 0, 1 ) , "BODY", TRUE );
+						// Drop error
+						else
+							$this->buffer( array ( "", "__saveError", 0, 2 ) , "BODY", TRUE );
+					}
+				}
+			}
+		}
 	}
 
 	public function calendar(\Base $f3, $params) {

@@ -42,7 +42,7 @@ class Base extends \Prefab {
 	protected function parametric($params=NULL)
 	{
 		$r = [];
-		if ( $pArray = explode(";", str_replace("/",";",$params) ) )
+		if ( $pArray = explode(";", str_replace(["/","&"],";",$params) ) )
 		{
 			foreach ( $pArray as $pKey => $pElement )
 			{
@@ -51,7 +51,6 @@ class Base extends \Prefab {
 				{
 					$r[$x[0]] = explode(",",$x[1]);
 					if ( sizeof($r[$x[0]])==1 ) $r[$x[0]] = $x[1];
-					//$r[$pKey] = $r[$x[0]];
 				}
 				else
 				{

@@ -37,11 +37,16 @@ class Auth extends Base
 	
 	public static function captchaF3()
 	{
-		//$i = 1;
 		$img = new \Image();
 		$img->captcha('template/captchaFonts/Browning.ttf',16,5,'SESSION.captcha');
-		//touch($_SESSION['captcha']."-".microtime().".cap");
+		$_SESSION['captcha'] = password_hash($_SESSION['captcha'], PASSWORD_DEFAULT);
+
+		ob_start();
 		$img->render();
+		$image_data = ob_get_contents();
+		ob_end_clean();
+
+		echo base64_encode($image_data);
 	}
 	
 	public static function captchaEfiction()
@@ -60,7 +65,7 @@ class Auth extends Base
 		shuffle ( $cnum );
 		$cnum = array_slice( $cnum, 0, 5);
 		
-		$_SESSION['captcha'] = implode("", $cnum);
+		$_SESSION['captcha'] = password_hash(implode("", $cnum), PASSWORD_DEFAULT);
 
 		//The directory where your fonts reside
 		$folder=dir("template/captchaFonts/");
@@ -97,14 +102,23 @@ class Auth extends Base
 			imagettftext($image, mt_rand(20, 24), $angle,  $x, $y, $colori, $fontList[$fnt], $char);
 		}
 
-		header("Expires: Tue, 11 Jun 1985 05:00:00 GMT");  
-		header("Last-Modified: " . gmdate("D, d M Y H:i:s") . " GMT");  
+		/*
+		$ts = gmdate("D, d M Y H:i:s") . " GMT";
+		header("Expires: $ts");
+		header("Last-Modified: $ts");
+		header("Pragma: no-cache");
 		header("Cache-Control: no-store, no-cache, must-revalidate");  
-		header("Cache-Control: post-check=0, pre-check=0", false);
 		header("Pragma: no-cache");
 		header('Content-type: image/png');
+*/
+		ob_start();
 		imagepng($image);
+		$image_data = ob_get_contents();
+		ob_end_clean();
+
 		imagedestroy($image);
+		
+		echo base64_encode($image_data);
 	}
 
 	

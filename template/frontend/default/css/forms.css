@@ -40,7 +40,7 @@ select {
     font-family: 'Open Sans', sans-serif;
 }
 
-select.search {
+select.search, select.chap-change {
     width: 25%;
 }
 
@@ -56,12 +56,14 @@ input[type=button], .button {
 }
 
 .button {
-    margin: 4px 2px;
+    max-width: 60%;
+    margin: 0 auto;
     padding: 6px 12px;
     background-color: #2e2e2e;
     border: none;
-    color: white;
+    color: white !important;
     text-decoration: none;
+    text-align: center;
 	  cursor: pointer;
     font-family: 'Open Sans', sans-serif;
 }

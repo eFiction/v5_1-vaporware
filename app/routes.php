@@ -32,11 +32,12 @@ $f3->route( 'GET /shoutbox/@action/@sub', 'Controller\Blocks->shoutbox' );
 
 
 $f3->route( 
-		[ 'GET /captcha', 'GET /captcha/*' ],
+		[ 'GET|POST /captcha [ajax]', 'GET|POST /captcha/* [ajax]' ],
 		'Controller\Auth->captcha' );
 
 // Ajax routes
 $f3->route( 'GET /blocks/calendar/* [ajax]', 'Controller\Blocks->calendar' );
+$f3->route( 'POST /shoutbox/* [ajax]', 'Controller\Blocks->shoutbox' );
 $f3->route( 'POST /story/ajax/@segment [ajax]', 'Controller\Story->ajax' );
 
 if (\Controller\Auth::isLoggedIn($f3))

@@ -307,7 +307,7 @@ class AdminCP_Archive extends AdminCP
 			$data = $this->model->loadCategory((int)$params['delete']);
 			if ( isset($data['category']) )
 			{
-				$data['stats'] = unserialize($data['stats']);
+				$data['stats'] = json_decode($data['stats'],TRUE);
 
 				if ( $data['stats']['sub']===NULL AND $data['stats']['count']==0 )
 				{
@@ -338,7 +338,7 @@ class AdminCP_Archive extends AdminCP
 				$data['move'] = array_merge([ [ "cid" => $parent['id'], "parent_cid" => $parent['parent_cid'], "leveldown" => $parent['leveldown']-1, "category" => $parent['category']." (one level up)" ] ], $data['move'] );
 			}
 			$data['move'] = array_merge([ [ "cid" => 0, "parent_cid" => 0, "leveldown" => -1, "category" => "__Category_MainCategory"] ], $data['move'] );
-			$data['stats'] = unserialize($data['stats']);
+			$data['stats'] = json_decode($data['stats'],TRUE);
 			$data['errors'] = @$errors;
 			$data['changes'] = @$changes;
 			$this->buffer( \View\AdminCP::editCategory($data) );

@@ -53,7 +53,7 @@ class AdminCP_Home extends AdminCP
 
 		if ($versions)
 		{
-			$version = @unserialize($versions)['efiction5'];
+			$version = @json_decode($versions,TRUE)['efiction5'];
 			if ( @$version['dev'] ) $compare['dev'] = version_compare ( $version['dev'], $compare['base'] );
 			if ( @$version['stable'] ) $compare['stable'] = version_compare ( $version['stable'], $compare['base'] );
 		}

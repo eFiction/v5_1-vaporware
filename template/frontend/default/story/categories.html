@@ -11,13 +11,13 @@
 			<true><h3><a href="{{@BASE}}/story/categories/{{@element.cid}}">{{@element.category}}</a></h3></true>
 			<false><h3>{{@element.category}}</h3></false>
 		</check>
-		{{@element.description | raw}}<br />
-		<check if="{{@element.stats.count}}"><a href="{{@BASE}}/story/browse/category={{@element.cid}}">{{ @LN__BrowseStories, @element.stats.count | format }}</a><br /></check>
+		<div class="category-description">{{@element.description | raw}}</div><br />
+		<check if="{{@element.stats.count}}"><div class="button"><a href="{{@BASE}}/story/browse/category={{@element.cid}}">{{ @LN__BrowseStories, @element.stats.count | format }}</a></div><br /></check>
 		<check if="{{ sizeof(@element.stats.sub)}}">
-			<repeat group="{{ @leftover = array_splice(@element['stats']['sub'],0,3) }}" key="{{@name}}" value="{{ @count }}" counter="{{@line}}">
+			<repeat group="{{ array_splice(@element['stats']['sub'],0,4) }}" key="{{@name}}" value="{{ @count }}" counter="{{@line}}">
 				{ICON:folder} {{@name}} [{{ @count }}]<br />
 			</repeat>
-			<check if="{{ sizeof(@leftover) }}">and {{ sizeof(@leftover) }} more subs</check>
+			<check if="{{ sizeof(@element.stats.sub) }}">and {{ sizeof(@element.stats.sub) }} more subs</check>
 		</check>
 	</div>
 

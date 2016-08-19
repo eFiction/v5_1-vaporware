@@ -2,8 +2,8 @@
 	<true>
 	</true>
 	<false>
-		<a href="{{@BASE}}/userCP/library/bookmark/edit/id=ST,{{@data.story.sid}};returnpath={{@PATH}}"<check if="{{isset(@data.story.is_favourite.1)}}"><true> title="{{@LN__St_BookmarkRemove}}">{ICON:bookmark}</true><false> title="{{@LN__St_BookmarkAdd}}">{ICON:bookmark-off}</false></check></a>&nbsp;
-		<a href="{{@BASE}}/userCP/library/favourite/edit/id=ST,{{@data.story.sid}};returnpath={{@PATH}}"<check if="{{@@data.story.is_favourite.0>0}}"><true> title="{{@LN__St_FavouriteRemove}}">{ICON:favourite}</true><false> title="{{@LN__St_FavouriteAdd}}">{ICON:favourite-off}</false></check></a>&nbsp;
+		<a href="{{@BASE}}/userCP/library/bookmark/edit/id=ST,{{@data.story.sid}};returnpath={{@PATH}}"<check if="{{isset(@data.story.is_favourite.1)}}"><true> title="{{@LN__BookmarkRemove}}">{ICON:bookmark}</true><false> title="{{@LN__BookmarkAdd}}">{ICON:bookmark-off}</false></check></a>&nbsp;
+		<a href="{{@BASE}}/userCP/library/favourite/edit/id=ST,{{@data.story.sid}};returnpath={{@PATH}}"<check if="{{@@data.story.is_favourite.0>0}}"><true> title="{{@LN__FavouriteRemove}}">{ICON:favourite}</true><false> title="{{@LN__FavouriteAdd}}">{ICON:favourite-off}</false></check></a>&nbsp;
 	</false>
 </check>
 <span class="fa fa-print"></span>&nbsp;

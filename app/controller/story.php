@@ -269,32 +269,44 @@ class Story extends Base
 		elseif ( $select[1] == "new" )
 		{
 			$items = (isset($select[2]) AND is_numeric($select[2])) ? $select[2] : 5;
-			$data['data'] = $this->model->blockNewStories($items);
-			$data['size'] = isset($select[3]) ? $select[3] : 'large';
+			$data = $this->model->blockNewStories($items);
+			$size = isset($select[3]) ? $select[3] : 'large';
 			
-			return \View\Story::blockNewStories($data);
+			return \View\Story::blockStory("new", $data, $size);
 		}
 		elseif ( $select[1] == "random" )
 		{
 			$items = (isset($select[2]) AND is_numeric($select[2])) ? $select[2] : 1;
 			$data = $this->model->blockRandomStory($items);
 			
-			return \View\Story::blockRandomStory($data);
+			return \View\Story::blockStory("random", $data);
 		}
 		elseif ( $select[1] == "featured" )
 		{
+			/*
+				$items: 0 = all featured stories
+				$order: "random" or NULL
+			*/
 			$items = (isset($select[2]) AND is_numeric($select[2])) ? $select[2] : 1;
 			$order = isset($select[3]) ? $select[3] : FALSE;
 			$data = $this->model->blockFeaturedStory($items,$order);
 			
-			return \View\Story::blockFeaturedStory($data);
+			return \View\Story::blockStory("featured", $data);
 		}
 		elseif ( $select[1] == "recommend" )
 		{
 			// break if module not enabled
-			if ( empty(\Config::instance()->optional_modules['recommendation']) ) return NULL;
+			if ( empty(\Config::instance()->modules_enabled['recommendations']) ) return NULL;
+			/*
+				$items: 0 = all featured stories
+				$order: "random" or NULL
+			*/
+			$items = (isset($select[2]) AND is_numeric($select[2])) ? $select[2] : 1;
+			$order = isset($select[3]) ? $select[3] : FALSE;
 			
-			return "**recommend**";
+			$data = $this->model->blockRecommendedStory($items,$order);
+			
+			return \View\Story::blockStory("recommended", $data);
 		}
 		elseif ( $select[1] == "tagcloud" )
 		{

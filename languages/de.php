@@ -9,6 +9,8 @@ return array(
 'Yes'		=>	'Ja',
 'no'		=>	'nein',
 'No'		=>	'Nein',
+'Cancel'	=>	'Abbrechen',
+'Submit'	=>	'Absenden',
 
 // Login
 'Login'			=> 'Anmelden',
@@ -92,13 +94,14 @@ return array(
 'UserField_Type5'	=> 'Custom Code',	// _FIELDCUSTOM
 'UserField_Type6'	=> 'Text',			// _TEXT
 
-
-
-
-
-
-
-
+'Author'	=> 'Author',
+'Authors'	=> 'Authors',
+'Recomm'	=> 'Recommendation',
+'Recomms'	=> 'Recommendations',
+'RecommBy'	=> 'Empfohlen von',
+'Series'	=> 'Serie',
+'Story'		=> 'Geschichte',
+'Stories'	=> 'Geschichten',
 
 // UserCP elements
 'UserMenu_Profile' => 'Profil',
@@ -192,6 +195,10 @@ return array(
 // Story view'
 'Title' =>	'Titel',
 'Author' =>	'Autor',
+'AuthorCounted' => '{0, plural,'.
+	'one	{Author},'.
+	'other	{Authors}
+}',
 'Categories' =>	'Kategorien',
 'Characters' =>	'Charaktere',
 'Rating' =>	'Einstufung',
@@ -202,32 +209,38 @@ return array(
 'Foreword' =>	'Vorwort',
 'Summary' =>	'Klappentext',
 'Tags' =>	'Tags',
-'by' => 'by',
-'Stories' => 'Stories',
+'by' => 'von',
+'Stories' => 'Geschichten',
 'NewStories' => 'Neue Geschichten',
-'RandomStory' => 'Zufällige Geschichte',
-'RandomStories' => 'Zufällige Geschichten',
-'FeaturedStory' => 'Empfohlene Geschichte',
-'FeaturedStories' => 'Empfohlene Geschichten',
+'RandomStory' => '{0, plural,'.
+	'one	{Zufällige Geschichte},'.
+	'other	{Zufällige Geschichten} }',
+'FeaturedStory' => '{0, plural,'.
+	'one	{Empfohlene Geschichte},'.
+	'other	{Empfohlene Geschichten} }',
+'RecommendedStory'	=> '{0, plural,'.
+	'one	{Externe Empfehlung},'.
+	'other	{Externe Empfehlungen} }',
 
-'St_BookmarkAdd'		=> 'Diese Geschichte hat kein Lesezeichen.
+'BookmarkAdd'		=> 'Diese Geschichte hat kein Lesezeichen.
 Hier klicken um eines zu setzen.',
-'St_BookmarkRemove'		=> 'Diese Geschichte hat ein Lesezeichen.
+'BookmarkRemove'		=> 'Diese Geschichte hat ein Lesezeichen.
 Hier klicken um es zu entfernen.',
-'St_FavouriteAdd'		=> 'Diese Geschichte gehört nicht zu den Favoriten.
+'FavouriteAdd'		=> 'Diese Geschichte gehört nicht zu den Favoriten.
 Hier klicken um hinzuzufügen.',
-'St_FavouriteRemove'	=> 'Diese Geschichte gehört zu den Favoriten.
+'FavouriteRemove'	=> 'Diese Geschichte gehört zu den Favoriten.
 Hier klicken um zu entfernen.',
 
-'St_NoTags' => 'Keine Tags gesetzt',
-'St_Published' => 'Veröffentlicht',
-'St_Updated'	=> 'Zuletzt überarbeitet',
-'St_Chapters' => 'Kapitel',
-'St_Words' => 'Wörter',
-'St_Status' => 'Status',
-'St_WIP' => 'Work in progress',
-'St_Completed' => 'Abgeschlossen',
+'TOC'	=> 'Inhaltsverzeichnis',
+'NoTags' => 'Keine Tags gesetzt',
+'Published' => 'Veröffentlicht',
+'Updated'	=> 'Zuletzt überarbeitet',
+'Chapters' => 'Kapitel',
+'Words' => 'Wörter',
+'WIP' => 'Work in progress',
+'Completed' => 'Abgeschlossen',
 'Characters' => 'Charaktere',
+'Clicks' => 'Klicks',
 'Author_Notes' => 'Anmerkungen des Autors',
 'BrowseStories' => '{0, plural,'.
 	'one	{Eine Geschichte anzeigen},'.

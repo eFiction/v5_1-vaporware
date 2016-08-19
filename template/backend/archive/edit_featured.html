@@ -1,10 +1,10 @@
-<h1>__A_TagGroups:</h1>
+<h3>{{@LN__FeaturedStories}}:</h1>
 <form action="{{@BASE}}/adminCP/archive/featured/sid={{ @data['sid'] }}" method="post">
 	<div class="grid-wrapper">
 		<check if="{{ @data['errors'] }}"><div class="gb-90 alert-box error">{{ @data['errors'] }}</div></check>
 		<check if="{{ @data['changes'] }}"><div class="gb-90 alert-box success">__StatusUpdated</div></check>
 		<div class="gb-20">__Story_Title</div><div class="gb-80">{{ @data['title'] }}</div>
-		<div class="gb-20">__StoryBy</div><div class="gb-80"><repeat group="{{ @data['authorblock'] }}" value="{{ @author }}" counter="{{ @count }}"><check if="{{@count >1}}">, </check>{{ @author.1 }}</repeat></div>
+		<div class="gb-20">__StoryBy</div><div class="gb-80"><repeat group="{{ @data['cache_authors'] }}" value="{{ @author }}" counter="{{ @count }}"><check if="{{@count >1}}">, </check>{{ @author.1 }}</repeat></div>
 		<check if="{{ @data.status == NULL AND @data.start == NULL }}">
 			<true><div class="gb-90 alert-box warning">__No featured data yet</div></true>
 			<false><div class="gb-20">__Changedby:</div><div class="gb-80">{{ @data['nickname'] }}&nbsp;</div></false>

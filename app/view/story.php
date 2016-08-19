@@ -33,13 +33,17 @@ class Story extends Base
 										$item['number']		= isset($item['inorder']) ? "{$item['inorder']}&nbsp;" : "";
 		if (isset($item['wordcount'])) 	$item['wordcount']	= number_format($item['wordcount'], 0, '','.');
 		if (isset($item['count'])) 		$item['count']		= number_format($item['count'], 0, '','.');
-										$item['authors'] 	= $item['authorblock'] = unserialize($item['authorblock']);
 
-		array_walk($item['authors'], function (&$v, $k){ $v = $v[1];} );
+		if (isset($item['cache_authors']))
+		{
+												$item['authors'] 	= $item['cache_authors'] = json_decode($item['cache_authors'],TRUE);
+												array_walk($item['authors'], function (&$v, $k){ $v = $v[1];} );
+		}
 
-		if (isset($item['categoryblock'])) 	$item['categoryblock']	= unserialize($item['categoryblock']);
-		if (isset($item['tagblock'])) 		$item['tagblock']		= unserialize($item['tagblock']);
-		if (isset($item['characterblock'])) $item['characterblock']	= unserialize($item['characterblock']);
+		if (isset($item['cache_categories'])) 	$item['cache_categories']	= json_decode($item['cache_categories'],TRUE);
+		if (isset($item['cache_rating'])) 		$item['cache_rating']		= json_decode($item['cache_rating'],TRUE);
+		if (isset($item['cache_tags'])) 		$item['cache_tags']			= json_decode($item['cache_tags'],TRUE);
+		if (isset($item['cache_characters'])) 	$item['cache_characters']	= json_decode($item['cache_characters'],TRUE);
 	}
 
 	public static function buildTOC($tocData, $storyData)
@@ -57,9 +61,9 @@ class Story extends Base
 	
 	public static function buildInfoblock($storyData)
 	{
-		$storyData['categoryblock'] = unserialize($storyData['categoryblock']);
-		$storyData['tagblock'] = unserialize($storyData['tagblock']);
-		$storyData['characterblock'] = unserialize($storyData['characterblock']);
+		$storyData['cache_categories'] = json_decode($storyData['cache_categories'],TRUE);
+		$storyData['cache_tags'] = json_decode($storyData['cache_tags'],TRUE);
+		$storyData['cache_characters'] = json_decode($storyData['cache_characters'],TRUE);
 
 		\Base::instance()->set('storyData', $storyData);
 
@@ -94,7 +98,7 @@ class Story extends Base
 		\Registry::get('VIEW')->javascript('body', TRUE, 'chapter.js' );
 		\Registry::get('VIEW')->javascript('body', FALSE, "var url='".\Base::instance()->get('BASE')."/story/read/{$storyData['sid']},'" );
 
-		$storyData['authorblock'] = unserialize($storyData['authorblock']);
+		$storyData['cache_authors'] = json_decode($storyData['cache_authors'],TRUE);
 		$storyData['published'] = date( \Config::instance()->date_format_short, $storyData['published']);
 		$storyData['modified'] = date( \Config::instance()->date_format_short, $storyData['modified']);
 		
@@ -116,12 +120,12 @@ class Story extends Base
 	public static function dropdown($data,$chapter)
 	{
 		$i=1;
-		if(sizeof($data) > 1) $dropDown[] = array ( FALSE, "toc", FALSE, "__TOC" );
+		if(sizeof($data) > 1) $dropDown[] = array ( FALSE, "toc", FALSE, \Base::instance()->get("LN__TOC") );
 		foreach ( $data as $item )
 		{
 			$dropDown[] = array ( ($chapter==$item['chapter']), $item['chapter'], $i++, $item['title']);
 		}
-		$dropDown[] = array ( ($chapter==="reviews"), "reviews", FALSE, "__Reviews" );
+		$dropDown[] = array ( ($chapter==="reviews"), "reviews", FALSE, \Base::instance()->get("LN__Reviews") );
 		return $dropDown;
 	}
 	
@@ -239,31 +243,21 @@ class Story extends Base
 		return parent::render('story/block.stats.html');
 	}
 	
-	public static function blockNewStories($stories)
+	public static function blockStory($type, $stories=[], $extra=NULL)
 	{
-		while ( list($key, $value) = each($stories['data']) )
-			Story::dataProcess($stories['data'][$key]);
+		$blocks = [ "recommended", "featured", "random", "new" ];
 
-		\Base::instance()->set('renderData', $stories);
-		return parent::render('story/block.new.html');
-	}
-	
-	public static function blockRandomStory($stories)
-	{
-		while ( list($key, ) = each($stories) )
-			Story::dataProcess($stories[$key]);
+		if ( in_array($type, $blocks) )
+		{
+			while ( list($key, ) = each($stories) )
+				Story::dataProcess($stories[$key]);
 
-		\Base::instance()->set('renderData', $stories);
-		return parent::render('story/block.random.html');
-	}
-	
-	public static function blockFeaturedStory($stories)
-	{
-		while ( list($key, ) = each($stories) )
-			Story::dataProcess($stories[$key]);
+			\Base::instance()->set('renderData', $stories);
+			\Base::instance()->set('extra', $extra);
 
-		\Base::instance()->set('renderData', $stories);
-		return parent::render('story/block.featured.html');
+			return parent::render("story/block.{$type}.html");
+		}
+		else return NULL;
 	}
 	
 	public static function blockTagcloud($taglist)

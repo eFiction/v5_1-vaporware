@@ -8,13 +8,14 @@
 </repeat>
 </check>
 <check if="{{isset(@shoutboxMember)}}">
+{*<div id="captchaBox">Inhalt</div> *}
 			<div id="sBoxEmoticons">%emoticons%</div>
-				<check if="{{ @form1['uid']==0 }}"><div class="field"><span class="fa fa-user icon"></span><input type="text" name="name" placeholder="your name" value="{NAME}"></div></check>
-				<div class="field"><span class="fa fa-keyboard-o icon"></span><textarea id="shout" rows="10" cols="29" name="message" placeholder="__yourTextHere">{MESSAGE}</textarea></div>
+{*				<div class="field">{ICON:member}<input type="text" name="name" placeholder="your name" value="{NAME}"></div> *}
+			<div class="field">{ICON:keyboard}<textarea id="shout" rows="10" cols="29" name="message" placeholder="__yourTextHere"></textarea></div>
 </check>
 <check if="{{isset(@shoutboxGuest)}}">
-			<img id="captcha" src="{{@BASE}}?ajax=blocks&amp;shoutbox=captcha" alt="CAPTCHA Image" /><br>
-			<input type="text" name="captcha" placeholder="captcha"><br>
-			<input type="hidden" name="name" value="{NAME}">
-			<input type="hidden" name="message" value="{MESSAGE}">
+			<div class="field">{ICON:member}<input type="text" name="name" placeholder="your name" value=""></div>
+			<div class="field">{ICON:keyboard}<textarea id="shout" rows="10" cols="29" name="message" placeholder="__yourTextHere"></textarea></div>
+			<div id="captchaBox">&nbsp;</div>
+			<div class="field"><input type="text" name="captcha" placeholder="captcha"></div>
 </check>

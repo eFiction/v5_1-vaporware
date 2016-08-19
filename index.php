@@ -33,7 +33,7 @@
  **/
 
 /** initialize the framework **/
-$f3 = require('lib/base.php');
+$f3 = @require('lib/f3/base.php');
 
 /** define the current version of eFiction **/
 $f3->set('APP_VERSION', '5.0.0-dev.0');
@@ -43,7 +43,44 @@ $f3->set('APP_VERSION', '5.0.0-dev.0');
 
 ini_set('display_errors', 1);
 error_reporting(1);
-error_reporting(defined('E_STRICT') ? E_ALL | E_STRICT : E_ALL );
+error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED );
+
+
+function exception_error_handler($errno, $errstr, $errfile, $errline ) {
+        $severity =
+            1 * E_ERROR |
+            0 * E_WARNING |
+            0 * E_PARSE |
+            0 * E_NOTICE |
+            0 * E_CORE_ERROR |
+            0 * E_CORE_WARNING |
+            0 * E_COMPILE_ERROR |
+            0 * E_COMPILE_WARNING |
+            0 * E_USER_ERROR |
+            0 * E_USER_WARNING |
+            0 * E_USER_NOTICE |
+            0 * E_STRICT |
+            0 * E_RECOVERABLE_ERROR |
+            0 * E_DEPRECATED |
+            0 * E_USER_DEPRECATED;
+        $ex = new ErrorException($errstr, 0, $errno, $errfile, $errline);
+        if (($ex->getSeverity() & $severity) != 0) {
+            //critical Error, revert to f3s error handler
+            restore_error_handler();
+        }
+        else
+        {
+            $f3=Base::instance();
+            // Only show non Critical Errors if the DEBUG Variable is higher than 0
+            if($f3->get('DEBUG')>0)
+            {
+                //echo $errstr."<br>";
+            }   
+        }
+    }
+	
+set_error_handler('exception_error_handler');
+	
 
 /** load the core config file **/
 $f3->config('data/config.ini');
@@ -61,7 +98,7 @@ $f3->set('CONFIG', $cfg);
 
 /** We have DB and Config, let's check for bad ppl **/
 if ( TRUE === $cfg->bb2_enabled )
-	require('bad-behaviour.php');
+	require('app/bad-behaviour-efiction5.php');
 
 /** Load routes **/
 require('app/routes.php');

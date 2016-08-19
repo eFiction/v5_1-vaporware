@@ -248,7 +248,7 @@ class Auth extends Base {
 			  $sfs['success'] = 0;
 			}
 			else {
-			  $sfs = unserialize(stream_get_contents($handle));
+			  $sfs = json_decode(stream_get_contents($handle));
 			}
 		}
 

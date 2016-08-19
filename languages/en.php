@@ -9,6 +9,8 @@ return array(
 'Yes'		=>	'Yes',
 'no'		=>	'no',
 'No'		=>	'No',
+'Cancel'	=>	'Cancel',
+'Submit'	=>	'Submit',
 
 // Login related
 'Login'			=> 'Login',
@@ -96,6 +98,7 @@ return array(
 'Authors'	=> 'Authors',
 'Recomm'	=> 'Recommendation',
 'Recomms'	=> 'Recommendations',
+'RecommBy'	=> 'Recommended by',
 'Series'	=> 'Series',
 'Story'		=> 'Story',
 'Stories'	=> 'Stories',
@@ -192,6 +195,10 @@ return array(
 // Story view'
 'Title' =>	'Title',
 'Author' =>	'Author',
+'AuthorCounted' => '{0, plural,'.
+	'one	{Author},'.
+	'other	{Authors}
+}',
 'Categories' =>	'Categories',
 'Characters' =>	'Characters',
 'Rating' =>	'Rating',
@@ -205,29 +212,35 @@ return array(
 'by' => 'by',
 'Stories'				=> 'Stories',
 'NewStories'			=> 'New Stories',
-'RandomStory'		=> 'Random Story',
-'RandomStories'		=> 'Random Stories',
-'FeaturedStory'		=> 'Featured Story',
-'FeaturedStories'	=> 'Featured Stories',
+'RandomStory' => '{0, plural,'.
+	'one	{Random Story},'.
+	'other	{Random Stories} }',
+'FeaturedStory' => '{0, plural,'.
+	'one	{Featured Story},'.
+	'other	{Featured Stories} }',
+'RecommendedStory'	=> '{0, plural,'.
+	'one	{Recommended Story},'.
+	'other	{Recommended Stories} }',
 
-'St_BookmarkAdd'		=> 'This story has no bookmark.
+'BookmarkAdd'		=> 'This story has no bookmark.
 Click here to add one now.',
-'St_BookmarkRemove'		=> 'This story has a bookmark.
+'BookmarkRemove'		=> 'This story has a bookmark.
 Click here to remove it.',
-'St_FavouriteAdd'		=> 'This story is not a favourite.
+'FavouriteAdd'		=> 'This story is not a favourite.
 Click here to set.',
-'St_FavouriteRemove'	=> 'This story is a favourite.
+'FavouriteRemove'	=> 'This story is a favourite.
 Click here to unset.',
 
-'St_NoTags' => 'No tags defined',
-'St_Published' => 'Published',
-'St_Updated'	=> 'Last update',
-'St_Chapters' => 'Chapters',
-'St_Words' => 'Words',
-'St_Status' => 'Status',
-'St_WIP' => 'Work in progress',
-'St_Completed' => 'Completed',
+'TOC'	=> 'Table of content',
+'NoTags' => 'No tags defined',
+'Published' => 'Published',
+'Updated'	=> 'Last update',
+'Chapters' => 'Chapters',
+'Words' => 'Words',
+'WIP' => 'Work in progress',
+'Completed' => 'Completed',
 'Characters' => 'Characters',
+'Clicks' => 'Clicks',
 'Author_Notes' => 'Author notes',
 'BrowseStories' => '{0, plural,'.
 	'one	{Browse # story},'.

@@ -35,14 +35,14 @@ class Routines extends Base {
 				{
 					$sub_categories = explode("||", $item['sub_categories']);
 					$sub_stats = explode("||", $item['sub_stats']);
-					$sub_stats = array_map("unserialize", $sub_stats);
+					$sub_stats = array_map("json_decode", $sub_stats);
 					foreach( $sub_categories as $key => $value )
 					{
-						$item['counted'] += $sub_stats[$key]['count'];
-						$sub[$value] = $sub_stats[$key]['count'];
+						$item['counted'] += $sub_stats[$key]->count;
+						$sub[$value] = $sub_stats[$key]->count;
 					}
 				}
-				$stats = serialize([ "count" => (int)$item['counted'], "cid" => $item['cid'], "sub" => $sub ]);
+				$stats = json_encode([ "count" => (int)$item['counted'], "cid" => $item['cid'], "sub" => $sub ]);
 				unset($sub);
 				
 				$categories->load(array('cid=?',$item['cid']));

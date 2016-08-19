@@ -26,7 +26,7 @@ http://bad-behavior.ioerror.us/
 ###############################################################################
 ###############################################################################
 
-define('BB2_CWD', dirname(__FILE__));
+define('BB2_CWD', realpath( dirname(__FILE__) . "/../lib/" ) );
 
 // Bad Behavior callback functions.
 
@@ -42,10 +42,9 @@ function bb2_db_affected_rows() {
 	return false;
 }
 
-// Escape a string for database usage
+// No need to escape strings, we use PDO
 function bb2_db_escape($string) {
-	//return mysql_real_escape_string($string);
-	return $string;	// No-op when database not in use.
+	return $string;
 }
 
 // Return the number of rows in a particular query.
@@ -76,7 +75,6 @@ function bb2_db_rows($result) {
 }
 
 // Create the SQL query for inserting a record in the database.
-// See example for MySQL elsewhere.
 function bb2_insert($settings, $package, $key)
 {
 	if (!$settings['logging']) return "";
@@ -114,12 +112,13 @@ function bb2_insert($settings, $package, $key)
 
 // Return emergency contact email address.
 function bb2_email() {
-	return "example@example.com";	// You need to change this.
+	global $cfg;
+	return $cfg->page_mail;
 }
 
 // retrieve whitelist
 function bb2_read_whitelist() {
-	return parse_ini_file(dirname(BB2_CORE) . "/data/bb-whitelist.ini");
+	return parse_ini_file(dirname(BB2_CORE) . "/bb-whitelist.ini");
 }
 
 // retrieve settings from database
@@ -131,6 +130,7 @@ function bb2_read_settings() {
 }
 
 // write settings to database
+// this happens in the eFi5 Admin Panel
 function bb2_write_settings($bb_settings) {
 	return false;
 }
@@ -138,8 +138,6 @@ function bb2_write_settings($bb_settings) {
 // Our log table structure
 function bb2_table_structure($name)
 {
-	// It's not paranoia if they really are out to get you.
-	//$name_escaped = bb2_db_escape($name);
 	$sql = "CREATE TABLE IF NOT EXISTS :name (
 		`id` INT(11) NOT NULL auto_increment,
 		`ip` TEXT NOT NULL,
@@ -166,14 +164,10 @@ function bb2_install() {
 	return false;
 }
 
-// Screener
-// Insert this into the <head> section of your HTML through a template call
-// or whatever is appropriate. This is optional we'll fall back to cookies
-// if you don't use it.
+// This will put the bb2 screener into the f3 hive key for javascript
 function bb2_insert_head() {
 	global $bb2_javascript;
 	$f3->set('bb2_javascript', $bb2_javascript);
-	//echo $bb2_javascript;
 	return TRUE;
 }
 
@@ -190,11 +184,8 @@ function bb2_insert_stats($force = false) {
 }
 
 // Return the top-level relative path of wherever we are (for cookies)
-// You should provide in $url the top-level URL for your site.
 function bb2_relative_path() {
-	//$url = parse_url(get_bloginfo('url'));
-	//return $url['path'] . '/';
-	return '/';
+	return \Base::instance()->get('BASE').'/';
 }
 
 // Calls inward to Bad Behavor itself.
@@ -203,7 +194,7 @@ require_once(BB2_CWD . "/bad-behavior/core.inc.php");
 $bb_db = $f3->get('DB');
 $bb_settings = bb2_read_settings();
 
-bb2_install();	// FIXME: see above
+bb2_install();
 
 bb2_start($bb_settings);
 

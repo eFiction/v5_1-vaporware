@@ -130,7 +130,12 @@ class AdminCP extends Base {
 							$mapper->{$key[0]}[$key[1]] = $value;
 						}
 						else
-							$mapper->{$key[0]} = $value;
+						{
+							if ( NULL === $c = json_decode( $value ,TRUE ) )
+								$mapper->{$key[0]} = $value;
+							else
+								$mapper->{$key[0]} = $c;
+						}
 					}
 					$affected++;	
 				}
@@ -377,7 +382,7 @@ class AdminCP extends Base {
 		
 		foreach ( $data as $item )
 		{
-			$item['stats'] = unserialize($item['stats']);
+			$item['stats'] = json_decode($item['stats'],TRUE);
 			$temp[$item['parent_cid']][] = $item;
 			if ( isset($temp[$item['cid']]) ) $temp[$item['parent_cid']] = array_merge ( $temp[$item['parent_cid']], $temp[$item['cid']]);
 		}
@@ -559,7 +564,7 @@ class AdminCP extends Base {
 		$delete = new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
 		$delete->load( ["cid = ?", $cid ] );
 		if ( 1 != $delete->count( ["cid = ?", $cid ] ) ) return FALSE;
-		$stats = unserialize( $delete->stats );
+		$stats = json_decode( $delete->stats, TRUE );
 		if ( $stats['sub']===NULL AND $stats['count']==0 )
 		{
 			$parent = $delete->parent_cid;
@@ -759,10 +764,9 @@ class AdminCP extends Base {
 				(
 					"%JOIN%",
 					$join,
-					"SELECT SQL_CALC_FOUND_ROWS S.title, S.sid, S.summary, Cache.authorblock, Cache.rating
+					"SELECT SQL_CALC_FOUND_ROWS S.title, S.sid, S.summary, S.cache_authors, S.cache_rating
 						FROM `tbl_stories`S
 						INNER JOIN `tbl_stories_featured`F ON ( F.sid = S.sid AND %JOIN% )
-						INNER JOIN `tbl_stories_blockcache`Cache ON ( S.sid = Cache.sid  )
 					ORDER BY {$sort['order']} {$sort['direction']}
 					LIMIT ".(max(0,$pos*$limit)).",".$limit
 				);
@@ -781,16 +785,15 @@ class AdminCP extends Base {
 //	public function loadFeatured ( int $sid )
 	public function loadFeatured ( $sid )
 	{
-		$sql = "SELECT SQL_CALC_FOUND_ROWS S.title, S.sid, S.summary, F.status, F.start, F.end, F.uid, U.nickname, Cache.authorblock, Cache.rating
+		$sql = "SELECT SQL_CALC_FOUND_ROWS S.title, S.sid, S.summary, F.status, F.start, F.end, F.uid, U.nickname, S.cache_authors, S.cache_rating
 					FROM `tbl_stories`S
 						LEFT JOIN `tbl_stories_featured`F ON ( F.sid = S.sid )
 						LEFT JOIN `tbl_users`U ON ( F.uid = U.uid )
-						INNER JOIN `tbl_stories_blockcache`Cache ON ( S.sid = Cache.sid  )
 				WHERE S.sid = :sid";
 		$data = $this->exec($sql, [":sid" => $sid ]);
 		if (sizeof($data)==1)
 		{
-			$data[0]['authorblock'] = unserialize($data[0]['authorblock']);
+			$data[0]['cache_authors'] = json_decode($data[0]['cache_authors'], TRUE);
 			return $data[0];
 		}
 		return NULL;
@@ -828,9 +831,8 @@ class AdminCP extends Base {
 	{
 		$data = $this->exec
 		(
-			"SELECT S.*, Cache.*, COUNT(DISTINCT Ch.chapid) as chapters
+			"SELECT S.*, COUNT(DISTINCT Ch.chapid) as chapters
 				FROM `tbl_stories`S
-					INNER JOIN `tbl_stories_blockcache`Cache ON ( S.sid = Cache.sid )
 					LEFT JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid)
 				WHERE S.sid = :sid",
 			[":sid" => $sid ]
@@ -846,15 +848,15 @@ class AdminCP extends Base {
 	
 	public function storyEditPrePop(array $storyData)
 	{
-		$categories = unserialize($storyData['categoryblock']);
+		$categories = json_decode($storyData['cache_categories']);
 		foreach ( $categories as $tmp ) $pre['cat'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
 		$pre['cat'] = json_encode($pre['cat']);
 
-		$tags = unserialize($storyData['tagblock']);
+		$tags = json_decode($storyData['cache_tags']);
 		foreach ( $tags as $tmp ) $pre['tag'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
 		$pre['tag'] = json_encode($pre['tag']);
 
-		$characters = unserialize($storyData['characterblock']);
+		$characters = json_decode($storyData['cache_characters']);
 		foreach ( $characters as $tmp ) $pre['char'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
 		$pre['char'] = json_encode($pre['char']);
 		
@@ -1213,8 +1215,8 @@ class AdminCP extends Base {
 		foreach ( $data as $dat )
 			$config[$dat['name']] = $dat['value'];
 
-		$config['language_available'] = unserialize($config['language_available']);
-		if ( $config['language_available'] === FALSE ) $config['language_available'] = [];
+		$config['language_available'] = json_decode($config['language_available'], TRUE);
+		if ( !is_array($config['language_available']) ) $config['language_available'] = [];
 
 		return $config;
 	}
@@ -1232,7 +1234,7 @@ class AdminCP extends Base {
 		
 		$post["settings_language_file"] =
 			[
-				"language_available" 	=> serialize($available),
+				"language_available" 	=> json_encode($available),
 				"language_default"		=> $default,
 			];
 			
@@ -1250,8 +1252,8 @@ class AdminCP extends Base {
 		foreach ( $data as $dat )
 			$config[$dat['name']] = $dat['value'];
 
-		$config['layout_available'] = @unserialize($config['layout_available']);
-		if ( $config['layout_available'] === FALSE ) $config['layout_available'] = [];
+		$config['layout_available'] = @json_decode($config['layout_available']);
+		if ( !is_array($config['layout_available']) ) $config['layout_available'] = [];
 
 		return $config;
 	}
@@ -1269,7 +1271,7 @@ class AdminCP extends Base {
 		
 		$post["settings_layout_file"] =
 			[
-				"layout_available" 	=> serialize($available),
+				"layout_available" 	=> json_encode($available),
 				"layout_default"	=> $default,
 			];
 			

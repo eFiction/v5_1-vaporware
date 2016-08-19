@@ -96,9 +96,9 @@ class Story extends Base
 		if ( isset($terms['chapters']) )
 		{
 			if ( $terms['chapters'] == "multichapters" )
-				$where[] = "AND Cache.chapters > 1";
+				$where[] = "AND S.chapters > 1";
 			elseif ( $terms['chapters'] == "oneshot" )
-				$where[] = "AND Cache.chapters = 1";
+				$where[] = "AND S.chapters = 1";
 
 		}
 		if ( isset($terms['story_title']) )
@@ -149,6 +149,19 @@ class Story extends Base
 			"/story/search/".$return,
 			$limit
 		);
+
+		if ( sizeof($data)>0 )
+		{
+			foreach ( $data as &$dat)
+			{
+				$favs = $this->cleanResult($dat['is_favourite']);
+				$dat['is_favourite'] = [];
+				if(!empty($favs))
+				foreach ( $favs as $value )
+					if ( isset($value[1]) ) $dat['is_favourite'][$value[0]] = $value[1];
+			}
+		}
+
 		
 		return $data;
 	}
@@ -246,6 +259,12 @@ class Story extends Base
 		];
 
 		$data = $this->exec($this->storySQL($replacements), [ ":sid" => $story, ":chapter" => $chapter ]);
+		
+		if ( !@in_array($story, @$_SESSION['viewed']) )
+		{
+			$this->exec("UPDATE `tbl_stories` SET count = count + 1 WHERE sid = :sid", [ ":sid" => $story ] );
+			$_SESSION['viewed'][] = $story;
+		}
 
 		if ( sizeof($data)==1 )
 		{
@@ -268,14 +287,13 @@ class Story extends Base
 	public function storySQL($replacements=[])
 	{
 		$sql_StoryConstruct = "SELECT SQL_CALC_FOUND_ROWS
-				Cache.*,
-				S.title, S.summary, S.storynotes, S.completed, S.wordcount, UNIX_TIMESTAMP(S.date) as published, UNIX_TIMESTAMP(S.updated) as modified, 
+				S.sid, S.title, S.summary, S.storynotes, S.completed, S.wordcount, UNIX_TIMESTAMP(S.date) as published, UNIX_TIMESTAMP(S.updated) as modified, 
 				S.count,GROUP_CONCAT(rSC.chalid) as contests,GROUP_CONCAT(Ser.seriesid,',',rSS.inorder,',',Ser.title ORDER BY Ser.title DESC SEPARATOR '||') as in_series @EXTRA@,
 				GROUP_CONCAT(Fav.bookmark,',',Fav.fid SEPARATOR '||') as is_favourite,
-				Ra.rating as rating_name, Edit.uid as can_edit
+				Ra.rating as rating_name, Edit.uid as can_edit,
+				S.cache_authors, S.cache_tags, S.cache_characters, S.cache_categories, S.cache_rating, S.chapters, S.reviews
 			FROM `tbl_stories`S
 				@JOIN@
-			LEFT JOIN `tbl_stories_blockcache`Cache ON ( S.sid = Cache.sid )
 			LEFT JOIN `tbl_contest_relation`rSC ON ( rSC.relid = S.sid AND rSC.type = 'story' )
 			LEFT JOIN `tbl_series_stories`rSS ON ( rSS.sid = S.sid )
 				LEFT JOIN `tbl_series`Ser ON ( Ser.seriesid=rSS.seriesid )
@@ -316,7 +334,7 @@ class Story extends Base
 		$data['elements'] = $this->exec($sql);
 		if ( sizeof($data) )
 		{
-			foreach ( $data['elements'] as &$entry ) $entry['stats'] = unserialize($entry['stats']);
+			foreach ( $data['elements'] as &$entry ) $entry['stats'] = json_decode($entry['stats'],TRUE);
 		}
 		else return FALSE;
 		
@@ -331,7 +349,7 @@ class Story extends Base
 			if ( sizeof($parent)==1 )
 			{
 				$data['parent'] = $parent[0];
-				$data['parent']['stats'] = unserialize($data['parent']['stats']);
+				$data['parent']['stats'] = json_decode($data['parent']['stats'],TRUE);
 			}
 			else return FALSE;
 			
@@ -453,9 +471,8 @@ class Story extends Base
 	public function blockNewStories($items)
 	{
 		return $this->exec('SELECT S.sid, S.title, S.summary, 
-											Cache.*
+											S.cache_authors
 										FROM `tbl_stories`S
-											INNER JOIN `tbl_stories_blockcache`Cache ON ( S.sid = Cache.sid )
 										WHERE (datediff(S.updated,S.date) = 0)
 										ORDER BY S.updated DESC
 										LIMIT 0,'.(int)$items);
@@ -463,9 +480,8 @@ class Story extends Base
 	
 	public function blockRandomStory($items=1)
 	{
-		return $this->exec('SELECT S.title, S.sid, S.summary, Cache.authorblock, Cache.rating
+		return $this->exec('SELECT S.title, S.sid, S.summary, S.cache_authors, S.cache_rating, S.cache_categories
 				FROM `tbl_stories`S
-					INNER JOIN `tbl_stories_blockcache`Cache ON ( S.sid = Cache.sid  )
 			ORDER BY RAND() 
 			LIMIT '.(int)$items);
 	}
@@ -479,16 +495,27 @@ class Story extends Base
 			LIMIT 0, '.(int)$items);
 	}
 	
+	public function blockRecommendedStory($items=1, $order=FALSE)
+	{
+		$limit = ($items) ? "LIMIT 0,".$items : "";
+		$sort = ( $order == "random" ) ? 'RAND()' : 'Rec.date DESC';
+		
+		return $this->exec("SELECT Rec.recid, Rec.title, Rec.summary, Rec.author, Rec.url, Rec.cache_categories, Rec.cache_rating,
+					U.uid, U.nickname
+						FROM `tbl_recommendations`Rec
+							LEFT JOIN `tbl_users`U ON ( Rec.uid = U.uid)
+						ORDER BY {$sort} {$limit}");
+	}
+
 	public function blockFeaturedStory($items=1, $order=FALSE)
 	{
-		if ( $order == "random" ) $sort = 'RAND()';
-		else $sort = 'S.featured DESC';
-		return $this->exec("SELECT S.title, S.sid, S.summary, Cache.authorblock, Cache.rating
+		$limit = ($items) ? "LIMIT 0,".$items : "";
+		$sort = ( $order == "random" ) ? 'RAND()' : 'S.featured DESC';
+
+		return $this->exec("SELECT S.title, S.sid, S.summary, S.cache_authors, S.cache_rating, S.cache_categories
 				FROM `tbl_stories`S
 					INNER JOIN `tbl_stories_featured`F ON ( F.sid = S.sid AND F.status=1 OR ( F.status IS NULL AND F.start < NOW() AND F.end > NOW() ))
-					INNER JOIN `tbl_stories_blockcache`Cache ON ( S.sid = Cache.sid  )
-			ORDER BY {$sort} 
-			LIMIT 0,".$items);
+			ORDER BY {$sort} {$limit}");
 		// 1 = aktuell, 2, ehemals
 		//return $this
 	}

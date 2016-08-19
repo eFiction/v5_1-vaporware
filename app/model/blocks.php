@@ -3,8 +3,6 @@ namespace Model;
 
 class Blocks extends Base
 {
-    //protected $db = 'DB';
-	
 	public function shoutboxLines($offset)
 	{
 		$shoutSQL = "SELECT B.id, B.uid, IF(B.uid=0,B.guest_name,U.nickname) as name, B.message, UNIX_TIMESTAMP(B.date) as date
@@ -14,6 +12,20 @@ class Blocks extends Base
 								LIMIT :offset,5" ;
 
 		return $this->exec($shoutSQL,[ ":offset" => $offset]);
+	}
+	
+	public function addShout($data, $member=FALSE)
+	{
+		$sql = "INSERT INTO `tbl_shoutbox`
+					(`uid`, `guest_name`, `message`, `date`) VALUES 
+					(:uid, :guest_name, :message, CURRENT_TIMESTAMP)";
+		$bind =
+		[
+			":uid"			=> ( $member ) ? $_SESSION['userID'] : 0,
+			":guest_name"	=> ( $member ) ? NULL : $data['name'],
+			":message"		=> $data['message'],
+		];
+		return $this->exec($sql, $bind);
 	}
 
 	function ajaxCalendar($params)
@@ -125,7 +137,7 @@ class Blocks extends Base
 	{
 		$data = $this->exec("SELECT C.cid as id, C.category as name, C.stats FROM `tbl_categories`C WHERE C.leveldown = 0");
 		if ( sizeof($data)==0 ) return NULL;
-		foreach( $data as &$dat ) $dat['stats'] = unserialize($dat['stats']);
+		foreach( $data as &$dat ) $dat['stats'] = json_decode($dat['stats'], TRUE);
 		return $data;
 	}
 }

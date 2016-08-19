@@ -251,7 +251,7 @@ class UserCP extends Base
 		if ( sizeof($data)==1 )
 		{
 			if ( isset($data[0]['authorblock']) )
-				$data[0]['authorblock'] = unserialize($data[0]['authorblock']);
+				$data[0]['authorblock'] = json_decode($data[0]['authorblock'],TRUE);
 
 			return $data[0];
 		}
@@ -291,14 +291,12 @@ class UserCP extends Base
 						FROM `tbl_users`U 
 						{$join} JOIN `tbl_user_favourites`Fav ON ( U.uid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='AU' AND Fav.bookmark = :bookmark ) ",
 			"ST"
-				=>	"SELECT SQL_CALC_FOUND_ROWS 'ST' as type, S.sid as id, S.title as name, Cache.authorblock, Fav.comments, Fav.visibility, Fav.notify, Fav.fid
+				=>	"SELECT SQL_CALC_FOUND_ROWS 'ST' as type, S.sid as id, S.title as name, S.cache_authors as authorblock, Fav.comments, Fav.visibility, Fav.notify, Fav.fid
 						FROM `tbl_stories`S 
-						INNER JOIN `tbl_stories_blockcache`Cache ON ( S.sid = Cache.sid )
 						{$join} JOIN `tbl_user_favourites`Fav ON ( S.sid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='ST' AND Fav.bookmark = :bookmark ) ",
 			"SE"
-				=>	"SELECT SQL_CALC_FOUND_ROWS 'SE' as type, Ser.seriesid as id, Ser.title as name, Cache.authorblock, Fav.comments, Fav.visibility, Fav.notify, Fav.fid
+				=>	"SELECT SQL_CALC_FOUND_ROWS 'SE' as type, Ser.seriesid as id, Ser.title as name, Ser.cache_authors, Fav.comments, Fav.visibility, Fav.notify, Fav.fid
 						FROM `tbl_series`Ser
-						INNER JOIN `tbl_series_blockcache`Cache ON ( Ser.seriesid = Cache.seriesid )
 						{$join} JOIN `tbl_user_favourites`Fav ON ( Ser.seriesid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='SE' AND Fav.bookmark = :bookmark ) ",
 		];
 		return $sql[$type];
