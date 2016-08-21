@@ -36,14 +36,10 @@ class UserCP extends Base
 
 	public static function msgRead($data)
 	{
-		return \Template::instance()->render
-														('usercp/messaging.read.html','text/html', 
-															[
-																"message"	=> $data,
-																"forward"		=> ($data['sender_id']==$_SESSION['userID']),
-																"BASE"		=> \Base::instance()->get('BASE')
-															]
-														);
+		\Base::instance()->set('message', $data);
+		\Base::instance()->set('forward',($data['sender_id']==$_SESSION['userID']) );
+		
+		return \Template::instance()->render('usercp/messaging.read.html');
 	}
 
 	public static function msgWrite($data)

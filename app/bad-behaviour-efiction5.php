@@ -197,6 +197,5 @@ $bb_settings = bb2_read_settings();
 bb2_install();
 
 bb2_start($bb_settings);
-
 // eFiction 5 specific
 bb2_insert_stats();

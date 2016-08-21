@@ -58,11 +58,16 @@ class Blocks extends Base
 						@captcha
 					)
 				*/
-
-				if($_SESSION['userID'])
+				if ( "" == $data['message'] = trim($data['message']) )
 				{
+					// Don't accept empty message
+					$this->buffer( array ( "", $f3->get('LN__MessageEmpty'), 0, 2 ) , "BODY", TRUE );
+				}
+				elseif($_SESSION['userID'])
+				{
+					// Attempt to save data
 					if ( 1 == $this->model->addShout($data, TRUE) )
-					// tell the shoutbox to reload and go to top
+						// tell the shoutbox to reload and go to top
 						$this->buffer( array ( "", "", 0, 1 ) , "BODY", TRUE );
 					// Drop error
 					else
@@ -73,13 +78,27 @@ class Blocks extends Base
 					if ( empty($_SESSION['captcha']) OR !password_verify(strtoupper($data['captcha']),$_SESSION['captcha']) )
 					{
 						// Drop error
-						$this->buffer( array ( "", "__badCaptcha", 0, 2 ) , "BODY", TRUE );
+						$this->buffer( array ( "", $f3->get('LN__CaptchaMismatch'), 0, 2 ) , "BODY", TRUE );
 					}
 					else
 					{
-						if ( 1 == $this->model->addShout($data) )
-						// tell the shoutbox to reload and go to top
+						// Don't accept empty guest name
+						if ( "" == $data['name'] = trim($data['name']) )
+						{
+							$this->buffer( array ( "", "__nameEmpty", 0, 2 ) , "BODY", TRUE );
+						}
+						elseif (preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i",$data['message']))
+						{
+							$this->buffer( array ( "", "__guestURL", 0, 2 ) , "BODY", TRUE );
+						}
+						// Attempt to save data
+						elseif ( 1 == $this->model->addShout($data) )
+						{
+							// destroy this session captcha
+							unset($_SESSION['captcha']);
+							// tell the shoutbox to reload and go to top
 							$this->buffer( array ( "", "", 0, 1 ) , "BODY", TRUE );
+						}
 						// Drop error
 						else
 							$this->buffer( array ( "", "__saveError", 0, 2 ) , "BODY", TRUE );

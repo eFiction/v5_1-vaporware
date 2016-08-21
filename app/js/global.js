@@ -19,3 +19,19 @@ $("#hideMessage").change( function(c){
 	}
 	document.cookie = 'skip_redirect_message=1'+expires+'; path=/'
 });
+
+// http://stackoverflow.com/questions/12264205/jquery-ajax-and-chrome-caching-issue
+function getCaptchaImage(){
+	$.ajax({
+		url: base + '/captcha',
+		method: "POST", 
+		data: { random: Date.now() },
+		cache: false,
+		success: function(response){
+			$('#captchaBox').html('<img src="data:image/png;base64,' + response + '" />');
+		},
+		error: function(response){
+			alert ("Ajax Error");
+		}
+	});
+}

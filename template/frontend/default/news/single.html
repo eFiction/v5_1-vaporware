@@ -1,0 +1,52 @@
+<h1>{{@LN__News_Box}}</h1>
+<check if="{{isset(@formError)}}"><div class="note alert-box-half error">{{ @LN__FormErrors, sizeof(@formError) | format }}:<br><repeat group="{{@formError}}" value="{{@error}}">{ICON:close} {{ ${'LN__'.@error} }}<br /></repeat></div></check>
+<div class="news-box">
+	<h2><a href='{{@BASE}}/news/id={{ @news.nid }}'>{{ @news.headline }}</a></h2>
+	<div class="news-dateauthor">{{@LN__News_writtenby}} <a href='{{@BASE}}/member/profile/{{ @news.uid }}'>{{ @news.nickname }}</a> @ {{ date(@CONFIG["date_format_long"], @news.timestamp) }} <check if="{{@canAdmin['home/news']}}"><a href="{{@BASE}}/adminCP/home/news/id={{@news.nid}}" target="_blank">{ICON:edit}</a></check></div>
+	{{ @news.newstext | raw}}
+</div>
+<span id="comments">
+<repeat group="{{ @news.comments }}" value="{{ @comment }}" counter="{{ @ctr }}">
+<div class="comment">
+	<check if="{{@comment.writer_uid}}">
+	<true>
+		<a href="{{@BASE}}/member/profile/{{@comment.writer_uid}}">{{@comment.comment_writer_name}}</a> <check if="{{@comment.writer_uid==$_SESSION['userID']}}">{ICON:edit}</check>
+	</true>
+	<false>
+		{{@comment.comment_writer_name}}
+	</false>
+	</check>
+	{{ date(@CONFIG["date_format_long"], @comment.timestamp) }} <br />
+	{{@comment.text|raw}}
+</div>
+</repeat>
+</span>
+<check if="{{isset(@formError)}}"><div class="note alert-box-half error">{{ @LN__FormErrors, sizeof(@formError) | format }}:<br><repeat group="{{@formError}}" value="{{@error}}">{ICON:close} {{ ${'LN__'.@error} }}<br /></repeat></div></check>
+<check if="{{@_SESSION['userID'] OR @CONFIG['allow_guest_comment_news']}}">
+	<true>
+		<fieldset>
+		<form class="write_review" method="post" action="{{@BASE}}/news/id={{@news.nid}}">
+			<check if="{{@_SESSION['userID']==0}}">
+				<true>
+					<legend>__guestComment:</legend>
+					<div class="field">{ICON:member} __yourName: <input type="text" name="comment[name]" placeholder="your name" value="{{@@POST.comment.name}}"></div>
+					<div class="field">{ICON:keyboard} __yourComment: <textarea id="shout" rows="10" cols="29" name="comment[text]" placeholder="__yourTextHere">{{@@POST.comment.text}}</textarea></div>
+					<div>{ICON:key}
+						<input type="text" name="comment[captcha]" class="half" placeholder="captcha" value=""><div id="captchaBox">&nbsp;</div>
+					</div>
+				</true>
+				<false>
+					<legend>__memberComment</legend>
+					<div>{ICON:member} {{@_SESSION['username']}}</div>
+					<div class="field textarea"><textarea class="message" name="comment[text]" placeholder="enter text here"></textarea></div>
+				</false>
+			</check>
+			<input class="button" value="__Submit" type="submit">
+		</form>
+		</fieldset>
+	</true>
+	<false>
+		No Guest
+	</false>
+</check>
+

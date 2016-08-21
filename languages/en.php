@@ -11,6 +11,16 @@ return array(
 'No'		=>	'No',
 'Cancel'	=>	'Cancel',
 'Submit'	=>	'Submit',
+'CaptchaMismatch'	=>	'Captcha did not match',
+'GuestURL'		=>	'Guests are not allowed to post URLs',
+'GuestNameEmpty' => 'Name field cannot be empty',
+'MessageEmpty'	=>	'No message entered',
+'CommentEmpty'	=>	'No comment entered',
+'CannotSave'	=>	'Could not save the data, please try again',
+'FormErrors'	=> '{0, plural,'.
+							'zero	{No errors},'.
+							'one	{There was an error while processing this form},'.
+							'other	{There were errors while processing this form} }',
 
 // Login related
 'Login'			=> 'Login',
@@ -268,6 +278,10 @@ Click here to unset.',
 'News_Box' => 'Archive News',
 'News_Archive' => 'News Archive',
 'News_writtenby' => 'written by',
+'CommentsC' => '{0, plural,'.
+	'zero	{No comments yet},'.
+	'one	{One comment},'.
+'other	{# comments} }',
 
 // Archiv Stats
 'AS_ArchiveStats' => 'Archive Stats',
@@ -285,6 +299,11 @@ Click here to unset.',
 	'zero	{No changes.},'.
 	'one	{One element changed.},'.
 	'other	{# elements changed.}
+}',
+'Status_Errors' => '{0, plural,'.
+	'zero	{No errors.},'.
+	'one	{An error occurred while saving data.},'.
+	'other	{# errors occurred while saving data.}
 }',
 );
 

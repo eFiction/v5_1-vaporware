@@ -11,6 +11,16 @@ return array(
 'No'		=>	'Nein',
 'Cancel'	=>	'Abbrechen',
 'Submit'	=>	'Absenden',
+'CaptchaMismatch'	=>	'Captcha stimmt nicht überein',
+'GuestURL'		=>	'Gäste dürfen keine URLs posten',
+'GuestNameEmpty' => 'Gäste müssen einen Namen angeben',
+'MessageEmpty'	=>	'Keine Nachricht eingegeben',
+'CommentEmpty'	=>	'Kein Kommentar eingegeben',
+'CannotSave'	=>	'Daten konnten nicht gespeichert werden, bitte erneut versuchen',
+'FormErrors'	=> '{0, plural,'.
+							'zero	{Keine Fehler},'.
+							'one	{Beim Verarbeiten des Formulars ist ein Fehler aufgetreten},'.
+							'other	{Beim Verarbeiten des Formulars sind Fehler aufgetreten} }',
 
 // Login
 'Login'			=> 'Anmelden',
@@ -268,6 +278,10 @@ Hier klicken um zu entfernen.',
 'News_Box' => 'Archiv News',
 'News_Archive' => 'Alle News lesen',
 'News_writtenby' => 'geschrieben von',
+'CommentsC' => '{0, plural,'.
+	'zero	{Noch keine Kommentare},'.
+	'one	{Ein Kommentar},'.
+'other	{# Kommentare} }',
 
 // Archiv Stats'
 'AS_ArchiveStats' => 'Archiv Statistiken',

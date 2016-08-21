@@ -10,32 +10,35 @@ $f3->route(
   'Controller\Redirect->filter' );
 
 $f3->route(
-  [ 
-	'GET /story',
-	'GET /story/@action',
-	'GET /story/@action/*',
-  ],
-  'Controller\Story->index' );
+  [ 'GET /story', 'GET /story/@action', 'GET /story/@action/*', ],
+	'Controller\Story->index' );
 $f3->route(
-  [ 'POST /story', 'POST /story/@action' , 'POST /story/@action/*' ], 'Controller\Story->save' );
-
+  [ 'POST /story', 'POST /story/@action' , 'POST /story/@action/*' ],
+	'Controller\Story->save' );
 $f3->route(
   [ 'GET /story/search', 'GET /story/search/*', 'POST /story/search',
 	'GET /story/browse', 'GET /story/browse/*', 'POST /story/browse' ],
-  'Controller\Story->search' );
+	'Controller\Story->search' );
 
 $f3->route(
   [ 'GET /authors', 'GET /authors/@id', 'GET /authors/@id/*' ],
-  'Controller\Authors->index' );
+	'Controller\Authors->index' );
+
+$f3->route(
+  [ 'GET|POST /news', 'GET /news/*' ],
+	'Controller\News->index' );
+$f3->route(
+  [ 'POST /news/*' ],
+	'Controller\News->save' );
 
 $f3->route( 'GET /shoutbox/@action/@sub', 'Controller\Blocks->shoutbox' );
 
 
+
+// Ajax routes
 $f3->route( 
 		[ 'GET|POST /captcha [ajax]', 'GET|POST /captcha/* [ajax]' ],
 		'Controller\Auth->captcha' );
-
-// Ajax routes
 $f3->route( 'GET /blocks/calendar/* [ajax]', 'Controller\Blocks->calendar' );
 $f3->route( 'POST /shoutbox/* [ajax]', 'Controller\Blocks->shoutbox' );
 $f3->route( 'POST /story/ajax/@segment [ajax]', 'Controller\Story->ajax' );

@@ -41,6 +41,16 @@ class Base extends \Prefab {
 		return $config;
 	}
 	
+	public function canAdmin($link)
+	{
+		if(NULL==\Base::instance()->get('canAdmin.'.$link))
+		{
+			if (empty($this->cAM)) $this->cAM = new \DB\SQL\Mapper($this->db,str_replace("tbl_", $this->prefix, 'tbl_menu_adminpanel'));
+			$this->cAM->load( array('link=?',$link) );
+			\Base::instance()->set('canAdmin.'.$link, ($this->cAM->requires & $_SESSION['groups']) );
+		}
+	}
+	
 	protected function prepare($id, $sql)
 	{
 		$this->sqlTmp[$id]['sql'] = $sql;

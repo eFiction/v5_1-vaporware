@@ -18,7 +18,7 @@ class Blocks extends Base
 
 	public static function shoutboxInit()
 	{
-		\Registry::get('VIEW')->javascript( 'head', TRUE, "shoutbox.js.php?base=".\Base::instance()->get('BASE') );
+		\Registry::get('VIEW')->javascript( 'head', TRUE, "shoutbox.js" );
 		return parent::render('blocks/shoutbox.html');
 	}
 

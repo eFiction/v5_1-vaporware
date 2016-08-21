@@ -24,7 +24,6 @@ $( document ).ready(function() {
 		{
 			if(sb_act=="submit")
 			{
-				//alert ( $('#sboxInput').serialize() ); //ajax_url = //$('#sboxInput').serialize()+'&ajax=blocks&shoutbox=save';
 				shoutbox_data ( 'shout', $('#sboxInput').serialize() );
 			}
 			else if(sb_act=="reset")
@@ -43,6 +42,7 @@ $( document ).ready(function() {
 				}
 				else
 				{
+					$('#sboxError').hide('slow');
 					$('#sboxInput').hide('slow');
 					$('#sboxForm').html("");
 				}
@@ -57,7 +57,7 @@ function shoutbox_data ( ajax_url, ajax_data )
 	$.ajax({
 		dataType: "json",
 		//async: false,
-		url: '<?php echo $_GET["base"]; ?>/shoutbox/' + ajax_url, 
+		url: base + '/shoutbox/' + ajax_url, 
 		method: "POST", 
 		cache: false, 
 		data: { random: Date.now(), data: ajax_data },
@@ -90,22 +90,6 @@ function shoutbox_data ( ajax_url, ajax_data )
 		error: function(  )
 		{
 			$( "#sboxLines" ).html( "Error!" );
-		}
-	});
-}
-
-// http://stackoverflow.com/questions/12264205/jquery-ajax-and-chrome-caching-issue
-function getCaptchaImage(){
-	$.ajax({
-		url: '<?php echo $_GET['base']; ?>/captcha',
-		method: "POST", 
-		data: { random: Date.now() },
-		cache: false,
-		success: function(response){
-			$('#captchaBox').html('<img src="data:image/png;base64,' + response + '" />');
-		},
-		error: function(response){
-			alert ("Ajax Error");
 		}
 	});
 }

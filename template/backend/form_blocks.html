@@ -1,9 +1,9 @@
 <form method="post" action="{{@BASE}}/adminCP/{{@form_target}}">
 	<check if="{{ @form_feedback.0 }}">
-	<div class="alert-box success">{{ @form_feedback.0 }} <check if="{{ @form_feedback.0==1 }}"><true>__Entry</true><false>__Entries</false></check> __SuccessfullySaved</div>
+		<div class="alert-box success">{{ @LN__Status_Changes, @form_feedback.0 | format }}</div>
 	</check>
 	<check if="{{ @form_feedback.1 }}">
-	<div class="alert-box error">{{ @form_feedback.1 }} <check if="{{ @form_feedback.1==1 }}"><true>__Error</true><false>__Errors</false></check> __SavingData.<br>__CheckData</div>
+		<div class="alert-box error">{{ @LN__Status_Errors, @form_feedback.0 | format }}.<br />__CheckData!</div>
 	</check>
 	
 	<repeat group="{{ @form_elements }}" key="{{@title }}" value="{{ @elements }}" counter="{{ @ctr }}">
@@ -15,7 +15,7 @@
 				<case value="{{ 'text' }}" break="{{ TRUE }}">
 				<!-- TEXT (not TEXTAREA) -->
 				<dd>
-					<input class="text-input" type="text" value="{{ @element.value }}" name="form_data[{{@elements.section}}][{{@element.name}}]" />
+					<input <check if="{{ @element.form_type.0!='' }}">class="half" </check>type="text" value="{{ @element.value }}" name="form_data[{{@elements.section}}][{{@element.name}}]" />
 				</dd>
 				<!-- END: TEXT -->
 				</case>
@@ -29,7 +29,7 @@
 				<case value="{{ 'select' }}" break="{{ TRUE }}">
 				<!-- SELECT -->
 				<dd>
-					<select name="form_data[{{@elements.section}}][{{@element.name}}]" size="1">
+					<select class="half" name="form_data[{{@elements.section}}][{{@element.name}}]" size="1">
 						<repeat group="{{ @element.form_type }}" value="{{ @option }}">
 							<option value="{{@option.1}}"<check if="{{ @element['value']==@option.1 }}"> selected="selected"</check>>{{ @option.0 }}</option>
 						</repeat>

@@ -43,9 +43,9 @@ $f3->set('APP_VERSION', '5.0.0-dev.0');
 
 ini_set('display_errors', 1);
 error_reporting(1);
-error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED );
+error_reporting(E_ALL);// & ~E_NOTICE & ~E_DEPRECATED );
 
-
+/*
 function exception_error_handler($errno, $errstr, $errfile, $errline ) {
         $severity =
             1 * E_ERROR |
@@ -80,7 +80,7 @@ function exception_error_handler($errno, $errstr, $errfile, $errline ) {
     }
 	
 set_error_handler('exception_error_handler');
-	
+	*/
 
 /** load the core config file **/
 $f3->config('data/config.ini');
@@ -97,7 +97,7 @@ else {
 $f3->set('CONFIG', $cfg);
 
 /** We have DB and Config, let's check for bad ppl **/
-if ( TRUE === $cfg->bb2_enabled )
+if ( TRUE == $cfg->bb2_enabled )
 	require('app/bad-behaviour-efiction5.php');
 
 /** Load routes **/

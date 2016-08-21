@@ -1,5 +1,5 @@
 {
-    "57b6c84bb16fc4.10921634": {
+    "57b9d4367a18b9.09710101": {
         "_name": "Font Awesome CSS Icons",
         "archive": "<span class=\"fa fa-university\"><\/span>",
         "arrow-down": "<span class=\"fa fa-arrow-down\"><\/span>",
@@ -10,6 +10,7 @@
         "bookmark": "<span class=\"fa fa-bookmark\"><\/span>",
         "bookmark-off": "<span class=\"fa fa-bookmark-o\"><\/span>",
         "check": "<span class=\"fa fa-check\"><\/span>",
+        "close": "<span class=\"fa fa-times\"><\/span>",
         "cloud": "<span class=\"fa fa-cloud\"><\/span>",
         "comment": "<span class=\"fa fa-comment-o\"><\/span>",
         "comments": "<span class=\"fa fa-comments-o\"><\/span>",

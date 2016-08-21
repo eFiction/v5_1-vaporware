@@ -26,7 +26,6 @@ abstract class Base {
 
 		\View\Base::javascript('body', TRUE, 'global.js' );
 		\View\Base::javascript('body', FALSE, "var base='{$f3->get('BASE')}'" );
-		//$this->css[] = "styles.css";
 	}
 	
 	public function javascript($location, $file=FALSE, $string)
