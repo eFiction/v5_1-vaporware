@@ -11,7 +11,7 @@
 		</div>
 		<check if="{{ @data.dropdown }}">
 			<div class="story-chapter">
-			<select class='chap-change' onchange="changeChapter();">
+			<select class='chap-change' id='chap_change' onchange="changeChapter();">
 				<repeat group="{{ @data.dropdown }}" value="{{ @item }}"><option <check if="{{ @item[0] }}">selected="selected" </check> value="{{ @item[1] }}"><check if="{{ @item[2] }}">{{ @item[2] }}) </check>{{ @item[3] }}</option></repeat>
 			</select>
 			</div>
@@ -28,7 +28,7 @@
 				<include href="story/reviews.html" with="story_reviews={{@data.story.reviewData}}" />
 			</check>
 			<check if="{{empty($no_review)}}">
-				<include href="main/feedback_form.html" with="element={{@data.story.chapid}},childof={{@data.story.sid}}" />
+				<include href="main/feedback_form.html" with="element={{@data.story.chapid}},childof={{@data.story.sid}},level=NULL" />
 			</check>
 		</div>
 	</div>

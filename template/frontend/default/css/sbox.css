@@ -8,7 +8,7 @@
 }
 #sBoxEmoticons {
 	background-color: #f4f4f4;
-	border: 1px dashed #dcdcdc;
+	border: 1px dashed #e6e6e6;
 	padding: 5px 2px;
 	margin: 10px 2px;
 }
@@ -24,11 +24,11 @@
 .sboxInfo a {
 	background: #f4f4f4;
 	color: #48779f;
-	border: 1px solid #dcdcdc;
+	border: 1px solid #e6e6e6;
 	padding: 4px 6px;
 	font-family: inherit;
-	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
 	border-radius: 4px;
 }
 .sboxInfo a:hover {
@@ -43,7 +43,6 @@
 }
 .sboxUser {
 	float: left;
-	color: #7bcac8;
 	padding: 0;
 	margin: 0 4px 0 0;
 }
@@ -56,23 +55,23 @@
 }
 .sboxMSG:nth-child(even) {
 	background-color: #f4f4f4;
-	border: 1px solid #dcdcdc;
+	border: 1px solid #e6e6e6;
 	margin: 1px;
 	padding: 3px;
 	font-size: 10pt;
 	min-height: 60px;
-	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
 	border-radius: 4px;
 }
 .sboxMSG:nth-child(odd) {
-	background-color: #ededed;
-	border: 1px solid #dcdcdc;
+	background-color: #fafafa;
+	border: 1px solid #e6e6e6;
 	margin: 1px;
 	padding: 3px;
 	font-size: 10pt;
 	min-height: 60px;
-	-moz-border-radius: 4px;
 	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
 	border-radius: 4px;
 }

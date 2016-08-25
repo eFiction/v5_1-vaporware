@@ -135,7 +135,7 @@ class Story extends Base
 		
 		$replacements =
 		[
-			"ORDER"	=> "ORDER BY date,updated ASC" ,
+			"ORDER"	=> "ORDER BY updated DESC" ,
 			"LIMIT" => "LIMIT ".(max(0,$pos*$limit)).",".$limit,
 			"JOIN"	=> isset($join) ? implode("\n",$join) : "",
 			"WHERE"	=> implode(" ", $where),
@@ -197,7 +197,7 @@ class Story extends Base
 		
 		$replacements =
 		[
-			"ORDER" => "ORDER BY date,updated ASC" ,
+			"ORDER" => "ORDER BY date,updated DESC" ,
 			"LIMIT" => "LIMIT ".(max(0,$pos*$limit)).",".$limit,
 			"WHERE" => "AND ( (".implode(" AND ",$filter_date).") OR (".implode(" AND ",$filter_updated).") )"
 		];
@@ -298,23 +298,28 @@ class Story extends Base
 			LEFT JOIN `tbl_series_stories`rSS ON ( rSS.sid = S.sid )
 				LEFT JOIN `tbl_series`Ser ON ( Ser.seriesid=rSS.seriesid )
 			LEFT JOIN `tbl_ratings`Ra ON ( Ra.rid = S.ratingid )
-			LEFT JOIN `tbl_users`Edit ON ( ".(int)$_SESSION['userID']." = Edit.uid OR ".(int)$_SESSION['userID']." = Edit.curator )
-			LEFT JOIN `tbl_user_favourites`Fav ON ( Fav.item = S.sid AND Fav. TYPE = 'ST' AND Fav.uid = ".(int)$_SESSION['userID'].")
+
+            LEFT JOIN `tbl_stories_authors`rSAE ON ( S.sid = rSAE.sid )
+				LEFT JOIN `tbl_users`Edit ON ( ".(int)$_SESSION['userID']." = rSAE.aid OR ( Edit.uid = rSAE.aid AND Edit.curator = ".(int)$_SESSION['userID']." ) )
+
+				LEFT JOIN `tbl_user_favourites`Fav ON ( Fav.item = S.sid AND Fav. TYPE = 'ST' AND Fav.uid = ".(int)$_SESSION['userID'].")
 			WHERE S.completed @COMPLETED@ 0 AND S.validated > 0 @WHERE@
 			GROUP BY S.sid
 			@ORDER@
 			@LIMIT@";
 			
+		// default replacements
 		$replace =
 		[
-			"@EXTRA@"			=> "",
-			"@JOIN@"				=> "",
+			"@EXTRA@"		=> "",
+			"@JOIN@"		=> "",
 			"@COMPLETED@"	=> ">=",
-			"@WHERE@"			=> "",
-			"@ORDER@"			=> "",
-			"@LIMIT@"			=> ""
+			"@WHERE@"		=> "",
+			"@ORDER@"		=> "",
+			"@LIMIT@"		=> ""
 		];
 		
+		// insert custom replacements
 		foreach ( $replacements as $key => $value )
 		{
 			$replace["@{$key}@"] = $value;
@@ -370,7 +375,14 @@ class Story extends Base
 		
 		return $data;
 	}
-	
+	/*
+	public function loadReviews($storyID,$chapter=NULL)
+	{
+		$sql = "";
+		
+		
+	}
+	*/
 	public function loadReviews($storyID,$chapter=NULL)
 	{
 		$limit=5;
@@ -406,7 +418,7 @@ class Story extends Base
 		else $flat = $this->exec( str_replace("@CHAPTER@", "", $sql), [':storyid' => $storyID] );
 		
 		if ( sizeof($flat) == 0 ) return FALSE;
-		
+
 		$current_id = 0;
 		foreach ( $flat as $item )
 		{
@@ -416,31 +428,38 @@ class Story extends Base
 				$current_id = $item['review_id'];
 				$data[] =
 				[
-					"level"	=> 1,
+					"level"	=>	1,
 					"sid"	=>	$item['review_storyid'],
-					"id"	=> $item['review_id'],
-					"text" => $item['review_text'],
-					"name" => $item['review_writer_name'],
-					"uid" =>	$item['review_writer_uid']
+					"id"	=>	$item['review_id'],
+					"text"	=>	$item['review_text'],
+					"name"	=>	$item['review_writer_name'],
+					"uid"	=>	$item['review_writer_uid']
 				];
 			}
-			// Check parent level and remember this node's level
-			if ( isset($depth[$item['parent_item']]) )
-				$depth[$item['comment_id']] = $depth[$item['parent_item']] + 1;
-			else
-				$depth[$item['comment_id']] = 2;
 			
+			// This item has comment data
+			if ( $item['comment_id'] != "" )
+			{
+				// Check parent level and remember this node's level
+				if ( isset($depth[$item['parent_item']]) )
+					$depth[$item['comment_id']] = $depth[$item['parent_item']] + 1;
+				else
+					$depth[$item['comment_id']] = 2;
+			}
+
+			// Add the comment to the data structure
 			if ( $item['comment_id'] != NULL )
 			$data[] =
 			[
-				"level"	=> min ($depth[$item['comment_id']], 3),
+				"level"	=>	min ($depth[$item['comment_id']], 3),
 				"sid"	=>	$item['review_storyid'],
-				"id"	=> $item['comment_id'],
-				"text" => $item['comment_text'],
-				"name" => $item['comment_writer_name'],
-				"uid" =>	$item['comment_writer_uid']
+				"id"	=>	$item['comment_id'],
+				"text"	=>	$item['comment_text'],
+				"name"	=>	$item['comment_writer_name'],
+				"uid"	=>	$item['comment_writer_uid']
 			];
 		}
+
 		return $data;
 	}
 	

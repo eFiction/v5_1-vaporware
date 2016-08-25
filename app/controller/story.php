@@ -19,8 +19,8 @@ class Story extends Base
 	public function index(\Base $f3, $params)
 	{
 		// remove, once commentform is moved to post ajax
-		if ( $f3->get('AJAX')===TRUE )
-			$this->ajax_old($f3, $params);
+		//if ( $f3->get('AJAX')===TRUE )
+//			$this->ajax_old($f3, $params);
 		/*
 		if ( empty($params['action']) )
 			$data = $this->intro($f3);
@@ -57,7 +57,7 @@ class Story extends Base
 	
 	public function ajax(\Base $f3, $params)
 	{
-		if ( isset($params['segment']) && $params['segment']=="search" )
+		if ( isset($params['segment']) AND $params['segment']=="search" )
 		{
 			$query = $f3->get('POST');
 			$item = NULL;
@@ -69,14 +69,24 @@ class Story extends Base
 
 			exit;
 		}
-		elseif ( isset($params['segment']) && $params['segment']=="review_comment_form" )
+		elseif ( isset($params['segment']) AND $params['segment']=="review_comment_form" )
 		{
+			// This is a comment to an element
 			$id = $f3->get('POST.childof');
-			$view = \View\Story::commentForm($id);
-			//echo json_encode(print_r($query,1));
-			echo $view;
+			$return = "";
+			
+			// Is there form data?
+			if ( isset($_POST['write']) )
+			{
+				$f3->set('formError.1', "CaptchaMismatch");
+				$return = $id;
+				//return TRUE;
+				
+				$view = "Kommentar geschrieben! ";
+			}
 
-			exit;
+			if(empty($view)) $view = \View\Story::commentForm($id);
+			$this->buffer( array ( "", $view, $return, ($_SESSION['userID']==0) ) , "BODY", TRUE );
 		}
 	}
 

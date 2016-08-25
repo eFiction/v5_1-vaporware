@@ -21,6 +21,7 @@ $("#hideMessage").change( function(c){
 });
 
 // http://stackoverflow.com/questions/12264205/jquery-ajax-and-chrome-caching-issue
+// heavily modified
 function getCaptchaImage(){
 	$.ajax({
 		url: base + '/captcha',
@@ -28,7 +29,8 @@ function getCaptchaImage(){
 		data: { random: Date.now() },
 		cache: false,
 		success: function(response){
-			$('#captchaBox').html('<img src="data:image/png;base64,' + response + '" />');
+			//console.log(reference);
+			$('.captchaBox').html('<img src="data:image/png;base64,' + response + '" />');
 		},
 		error: function(response){
 			alert ("Ajax Error");

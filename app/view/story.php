@@ -72,6 +72,7 @@ class Story extends Base
 
 	public static function buildReviews($reviewData)
 	{
+		\Base::instance()->set('returnpath', \Base::instance()->get('PATH') );
 		\Base::instance()->set('story_reviews', $reviewData);
 
 		return parent::render('story/reviews.html');
@@ -80,18 +81,12 @@ class Story extends Base
 	public static function commentForm($parentID)
 	{
 		\Base::instance()->set('childof', $parentID);
+		\Base::instance()->set('level', isset($_POST['level']) ? (int)$_POST['level'] : 1);
 		\Base::instance()->set('element', NULL);
 		\Base::instance()->set('data', [ "cancel" => TRUE, "feedback_form_label" => "__Comment" ]);
 		
 		return parent::render('main/feedback_form.html');
 	}
-
-	/*
-	public static function reviewForm($storyID, $parentID)
-	{
-		return parent::render('main/feedback_form.html');
-	}
-	*/
 
 	public static function buildStory($storyData,$content,$dropdown)
 	{

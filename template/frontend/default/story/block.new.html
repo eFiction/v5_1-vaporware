@@ -1,30 +1,26 @@
 <h1>{{@LN__NewStories}}</h1>
-<repeat group="{{@renderData}}"  value="{{ @story }}" counter="{{ @ctr }}">
-	<h5><a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a></h5>
-	<check if="{{@extra=='large'}}">
-		<true>
-			<div class="index-box">
-				<div class="listing">
-					<div class="updated-title">
-					{{ @LN__AuthorCounted, sizeof(@story.cache_authors) | format }}: <repeat group="{{@story.cache_authors}}"  value="{{ @author }}" counter="{{ @ctr }}"><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/member/profile/{{@author.0}}">{{@author.1}}</a></repeat><br />
-					{{@story.summary | raw}}
+<div class="index-box">
+	<repeat group="{{@renderData}}"  value="{{ @story }}" counter="{{ @ctr }}">
+		<check if="{{@extra=='large'}}">
+			<true>
+					<div class="listing">
+						<div class="updated-title"><a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a> {{@LN__by}} 
+						<repeat group="{{@story.cache_authors}}"  value="{{ @author }}" counter="{{ @ctr }}"><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/member/profile/{{@author.0}}">{{@author.1}}</a></repeat></div>
+						<div class="updated-summary">{{@story.summary | raw}}</div>
 					</div>
-				</div>
-			</div>
-		</true>
-		<false>
-			<div class="index-box">
-				<div class="listing">
-					<div class="updated-title">
-						<span class="toggle">
-							<span class="toggle_more"><span class="fa fa-caret-square-o-down"></span></span>
-							<span class="toggle_less" style="display:none" ><span class="fa fa-caret-square-o-up"></span></span>
-						</span>
-						{{ @LN__AuthorCounted, sizeof(@story.cache_authors) | format }}: <repeat group="{{@story.cache_authors}}"  value="{{ @author }}" counter="{{ @ctr }}"><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/member/profile/{{@author.0}}">{{@author.1}}</a></repeat><br />
-						<div class="toggle_container" style="display:none"><div class="updated-summary">{{@story.summary | raw}}</div></div>
+			</true>
+			<false>
+					<div class="listing">
+						<div class="updated-title">
+							<span class="toggle">
+								<span class="toggle_more"><span class="fa fa-caret-square-o-down"></span></span>
+								<span class="toggle_less" style="display:none" ><span class="fa fa-caret-square-o-up"></span></span>
+							</span>
+							{{ @LN__AuthorCounted, sizeof(@story.cache_authors) | format }}: <repeat group="{{@story.cache_authors}}"  value="{{ @author }}" counter="{{ @ctr }}"><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/member/profile/{{@author.0}}">{{@author.1}}</a></repeat><br />
+							<div class="toggle_container" style="display:none"><div class="updated-summary">{{@story.summary | raw}}</div></div>
+						</div>
 					</div>
-				</div>
-			</div>
-		</false>
-	</check>
-</repeat>
+			</false>
+		</check>
+	</repeat>
+</div>

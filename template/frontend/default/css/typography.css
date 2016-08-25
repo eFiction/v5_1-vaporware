@@ -80,19 +80,9 @@ h4 {
 	border-color: #e6e6e6;
 	margin: 5px 0 0 0;
 	padding: 0 0 0 15px;
-	background:-webkit-gradient(linear, left top, left bottom, color-stop(0.05, #f4f4f4), color-stop(1, #ededed)); /* Chrome,Safari4+ */
-	background:-moz-linear-gradient(top, #f4f4f4 5%, #ededed 100%); /* FF3.6+ */
-	background:-webkit-linear-gradient(top, #f4f4f4 5%, #ededed 100%); /* Chrome10+,Safari5.1+ */
-	background:-o-linear-gradient(top, #f4f4f4 5%, #ededed 100%); /* Opera 11.10+ */
-	background:-ms-linear-gradient(top, #f4f4f4 5%, #ededed 100%); /* IE10+ */
-	background:linear-gradient(to bottom, #f4f4f4 5%, #ededed 100%); /* W3C */
-	filter:progid:DXImageTransform.Microsoft.gradient(startColorstr='#ededed', endColorstr='#dfdfdf',GradientType=0); /* IE6-9 */
-	-webkit-border-radius: 5px 5px 0 0;
-	-moz-border-radius: 5px 5px 0 0;
-	border-radius: 5px 5px 0 0;
 	}
 	
-/* i.e. updated & recent stories */
+/* i.e. story listing */
 h5 {
 	font-size: 14pt;
 	font-weight: 300;
@@ -103,8 +93,8 @@ h5 {
 	border-width: 0 0 1px 0;
 	border-style: solid;
 	border-color: #dcdcdc;
-	margin: 20px 0 0 0;
-	padding: 0;
+	margin: 0;
+	padding: 5px 10px;
 	}
 	
 	/* i.e. add story form */

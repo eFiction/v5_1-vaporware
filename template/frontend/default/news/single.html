@@ -10,13 +10,13 @@
 <div class="comment">
 	<check if="{{@comment.writer_uid}}">
 	<true>
-		<a href="{{@BASE}}/member/profile/{{@comment.writer_uid}}">{{@comment.comment_writer_name}}</a> <check if="{{@comment.writer_uid==$_SESSION['userID']}}">{ICON:edit}</check>
+		&nbsp;{ICON:member} <a href="{{@BASE}}/member/profile/{{@comment.writer_uid}}">{{@comment.comment_writer_name}}</a> <check if="{{@comment.writer_uid==$_SESSION['userID']}}">{ICON:edit}</check>
 	</true>
 	<false>
-		{{@comment.comment_writer_name}}
+		&nbsp;{ICON:member} {{@comment.comment_writer_name}}
 	</false>
 	</check>
-	{{ date(@CONFIG["date_format_long"], @comment.timestamp) }} <br />
+	{{ date(@CONFIG["date_format_long"], @comment.timestamp) }} <br /><br />
 	{{@comment.text|raw}}
 </div>
 </repeat>
@@ -24,21 +24,21 @@
 <check if="{{isset(@formError)}}"><div class="note alert-box-half error">{{ @LN__FormErrors, sizeof(@formError) | format }}:<br><repeat group="{{@formError}}" value="{{@error}}">{ICON:close} {{ ${'LN__'.@error} }}<br /></repeat></div></check>
 <check if="{{@_SESSION['userID'] OR @CONFIG['allow_guest_comment_news']}}">
 	<true>
-		<fieldset>
+		<fieldset><legend>__memberComment</legend>
 		<form class="write_review" method="post" action="{{@BASE}}/news/id={{@news.nid}}">
-			<check if="{{@_SESSION['userID']==0}}">
+			<check if="{{@_SESSION['userID']}}">
 				<true>
+					
+					<div>&nbsp;{ICON:member} {{@_SESSION['username']}}</div>
+					<div class="field textarea"><textarea class="message" name="comment[text]" placeholder="enter text here"></textarea></div>
+				</true>
+				<false>
 					<legend>__guestComment:</legend>
 					<div class="field">{ICON:member} __yourName: <input type="text" name="comment[name]" placeholder="your name" value="{{@@POST.comment.name}}"></div>
 					<div class="field">{ICON:keyboard} __yourComment: <textarea id="shout" rows="10" cols="29" name="comment[text]" placeholder="__yourTextHere">{{@@POST.comment.text}}</textarea></div>
 					<div>{ICON:key}
-						<input type="text" name="comment[captcha]" class="half" placeholder="captcha" value=""><div id="captchaBox">&nbsp;</div>
+						<input type="text" name="comment[captcha]" class="half" placeholder="captcha" value=""><div class="captchaBox">&nbsp;</div>
 					</div>
-				</true>
-				<false>
-					<legend>__memberComment</legend>
-					<div>{ICON:member} {{@_SESSION['username']}}</div>
-					<div class="field textarea"><textarea class="message" name="comment[text]" placeholder="enter text here"></textarea></div>
 				</false>
 			</check>
 			<input class="button" value="__Submit" type="submit">

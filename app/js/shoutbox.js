@@ -83,8 +83,6 @@ function shoutbox_data ( ajax_url, ajax_data )
 			else if (json_data[1] != "")
 			{
 				$( "#sboxForm" ).html(  json_data[1] );
-				getCaptchaImage();
-				$('#captchaBox').click(getCaptchaImage);
 			}
 		},
 		error: function(  )
