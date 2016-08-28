@@ -392,25 +392,29 @@ class Story extends Base
 						F2.text as comment_text, 
 						F2.reference_sub as parent_item, 
 						IF(F2.writer_uid>0,U2.nickname,F2.writer_name) as comment_writer_name, 
-						F2.writer_uid as comment_writer_uid 
+						F2.writer_uid as comment_writer_uid,
+						UNIX_TIMESTAMP(F2.datetime) as date_comment
 					FROM 
 					(
 						SELECT 
 							F.fid as review_id, 
+							Ch.inorder,
 							F.text as review_text, 
-							F.reference as review_storyid, 
+							F.reference as review_chapter, 
 							F.reference_sub as review_chapterid, 
 							IF(F.writer_uid>0,U.nickname,F.writer_name) as review_writer_name, 
-							F.writer_uid as review_writer_uid 
+							F.writer_uid as review_writer_uid, 
+							UNIX_TIMESTAMP(F.datetime) as date_review
 						FROM `tbl_feedback`F 
 							JOIN `tbl_users`U ON ( F.writer_uid = U.uid )
+							LEFT JOIN `tbl_chapters`Ch ON ( Ch.chapid = F.reference )
 						WHERE F.reference = :storyid @CHAPTER@ AND F.type='ST' 
 						ORDER BY F.datetime 
 						DESC LIMIT 0,".$limit."
 					) F1
 				LEFT JOIN `tbl_feedback`F2  ON (F1.review_id = F2.reference AND F2.type='C')
 					LEFT JOIN `tbl_users`U2 ON ( F2.writer_uid = U2.uid )
-				ORDER BY F2.datetime ASC";
+				ORDER BY F1.date_review DESC, F2.datetime ASC";
 
 		if ( $chapter )
 			$flat = $this->exec( str_replace("@CHAPTER@", "AND F.reference_sub = :chapter", $sql), [':storyid' => $storyID, ':chapter' => $chapter] );
@@ -419,50 +423,100 @@ class Story extends Base
 		
 		if ( sizeof($flat) == 0 ) return FALSE;
 
-		$current_id = 0;
+		$current_id = NULL;
+		$tree = [];
 		foreach ( $flat as $item )
 		{
+			// new review root element
 			if ( $item['review_id']!=$current_id )
 			{
 				// remember current review ID
 				$current_id = $item['review_id'];
-				$data[] =
+				$data['r'.$current_id] =
 				[
-					"level"	=>	1,
-					"sid"	=>	$item['review_storyid'],
-					"id"	=>	$item['review_id'],
-					"text"	=>	$item['review_text'],
-					"name"	=>	$item['review_writer_name'],
-					"uid"	=>	$item['review_writer_uid']
+					"level"		=>	1,
+					"chapter"	=>	$item['review_chapter'],
+					"id"		=>	$item['review_id'],
+					"text"		=>	$item['review_text'],
+					"name"		=>	$item['review_writer_name'],
+					"uid"		=>	$item['review_writer_uid'],
+					"timestamp"	=>	$item['date_review'],
 				];
 			}
 			
-			// This item has comment data
-			if ( $item['comment_id'] != "" )
+			$tree += [ 'r'.$current_id => null ];
+			
+			// Add the comment to the data structure
+			if ( $item['comment_id'] != NULL )
 			{
 				// Check parent level and remember this node's level
 				if ( isset($depth[$item['parent_item']]) )
 					$depth[$item['comment_id']] = $depth[$item['parent_item']] + 1;
 				else
 					$depth[$item['comment_id']] = 2;
+
+				// tell the tree where this item originates from
+				if ( $item['parent_item'] == "" )
+					$tree += [ 'c'.$item['comment_id'] => 'r'.$current_id ];
+				else
+					$tree += [ 'c'.$item['comment_id'] => 'c'.$item['parent_item'] ];
+				
+				$data['c'.$item['comment_id']] = 
+				[
+					"level"		=>	min ($depth[$item['comment_id']], 4),
+					"chapter"	=>	$item['review_chapter'],
+					"id"		=>	$item['comment_id'],
+					"parent"	=>	$item['parent_item'],
+					"text"		=>	$item['comment_text'],
+					"name"		=>	$item['comment_writer_name'],
+					"uid"		=>	$item['comment_writer_uid'],
+					"timestamp"	=>	$item['date_comment'],
+				];
 			}
-
-			// Add the comment to the data structure
-			if ( $item['comment_id'] != NULL )
-			$data[] =
-			[
-				"level"	=>	min ($depth[$item['comment_id']], 3),
-				"sid"	=>	$item['review_storyid'],
-				"id"	=>	$item['comment_id'],
-				"text"	=>	$item['comment_text'],
-				"name"	=>	$item['comment_writer_name'],
-				"uid"	=>	$item['comment_writer_uid']
-			];
 		}
+		
+		// build an index-tree of all elements on their proper location
+		$indexTree = $this->parseTree($tree);
+		
+		// flatten the tree and use it to order the data
+		// based on http://stackoverflow.com/questions/21516892/flatten-a-multdimensional-tree-array-in-php/21517018#21517018
+		array_walk_recursive($indexTree, function($item, $key) use (&$indexFlat, &$i, $data)
+		{
+			if ( $item != "" ) $indexFlat[(int) $i++] = $data[$item]; 
+		});
 
-		return $data;
+		//	print_r($indexFlat);
+			//exit;*/
+		return $indexFlat;
 	}
-	
+
+	public function saveComment($id, $data, $member=FALSE)
+	{
+		$reference_sub = NULL;
+		if ( $parent = $this->exec("SELECT reference as parent_id FROM `tbl_feedback` WHERE fid = :fid AND type='C';", [":fid"=>$id]) )
+		{
+			$reference_sub = $id;
+			$id = $parent[0]['parent_id'];
+			
+		}
+		$sql = "INSERT INTO `tbl_feedback`
+					(`reference`, `reference_sub`, `writer_name`, `writer_uid`, `text`, `datetime`,        `type`) VALUES 
+					(:reference,  :reference_sub,  :guest_name,   :uid,         :text,  CURRENT_TIMESTAMP, 'C')";
+		$bind =
+		[
+			":reference"		=> $id,
+			":reference_sub"	=> $reference_sub,
+			":uid"				=> ( $member ) ? $_SESSION['userID'] : 0,
+			":guest_name"		=> ( $member ) ? NULL : $data['name'],
+			":text"				=> $data['text'],
+		];
+		if ( 1== $this->exec($sql, $bind) )
+			return (int)$this->db->lastInsertId();
+		else return FALSE;
+		
+		//return FALSE;
+	}
+
 	public function getTOC($story)
 	{
 		return $this->exec( "SELECT UNIX_TIMESTAMP(T.last_read) as tracker_last_read, T.last_chapter, IF(T.last_chapter=Ch.inorder,1,0) as last,

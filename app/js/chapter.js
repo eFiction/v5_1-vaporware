@@ -19,7 +19,7 @@ $('#story-container').on("click", ".openform", function(e) {
 
 function review_data ( ajax_url, ajax_data, ajax_form )
 {
-		$.ajax({
+	$.ajax({
         type: "POST",
         url: ajax_url,
         data: ajax_data,
@@ -46,4 +46,5 @@ function review_data ( ajax_url, ajax_data, ajax_form )
 
 		}		
     });
+	getCaptchaImage();
 }

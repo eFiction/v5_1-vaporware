@@ -69,24 +69,66 @@ class Story extends Base
 
 			exit;
 		}
+
 		elseif ( isset($params['segment']) AND $params['segment']=="review_comment_form" )
 		{
 			// This is a comment to an element
-			$id = $f3->get('POST.childof');
-			$return = "";
-			
-			// Is there form data?
-			if ( isset($_POST['write']) )
-			{
-				$f3->set('formError.1', "CaptchaMismatch");
-				$return = $id;
-				//return TRUE;
-				
-				$view = "Kommentar geschrieben! ";
-			}
+			$id = (int)$f3->get('POST.childof');
 
+			$errors = [];
+			$removeButton = "";
+			
+			if($_SESSION['userID']!=0 || \Base::instance()->get('CONFIG')['allow_guest_reviews'] )
+			{
+				if ( isset($_POST['write']) )
+				{
+					$data = $f3->get('POST.write');
+
+					// Obviously, there should be some text ...
+					if ( "" == $data['text'] = trim($data['text']) )
+						$errors[]= 'MessageEmpty';
+
+					if ( $_SESSION['userID'] )
+					{
+						if ( empty($errors) AND $insert_id = $this->model->saveComment($id, $data, TRUE) )
+						{
+							$removeButton = $id;
+							$view = \View\Story::buildReviewCell($data, (int)$_POST['level'], $insert_id);
+							//$f3->reroute('news/id='.$params['id'], false);
+						}
+						else $errors[] = "CannotSave";
+					}
+					else
+					{
+						// Check if captcha is initialized and matches user entry
+						if ( empty($_SESSION['captcha']) OR !password_verify(strtoupper($data['captcha']),$_SESSION['captcha']) )
+							$errors[]= 'CaptchaMismatch';
+
+						// Guest can't post with an empty name
+						if ( "" == $data['name'] = trim($data['name']) )
+							$errors[]= 'GuestNameEmpty';
+
+						// guest can't post URL (reg ex is not perfect, but it's a start)
+						if (preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i",$data['text']))
+							$errors[]= 'GuestURL';
+
+						if ( empty($errors) AND $insert_id = $this->model->saveComment($id, $data) )
+						{
+							// destroy this session captcha
+							unset($_SESSION['captcha']);
+							$removeButton = $id;
+							$view = \View\Story::buildReviewCell($data, (int)$_POST['level']);
+						}
+
+						//$f3->set('formError.1', "CaptchaMismatch");
+					}
+					// If no data was saved, we end up here, so we show the page again and it will display the errors
+					$f3->set('formError', $errors);
+				}
+			}
+			
 			if(empty($view)) $view = \View\Story::commentForm($id);
-			$this->buffer( array ( "", $view, $return, ($_SESSION['userID']==0) ) , "BODY", TRUE );
+			$this->buffer( array ( "", $view, $removeButton, ($_SESSION['userID']==0) ) , "BODY", TRUE );
 		}
 	}
 

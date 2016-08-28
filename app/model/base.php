@@ -382,4 +382,25 @@ class Base extends \Prefab {
 		return($elements);
 	}
 	
+	// http://stackoverflow.com/questions/2915748/convert-a-series-of-parent-child-relationships-into-a-hierarchical-tree/2915920#2915920
+	protected function parseTree($tree, $root = null)
+	{
+		$return = array();
+		# Traverse the tree and search for direct children of the root
+		foreach($tree as $child => $parent) {
+			# A direct child is found
+			if($parent == $root) {
+				# Remove item from tree (we don't need to traverse this again)
+				unset($tree[$child]);
+				# Append the child into result array and parse its children
+				$return[] = array(
+					'name' => $child,
+					'children' => $this->parseTree($tree, $child)
+				);
+			}
+		}
+		return empty($return) ? null : $return;    
+	}
+	
 }
+

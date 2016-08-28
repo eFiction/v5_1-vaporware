@@ -78,6 +78,23 @@ class Story extends Base
 		return parent::render('story/reviews.html');
 	}
 
+	public static function buildReviewCell($data, $level = 1, $insert_id = NULL)
+	{
+		$item =
+		[
+			"name"		=> ($_SESSION['userID'] == 0) ? $data['name'] : $_SESSION['username'],
+			"timestamp" => time(),
+			"text"		=> $data['text'],
+			"uid"		=> $_SESSION['userID'],
+			"level"		=> $level,
+			"id"		=> $insert_id,
+		];
+		\Base::instance()->set('item', $item);
+		\Base::instance()->set('returnpath', \Base::instance()->get('PATH') );
+
+		return parent::render('story/reviews.inner.html');
+	}
+
 	public static function commentForm($parentID)
 	{
 		\Base::instance()->set('childof', $parentID);

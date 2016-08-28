@@ -1,23 +1,8 @@
 <span class="review_container">
 <set last_level="0">
 <repeat group="{{ @story_reviews }}" value="{{ @item }}">
-{*	<check if="{{@last_level==@item.level}}">*</div></check> *}
 	<loop from="{{ @i=@last_level }}" to="{{ @i >= @item.level }}" step="{{ @i-- }}"></div></loop>
-	<div class="review review-level-{{@item.level}}">
-		{{@item.name}}:
-		{{@item.text | raw}} <br />
-		<div align="right">
-			<check if="{{ @_SESSION.userID OR TRUE==@CONFIG.allow_guest_reviews }}">
-				<check if="{{ @_SESSION.userID > 0 AND @_SESSION.userID == @item.uid }}">
-					<true>
-						<a href="{{@BASE}}/userCP/reviews/edit={{@item.id}}/returnpath={{@returnpath}}">{ICON:edit}</a>
-					</true>
-					<false>
-						<span id="{{@item.id}}" data-level="{{@item.level}}" class="openform"><input class="button" type="submit" value="__Comment"></span>
-					</false>
-				</check>
-			</check>
-		</div>
+		<include href="story/reviews.inner.html" />
 		<set last_level="{{@item.level}}">
 		<div class="ajaxform"></div>
 </repeat>

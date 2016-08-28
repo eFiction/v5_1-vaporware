@@ -8,7 +8,7 @@
 					<true>
 						<legend>{{@data.feedback_form_label}}</legend>
 						<div>{ICON:member} {{@_SESSION['username']}}</div>
-						<div class="field textarea"><textarea class="message" name="write[text]" placeholder="enter text here"></textarea></div>
+						<div class="field textarea"><textarea class="message" name="write[text]" placeholder="enter text here">{{@@POST.write.text}}</textarea></div>
 					</true>
 					<false>
 						<legend>__Review / Anonymous</legend>
