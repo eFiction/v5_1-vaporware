@@ -31,6 +31,7 @@ return array(
 'Guest'			=> 'Guest',
 'ForgotPW'		=> 'Forgot you password',
 'ResetPW'		=> 'Reset my password',
+'ChangePW'		=> 'Change password',
 'Login_NoMatch'	=> 'Failed to log in, invalid username or password!',
 'Login_NoData'	=> 'Failed to log in, data error!',
 
@@ -82,6 +83,7 @@ return array(
 'PM_ReplySubject'		=> 'Re:',
 'PM_ReplyMessageHeader'	=> 'On {0}, {1} wrote:',
 'PM_WritePM'			=> 'Writing message',
+'PM_ReadPM'				=> 'Reading message',
 
 // using php strftime
 'Month_Calendar' => '{0,date,custom,%B %Y}',
@@ -138,8 +140,15 @@ return array(
 	'Library_Recommendations' => '{0, plural,'.
 		'other	{Recommendations (#)}
 	}',
+'UserMenu_Feedback' => 'Feedback',
 'UserMenu_Reviews' => 'Reviews',
-'UserMenu_Preferences' => 'Preferences',
+	'UserMenu_ReviewsWritten'	=> '{0, plural,'. 'other {Reviews written (#)} }',
+	'UserMenu_ReviewsReceived'	=> '{0, plural,'. 'other {Reviews received (#)} }', 
+	'UserMenu_CommentsWritten'	=> '{0, plural,'. 'other {Comments written (#)} }',
+	'UserMenu_CommentsReceived'	=> '{0, plural,'. 'other {Comments received (#)} }', 
+	'UserMenu_Shoutbox'			=> '{0, plural,'. 'other {Shoutbox (#)} }', 
+'UserMenu_Settings' => 'Settings',
+	'UserMenu_Preferences' => 'Preferences',
 
 'UserMenu_AddStory' => 'Add Story',
 'UserMenu_Curator' => 'Curator',

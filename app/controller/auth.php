@@ -94,10 +94,10 @@ class Auth extends Base {
 		$return = explode("returnpath=",$params[1]);
 		$returnpath = ( isset($return[1]) AND $return[1]!="") ? $return[1] : "/";
 
-		$this->model->userSession(NULL);
-		unset($_SESSION['session_id']);
-		unset($_COOKIE['session_id']);
-		setcookie("session_id", "", time()-1, $f3->get('BASE') );
+		$this->model->userSession(0);
+		//unset($_SESSION['session_id']);
+		//unset($_COOKIE['session_id']);
+		//setcookie("session_id", "", time()-1, $f3->get('BASE') );
 		//session_destroy();
 		
 		$f3->reroute($returnpath, false);

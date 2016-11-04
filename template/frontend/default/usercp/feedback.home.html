@@ -1,0 +1,92 @@
+<check if="{{@stats.stories>0}}">
+<div class="grid-wrapper">
+	<div class="gb-full">
+		{{@LN__Welcome}} {{@_SESSION['username']}}<br />
+		__Feedback stats:
+	</div>
+</div>
+<div class="grid-wrapper">
+	<div class="gb-half">
+		<h3>__ReviewRatio</h3>
+		<canvas id="chart1" width="200" height="200" style="float: left;">
+			This would have shown a pie chart of the ratio of reviewed stories.
+		</canvas>
+		<span id="b1">{ICON:plus} stories reviewed</span><br />
+		<span id="b1_not">{ICON:minus} stories without review</span>
+		<div valign="bottom">{{@stats.storiesReviewedQ}}%<br />
+		This is {{@stats.reviewsPerStoryTotal}} __reviewsPerStory (or {{@stats.reviewsPerChapter}} __reviewsPerChapter)</div>
+	</div>
+	<div class="gb-half">
+	<h3>"more"</h3>
+	</div>
+	<div class="gb-half">
+	<h3>"to"</h3>
+	</div>
+	<div class="gb-half">
+	<h3>"come"</h3>
+	</div>
+</div>
+<script type="text/javascript">
+// Grab font and link color from stylesheet
+var backcolor = $( "body" ).css( "color" );
+var linkcolor = $( "a" ).css( "color" );
+// recolor spans
+$("#b1").css( "color", linkcolor );
+
+// create pie chart
+window.onload = createPieChart;
+function createPieChart() {
+	var pieChart = new PieChart( "chart1", 
+		{
+			includeLabels: false, 
+			data: [{{@stats.storiesReviewedPie}}, {{360-@stats.storiesReviewedPie}}],
+			labels: ["{{@stats.storiesReviewedQ}}%", "{{100-@stats.storiesReviewedQ}}%"],
+			colors: [
+            	[linkcolor, backcolor],
+            	[backcolor, linkcolor]
+			]
+		}
+	);
+	pieChart.draw();
+}
+/*
+$("#b1_not").css( "color", linkcolor );
+
+var myColor = [linkcolor,backcolor];
+var myData = [{{(int)@stats.storiesReviewedQ}},{{100-(int)@stats.storiesReviewedQ}}];
+
+function getTotal(){
+	var myTotal = 0;
+	for (var j = 0; j < myData.length; j++) {
+		myTotal += (typeof myData[j] == 'number') ? myData[j] : 0;
+	}
+	return myTotal;
+}
+
+function plotData() {
+	var canvas;
+	var ctx;
+	var lastend = 1;
+	var myTotal = getTotal();
+
+	canvas = document.getElementById("canvas");
+	ctx = canvas.getContext("2d");
+	ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+	for (var i = 0; i < myData.length; i++)
+	{
+	ctx.fillStyle = myColor[i];
+	ctx.beginPath();
+	ctx.moveTo(200,150);
+	ctx.arc(200,150,150,lastend,lastend+
+	  (Math.PI*2*(myData[i]/myTotal)),false);
+	ctx.lineTo(200,150);
+	ctx.fill();
+	lastend += Math.PI*2*(myData[i]/myTotal);
+	}
+}
+
+plotData();
+*/
+</script>
+</check>

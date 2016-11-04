@@ -3,7 +3,9 @@
 		<div class="story-info2"><b>{{@LN__Status}}:</b> <check if="{{@storyData.completed==1}}"><true>{{@LN__Completed}}</true><false>{{@LN__WIP}}</false></check></div>
 		<div class="story-info2"><b>{{@LN__Reviews}}:</b> <a href="{{@BASE}}/story/read/{{ @storyData.sid}},reviews">{{ @LN__Review_Link, @storyData['reviews'] | format }}</a></div>
 		<div class="story-info2"><b>{{@LN__Tags}}:</b> <repeat group="{{ @storyData['cache_tags'] }}" value="{{ @tag }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check><a href="{{@BASE}}story/search/tagIn={{ @tag[0] }}">{{ @tag[1] }}</a></repeat></div>
+<check if="{{ isset(@storyData.cache_characters.0.1) }}">
 		<div class="story-info2"><b>{{@LN__Characters}}:</b> <repeat group="{{ @storyData['cache_characters'] }}" value="{{ @tag }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check><a href="{{@BASE}}story/search/charIn={{ @tag[0] }}">{{ @tag[1] }}</a></repeat></div>
+</check>
 <check if="{{ @storyData['storynotes'] > '' }}">
 		<div class="story-info2"><b>{{@LN__Foreword}}:</b> {{ @storyData.storynotes | raw}}</div>
 </check>

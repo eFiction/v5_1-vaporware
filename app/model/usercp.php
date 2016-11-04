@@ -60,7 +60,7 @@ class UserCP extends Base
 	
 	public function getCount($module="")
 	{
-		if ( $module = "library" )
+		if ( $module == "library" )
 		{
 			$sql[]= "SET @bms  := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_user_favourites`F WHERE F.uid={$_SESSION['userID']} AND F.bookmark=1 GROUP BY F.type) AS F1);";
 			$sql[]= "SET @favs := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_user_favourites`F WHERE F.uid={$_SESSION['userID']} AND F.bookmark=0 GROUP BY F.type) AS F1);";
@@ -72,7 +72,22 @@ class UserCP extends Base
 			$sql[]= "SELECT @bms as bookmark,@favs as favourite,@recs as recommendation;";
 
 			$data = $this->exec($sql)[0];
+		}
+		elseif ( $module == "feedback" )
+		{
+			$user = \User::instance();
+			
+			if ( NULL == $data = json_decode($user->feedback_cache,TRUE) )
+			{
+				$data = $this->userCacheRecount("feedback");
+				$user->feedback_cache = json_encode($data);
+				$user->save();
+			}
+			return (array)$data;
+		}
 
+		if ( isset($data) ) //and sizeof($data>0) )
+		{
 			foreach( $data as $key => $count )
 				list($counter[$key]['sum'], $counter[$key]['details']) = array_pad(explode("//",$count), 2, '');
 
@@ -88,6 +103,24 @@ class UserCP extends Base
 			}
 			return $counter;
 		}
+		return NULL;
+	}
+	
+	public function feedbackHomeStats($data)
+	{
+		$chapters = $this->exec("SELECT COUNT(1) as count FROM `tbl_chapters`C INNER JOIN `tbl_stories_authors`SA ON ( C.sid = SA.sid ) WHERE SA.aid = {$_SESSION['userID']};")[0]['count'];
+		$stats = 
+		[
+			"stories"	=> $data['st']['sum'],
+			"storiesReviewedQ" => round(($data['rq']['sum']/$data['st']['sum']*100),1),
+			"storiesReviewedPie" => (int)($data['rq']['sum']/$data['st']['sum']*360),
+			"reviewsPerStory"=> round(($data['rr']['details']['ST']/$data['rq']['sum']),1),
+			"reviewsPerStoryTotal"=> round(($data['rr']['details']['ST']/$data['st']['sum']),1),
+			"reviewsPerChapter"=> round(($data['rr']['details']['ST']/$chapters),1),
+		];
+//		print_r($stats);
+//		print_r($data);
+		return $stats;
 	}
 	
 	public function ajax($key, $data)
@@ -225,39 +258,6 @@ class UserCP extends Base
 		}
 	}
 	
-	public function loadBookFav($params)
-	{
-		// ?
-		if ( empty($params['id'][0]) OR empty($params['id'][1]) ) return FALSE;
-
-		if ( $params['id'][0]=="AU" )
-		{
-			$sql = $this->sqlBookFav("AU", FALSE) . 
-				"WHERE U.uid = :id ";
-		}
-		elseif ( $params['id'][0]=="SE" )
-		{
-			$sql = $this->sqlBookFav("SE", FALSE) . 
-				"WHERE Ser.seriesid = :id ";
-		}
-		elseif ( $params['id'][0]=="ST" )
-		{
-			$sql = $this->sqlBookFav("ST", FALSE) . 
-				"WHERE S.sid = :id ";
-		}
-		else return FALSE;
-
-		$data = $this->exec($sql,[":bookmark" => (($params[0]=="bookmark")?1:0), ":id"=>$params['id'][1]]);
-		if ( sizeof($data)==1 )
-		{
-			if ( isset($data[0]['authorblock']) )
-				$data[0]['authorblock'] = json_decode($data[0]['authorblock'],TRUE);
-
-			return $data[0];
-		}
-		return FALSE;
-	}
-	
 	public function listBookFav($page, $sort, $params)
 	{
 		$limit = 10;
@@ -265,7 +265,7 @@ class UserCP extends Base
 		
 		if ( in_array($params[1],["AU","RC","SE","ST"]) )
 		{
-			$sql = $this->sqlBookFav($params[1]) . 
+			$sql = $this->sqlMaker("bookfav", $params[1]) . 
 					"ORDER BY {$sort['order']} {$sort['direction']}
 					LIMIT ".(max(0,$pos*$limit)).",".$limit;
 		}
@@ -281,10 +281,90 @@ class UserCP extends Base
 		return $data;
 	}
 	
-	protected function sqlBookFav($type, $inner = TRUE)
+	public function loadBookFav($params)
+	{
+		// ?
+		if ( empty($params['id'][0]) OR empty($params['id'][1]) ) return FALSE;
+
+		if ( $params['id'][0]=="AU" )
+		{
+			$sql = $this->sqlMaker("bookfav", "AU", FALSE) . 
+				"WHERE U.uid = :id ";
+		}
+		elseif ( $params['id'][0]=="SE" )
+		{
+			$sql = $this->sqlMaker("bookfav", "SE", FALSE) . 
+				"WHERE Ser.seriesid = :id ";
+		}
+		elseif ( $params['id'][0]=="ST" )
+		{
+			$sql = $this->sqlMaker("bookfav", "ST", FALSE) . 
+				"WHERE S.sid = :id ";
+		}
+		else return FALSE;
+
+		$data = $this->exec($sql,[":bookmark" => (($params[0]=="bookmark")?1:0), ":id"=>$params['id'][1]]);
+		if ( sizeof($data)==1 )
+		{
+			if ( isset($data[0]['authorblock']) )
+				$data[0]['authorblock'] = json_decode($data[0]['authorblock'],TRUE);
+
+			return $data[0];
+		}
+		return FALSE;
+	}
+	
+	public function listReviews($page, $sort, $params)
+	{
+		$limit = 10;
+		$pos = $page - 1;
+
+		if ( in_array($params[2],["RC","SE","ST"]) )
+		{
+			$sql = $this->sqlMaker("feedback".$params[1], $params[2]) . 
+					( $params[1]=="written" ? "GROUP BY F.reference " : "") .
+					"ORDER BY {$sort['order']} {$sort['direction']}
+					LIMIT ".(max(0,$pos*$limit)).",".$limit;
+					//echo $sql;exit;
+		}
+		else return FALSE;
+
+		$data = $this->exec($sql);
+
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/userCP/feedback/{$params[0]}/{$params[1]}/{$params[2]}/order={$sort['link']},{$sort['direction']}",
+			$limit
+		);
+		return $data;
+	}
+
+	public function loadReview($params)
+	{
+		// ?
+		if ( empty($params['id'][0]) OR empty($params['id'][1]) ) return FALSE;
+
+		if ( $params[1] == "written")
+		{
+			if ( $params['id'][0] == "ST" )
+			{
+				$sql = $this->sqlMaker("feedback".$params[1], "ST", FALSE) . 
+					"AND F.fid = :id ";
+			}
+		}
+		else return FALSE;
+		
+		$data = $this->exec($sql,[ ":id"=>$params['id'][1] ]);
+
+		if ( sizeof($data)==1 )
+			return $data[0];
+		return FALSE;
+	}
+	
+	protected function sqlMaker($module, $type, $inner = TRUE)
 	{
 		$join = $inner ? "INNER" : "LEFT";
-		$sql =
+		$sql['bookfav'] =
 		[
 			"AU"
 				=>	"SELECT SQL_CALC_FOUND_ROWS 'AU' as type, U.uid as id, U.nickname as name, Fav.comments, Fav.visibility, Fav.notify, Fav.fid
@@ -298,8 +378,61 @@ class UserCP extends Base
 				=>	"SELECT SQL_CALC_FOUND_ROWS 'SE' as type, Ser.seriesid as id, Ser.title as name, Ser.cache_authors, Fav.comments, Fav.visibility, Fav.notify, Fav.fid
 						FROM `tbl_series`Ser
 						{$join} JOIN `tbl_user_favourites`Fav ON ( Ser.seriesid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='SE' AND Fav.bookmark = :bookmark ) ",
+			"RC"
+				=>	"SELECT SQL_CALC_FOUND_ROWS 'RC' as type, Rec.recid as id, Rec.title as name, Rec.author as cache_authors, Fav.comments, Fav.visibility, Fav.notify, Fav.fid
+						FROM `tbl_recommendations`Rec
+						{$join} JOIN `tbl_user_favourites`Fav ON ( Rec.recid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='RC' AND Fav.bookmark = :bookmark ) ",
 		];
-		return $sql[$type];
+
+		$sql['feedbackwritten'] =
+		[
+			"ST"
+				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, SA.sid as id, Ch.inorder as chapter, GROUP_CONCAT(DISTINCT U.nickname SEPARATOR ', ') as name, U.uid, F.text, S.title, UNIX_TIMESTAMP(F.datetime) as date 
+						FROM `tbl_feedback`F
+						INNER JOIN `tbl_stories`S ON ( F.reference = S.sid )
+							{$join} JOIN `tbl_stories_authors`SA ON ( S.sid = SA.sid )
+							INNER JOIN `tbl_users`U ON ( U.uid = SA.aid )
+						LEFT JOIN `tbl_chapters`Ch ON ( F.reference_sub = Ch.chapid )
+						WHERE F.writer_uid = {$_SESSION['userID']} AND F.type='ST' ",
+			"SE"
+				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Ser.seriesid as id, GROUP_CONCAT(DISTINCT U.nickname SEPARATOR ', ') as name, U.uid, F.text, Ser.title, UNIX_TIMESTAMP(F.datetime) as date 
+						FROM `tbl_feedback`F
+						INNER JOIN `tbl_series`Ser ON ( F.reference = Ser.seriesid )
+							INNER JOIN `tbl_users`U ON ( U.uid = Ser.uid )
+						WHERE F.writer_uid = {$_SESSION['userID']} AND F.type='SE' ",
+			"RC"
+				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Rec.recid as id, Rec.author as name, F.text, Rec.title, Rec.url, UNIX_TIMESTAMP(F.datetime) as date 
+						FROM `tbl_feedback`F
+							INNER JOIN `tbl_recommendations`Rec ON ( F.reference = Rec.recid )
+						WHERE F.writer_uid = {$_SESSION['userID']} AND F.type='ST' ",
+		];
+
+		$sql['feedbackreceived'] =
+		[
+			"ST"
+				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, SA.sid as id, Ch.inorder as chapter, IF(F.writer_uid>0,U.nickname,F.writer_name) as name, U.uid, F.text, S.title, UNIX_TIMESTAMP(F.datetime) as date 
+						FROM `tbl_feedback`F
+							LEFT JOIN `tbl_users`U ON ( F.writer_uid = U.uid )
+							INNER JOIN `tbl_stories_authors`SA ON ( F.reference = SA.sid AND SA.aid = {$_SESSION['userID']} )
+							INNER JOIN `tbl_stories`S ON ( F.reference = S.sid )
+								LEFT JOIN `tbl_chapters`Ch ON ( F.reference_sub = Ch.chapid )
+						WHERE F.type='ST' ",
+			"SE"
+				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Ser.seriesid as id, IF(F.writer_uid>0,U.nickname,F.writer_name) as name, U.uid, F.text, Ser.title, UNIX_TIMESTAMP(F.datetime) as date 
+						FROM `tbl_feedback`F
+							INNER JOIN `tbl_series`Ser ON ( F.reference = Ser.seriesid AND Ser.uid = {$_SESSION['userID']} )
+							LEFT JOIN `tbl_users`U ON ( F.writer_uid = U.uid )
+						WHERE F.type='SE' ",
+			"RC"
+				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Rec.recid as id, IF(F.writer_uid>0,U.nickname,F.writer_name) as name, U.uid, F.text, Rec.title, Rec.url, UNIX_TIMESTAMP(F.datetime) as date 
+						FROM `tbl_feedback`F
+							INNER JOIN `tbl_recommendations`Rec ON ( F.reference = Rec.recid AND Rec.uid = {$_SESSION['userID']} )
+							LEFT JOIN `tbl_users`U ON ( F.writer_uid = U.uid )
+						WHERE F.type='RC' ",
+		];
+		if ( isset($sql[$module][$type]) )
+			return $sql[$module][$type];
+		else return NULL;
 	}
 	
 	public function saveBookFav($post, $params)

@@ -1,8 +1,10 @@
 {
-    "57b9d4367a18b9.09710101": {
+    "57c6aef96e1251.58172467": {
         "_name": "Font Awesome CSS Icons",
         "archive": "<span class=\"fa fa-university\"><\/span>",
         "arrow-down": "<span class=\"fa fa-arrow-down\"><\/span>",
+        "arrow-left": "<span class=\"fa fa-arrow-left\"><\/span>",
+        "arrow-right": "<span class=\"fa fa-arrow-right\"><\/span>",
         "arrow-up": "<span class=\"fa fa-arrow-up\"><\/span>",
         "bars": "<span class=\"fa fa-bars\"><\/span>",
         "blank": "<span class=\"fa fa-square-o\"><\/span>",
@@ -43,11 +45,14 @@
         "recommendation-off": "<span class=\"fa fa-star-o\"><\/span>",
         "register": "<span class=\"fa fa-sign-in\"><\/span>",
         "remove": "<span class=\"fa fa-remove\"><\/span>",
+        "report": "<span class=\"fa fa-exclamation-triangle\"><\/span>",
         "search": "<span class=\"fa fa-search\"><\/span>",
         "settings": "<span class=\"fa fa-cogs\"><\/span>",
         "sort": "<span class=\"fa fa-sort\"><\/span>",
         "sort-alpha-asc": "<span class=\"fa fa-sort-alpha-asc\"><\/span>",
         "sort-alpha-desc": "<span class=\"fa fa-sort-alpha-desc\"><\/span>",
+        "sort-asc": "<span class=\"fa fa-sort-asc\"><\/span>",
+        "sort-desc": "<span class=\"fa fa-sort-desc\"><\/span>",
         "sort-numeric-asc": "<span class=\"fa fa-sort-numeric-asc\"><\/span>",
         "sort-numeric-desc": "<span class=\"fa fa-sort-numeric-desc\"><\/span>",
         "sort-size-asc": "<span class=\"fa fa-sort-amount-asc\"><\/span>",

@@ -31,6 +31,7 @@ return array(
 'Guest'			=> 'Gast',
 'ForgotPW'		=> 'Passwort vergessen',
 'ResetPW'		=> 'Passwort zurücksetzen',
+'ChangePW'		=> 'Passwort ändern',
 'Login_NoMatch'	=> 'Anmeldung nicht möglich, Benutzername oder Passwort ungültig!',
 'Login_NoData'	=> 'Anmeldung nicht möglich, keine Daten!',
 
@@ -82,6 +83,7 @@ return array(
 'PM_ReplySubject'		=> 'Aw:',
 'PM_ReplyMessageHeader'	=> 'Am {0} schrieb {1}:',
 'PM_WritePM'			=> 'Nachricht verfassen',
+'PM_ReadPM'				=> 'Nachricht lesen',
 
 // using php strftime
 'Month_Calendar' => '{0,date,custom,%B %Y}',
@@ -139,7 +141,10 @@ return array(
 		'other	{Empfehlungen (#)}
 	}',
 'UserMenu_Reviews' => 'Bewertungen',
-'UserMenu_Preferences' => 'Preferences',
+	'UserMenu_RevWritten' => 'Bewertungen geschrieben',
+	'UserMenu_RevReceived' => 'Bewertungen erhalten',
+'UserMenu_Settings' => 'Einstellungen',
+	'UserMenu_Preferences' => 'Preferences',
 
 'UserMenu_AddStory' => 'Hinzufügen',
 'UserMenu_Curator' => 'Betreuer',

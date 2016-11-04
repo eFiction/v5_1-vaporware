@@ -7,8 +7,6 @@ class Blocks extends Base
 	public function __construct()
 	{
 		$this->model = \Model\Blocks::instance();
-		//$mapper = new \Model\News();
-		//parent::__construct($mapper);
 	}
 
 	public function shoutbox(\Base $f3, $params)
@@ -124,8 +122,8 @@ class Blocks extends Base
 		$data = $this->model->menuData($pageSelect);
 		$main = $data['main'];
 		$sub = empty($data['sub'])?FALSE:$data['sub'];
-		//print_r($data);
-		return \View\Blocks::pageMenu($main, $sub, isset($menuSelect[2]) );//$menuSelect.$pageSelect;
+
+		return \View\Blocks::pageMenu($main, $sub, isset($menuSelect[2]) );
 	}
 	
 	public function categories()

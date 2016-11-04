@@ -7,21 +7,29 @@ RewriteEngine On
 #
 # RewriteBase /
 
-RewriteCond %{HTTP_HOST} ^www\.
-RewriteCond %{HTTPS}s ^on(s)|off
-RewriteCond http%1://%{HTTP_HOST} ^(https?://)(www\.)?(.+)$
-RewriteRule ^ %1%3%{REQUEST_URI} [R=301,L]
+# F3 generic rewrite
+# https://fatfreeframework.com/routing-engine#SampleApacheConfiguration
+RewriteCond %{REQUEST_FILENAME} !-l
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule .* index.php [L,QSA]
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization},L]
 
-RewriteRule ^(data|tmp)\/|\.ini$ - [R=404]
 
+# Protect files in data and tmp folder
+RewriteRule ^(data|tmp)\/|\*$ - [R=403]
+
+
+# rewrite old links
 RewriteCond %{REQUEST_URI}~%{QUERY_STRING} ^(.*?\/*)?(modules/challenges/)?(browse|viewpage|viewuser|viewstory|viewseries|reviews|challenges|news)\.php~?(.+)$ [NC]
 RewriteRule ^(.+).php$ /special-rewrite-here?/redirect/$1/%4 [B]
 RewriteCond %{REQUEST_URI}~%{QUERY_STRING} ^(.*?\/*)?(modules/challenges/)?(browse|viewpage|viewuser|viewstory|viewseries|reviews|challenges|news)\.php~?(.+)$ [NC]
 RewriteRule ^/.+$ %1 [L,R=301]
 
 
-RewriteCond %{REQUEST_FILENAME} !-l
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule .* index.php [L,QSA]
-RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization},L]
+
+# deprecated
+#RewriteCond %{HTTP_HOST} ^www\.
+#RewriteCond %{HTTPS}s ^on(s)|off
+#RewriteCond http%1://%{HTTP_HOST} ^(https?://)(www\.)?(.+)$
+#RewriteRule ^ %1%3%{REQUEST_URI} [R=301,L]

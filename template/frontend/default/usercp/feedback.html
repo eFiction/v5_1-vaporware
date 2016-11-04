@@ -1,0 +1,78 @@
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
+<table class="tbody">
+	<tr>
+		<th>&nbsp;</th>
+		<th>&nbsp;</th>
+		<th><a href="{{@BASE}}/userCP/feedback/{{@extra.sub.0}}/{{@extra.sub.1}}/{{@extra.type}}/order=date,
+			<check if="{{ @sort['link']!='date' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-desc}</true>
+						<false>desc">{ICON:sort-asc}</false>
+					</check>
+				</false>
+			</check></a> __Date
+		</th>
+		<th><a href="{{@BASE}}/userCP/feedback/{{@extra.sub.0}}/{{@extra.sub.1}}/{{@extra.type}}/order=title,
+			<check if="{{ @sort['link']!='title' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-alpha-desc}</true>
+						<false>desc">{ICON:sort-alpha-asc}</false>
+					</check>
+				</false>
+			</check></a> __Title
+		</th>
+		<th><a href="{{@BASE}}/userCP/feedback/{{@extra.sub.0}}/{{@extra.sub.1}}/{{@extra.type}}/order=name,
+			<check if="{{ @sort['link']!='name' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-alpha-desc}</true>
+						<false>desc">{ICON:sort-alpha-asc}</false>
+					</check>
+				</false>
+			</check></a> __Name
+		</th>
+		<th><a href="{{@BASE}}/userCP/feedback/{{@extra.sub.0}}/{{@extra.sub.1}}/{{@extra.type}}/order=text,
+			<check if="{{ @sort['link']!='text' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-alpha-desc}</true>
+						<false>desc">{ICON:sort-alpha-asc}</false>
+					</check>
+				</false>
+			</check></a> __Text
+		</th>
+	</tr>
+	<repeat group="{{ @feedbackEntries }}" value="{{ @row }}">
+	<tr>
+	<check if="{{@extra.sub.1 == 'written'}}">
+	<true>
+		<td><a href="{{@BASE}}/userCP/feedback/{{@extra.sub.0}}/{{@extra.sub.1}}/edit/id={{@extra.type}},{{ @row['fid'] }};returnpath=/userCP/feedback/{{@extra.sub.0}}/{{@extra.sub.1}}/{{@extra.type}}/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
+		<td><a href="{{@BASE}}/userCP/feedback/{{@extra.sub.0}}/{{@extra.sub.1}}/delete/id={{@extra.type}},{{ @row['fid'] }};returnpath=/userCP/feedback/{{@extra.sub.0}}/{{@extra.sub.1}}/{{@extra.type}}/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}" class="deleteItem" title="{{ @row['name'] }}">{ICON:trash}</a></td>
+	</true>
+	<false>
+		<td>{ICON:following}</td>
+		<td>{ICON:report}</td>
+	</false>
+	</check>
+		<td>{{ date(@CONFIG.date_format_long,@row.date) }}</td>
+		<check if="{{@extra.type=='ST'}}">
+			<td><a href="{{@BASE}}/story/read/{{ @row['id'] }}">{{ @row['title'] }}</a> ({{@row.chapter}})</td>
+		</check>
+		<check if="{{@extra.type=='SE'}}">
+			<td><a href="{{@BASE}}/story/series/{{ @row['id'] }}">{{ @row['title'] }}</a></td>
+		</check>
+		<check if="{{@extra.type=='RC'}}">
+			<td><a href="{{@BASE}}/recommendations/{{ @row['id'] }}">{{ @row['title'] }}</a></td>
+		</check>
+		<td>{{ @row.name }}</td>
+		<td>{{ @row.text | raw}}<check if="{{@extra.type=='RC'}}"><br /><small><a href="{{@row.url}}" target="_blank">{ICON:external-link} {{@row.url}}</a></small></check></td>
+	</tr>
+	</repeat>
+</table>
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>

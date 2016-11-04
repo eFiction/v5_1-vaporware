@@ -1,24 +1,24 @@
 <div class="form-wrapper">
 <fieldset>
-	<legend>__ReadPM</legend>
+	<legend>{{@LN__PM_ReadPM}}</legend>
 	<table width="100%">
-		<tr><td><h6>__Sender:</h6></td><td>{{@message.sender}}</td><td>{{ date(@CONFIG["date_format_long"],@message.date_sent) }}</td></tr>
+		<tr><td><h6>{{@LN__PM_Sender}}:</h6></td><td>{{@message.sender}}</td><td>{{ date(@CONFIG.date_format_long,@message.date_sent) }}</td></tr>
 		<tr>
-			<td><h6>__Recipient:</h6></td><td>{{@message.recipient}}</td>
+			<td><h6>{{@LN__PM_Recipient}}:</h6></td><td>{{@message.recipient}}</td>
 			<td>
 				<check if="{{@message.date_read}}">
 				<true>
-					{{ date(@CONFIG["date_format_long"],@message.date_read) }}
+					{{ date(@CONFIG.date_format_long,@message.date_read) }}
 				</true>
 				<false>
-					__unread
+					{{@LN__PM_unread}}
 				</false>
 				</check>
 			</td>
 		</tr>
-		<tr><td><h6>__Subject:</h6></td><td colspan="2">{{@message.subject}}</td></tr>
+		<tr><td><h6>{{@LN__PM_Subject}}:</h6></td><td colspan="2">{{@message.subject}}</td></tr>
 		<tr><td colspan="3"><textarea class="textarea" readonly>{{@message.message}}</textarea></td></tr>
-		<tr><td><a class="button" href="{{@BASE}}/userCP/messaging/write,{{@message.mid}}"><check if="({{@forward}})"><true>__Forward</true><false>__Reply</false></check></a></td><td colspan="2"><input class="button delete" type="submit" value="delete" id="{{@message.mid}}"></td></tr>
+		<tr><td><a class="button" href="{{@BASE}}/userCP/messaging/write/reply={{@message.mid}}"><check if="({{@forward}})"><true>__Forward</true><false>__Reply</false></check></a></td><td colspan="2"><input class="button delete" type="submit" value="delete" id="{{@message.mid}}"></td></tr>
 	</table>
 </fieldset>
 </div>

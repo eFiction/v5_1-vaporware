@@ -18,14 +18,6 @@ class Story extends Base
 
 	public function index(\Base $f3, $params)
 	{
-		// remove, once commentform is moved to post ajax
-		//if ( $f3->get('AJAX')===TRUE )
-//			$this->ajax_old($f3, $params);
-		/*
-		if ( empty($params['action']) )
-			$data = $this->intro($f3);
-		*/
-		
 		switch(@$params['action'])
 		{
 			case 'read':
@@ -39,6 +31,9 @@ class Story extends Base
 				break;
 			case 'updates':
 				$data = $this->updates($params);
+				break;
+			case 'series':
+				$data = $this->series($params);
 				break;
 			case 'archive':
 			default:
@@ -189,6 +184,12 @@ class Story extends Base
 		if ( $printer == "epub" ) $this->model->printEPub($id);
 
 	}
+	
+	public function series($params)
+	{
+		
+		$this->buffer ( \View\Base::stub("Series") );
+	}
 
 	public function search(\Base $f3, $params)
 	{
@@ -293,7 +294,8 @@ class Story extends Base
 				\Base::instance()->set('bigscreen',TRUE);
 				$content = ($content = $this->model->getChapter( $story, $chapter )) ? : "Error";
 
-				$storyData['reviewData'] = $this->model->loadReviews($story,$storyData['chapid']);
+				if ( $reviewData = $this->model->loadReviews($story,$storyData['chapid']) )
+					$content .= \View\Story::buildReviews($reviewData);
 			}
 
 			$dropdown = \View\Story::dropdown($tocData,$id[1]);
@@ -309,13 +311,8 @@ class Story extends Base
 
 		if ( $select[1] == "stats" )
 		{
-			$statsCache = $this->model->blockStats();
+			$data = \Base::instance()->get('CONFIG')['stats'];
 
-			foreach($statsCache as $sC)
-			{
-				$data[$sC['field']] = $sC['value'];
-			}
-			if ( $data['newmember']!="" ) $data['newmember'] = explode(",",$data['newmember']);
 			return \View\Story::archiveStats($data);
 		}
 		elseif ( $select[1] == "new" )

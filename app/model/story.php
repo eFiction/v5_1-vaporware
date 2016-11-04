@@ -596,7 +596,7 @@ class Story extends Base
 	public function printEPub($id)
 	{
 		$epubSQL =	"SELECT 
-			S.print_cache, S.sid, S.title,
+			S.sid, S.title,
 			GROUP_CONCAT(DISTINCT U.nickname ORDER BY U.nickname ASC SEPARATOR ', ') as authors,
 			'1' AS allow_ebook
 			FROM `tbl_stories`S

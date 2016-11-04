@@ -212,14 +212,9 @@ class Base extends \Prefab {
 	protected function panelMenu($selected=FALSE, array $data=[])
 	{
 		$f3 = \Base::instance();
-		$sql = "SELECT M.label, M.link, M.icon, M.evaluate FROM `tbl_menu_userpanel`M WHERE M.child_of ";
+		$sql = "SELECT M.label, M.link, M.icon, M.evaluate FROM `tbl_menu_userpanel`M WHERE M.child_of @WHERE@ ORDER BY M.order ASC";
 
-		if ( $selected )
-			$sql .= "= :selected;";
-		else
-			$sql .= "IS NULL;";
-
-		$menuItems = $this->exec($sql, [":selected"=> $selected]);
+		$menuItems = $this->exec(str_replace("@WHERE@", ($selected?"= :selected;":"IS NULL;"), $sql) , [":selected"=> $selected]);
 		foreach ( $menuItems as $item )
 		{
 			$item["label"] = explode("%%",$item["label"]);
@@ -401,6 +396,89 @@ class Base extends \Prefab {
 		}
 		return empty($return) ? null : $return;    
 	}
+	
+	/**
+		This function refreshes the user`s cache for feedback and library count on demand
+	**/
+	public function userCacheRecount($module="")
+	{
+		if ( $module == "library" )
+		{
+			$sql[]= "SET @bms  := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_user_favourites`F WHERE F.uid={$_SESSION['userID']} AND F.bookmark=1 GROUP BY F.type) AS F1);";
+			$sql[]= "SET @favs := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_user_favourites`F WHERE F.uid={$_SESSION['userID']} AND F.bookmark=0 GROUP BY F.type) AS F1);";
+			if(array_key_exists("recommendations", $this->config['modules_enabled']))
+			{
+				$sql[]= "SET @recs := (SELECT COUNT(1) FROM `tbl_recommendations` WHERE `uid` = {$_SESSION['userID']});";
+			}
+			else $sql[]= "SET @recs := NULL";
+			$sql[]= "SELECT @bms as bookmark,@favs as favourite,@recs as recommendation;";
+
+			$data = $this->exec($sql)[0];
+		}
+		elseif ( $module == "feedback" )
+		{
+			$sql[]= "SET @rw  := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_feedback`F WHERE F.writer_uid={$_SESSION['userID']} AND F.type IN ('RC','SE','ST') GROUP BY F.type) AS F1);";
+			if(array_key_exists("recommendations", $this->config['modules_enabled']))
+			{
+				$sql[]= "SET @rr  := (SELECT CONCAT_WS('//', SUM(SE+ST+RC), GROUP_CONCAT(type,',',IF(ST=0,IF(SE=0,RC,SE),ST) SEPARATOR '||')) FROM 
+							(SELECT F.type, COUNT(SA.lid) as ST, COUNT(Ser.seriesid) as SE, COUNT(Rec.recid) as RC
+								FROM `tbl_feedback`F
+									LEFT JOIN `tbl_stories_authors`SA ON ( F.reference = SA.sid AND F.type='ST' AND SA.aid = {$_SESSION['userID']} )
+									LEFT JOIN `tbl_recommendations`Rec ON ( F.reference = Rec.recid AND F.type = 'RC' AND Rec.uid = {$_SESSION['userID']} )
+									LEFT JOIN `tbl_series`Ser ON ( F.reference = Ser.seriesid AND F.type = 'SE' AND Ser.uid = {$_SESSION['userID']}	)
+							WHERE F.type IN ('RC','SE','ST') GROUP BY F.type) as F1)";
+			}
+			else
+			{
+				$sql[]= "SET @rr  := (SELECT CONCAT_WS('//', SUM(SE+ST), GROUP_CONCAT(type,',',IF(ST=0,SE,ST) SEPARATOR '||')) FROM 
+							(SELECT F.type, COUNT(SA.lid) as ST, COUNT(Ser.seriesid) as SE
+								FROM `tbl_feedback`F
+									LEFT JOIN `tbl_stories_authors`SA ON ( F.reference = SA.sid AND F.type='ST' AND SA.aid = {$_SESSION['userID']} )
+									LEFT JOIN `tbl_series`Ser ON ( F.reference = Ser.seriesid AND F.type = 'SE' AND Ser.uid = {$_SESSION['userID']} )
+							WHERE F.type IN ('RC','SE','ST') GROUP BY F.type) as F1)";
+			}
+			$sql[]= "SET @rq := (SELECT COUNT(DISTINCT SA.sid) FROM `tbl_feedback`F INNER JOIN `tbl_stories_authors`SA ON ( F.reference = SA.sid AND F.type='ST' AND SA.aid = {$_SESSION['userID']}) )";
+			$sql[]= "SET @st := (SELECT COUNT(1) FROM `tbl_stories_authors` WHERE `aid` = {$_SESSION['userID']} )";
+
+			$sql[]= "SET @cw  := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_feedback`F WHERE F.writer_uid={$_SESSION['userID']} AND F.type IN ('N','C') GROUP BY F.type) AS F1);";
+			$sql[]= "SET @cr  := (SELECT CONCAT_WS('//', SUM(C+N), GROUP_CONCAT(type,',',IF(C=0,N,C) SEPARATOR '||')) FROM 
+							(SELECT F.type, COUNT(F0.fid) as C, COUNT(N.nid) as N
+								FROM `tbl_feedback`F
+									LEFT JOIN `tbl_feedback`F0 ON ( F.reference_sub = F0.reference AND F.type='C' AND F0.writer_uid = {$_SESSION['userID']} )
+									LEFT JOIN `tbl_news`N ON ( F.reference = N.nid AND F.type = 'N' AND N.uid = {$_SESSION['userID']} )
+							WHERE F.type IN ('C','N') GROUP BY F.type) as F1)";
+
+			if(array_key_exists("shoutbox", $this->config['modules_enabled']))
+			{
+				$sql[]= "SET @sb := (SELECT COUNT(1) FROM `tbl_shoutbox` WHERE `uid` = {$_SESSION['userID']});";
+			}
+			else $sql[]= "SET @sb := NULL";
+
+			$sql[]= "SELECT @rw as rw, @rr as rr, @rq as rq, @st as st, @cw as cw, @cr as cr, @sb as sb;";
+
+			$data = $this->exec($sql)[0];
+		}
+
+		if ( isset($data) )
+		{
+			foreach( $data as $key => $count )
+				list($counter[$key]['sum'], $counter[$key]['details']) = array_pad(explode("//",$count), 2, '');
+
+			foreach ( $counter as &$count )
+			{
+				$cc = $this->cleanResult($count['details']);
+				if(is_array($cc))
+				{
+					$count['details'] = [];
+					foreach ( $cc as $c ) $count['details'][$c[0]] = $c[1];
+				}
+				else $count['details'] = "";
+			}
+			return $counter;
+		}
+		return NULL;
+	}
+
 	
 }
 
