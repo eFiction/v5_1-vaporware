@@ -31,7 +31,9 @@ return array(
 'Guest'			=> 'Guest',
 'ForgotPW'		=> 'Forgot you password',
 'ResetPW'		=> 'Reset my password',
+'ResetPWMail'	=> 'If a user with this name or e-mail exists, a mail containing instructions on how to reset the password has been sent',
 'ChangePW'		=> 'Change password',
+'PWRecovery'	=> 'Password recovery',
 'Login_NoMatch'	=> 'Failed to log in, invalid username or password!',
 'Login_NoData'	=> 'Failed to log in, data error!',
 
@@ -166,6 +168,8 @@ return array(
 'AdminMenu_Settings' => 'Settings',
 'AdminMenu_Server' => 'Server',
 	'AdminMenu_DateTime'	=> 'Date and time',
+	'AdminMenu_Mail'		=> 'Mail and mail server',
+	'AdminMenu_Maintenance'	=> 'Maintenance',
 'AdminMenu_Registration' => 'Registration',
 	'AdminMenu_AntiSpam'	=> 'Spam protection',
 'AdminMenu_Security'	=> 'Security',
@@ -187,6 +191,9 @@ return array(
 
 'AdminMenu_Archive' => 'Archive',
 	'AdminMenu_Intro' => 'Intro',
+'AdminMenu_Submission' => 'Submissions',
+	'AdminMenu_Stories' => 'Stories',
+	'AdminMenu_Reviews' => 'Reviews',
 'AdminMenu_Featured' => 'Featured',
 	'AdminMenu_Future' => 'Future',
 	'AdminMenu_Current' => 'Current',

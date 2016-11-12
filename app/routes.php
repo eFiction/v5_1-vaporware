@@ -116,7 +116,7 @@ else
 		Guest routes
 	-------------------- */
 
-	$f3->route( 'GET|POST /forgotpw', 'Controller\Auth->forgotpw' );
+//	$f3->route( 'GET|POST /forgotpw', 'Controller\Auth->forgotpw' );
 
 	$f3->route( [ 'GET|POST /register', 'GET|POST /register/@status' ], 'Controller\Auth->register' );
 
@@ -130,7 +130,8 @@ else
 			'GET|POST /userCP/*',
 			'GET|POST /adminCP',
 			'GET|POST /adminCP/*',
-			'GET|POST /login'
+			'GET|POST /login',
+			'GET|POST /login/*'
 		],
 		'Controller\Auth->login' );
 }

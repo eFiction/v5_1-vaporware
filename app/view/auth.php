@@ -5,6 +5,7 @@ class Auth extends Base
 {
 	public static function loginError($f3)
 	{
+		\Base::instance()->set('loginform', TRUE );
 		if( sizeof($f3->get('POST'))>0 )
 		{
 			if(""==$f3->get('POST.login') || ""==$f3->get('POST.password')) 
@@ -19,14 +20,37 @@ class Auth extends Base
 		return \Template::instance()->render('main/login.html','text/html');
 	}
 
-	public static function loginSuccess(\Base $f3)
+	public static function loginMulti(\Base $f3, $switch)
 	{
-		\Base::instance()->set('success', TRUE );
+		switch ($switch)
+		{
+			case "success":
+				\Base::instance()->set('success', TRUE );
+				break;
+			case "lostpw":
+				\Base::instance()->set('lostpw', TRUE );
+				break;
+			case "changed":
+				\Base::instance()->set('changed', TRUE );
+				break;
+			case "tokenform":
+				\Base::instance()->set('tokenform', TRUE );
+				break;
+		}
+
 		\Base::instance()->set('returnpath', (""==$f3->get('POST.returnpath')) ? $f3->get('PATH') : $f3->get('POST.returnpath') );
 
 		return \Template::instance()->render('main/login.html','text/html');
 	}
-	
+
+	public static function lostPWMail(\Base $f3, $user, $token)
+	{
+		\Base::instance()->set('username', $user['nickname']);
+		\Base::instance()->set('token', $token);
+		
+		return \Template::instance()->render('email/lostpw.html','text/html');
+	}
+
 	public static function register($data = [], $error = [])
 	{
 		\Base::instance()->set('data', $data);

@@ -12,22 +12,22 @@
 		<repeat group="{{ @elements.fields }}" value="{{ @element }}" counter="{{ @ctr }}">
 			<dt>{{ nl2br(@element.comment) |raw}}<check if="{{ @element.comment_small }}"><br /><small>{{ nl2br(@element.comment_small) | raw }}</small></check></dt>
 			<switch expr="{{ @element['type'] }}">
+				{* -- TEXT (not TEXTAREA) -- *}
 				<case value="{{ 'text' }}" break="{{ TRUE }}">
-				<!-- TEXT (not TEXTAREA) -->
 				<dd>
-					<input <check if="{{ @element.form_type.0!='' }}">class="half" </check>type="text" value="{{ @element.value }}" name="form_data[{{@elements.section}}][{{@element.name}}]" />
+					<input <check if="{{ @element.form_type.0!='' }}">class="half" </check>type="<check if="{{ @@element.form_type.0=='password' }}"><true>password</true><false>text</false></check>" value="{{ @element.value }}" name="form_data[{{@elements.section}}][{{@element.name}}]" />
 				</dd>
-				<!-- END: TEXT -->
 				</case>
-				<case value="{{ 'textarea' }}" break="{{ TRUE }}">
+				{* -- END: TEXT -- *}
 				<!-- TEXTAREA -->
+				<case value="{{ 'textarea' }}" break="{{ TRUE }}">
 				<dd>
 					<textarea class="text-input" name="form_data[{{@elements.section}}][{{@element.name}}]">{{ @element.value }}</textarea>
 				</dd>
-				<!-- END: TEXTAREA -->
 				</case>
-				<case value="{{ 'select' }}" break="{{ TRUE }}">
+				<!-- END: TEXTAREA -->
 				<!-- SELECT -->
+				<case value="{{ 'select' }}" break="{{ TRUE }}">
 				<dd>
 					<select class="half" name="form_data[{{@elements.section}}][{{@element.name}}]" size="1">
 						<repeat group="{{ @element.form_type }}" value="{{ @option }}">

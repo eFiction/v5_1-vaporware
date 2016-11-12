@@ -35,6 +35,53 @@ class Auth extends Base {
 		return $user['uid'];
 	}
 	
+	public function userRecovery($username, $email)
+	{
+		$data = $this->exec(
+					"SELECT U.uid, U.nickname, U.email FROM `tbl_users`U WHERE ( U.email = :email AND U.email != '' ) OR ( U.login = :login );",
+					[ ':email' => $email, ':login' => $username ]
+				);
+		if ( sizeof($data)>0 )
+			return $data[0];
+		return NULL;
+	}
+	
+	public function setRecoveryToken($uid, $token)
+	{
+		// $uid and $token are safe
+		$this->exec("INSERT INTO `tbl_user_info` (uid,field,info) VALUES ({$uid},-1,'{$token}')
+						ON DUPLICATE KEY UPDATE info='{$token}' ");
+	}
+	
+	public function dropRecoveryToken($uid)
+	{
+		// $uid and $token are safe
+		$this->exec("DELETE FROM `tbl_user_info` WHERE `uid` = {$uid} AND `field` = -1;");
+	}
+	
+	public function getRecoveryToken($token, $ip)
+	{
+		// $ip is safe
+		$recovery = $this->exec(
+			"SELECT U.uid, I.info as token
+				FROM `tbl_users`U 
+					INNER JOIN `tbl_user_info`I ON (U.uid=I.uid AND I.field=-1)
+				WHERE I.info LIKE CONCAT( :token , '//{$ip}//%');",
+			[":token" => $token]
+		);
+		// no token found
+		if ( sizeof($recovery)==0 ) return FALSE;
+		
+		// token expired
+		$token = explode("//",$recovery[0]['token']);
+		if((time()-$token[2])>3600)
+			return FALSE;
+		
+		// return token
+		return $recovery[0]['uid'];
+	}
+	
+	
 	public function userSession($uid)
 	{
 		$session = new \DB\SQL\Mapper($this->db, $this->prefix."sessions");
@@ -171,6 +218,12 @@ class Auth extends Base {
 		/*
 			Password check
 		*/
+		if ( TRUE !== $pw_error = $this->newPasswordQuality( $register['password1'], $register['password2']) )
+		{
+			$error['count']++;
+			$error['password'] = $pw_error;
+		}
+		/*
 		$this->password_regex = '/^(?=^.{'.$this->configExt['reg_min_password'].',}$)(?:.*?(?>((?(1)(?!))[a-z]+)|((?(2)(?!))[A-Z]+)|((?(3)(?!))[0-9]+)|((?(4)(?!))[^a-zA-Z0-9\s]+))){'.$this->configExt['reg_password_complexity'].'}.*$/s';
 		
 		// Passwords match?
@@ -190,6 +243,7 @@ class Auth extends Base {
 			$error['count']++;
 			$error['password'] = "criteria";
 		}
+		*/
 
 		if ( $error['count']==0 )
 		{
@@ -339,7 +393,7 @@ class Auth extends Base {
 							"email"			=> $register['email'],
 							"registered"	=> [ "NOW", "" ],
 							"groups"		=> ($this->configExt['reg_require_email']) ? 0 : 1,
-							"resettoken"	=> $token."//".time(),
+							//"resettoken"	=> $token."//".time(),
 						];
 		$userID = $this->insertArray("tbl_users", $data);
 		
@@ -359,7 +413,7 @@ class Auth extends Base {
 				"tbl_users",
 				[
 					"groups"		=> 0,						// Revoke login permission (if set)
-					"resettoken"	=> NULL,				// Revoke the token
+					//"resettoken"	=> NULL,				// Revoke the token
 					"about"			=> $_SERVER['REMOTE_ADDR'].'#'.$this->regModeration	// Remember why this user is on moderation
 				],
 				[ "uid=?", $userID ]

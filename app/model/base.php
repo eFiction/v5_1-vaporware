@@ -18,6 +18,26 @@ class Base extends \Prefab {
 	{
 		return $this->db->exec(str_replace("`tbl_", "`{$this->prefix}", $cmds), $args,$ttl,$log);
 	}
+
+	public function newPasswordQuality($password1, $password2)
+	{
+		if ( empty($this->configExt) ) $this->configExt = $this->extendConfig();
+
+		$this->password_regex = '/^(?=^.{'.$this->configExt['reg_min_password'].',}$)(?:.*?(?>((?(1)(?!))[a-z]+)|((?(2)(?!))[A-Z]+)|((?(3)(?!))[0-9]+)|((?(4)(?!))[^a-zA-Z0-9\s]+))){'.$this->configExt['reg_password_complexity'].'}.*$/s';
+		
+		// Passwords match?
+		if( $password1 == "" OR $password2 == "" )
+			return "missing";
+
+		if ( $password1 != $password2 )
+			return "mismatch";
+
+		// Passwords meets the criteria required?
+		if ( preg_match( $this->password_regex, $password1, $matches) != 1 )
+			return "criteria";
+		
+		return TRUE;
+	}
 	
 	public function userChangePW($uid, $password)
 	{

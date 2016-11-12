@@ -71,22 +71,119 @@ class Auth extends Base {
 	
 	public function login($f3,$params)
 	{
+		if ( isset($params[1]) ) $params = ($this->parametric($params[1]));
 		\Registry::get('VIEW')->addTitle( $f3->get('LN__Login') );
+		
 		if( $f3->exists('POST.login') && $f3->exists('POST.password') )
 		{
 			if ( $userID = $this->model->userLoad($f3->get('POST.login'), $f3->get('POST.password') ) )
 			{
 				/*
-				$this->buffer( \View\Auth::loginSuccess($f3) );
+				$this->buffer( \View\Auth::loginMulti($f3, "success") );
 				*/
 				$f3->reroute($f3->get('POST')['returnpath'], false);
 				exit;
 			}
 			$this->buffer( \View\Auth::loginError($f3) );
 		}
+		elseif( ($f3->exists('POST.username') OR $f3->exists('POST.email')) AND $f3->get('POST.username').$f3->get('POST.email')>"" )
+		{
+			$this->recoveryMail($f3);
+		}
+		elseif( isset($params['token']) )
+		{
+			if ( $f3->exists('POST.token') AND ""!=$f3->get('POST.token') ) $params['token'] = $f3->get('POST.token');
+			$this->recoveryForm($f3, $params['token']);
+		}
 
 		else
 			$this->buffer( \View\Auth::loginError($f3) );
+	}
+	
+	protected function recoveryMail(\Base $f3)
+	{
+		$recovery = $this->model->userRecovery($f3->get('POST.username'), $f3->get('POST.email'));
+		if ( $recovery )
+		{
+			$token = md5(time());
+			$dbtoken = $token."//".ip2long($_SERVER["REMOTE_ADDR"])."//".time();
+			$this->model->setRecoveryToken($recovery['uid'], $dbtoken);
+			
+			$this->buffer( \View\Auth::loginMulti($f3, "lostpw") );
+			
+			$mailText = \View\Auth::lostPWMail($f3, $recovery, $token);
+			
+			if ( $this->cfg['smtp_server']!="" )
+			{
+				$smtp = new \SMTP ( 
+							$this->cfg['smtp_server'], 
+							$this->cfg['smtp_scheme'], 
+							$this->cfg['smtp_port']=="" ? ( $this->cfg['smtp_scheme']=="ssl" ? 465 : 587 ) : $this->cfg['smtp_port'],
+							$this->cfg['smtp_username'], 
+							$this->cfg['smtp_password']
+				);
+				$smtp->set('From', '"'.$this->cfg['page_title'].'" <'.$this->cfg['page_mail'].'>');
+				$smtp->set('To', '"'.$recovery['nickname'].'" <'.$recovery['email'].'>');
+				$smtp->set('Subject', $f3->get('LN__PWRecovery'));
+				$smtp->set('content_type', 'text/html; charset="utf-8"');
+				
+				$sent = $smtp->send($mailText, TRUE);
+				//$mylog = $smtp->log();
+				//echo '<pre>'.$smtp->log().'</pre>';
+			}
+			else
+			{
+				$headers   = array();
+				$headers[] = "MIME-Version: 1.0";
+				$headers[] = "Content-Type: text/html; charset=utf-8";
+				$headers[] = "From: {$this->cfg['page_title']} <{$this->cfg['page_mail']}>";
+				$headers[] = "X-Mailer: PHP/".phpversion();
+				
+				$sent = mail(
+					"{$recovery['nickname']} <{$recovery['email']}>",	// recipient
+					$f3->get('LN__PWRecovery'),							// subject
+					$mailText,											// content
+					implode("\r\n", $headers)							// headers
+				);
+			}
+			return $sent;
+		}
+		return FALSE;
+	}
+	
+	protected function recoveryForm(\Base $f3, $token)
+	{
+		if ( TRUE === $token OR $user = $this->model->getRecoveryToken($token, ip2long($_SERVER["REMOTE_ADDR"])) )
+		{
+			// valid token, proceed
+			if ( TRUE !== $token AND $f3->exists('POST.newpassword1') AND ( TRUE === $pw_check = $this->model->newPasswordQuality( $f3->get('POST.newpassword1'), $f3->get('POST.newpassword2')) ) )
+			{
+				$this->model->userChangePW($user, $f3->get('POST.newpassword1'));
+				$this->model->dropRecoveryToken($user);
+				$this->buffer( \View\Auth::loginMulti($f3, "changed") );
+			}
+			else
+			{
+				//print_r($pw_check);
+				if ( $f3->exists('POST.token') AND ""!=$f3->get('POST.token') )
+					$f3->set('resettoken',$f3->get('POST.token'));
+				elseif (TRUE===$token)
+					$f3->set('resettoken','');
+				else
+					$f3->set('resettoken',$token);
+
+				$this->buffer( \View\Auth::loginMulti($f3, "tokenform") );
+				//echo $pw_check;
+			}
+			//$this->buffer( print_r($user,1) );
+			//echo $params['token'];
+		}
+		else
+		{
+			// some error message
+			$this->buffer( "__tokenInvalid" );
+		}
+	
 	}
 	
 	public function logout($f3,$params)

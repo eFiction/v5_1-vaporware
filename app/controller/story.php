@@ -272,7 +272,8 @@ class Story extends Base
 		if($storyData = $this->model->getStory($id[0],@$id[1]))
 		{
 			$story = $id[0];
-			if ( empty($id[1]) AND $storyData['chapters']>1 ) $id[1] = "toc";
+			if ( empty($id[1]) AND $storyData['chapters']>1 )
+				$id[1] = (TRUE===\Base::instance()->get('CONFIG')['story_toc_default']) ? "toc" : 1;
 
 			if ( isset($id[1]) AND $id[1] == "reviews" )
 			{

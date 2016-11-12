@@ -4,6 +4,7 @@ namespace Model;
 
 class Story extends Base
 {
+	
 	public function intro()
 	{
 		$limit = $this->config['story_intro_items'];
@@ -288,13 +289,14 @@ class Story extends Base
 	{
 		$sql_StoryConstruct = "SELECT SQL_CALC_FOUND_ROWS
 				S.sid, S.title, S.summary, S.storynotes, S.completed, S.wordcount, UNIX_TIMESTAMP(S.date) as published, UNIX_TIMESTAMP(S.updated) as modified, 
-				S.count,GROUP_CONCAT(rSC.chalid) as contests,GROUP_CONCAT(Ser.seriesid,',',rSS.inorder,',',Ser.title ORDER BY Ser.title DESC SEPARATOR '||') as in_series @EXTRA@,
+				S.count,GROUP_CONCAT(Ser.seriesid,',',rSS.inorder,',',Ser.title ORDER BY Ser.title DESC SEPARATOR '||') as in_series @EXTRA@,
+				".((isset($this->config['modules_enabled']['contests']))?"GROUP_CONCAT(rSC.relid) as contests,":"")."
 				GROUP_CONCAT(Fav.bookmark,',',Fav.fid SEPARATOR '||') as is_favourite,
 				Ra.rating as rating_name, Edit.uid as can_edit,
 				S.cache_authors, S.cache_tags, S.cache_characters, S.cache_categories, S.cache_rating, S.chapters, S.reviews
 			FROM `tbl_stories`S
 				@JOIN@
-			LEFT JOIN `tbl_contest_relation`rSC ON ( rSC.relid = S.sid AND rSC.type = 'story' )
+			".((isset($this->config['modules_enabled']['contests']))?"LEFT JOIN `tbl_contest_relations`rSC ON ( rSC.relid = S.sid AND rSC.type = 'story' )":"")."
 			LEFT JOIN `tbl_series_stories`rSS ON ( rSS.sid = S.sid )
 				LEFT JOIN `tbl_series`Ser ON ( Ser.seriesid=rSS.seriesid )
 			LEFT JOIN `tbl_ratings`Ra ON ( Ra.rid = S.ratingid )
@@ -307,7 +309,7 @@ class Story extends Base
 			GROUP BY S.sid
 			@ORDER@
 			@LIMIT@";
-			
+
 		// default replacements
 		$replace =
 		[
@@ -587,7 +589,7 @@ class Story extends Base
 
 		return $this->exec("SELECT S.title, S.sid, S.summary, S.cache_authors, S.cache_rating, S.cache_categories
 				FROM `tbl_stories`S
-					INNER JOIN `tbl_stories_featured`F ON ( F.sid = S.sid AND F.status=1 OR ( F.status IS NULL AND F.start < NOW() AND F.end > NOW() ))
+					INNER JOIN `tbl_featured`F ON ( type='ST' AND F.id = S.sid AND F.status=1 OR ( F.status IS NULL AND F.start < NOW() AND F.end > NOW() ))
 			ORDER BY {$sort} {$limit}");
 		// 1 = aktuell, 2, ehemals
 		//return $this
@@ -655,19 +657,28 @@ class Story extends Base
 		$filename = realpath("tmp/epub")."/s{$epubData['sid']}.zip";
 
 		// Load or create the namespace
+		/*
 		if ( "" == @\Config::instance()->epub_namespace )
 		{
 			$cfg = \Config::instance();
 			$cfg['epub_namespace'] = uuid_v5("6ba7b810-9dad-11d1-80b4-00c04fd430c8", \Base::instance()->get('HOST').\Base::instance()->get('BASE') );
 			$cfg->save();
 		}
+		*/
 
 		/*
 		This must be coming from admin panel at some point, right now we will fake it
 		*/
 		$epubData['version'] = 2;		// supported by most readers, v3 is still quite new
 		$epubData['language'] = "de";
-		$epubData['uuid']  = uuid_v5(\Config::instance()->epub_namespace, $epubData['title']);
+		$epubData['uuid']  = uuid_v5(
+										uuid_v5
+										(
+											"6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+											(""==\Config::instance()->epub_domain) ? \Base::instance()->get('HOST').\Base::instance()->get('BASE') : \Config::instance()->epub_domain
+										),
+										$epubData['title']
+									);
 		
 		\Base::instance()->set('EPUB', $epubData);
 

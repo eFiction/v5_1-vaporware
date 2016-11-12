@@ -1,15 +1,43 @@
+<check if="{{ isset(@lostpw) }}">
+<div class="alert-box info">
+{{@LN__ResetPWMail}}.<br/>
+<br/>
+<a href="{{ @BASE }}{{ @returnpath}}">__Click</a>
+	</div>
+</check>
+<check if ="{{ isset(@tokenform)}}">
 <div class="grid-wrapper">
-<check if ="{{ isset(@success)}}"><true>
+	<div class="gb-half">
+			<fieldset>
+				<legend>{{ @LN__PWRecovery }}</legend>
+				<form method="post" action="{{ @BASE }}/login/token">
+				<div class="field"><span class="icon">{ICON:member}</span><input class="field input" value="{{@resettoken}}" type="text" name="token"></div>
+				<div class="field"><span class="icon">{ICON:key}</span><input class="field input" placeholder="{{@LN__Password}}" type="password" name="newpassword1"></div>
+				<div class="field"><span class="icon">{ICON:key}</span><input class="field input" placeholder="{{@LN__Password}}" type="password" name="newpassword2"></div>
+				<input class="button" type="submit" value="{{@LN__Login}}"><input type="hidden" name="returnpath" value="{{ @returnpath }}">
+				</form>
+			</fieldset>
+	</div>
+</div>
+</check>
+<check if ="{{ isset(@success)}}">
 	<div class="centermessage">
 Good!
 <a href="{{ @BASE }}{{ @returnpath}}">__Click</a>
 	</div>
-</true>
-<false>
-	<check if="{{ isset(@error) }}"><div class="gb-full"><div class="note alert-box error">{{ ${'LN__'.@error} }}</div></div></check>
-	<check if="{{ isset(@login.info) }}"><div class="gb-full"><div class="note alert-box info">{{@login.info}}</div></div></check>
+</check>
+<check if ="{{ isset(@changed)}}">
+<div class="centermessage">
+	Password has been changed!
+	<a href="{{ @BASE }}">__Click</a>
+</div>
+</check>
+<check if ="{{ isset(@loginform)}}">
+
+	<check if="{{ isset(@error) }}"><div class="gb-full"><div class="alert-box error">{{ ${'LN__'.@error} }}</div></div></check>
+	<check if="{{ isset(@login.info) }}"><div class="gb-full"><div class="alert-box info">{{@login.info}}</div></div></check>
+<div class="grid-wrapper">
 	<div class="gb-half">
-		<div id="login">
 			<fieldset>
 				<legend>{{ @LN__Login }}</legend>
 				<form method="post" action="{{ @BASE }}/login">
@@ -18,22 +46,20 @@ Good!
 				<input class="button" type="submit" value="{{@LN__Login}}"><input type="hidden" name="returnpath" value="{{ @returnpath }}">
 				</form>
 			</fieldset>
-		</div>
-		</div>
-		<div class="gb-half">
-		<div id="forgotpw">
+	</div>
+	<div class="gb-half">
 			<fieldset>
 				<legend>{{@LN__ForgotPW}}?</legend>
-				<form method="post" action="{{ @BASE }}/forgotpw">
+				<form method="post" action="{{ @BASE }}/login">
 				<div class="field"><span class="icon">{ICON:member}</span><input class="field input" placeholder="{{@LN__Username}}" type="text" name="username"></div>
+				<div>or</div>
 				<div class="field"><span class="icon">{ICON:mail}</span><input class="field input" placeholder="{{@LN__Email}}"  type="text" name="email"></div>
-				<input class="button" type="submit" value="{{@LN__ResetPW}}"><input type="hidden" name="returnpath" value="action={{ @returnpath }}">
+				<input class="button" type="submit" value="{{@LN__ResetPW}}"><input type="hidden" name="returnpath" value="{{ @returnpath }}">
 				</form>
 			</fieldset>
-		</div>
 	</div>
 	<check if="{{ @CONFIG.allow_registration }}">
 	<div class="gb-full"><a href="{{ @BASE }}/register">{{@LN__RegisterNow}}</a></div>
 	</check>
-</false></check>
 </div>
+</check>

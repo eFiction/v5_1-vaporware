@@ -77,7 +77,8 @@ class AdminCP_Settings extends AdminCP
 		}
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Server') );
 		$data['DateTime'] = $this->model->settingsFields('settings_datetime');
-		$data['Server'] = $this->model->settingsFields('settings_server');
+		$data['Mail'] = $this->model->settingsFields('settings_mail');
+		$data['Maintenance'] = $this->model->settingsFields('settings_maintenance');
 	}
 
 	public function save(\Base $f3, $params)

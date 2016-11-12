@@ -5,7 +5,7 @@ namespace Controller;
 class AdminCP_Archive extends AdminCP
 {
 	var $moduleBase = "archive";
-	var $submodules = [ "featured", "characters", "tags", "categories" ];
+	var $submodules = [ "submit", "featured", "characters", "tags", "categories" ];
 
 	public function index(\Base $f3, $params, $feedback = [ NULL, NULL ] )
 	{
@@ -14,6 +14,9 @@ class AdminCP_Archive extends AdminCP
 
 		switch( $this->moduleInit(@$params['module']) )
 		{
+			case "submit":
+				$this->submit($f3, $feedback);
+				break;
 			case "featured":
 				$this->featured($f3, $params, $feedback);
 				break;
@@ -63,6 +66,19 @@ class AdminCP_Archive extends AdminCP
 		$data['General'] = $this->model->settingsFields('archive_general');
 		$data['Intro'] = $this->model->settingsFields('archive_intro');
 		$this->buffer( \View\AdminCP::settingsFields($data, "archive/home", $feedback) );
+	}
+	
+	protected function submit(\Base $f3, $feedback = [ NULL, NULL ])
+	{
+		if ( isset($_POST['form_data']) )
+		{
+			$feedback = $this->model->saveKeys($f3->get('POST.form_data'));
+		}
+		//$this->response->addTitle( $f3->get('LN__AdminMenu_Archive') );
+		$this->response->addTitle( $f3->get('LN__AdminMenu_Submission') );
+		$data['Stories'] = $this->model->settingsFields('archive_submit');
+		$data['Reviews'] = $this->model->settingsFields('archive_reviews');
+		$this->buffer( \View\AdminCP::settingsFields($data, "archive/submit", $feedback) );
 	}
 	
 	

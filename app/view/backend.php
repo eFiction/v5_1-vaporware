@@ -34,12 +34,16 @@ class Backend extends Base
 		$f3->set('TITLE', implode($cfg['page_title_separator'], array_merge([$cfg['page_title']],$this->title) ) );
 
 		$f3->set('DEBUGLOG', $f3->get('DB')->log());
+		
+		$Iconset = Iconset::instance();
 
 		return preg_replace_callback(
 								'/\{ICON:([\w-]+)\}/s',
-								function ($icon)
+								function ($icon) use($Iconset)
 								{
-									return Iconset::instance()->{$icon[1]};
+									if ( $Iconset->exists($icon[1]) )
+										return $Iconset->get($icon[1]);
+									return "";
 									//return "#";
 								}
 								, \Template::instance()->render('layout.html')
