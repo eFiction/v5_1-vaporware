@@ -66,7 +66,7 @@
     			$(this).dialog('close');
     		},
     		__OK: function() {
-    	              window.location.href = "__baseURL?action=controlpanel&module=messaging,{MODULE}&delete="+element_id;
+    	              window.location.href = "{{@BASE}}/userCP/messaging/delete/message="+element_id+"/returnpath={{@WHICH}}";
     		  $(this).dialog('close');
     		}
     	}

@@ -222,9 +222,60 @@ class UserCP extends Base
 	public function settings(\Base $f3, $params)
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Settings') );
-		$this->buffer ( \View\Base::stub("settings") );
+		$sub = [ "profile", "preferences", "changepw" ];
+		if ( !in_array(@$params[0], $sub) ) $params[0] = "";
+
+		switch ( $params[0] )
+		{
+			case "profile":
+				$this->settingsProfile($f3, $params);
+				break;
+			case "preferences":
+				$this->settingsArchive($f3, $params);
+				break;
+			case "changepw":
+				$this->settingsChangePW($f3, $params);
+				break;
+			default:
+				$this->settingsUser($f3, $params);
+		}
 
 		$this->showMenu("settings");
+	}
+	
+	protected function settingsProfile(\Base $f3, $params)
+	{
+		
+	}
+
+	protected function settingsArchive(\Base $f3, $params)
+	{
+		
+	}
+
+	protected function settingsChangePW(\Base $f3, $params)
+	{
+		$feedback ="";
+		if( NULL != $post = $f3->get('POST') )
+		{
+			if ( TRUE === $check = $this->model->settingsCheckPW($f3->get('POST.change.old')) )
+			{
+				if ( TRUE === $new = $this->model->newPasswordQuality($f3->get('POST.change.new1'),$f3->get('POST.change.new2')) )
+				{
+					$this->model->userChangePW( $_SESSION['userID'], $f3->get('POST.change.new1') );
+					$feedback = "success";
+				}
+				else $feedback = "error";
+			}
+			else $feedback = "error";
+		}
+		
+		$this->buffer ( \View\UserCP::settingsChangePW($feedback) );
+	}
+
+	protected function settingsUser(\Base $f3, $params)
+	{
+		
 	}
 
 	public function library(\Base $f3, $params)
@@ -350,7 +401,7 @@ class UserCP extends Base
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Message') );
 		
-		$sub = [ "outbox", "read", "write" ];
+		$sub = [ "outbox", "read", "write", "delete" ];
 		if ( !in_array(@$params[0], $sub) ) $params[0] = "";
 
 		switch ( $params[0] )
@@ -360,6 +411,9 @@ class UserCP extends Base
 				break;
 			case "write":
 				$this->msgWrite($f3, $params);
+				break;
+			case "delete":
+				$this->msgDelete($f3, $params);
 				break;
 			case "outbox":
 				$data = $this->model->msgOutbox();
@@ -379,6 +433,23 @@ class UserCP extends Base
 			$this->buffer ( \View\UserCP::msgRead($data) );
 		}
 		else $this->buffer( "*** No such message or access violation!");
+	}
+	
+	public function msgDelete(\Base $f3, $params)
+	{
+		if ( is_numeric($params['message']) )
+		{
+			$result = $this->model->msgDelete($params['message']);
+			var_dump($result);
+		}
+		print_r($params);
+		/*
+		if ( $data = $this->model->msgRead($params['id']) )
+		{
+			$this->buffer ( \View\UserCP::msgRead($data) );
+		}
+		else $this->buffer( "*** No such message or access violation!");
+		*/
 	}
 	
 	// fix me!
@@ -411,9 +482,7 @@ class UserCP extends Base
 				// Build an array of recipients
 			}
 			
-			$status = $this->model->msgSave($save);
-
-			print_r($save);
+			$status = $this->model->msgSave($save); // return TRUE
 		}
 	}
 	

@@ -140,6 +140,7 @@ class AdminCP_Settings extends AdminCP
 				$data['active'] = array_key_exists($data['folder'], $layoutConfig['layout_available']);
 				$layoutFiles[] = $data;
 			}
+			print_r($data);
 		}
 
 		return \View\AdminCP::layout($layoutFiles, $layoutConfig);

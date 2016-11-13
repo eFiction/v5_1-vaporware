@@ -246,12 +246,12 @@ class AdminCP extends Base {
 	public function tagGroupsList($page, $sort)
 	{
 		/*
-		CREATE OR REPLACE VIEW efi5_list_tag_groups AS SELECT G.tgid,G.description,COUNT(T.tid) as `count`
+		CREATE OR REPLACE VIEW tbl_list_tag_groups AS SELECT G.tgid,G.description,COUNT(T.tid) as `count`
 				FROM `tbl_tag_groups`G 
 				LEFT JOIN `tbl_tags`T ON ( G.tgid = T.tgid )
 		
 
-		$tags = new \DB\SQL\Mapper($this->db, 'efi5_list_tag_groups' );
+		$tags = new \DB\SQL\Mapper($this->db, 'tbl_list_tag_groups' );
 		$data = $tags->paginate($page, 10, NULL, [ 'order' => "{$sort['order']} {$sort['direction']}", ] );
 		*/
 		$limit = 20;
@@ -403,8 +403,8 @@ class AdminCP extends Base {
 	public function loadCategoryPossibleParents($cid)
 	{
 		$sql = "SELECT C.cid, C.parent_cid, C.leveldown, C.category
-					FROM `efi5_categories`C 
-					INNER JOIN `efi5_categories`C2 ON ( ( C.parent_cid = C2.parent_cid OR C.cid = C2.parent_cid )AND C2.cid = :cid ) 
+					FROM `tbl_categories`C 
+					INNER JOIN `tbl_categories`C2 ON ( ( C.parent_cid = C2.parent_cid OR C.cid = C2.parent_cid )AND C2.cid = :cid ) 
 				WHERE C.cid != :cid2
 				ORDER BY C.leveldown, C.inorder ASC ";
 		
@@ -733,15 +733,15 @@ class AdminCP extends Base {
 
 		/*
 		active:
-		SELECT * FROM `efi5_stories_featured` WHERE status=1 OR ( start < NOW() AND end > NOW() )
+		SELECT * FROM `tbl_stories_featured` WHERE status=1 OR ( start < NOW() AND end > NOW() )
 		*/
 		/*
 		past:
-		SELECT * FROM `efi5_stories_featured` WHERE status=2 OR end < NOW()
+		SELECT * FROM `tbl_stories_featured` WHERE status=2 OR end < NOW()
 		*/
 		/*
 		future:
-		SELECT * FROM `efi5_stories_featured` WHERE start > NOW()
+		SELECT * FROM `tbl_stories_featured` WHERE start > NOW()
 		*/
 
 		$limit = 20;
@@ -766,7 +766,7 @@ class AdminCP extends Base {
 					$join,
 					"SELECT SQL_CALC_FOUND_ROWS S.title, S.sid, S.summary, S.cache_authors, S.cache_rating
 						FROM `tbl_stories`S
-						INNER JOIN `tbl_stories_featured`F ON ( F.sid = S.sid AND %JOIN% )
+						INNER JOIN `tbl_featured`F ON ( F.type='ST' AND F.id = S.sid AND %JOIN% )
 					ORDER BY {$sort['order']} {$sort['direction']}
 					LIMIT ".(max(0,$pos*$limit)).",".$limit
 				);
@@ -787,7 +787,7 @@ class AdminCP extends Base {
 	{
 		$sql = "SELECT SQL_CALC_FOUND_ROWS S.title, S.sid, S.summary, F.status, F.start, F.end, F.uid, U.nickname, S.cache_authors, S.cache_rating
 					FROM `tbl_stories`S
-						LEFT JOIN `tbl_stories_featured`F ON ( F.sid = S.sid )
+						LEFT JOIN `tbl_featured`F ON ( F.type='ST' AND F.id = S.sid )
 						LEFT JOIN `tbl_users`U ON ( F.uid = U.uid )
 				WHERE S.sid = :sid";
 		$data = $this->exec($sql, [":sid" => $sid ]);
@@ -1252,7 +1252,7 @@ class AdminCP extends Base {
 		foreach ( $data as $dat )
 			$config[$dat['name']] = $dat['value'];
 
-		$config['layout_available'] = @json_decode($config['layout_available']);
+		$config['layout_available'] = json_decode($config['layout_available'],TRUE);
 		if ( !is_array($config['layout_available']) ) $config['layout_available'] = [];
 
 		return $config;

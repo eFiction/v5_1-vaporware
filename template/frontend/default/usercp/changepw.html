@@ -1,0 +1,13 @@
+<check if="{{@feedback=='error'}}"><div class="note alert-box-half error">Error</div></check>
+<check if="{{@feedback=='success'}}"><div class="note alert-box-half success">Success</div></check>
+<form method="post" action="{{@BASE}}/userCP/settings/changepw">
+	<fieldset>
+		<legend>{{@LN__ChangePW}}</legend>
+		<div class="grid-wrap">
+			<div class="gb-20">__oldPW:</div><div class="gb-80"><input type="password" name="change[old]" /></div>
+			<div class="gb-20">__newPW:</div><div class="gb-80"><input type="password" name="change[new1]" /></div>
+			<div class="gb-20">__newPWconfirm:</div><div class="gb-80"><input type="password" name="change[new2]" /></div>
+			<div class="gb-full"><input class="button" type="submit"></full>
+		</div>
+	</fieldset>
+</form>

@@ -64,6 +64,43 @@ class Base extends \Prefab {
 		return $r;
 	}
 
+	public function mailman($subject, $mailText, $rcpt_mail, $rcpt_name=NULL)
+	{
+		if ( $this->cfg['smtp_server']!="" )
+		{
+			$smtp = new \SMTP ( 
+						$this->cfg['smtp_server'], 
+						$this->cfg['smtp_scheme'], 
+						$this->cfg['smtp_port']=="" ? ( $this->cfg['smtp_scheme']=="ssl" ? 465 : 587 ) : $this->cfg['smtp_port'],
+						$this->cfg['smtp_username'], 
+						$this->cfg['smtp_password']
+			);
+			$smtp->set('From', '"'.$this->cfg['page_title'].'" <'.$this->cfg['page_mail'].'>');
+			$smtp->set('To', '"'.$rcpt_name.'" <'.$rcpt_mail.'>');
+			$smtp->set('Subject', $subject);
+			$smtp->set('content_type', 'text/html; charset="utf-8"');
+			
+			$sent = $smtp->send($mailText, TRUE);
+			//$mylog = $smtp->log();
+			//echo '<pre>'.$smtp->log().'</pre>';
+		}
+		else
+		{
+			$headers   = array();
+			$headers[] = "MIME-Version: 1.0";
+			$headers[] = "Content-Type: text/html; charset=utf-8";
+			$headers[] = "From: {$this->cfg['page_title']} <{$this->cfg['page_mail']}>";
+			$headers[] = "X-Mailer: PHP/".phpversion();
+			
+			$sent = mail(
+				"{$rcpt_name} <{$rcpt_mail}>",	// recipient
+				$subject,							// subject
+				$mailText,											// content
+				implode("\r\n", $headers)							// headers
+			);
+		}
+	}
+	
 	/**
 	 * kick start the View, which creates the response
 	 * based on our previously set content data.

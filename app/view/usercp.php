@@ -109,4 +109,11 @@ class UserCP extends Base
 		return \Template::instance()->render('usercp/feedback.edit.html');
 	}
 	
+	public static function settingsChangePW($feedback)
+	{
+		\Base::instance()->set('feedback', $feedback);
+		
+		return \Template::instance()->render('usercp/changepw.html');
+	}
+	
 }

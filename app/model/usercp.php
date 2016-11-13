@@ -111,12 +111,12 @@ class UserCP extends Base
 		$chapters = $this->exec("SELECT COUNT(1) as count FROM `tbl_chapters`C INNER JOIN `tbl_stories_authors`SA ON ( C.sid = SA.sid ) WHERE SA.aid = {$_SESSION['userID']};")[0]['count'];
 		$stats = 
 		[
-			"stories"	=> $data['st']['sum'],
-			"storiesReviewedQ" => round(($data['rq']['sum']/$data['st']['sum']*100),1),
-			"storiesReviewedPie" => (int)($data['rq']['sum']/$data['st']['sum']*360),
-			"reviewsPerStory"=> round(($data['rr']['details']['ST']/$data['rq']['sum']),1),
-			"reviewsPerStoryTotal"=> round(($data['rr']['details']['ST']/$data['st']['sum']),1),
-			"reviewsPerChapter"=> round(($data['rr']['details']['ST']/$chapters),1),
+			"stories"				=> $data['st']['sum'],
+			"storiesReviewedQ"		=> $data['st']['sum'] > 0 ? round(($data['rq']['sum']/$data['st']['sum']*100),1) : NULL,
+			"storiesReviewedPie"	=> $data['st']['sum'] > 0 ? (int)($data['rq']['sum']/$data['st']['sum']*360) :NULL,
+			"reviewsPerStory"		=> $data['rq']['sum'] > 0 ? round(($data['rr']['details']['ST']/$data['rq']['sum']),1) : NULL,
+			"reviewsPerStoryTotal"	=> $data['st']['sum'] > 0 ? round(($data['rr']['details']['ST']/$data['st']['sum']),1) : NULL,
+			"reviewsPerChapter"		=> $chapters > 0 ?			round(($data['rr']['details']['ST']/$chapters),1) : NULL,
 		];
 //		print_r($stats);
 //		print_r($data);
@@ -239,6 +239,12 @@ class UserCP extends Base
 			$data = $this->exec($saveSQL, $bind);
 		}
 		return TRUE;
+	}
+	
+	public function msgDelete($message)
+	{
+		$sql = "DELETE FROM `tbl_messaging` WHERE mid = :message AND ( ( sender = {$_SESSION['userID']} AND date_read IS NULL ) OR ( recipient = {$_SESSION['userID']} ) )";
+		return $this->exec($sql, [ ":message" => $message ]);
 	}
 	
 	public function libraryBookFavDelete($params)
@@ -457,6 +463,25 @@ class UserCP extends Base
 			];
 			return $this->insertArray('tbl_user_favourites', $insert, TRUE);
 		}
+		return FALSE;
+	}
+	
+	public function settingsCheckPW($oldPW)
+	{
+		// Load a compatibility wrapper for PHP versions prior to 5.5.0
+		if ( !function_exists("password_hash") ) include ( "app/inc/password_compat.php" );
+
+		$password = $this->exec("SELECT U.password FROM `tbl_users` U where ( U.uid = {$_SESSION['userID']} )")[0]['password'];
+		
+		if ( password_verify ( $oldPW, $password ) )
+			return TRUE;
+		
+		if( $password==md5($oldPW) )
+		{
+			$this->userChangePW( $_SESSION['userID'], $oldPW );
+			return TRUE;
+		}
+		
 		return FALSE;
 	}
 }

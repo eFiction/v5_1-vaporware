@@ -113,40 +113,7 @@ class Auth extends Base {
 			
 			$mailText = \View\Auth::lostPWMail($f3, $recovery, $token);
 			
-			if ( $this->cfg['smtp_server']!="" )
-			{
-				$smtp = new \SMTP ( 
-							$this->cfg['smtp_server'], 
-							$this->cfg['smtp_scheme'], 
-							$this->cfg['smtp_port']=="" ? ( $this->cfg['smtp_scheme']=="ssl" ? 465 : 587 ) : $this->cfg['smtp_port'],
-							$this->cfg['smtp_username'], 
-							$this->cfg['smtp_password']
-				);
-				$smtp->set('From', '"'.$this->cfg['page_title'].'" <'.$this->cfg['page_mail'].'>');
-				$smtp->set('To', '"'.$recovery['nickname'].'" <'.$recovery['email'].'>');
-				$smtp->set('Subject', $f3->get('LN__PWRecovery'));
-				$smtp->set('content_type', 'text/html; charset="utf-8"');
-				
-				$sent = $smtp->send($mailText, TRUE);
-				//$mylog = $smtp->log();
-				//echo '<pre>'.$smtp->log().'</pre>';
-			}
-			else
-			{
-				$headers   = array();
-				$headers[] = "MIME-Version: 1.0";
-				$headers[] = "Content-Type: text/html; charset=utf-8";
-				$headers[] = "From: {$this->cfg['page_title']} <{$this->cfg['page_mail']}>";
-				$headers[] = "X-Mailer: PHP/".phpversion();
-				
-				$sent = mail(
-					"{$recovery['nickname']} <{$recovery['email']}>",	// recipient
-					$f3->get('LN__PWRecovery'),							// subject
-					$mailText,											// content
-					implode("\r\n", $headers)							// headers
-				);
-			}
-			return $sent;
+			return $this->mailman($f3->get('LN__PWRecovery'), $mailText, $recovery['email'], $recovery['nickname']);
 		}
 		return FALSE;
 	}

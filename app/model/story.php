@@ -256,7 +256,7 @@ class Story extends Base
 		[
 			"WHERE" => "AND S.sid = :sid",
 			"EXTRA"	=> ", C.chapid",
-			"JOIN"	=> "LEFT JOIN `efi5_chapters`C ON ( S.sid = C.sid and C.inorder = :chapter )"
+			"JOIN"	=> "LEFT JOIN `tbl_chapters`C ON ( S.sid = C.sid and C.inorder = :chapter )"
 		];
 
 		$data = $this->exec($this->storySQL($replacements), [ ":sid" => $story, ":chapter" => $chapter ]);

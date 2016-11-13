@@ -1,10 +1,13 @@
-<h1>__A_TagGroups:</h1>
+<h1>{{@LN__ACP_TagGroups}}:</h1>
 <form action="{{@BASE}}/adminCP/archive/tags/groups/id={{ @data['id'] }}" method="post">
 	<div class="grid-wrapper">
 		<check if="{{ @data['errors'] }}"><div class="gb-90 alert-box error">{{ @data['errors'] }}</div></check>
 		<check if="{{ @data['changes'] }}"><div class="gb-90 alert-box success">{{ @data['changes'] }}</div></check>
-		<div class="gb-20">__A_TagLabel</div><div class="gb-40"><input type="text" name="form_data[label]" value="{{ @data['label'] }}" /></div><div class="gb-40">(only change when needed)</div>
-		<div class="gb-20">__A_TagGroupName</div><div class="gb-80"><input type="text" name="form_data[description]" value="{{ @data['description'] }}" /></div>
-		<div class="gb-40" align="right"><input type="submit"></div><div class="gb-60"><input type="reset"></div>
+		<div class="gb-20">{{@LN__ACP_TagGroupLabel}}</div>
+			<div class="gb-80"><input type="text" name="form_data[label]" value="{{ @data['label'] }}" />({{@LN__ACP_TagLabel_Advice}})</div>
+		<div class="gb-20">{{@LN__ACP_TagGroup}}</div>
+			<div class="gb-70"><input type="text" name="form_data[description]" value="{{ @data['description'] }}" /></div>
+		<div class="gb-40" align="right"><input type="submit"></div>
+			<div class="gb-60"><input type="reset"></div>
 	</div>
 </form>
