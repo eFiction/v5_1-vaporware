@@ -21,6 +21,7 @@ return array(
 							'zero	{No errors},'.
 							'one	{There was an error while processing this form},'.
 							'other	{There were errors while processing this form} }',
+'UnknowError'	=> 'There was an unknown error',
 
 // Login related
 'Login'			=> 'Login',
@@ -123,6 +124,11 @@ return array(
 'UserMenu_PMInbox' => 'Inbox',
 'UserMenu_PMOutbox' => 'Outbox',
 'UserMenu_PMWrite' => 'Write',
+	'MSG_deletedSuccess'	=> 'Message deleted',
+	'MSG_deleteRead'	=> 'Unable to delete, this message has been read',
+	'MSG_deleteNotFound' => 'Unable to delete, Message not found',
+	'MSG_deleteNoAccess' => 'You have no access to this message',
+	
 'UserMenu_Authoring' => 'Authoring',
 	'Authoring_Finished' => '{0, plural,'.
 		'other	{Finished (#)}}',

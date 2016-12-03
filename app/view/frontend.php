@@ -87,14 +87,13 @@ class Frontend extends Base
 		$debug[] = $f3->get('DB')->log();
 				$debug[] = "SESSION: ".print_r($_SESSION,TRUE);
 
-		if($cfg['page_title_add']=='slogan')
+		if($cfg->page_title_add=='slogan')
 		{
-			$f3->set('TITLE', $cfg['page_title'].$cfg['page_title_separator'].$cfg['page_slogan']);
+			$f3->set('TITLE', $cfg->page_title.$cfg->page_title_separator.$cfg->page_slogan);
 		}
-		elseif($cfg['page_title_add']=='path')
+		elseif($cfg->page_title_add=='path')
 		{
-			//echo implode($cfg['page_title_separator'], array_merge([$cfg['page_title']],$this->title) );
-			$f3->set('TITLE', implode($cfg['page_title_separator'], array_merge([$cfg['page_title']],$this->title) ) );
+			$f3->set('TITLE', implode($cfg->page_title_separator, array_merge([$cfg->page_title],$this->title) ) );
 		}
 
 		else $f3->set('TITLE', '');

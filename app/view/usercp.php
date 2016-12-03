@@ -25,6 +25,12 @@ class UserCP extends Base
 			$date_means = "Received";
 		}
 		$f3 = \Base::instance();
+		
+		if( isset($_SESSION['lastAction']) )
+		{
+			$f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
+			unset($_SESSION['lastAction']);
+		}
 
 		$f3->set('messages', $data);
 		$f3->set('WHICH', $select);

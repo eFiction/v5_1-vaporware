@@ -244,7 +244,24 @@ class UserCP extends Base
 	public function msgDelete($message)
 	{
 		$sql = "DELETE FROM `tbl_messaging` WHERE mid = :message AND ( ( sender = {$_SESSION['userID']} AND date_read IS NULL ) OR ( recipient = {$_SESSION['userID']} ) )";
-		return $this->exec($sql, [ ":message" => $message ]);
+		if ( 1 === $this->exec($sql, [ ":message" => $message ]) )
+			return TRUE;
+		
+		$trouble = $this->exec("SELECT mid,date_read,sender,recipient FROM `tbl_messaging` WHERE mid=:message;", [ ":message" => $message ]);
+
+		// message doesn't exist
+		if ( sizeof($trouble)==0 )
+			return "notfound";
+		else $trouble = $trouble[0];
+		
+		// user is sender, but msg has been read
+		if ( $trouble['sender']==$_SESSION['userID'] AND $trouble['date_read']>0 )
+			return "msgread";
+		// user is neither recipient nor sender
+		if ( $trouble['recipient']!=$_SESSION['userID'] AND $trouble['sender']!=$_SESSION['userID'] )
+			return "noaccess";
+		// might not happen, but let's cover this
+		return "unknown";
 	}
 	
 	public function libraryBookFavDelete($params)

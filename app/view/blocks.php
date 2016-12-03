@@ -56,7 +56,7 @@ class Blocks extends Base
 		list($events, $c, $start) = $data;
 		
 		$day_count = date("t",mktime(0,0,0,$c['month'],1,$c['year']));
-		$blanks_front = ( \Base::instance()->get('CONFIG')["monday_first_day"] == 1 ) ? date('N',mktime(0,0,0,$c['month'],1,$c['year']))-1 : date('w',mktime(0,0,0,$c['month'],1,$c['year'])) ;
+		$blanks_front = ( \Config::getPublic('monday_first_day') == 1 ) ? date('N',mktime(0,0,0,$c['month'],1,$c['year']))-1 : date('w',mktime(0,0,0,$c['month'],1,$c['year'])) ;
 		$rows_required = intval ( ($day_count+$blanks_front+6) / 7 );
 		$blanks_after = $rows_required*7 - $blanks_front - $day_count;
 

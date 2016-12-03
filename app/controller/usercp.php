@@ -437,19 +437,10 @@ class UserCP extends Base
 	
 	public function msgDelete(\Base $f3, $params)
 	{
-		if ( is_numeric($params['message']) )
-		{
-			$result = $this->model->msgDelete($params['message']);
-			var_dump($result);
-		}
-		print_r($params);
-		/*
-		if ( $data = $this->model->msgRead($params['id']) )
-		{
-			$this->buffer ( \View\UserCP::msgRead($data) );
-		}
-		else $this->buffer( "*** No such message or access violation!");
-		*/
+		$result = $this->model->msgDelete($params['message']);
+
+		$_SESSION['lastAction'] = [ "deleted" => $result===TRUE ? "success" : $result ];
+		$f3->reroute($params['returnpath'], false);
 	}
 	
 	// fix me!
@@ -477,11 +468,12 @@ class UserCP extends Base
 				return FALSE;
 			}
 			$save['recipient'] = explode(",",$save['recipient']);
+			/*
 			if ( sizeof($save['recipient'])>1 )
 			{
 				// Build an array of recipients
 			}
-			
+			*/
 			$status = $this->model->msgSave($save); // return TRUE
 		}
 	}

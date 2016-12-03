@@ -1,7 +1,7 @@
 <check if="{{ @SESSION['userID']==0 }}">
 	<true>
 		<form method="post" action="{{ @BASE }}/login">
-			{{@LN__Welcome }}  {{@LN__Guest}} | {{@LN__Login }}: {ICON:member} <input class="navbar" placeholder="login" type="text" name="login"> {ICON:key} <input class="navbar" placeholder="password" type="password" name="password"><input class="navbar" type="submit" value="{{@LN__Login}}"><check if="{{ @CONFIG.allow_registration }}"> | <a href="{{ @BASE }}/register">{{@LN__RegisterNow}}</a></check>
+			{{@LN__Welcome }}  {{@LN__Guest}} | {{@LN__Login }}: {ICON:member} <input class="navbar" placeholder="login" type="text" name="login"> {ICON:key} <input class="navbar" placeholder="password" type="password" name="password"><input class="navbar" type="submit" value="{{@LN__Login}}"><check if="{{ @CONFIG->allow_registration }}"> | <a href="{{ @BASE }}/register">{{@LN__RegisterNow}}</a></check>
 			<input type="hidden" name="returnpath" value="{{ @PATH }}">
 		</form>
 	</true>

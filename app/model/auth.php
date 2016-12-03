@@ -162,7 +162,6 @@ class Auth extends Base {
 			return [ 'accept' => 1 ];
 		}
 		
-		$this->configExt = $this->extendConfig();
 		/*
 		 	$register: registration form data
 
@@ -248,7 +247,7 @@ class Auth extends Base {
 		if ( $error['count']==0 )
 		{
 			// Check with SFS database
-			if ( $this->configExt['reg_sfs_usage'] == TRUE )
+			if ( $this->config->reg_sfs_usage == TRUE )
 			{
 				$register['ip'] = $_SERVER['REMOTE_ADDR'];
 				$check = $this->checkInputSFS($register);
@@ -279,9 +278,9 @@ class Auth extends Base {
 	{
 		$url = "http://api.stopforumspam.org/api?f=serial";
 		
-		if ( $this->configExt['reg_sfs_check_mail'] 		== TRUE ) $url .= "&email=".$data['email'];
-		if ( $this->configExt['reg_sfs_check_ip'] 			== TRUE ) $url .= "&ip=".$data['ip'];
-		if ( $this->configExt['reg_sfs_check_username'] == TRUE ) $url .= "&username=".$data['login'];
+		if ( $this->config->reg_sfs_check_mail 		== TRUE ) $url .= "&email=".$data['email'];
+		if ( $this->config->reg_sfs_check_ip 		== TRUE ) $url .= "&ip=".$data['ip'];
+		if ( $this->config->reg_sfs_check_username	== TRUE ) $url .= "&username=".$data['login'];
 		
 		$context = stream_context_create( array(
 			'http'=>array(
@@ -310,15 +309,15 @@ class Auth extends Base {
 		{
 			$bad = "";
 			// Successful query
-			if ( $this->configExt['reg_sfs_check_mail'] == 		 "TRUE" && $sfs['email']['appears'] == 1 )
+			if ( $this->config->reg_sfs_check_mail == 		 "TRUE" && $sfs['email']['appears'] == 1 )
 			{
 				$bad .= "E";
 			}
-			if ( $this->configExt['reg_sfs_check_ip'] == 			 "TRUE" && $sfs['ip']['appears'] == 1 )
+			if ( $this->config->reg_sfs_check_ip == 			 "TRUE" && $sfs['ip']['appears'] == 1 )
 			{
 				$bad .= "I";
 			}
-			if ( $this->configExt['reg_sfs_check_username'] == "TRUE" && $sfs['username']['appears'] == 1 )
+			if ( $this->config->reg_sfs_check_username == "TRUE" && $sfs['username']['appears'] == 1 )
 			{
 				$bad .= "U";
 			}
@@ -331,12 +330,12 @@ class Auth extends Base {
 		else
 		{
 			// Failed to query SFS API Server
-			if ( $this->configExt['reg_sfs_failsafe'] == 0 )
+			if ( $this->config->reg_sfs_failsafe == 0 )
 			{
 				// Accept registration, but put member on hold
 				$save = "yellow";
 			}
-			elseif ( $this->configExt['reg_sfs_failsafe'] == 1 )
+			elseif ( $this->config->reg_sfs_failsafe == 1 )
 			{
 				// Accept registration
 				$save = "green";
@@ -420,7 +419,7 @@ class Auth extends Base {
 			);
 			$extra = "moderation,";			// and tell the user (s)he is
 		}
-		elseif( $this->configExt['reg_require_email'] )
+		elseif( $this->config->reg_require_email )
 		{
 			if 
 			(
@@ -434,9 +433,9 @@ class Auth extends Base {
 						"mailActivateAccount",
 						[
 							"USERNAME"	=>	$this->request['post']['login'],
-							"TOKEN"			=>	$token,
-							"UID"				=>	$userID,
-							"BASEURL"		=>	__baseURL__
+							"TOKEN"		=>	$token,
+							"UID"		=>	$userID,
+							"BASEURL"	=>	__baseURL__
 						]
 					)
 				)

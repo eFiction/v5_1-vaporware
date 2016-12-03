@@ -312,7 +312,7 @@ class Story extends Base
 
 		if ( $select[1] == "stats" )
 		{
-			$data = \Base::instance()->get('CONFIG')['stats'];
+			$data = \Base::instance()->get('CONFIG')->stats;
 
 			return \View\Story::archiveStats($data);
 		}

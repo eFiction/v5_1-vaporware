@@ -102,7 +102,7 @@ class AdminCP extends Base {
 		return $this->exec($sql);
 	}
 	
-	public function saveKeys($data)
+	public function saveKeys_file($data)
 	{
 		$affected=0;
 		$sqlUpdate = "UPDATE `tbl_config` SET `value` = :value WHERE `name` = :key and `admin_module` = :section;";
@@ -142,6 +142,26 @@ class AdminCP extends Base {
 			}
 		}
 		if ( $affected ) $mapper->save();
+		return [ $affected, FALSE ]; // prepare for error check
+	}
+	
+	public function saveKeys($data)
+	{
+		$affected=0;
+		$sqlUpdate = "UPDATE `tbl_config` SET `value` = :value WHERE `name` = :key and `admin_module` = :section;";
+		
+		foreach ( $data as $section => $fields )
+		{
+			foreach($fields as $key => $value)
+			{
+				if ( $res = $this->exec($sqlUpdate,[ ":value" => $value, ":key" => $key, ":section" => $section ]) )
+					$affected++;
+			}
+		}
+		
+		// re-build config cache field
+		\Config::cache();
+
 		return [ $affected, FALSE ]; // prepare for error check
 	}
 	
@@ -695,7 +715,7 @@ class AdminCP extends Base {
 		if (sizeof($data)!=1) 
 			return NULL;
 
-		$data[0]['date_format_short'] = \Config::instance()->date_format_short;
+		$data[0]['date_format_short'] = \Config::getPublic('date_format_short');
 		$data[0]['datetime'] = $this->timeToUser($data[0]['datetime'], $data[0]['date_format_short']." H:i");
 
 		return $data[0];
@@ -928,7 +948,7 @@ class AdminCP extends Base {
 	
 	public function addChapter ( $storyID, $post )
 	{
-		$location = \Config::instance()->chapter_data_location;
+		$location = \Config::getPublic('chapter_data_location');
 		
 		// Get current chapter count and raise
 		if ( FALSE == $chapterCount = @$this->exec("SELECT COUNT(chapid) as chapters FROM `tbl_chapters` WHERE `sid` = :sid ", [ ":sid" => $storyID ])[0]['chapters'] )

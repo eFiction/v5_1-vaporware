@@ -1,3 +1,22 @@
+<check if="{{isset(@deleted)}}">
+	<switch expr="{{ @deleted }}">
+		<case value="success" break="TRUE">
+			<div class="alert-box-half success">{{@LN__MSG_deletedSuccess}}</div>
+		</case>
+		<case value="msgread" break="TRUE">
+			<div class="alert-box-half warning">{{@LN__MSG_deleteRead}}</div>
+		</case>
+		<case value="notfound" break="TRUE">
+			<div class="alert-box-half warning">{{@LN__MSG_deleteNotFound}}</div>
+		</case>
+		<case value="noaccess" break="TRUE">
+			<div class="alert-box-half error">{{@LN__MSG_deleteNoAccess}}</div>
+		</case>
+		<case value="unknown" break="TRUE">
+			<div class="alert-box-half error">{{@LN__UnknowError}}</div>
+		</case>
+	</switch>
+</check>
 <fieldset>
 	<legend>{{ ${"LN__PM_".@WHICH} }}</legend>
 	<table class="pm-box" width="100%">
@@ -23,10 +42,10 @@
 		<tr>
 			{* check if mail has been read *}
 			<td><check if="{{ @pm_line['date_read']!==NULL }}">
-					<true><span class="fa fa-envelope-o" title="{{ date(@CONFIG.date_format_short,@pm_line['date_read']) }}"></span></true>
+					<true><span class="fa fa-envelope-o" title="{{ date(@CONFIG->date_format_short,@pm_line['date_read']) }}"></span></true>
 					<false><span class="fa fa-envelope" title="{{@LN__PM_unread}}"></span></false>
 			</check></td>
-			<td>{{ date(@CONFIG.date_format_short,@pm_line['date_sent']) }}</td>
+			<td>{{ date(@CONFIG->date_format_short,@pm_line['date_sent']) }}</td>
 			<td><a href="{{@BASE}}/userCP/messaging/read/id={{ @pm_line['mid'] }}">{{ @pm_line['subject'] }}</a></td>
 			<td><check if="{{ @pm_line['date_read']!==NULL }}">
 				<true><a href="{{@BASE}}/member/profile/{{ @pm_line['name_id'] }}">{{ @pm_line['name'] }}</a></true>
@@ -66,7 +85,7 @@
     			$(this).dialog('close');
     		},
     		__OK: function() {
-    	              window.location.href = "{{@BASE}}/userCP/messaging/delete/message="+element_id+"/returnpath={{@WHICH}}";
+    	              window.location.href = "{{@BASE}}/userCP/messaging/delete/message="+element_id+";returnpath=/userCP/messaging/{{strtolower(@WHICH)}}";
     		  $(this).dialog('close');
     		}
     	}

@@ -53,6 +53,12 @@ class Auth extends Base
 
 	public static function register($data = [], $error = [])
 	{
+		if( isset($_SESSION['lastAction']) )
+		{
+			$f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
+			unset($_SESSION['lastAction']);
+		}
+
 		\Base::instance()->set('data', $data);
 		\Base::instance()->set('error', $error);
 

@@ -84,17 +84,26 @@ set_error_handler('exception_error_handler');
 
 /** load the core config file **/
 $f3->config('data/config.ini');
-$cfg = Config::instance();
+
+/* Test: Config cache */
+//$f3->set('CACHE',TRUE);
+//$f3->set('CACHE','memcache=localhost:11211');
+$cache = \Cache::instance();
+/* Test ende */
+
+/* get page config */
+$cfg = new Config();
 
 /** Establish database connection **/
-if ($cfg->ACTIVE_DB)
-    $f3->set('DB', storage::instance()->get($cfg->ACTIVE_DB));
-else {
-    $f3->error(500,'Sorry, but there is no active DB setup.');
+$f3->set('DB', storage::instance()->build() );
+if ( FALSE === $f3->get('DB') )
+{
+	$f3->error(500,'Sorry, but there is no active DB setup.');
 }
 
 /** Add the configuration to the framework **/
 $f3->set('CONFIG', $cfg);
+$cfg->load();
 
 /** We have DB and Config, let's check for bad ppl **/
 if ( TRUE == $cfg->bb2_enabled )

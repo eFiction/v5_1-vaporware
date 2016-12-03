@@ -1,4 +1,22 @@
-<check if="{{@register.step=='form'}}">
+<check if="{{isset(@registered)}}">
+<true>
+	<switch expr="{{ @registered }}">
+		<case value="done" break="TRUE">
+<h3>Done!</h3>
+		</case>
+		<case value="mail" break="TRUE">
+<h3>Mail!</h3>
+		</case>
+		<case value="moderation" break="TRUE">
+<h3>Moderation!</h3>
+		</case>
+		<case value="failed" break="TRUE">
+<h3>Registration failed!</h3>
+Sorry, can't complete registration at this point.
+		</case>
+	</switch>
+</true>
+<false>
 <form method="post" action="{{@BASE}}/register">
 	<fieldset>
 		<legend>{{@LN__Registration}}</legend>
@@ -32,19 +50,17 @@
 			</check>
 			<div class="gb-1qrt">{{@LN__Password}}</div><div class="gb-3qrt"><input class="half" type="password" name="form[password1]" value=""></div>
 			<div class="gb-1qrt">{{@LN__Registration_PasswordRepeat}}</div><div class="gb-3qrt"><input class="half" type="password" name="form[password2]" value=""></div>
-			<div class="full"><img src="http://dev.efiction.org/mvc/captcha/c.png" /></div>
+			<div class="gb-1qrt"><div class="captchaBox">&nbsp;**cap**</div></div><div class="gb-3qrt"><input type="text" name="write[captcha]" class="half" placeholder="captcha" value=""></div>
 			<div class="gb-full"><input class="button" type="submit" value="__Register"></div>
 		</div>
 	</fieldset>
 </form>
-</check>
-<check if="{{@register.step=='done'}}">
-<h3>Done!</h3>
-</check>
-<check if="{{@register.step=='moderation'}}">
-<h3>Done!</h3>
-</check>
-<check if="{{@register.step=='failed'}}">
-<h3>Registration failed!</h3>
-Sorry, can't complete registration at this point.
+<script type="text/javascript">
+$( document ).ready(function() {
+	getCaptchaImage();
+	$('.captchaBox').unbind();
+	$('.captchaBox').click(getCaptchaImage);
+});
+</script>
+</false>
 </check>

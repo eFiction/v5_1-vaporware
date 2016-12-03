@@ -31,7 +31,7 @@ class Backend extends Base
 		if ( isset($this->JS['head']) ) $f3->set( 'JS_HEAD', implode("\n", $this->JS['head']) );
 		if ( isset($this->JS['body']) ) $f3->set( 'JS_BODY', implode("\n", $this->JS['body']) );
 		
-		$f3->set('TITLE', implode($cfg['page_title_separator'], array_merge([$cfg['page_title']],$this->title) ) );
+		$f3->set('TITLE', implode($cfg->page_title_separator, array_merge([$cfg->page_title],$this->title) ) );
 
 		$f3->set('DEBUGLOG', $f3->get('DB')->log());
 		

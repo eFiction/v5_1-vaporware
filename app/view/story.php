@@ -28,8 +28,8 @@ class Story extends Base
 	
 	protected static function dataProcess(&$item, $key=NULL)
 	{
-		if (isset($item['published']))	$item['published']	= date(\Base::instance()->get('CONFIG')['date_format_short'],$item['published']);
-		if (isset($item['modified']))	$item['modified']	= date(\Base::instance()->get('CONFIG')['date_format_short'],$item['modified']);
+		if (isset($item['published']))	$item['published']	= date(\Config::getPublic('date_format_short'),$item['published']);
+		if (isset($item['modified']))	$item['modified']	= date(\Config::getPublic('date_format_short'),$item['modified']);
 										$item['number']		= isset($item['inorder']) ? "{$item['inorder']}&nbsp;" : "";
 		if (isset($item['wordcount'])) 	$item['wordcount']	= number_format($item['wordcount'], 0, '','.');
 		if (isset($item['count'])) 		$item['count']		= number_format($item['count'], 0, '','.');
@@ -111,8 +111,8 @@ class Story extends Base
 		\Registry::get('VIEW')->javascript('body', FALSE, "var url='".\Base::instance()->get('BASE')."/story/read/{$storyData['sid']},'" );
 
 		$storyData['cache_authors'] = json_decode($storyData['cache_authors'],TRUE);
-		$storyData['published'] = date( \Config::instance()->date_format_short, $storyData['published']);
-		$storyData['modified'] = date( \Config::instance()->date_format_short, $storyData['modified']);
+		$storyData['published'] = date( \Config::getPublic('date_format_short'), $storyData['published']);
+		$storyData['modified'] = date( \Config::getPublic('date_format_short'), $storyData['modified']);
 		
 		$can_edit = ( $storyData['can_edit'] ) ? "userCP" : NULL;
 		if ( !$can_edit AND $_SESSION['groups'] & 64 ) $can_edit = "adminCP";
@@ -252,7 +252,7 @@ class Story extends Base
 	public static function archiveStats($stats)
 	{
 		\Base::instance()->set('archiveStats', $stats);
-		return parent::render('story/block.stats.html');
+		return parent::render('blocks/stats.html');
 	}
 	
 	public static function blockStory($type, $stories=[], $extra=NULL)
@@ -279,9 +279,9 @@ class Story extends Base
 		shuffle($taglist);
 		foreach ( $taglist as &$tag )
 		{
-			$size_factor = ( \Config::instance()->tagcloud_spread - 1 ) / ( ($min==$max)?1:($max - $min) ) * ( $tag['count'] - $min ) + 1;
+			$size_factor = ( \Config::getPublic('tagcloud_spread') - 1 ) / ( ($min==$max)?1:($max - $min) ) * ( $tag['count'] - $min ) + 1;
 			$tag['z_index'] = $max-$tag['count'];
-			$tag['percent'] = intval(\Config::instance()->tagcloud_basesize*$size_factor);
+			$tag['percent'] = intval(\Config::getPublic('tagcloud_basesize')*$size_factor);
 		}
 
 		\Base::instance()->set('renderData', $taglist);
