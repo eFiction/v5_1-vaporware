@@ -158,10 +158,11 @@ class AdminCP extends Base {
 					$affected++;
 			}
 		}
-		
-		// re-build config cache field
-		\Config::cache();
 
+		// Force re-caching right now
+		\Cache::instance()->clear('config');
+		\Config::instance()->load();
+		
 		return [ $affected, FALSE ]; // prepare for error check
 	}
 	

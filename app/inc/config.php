@@ -14,21 +14,11 @@ class Config extends \Prefab
 	
 	public function load()
 	{
-		if ( FALSE === \Cache::instance()->exists('config') )
+		if ( FALSE === self::$public = \Cache::instance()->get('config') )
 		{
-			$cache = \Model\Base::instance()->exec("SELECT `data` FROM `tbl_cache` WHERE `store`='cache';");
-
-			if(sizeof($cache)>0)
-				self::$public = self::$public + json_decode($cache[0]['data'],TRUE);
-
-			else
-				self::$public = self::$public + self::cache();
-			
+			self::$public['prefix'] = self::$protected['prefix'];
+			self::$public = self::$public + self::cache();
 			\Cache::instance()->set('config', self::$public, 3600);
-		}
-		else
-		{
-			self::$public = \Cache::instance()->get('config');
 		}
 	}
 	
@@ -71,13 +61,6 @@ class Config extends \Prefab
 					$configData[$key[0]] = $c;
 			}
 		}
-		
-		$configJSON = json_encode($configData);
-
-		\Model\Base::instance()->exec ( "INSERT INTO `tbl_cache` (`store`, `data`) VALUES ('cache', :data)
-							ON DUPLICATE KEY UPDATE `data` = :data2;", [ ":data" => $configJSON, ":data2" => $configJSON ] );
-		
-		\Cache::instance()->clear('config');
 		
 		return $configData;
 	}

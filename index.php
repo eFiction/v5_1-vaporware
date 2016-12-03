@@ -82,16 +82,14 @@ function exception_error_handler($errno, $errstr, $errfile, $errline ) {
 set_error_handler('exception_error_handler');
 	*/
 
-/** load the core config file **/
+/** load the framework core config file **/
 $f3->config('data/config.ini');
 
 /* Test: Config cache */
-//$f3->set('CACHE',TRUE);
-//$f3->set('CACHE','memcache=localhost:11211');
 $cache = \Cache::instance();
 /* Test ende */
 
-/* get page config */
+/* get database config */
 $cfg = new Config();
 
 /** Establish database connection **/
