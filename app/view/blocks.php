@@ -61,7 +61,7 @@ class Blocks extends Base
 		$blanks_after = $rows_required*7 - $blanks_front - $day_count;
 
 		$now 	 = array ( "month"	=> date("n"),
-									 "year"		=> date("Y") );
+						 "year"		=> date("Y") );
 		/*
 			check if we have events on prior calendar sheets
 		*/
