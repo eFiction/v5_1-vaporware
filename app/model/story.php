@@ -377,14 +377,7 @@ class Story extends Base
 		
 		return $data;
 	}
-	/*
-	public function loadReviews($storyID,$chapter=NULL)
-	{
-		$sql = "";
-		
-		
-	}
-	*/
+
 	public function loadReviews($storyID,$chapter=NULL)
 	{
 		$limit=5;
@@ -487,8 +480,6 @@ class Story extends Base
 			if ( $item != "" ) $indexFlat[(int) $i++] = $data[$item]; 
 		});
 
-		//	print_r($indexFlat);
-			//exit;*/
 		return $indexFlat;
 	}
 
@@ -515,6 +506,7 @@ class Story extends Base
 		if ( 1== $this->exec($sql, $bind) )
 		{
 			\Model\Routines::dropUserCache();
+			\Cache::instance()->clear('stats');
 			return (int)$this->db->lastInsertId();
 		}
 		else return FALSE;
