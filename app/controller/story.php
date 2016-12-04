@@ -45,6 +45,24 @@ class Story extends Base
 	
 	public function save(\Base $f3, $params)
 	{
+		if ( $params['action']=="write" )
+		{
+			// write review or reply to a review
+			if($_SESSION['userID']!=0 || \Config::getPublic('allow_guest_reviews') )
+			{
+				$data = $f3->get('POST.write');
+
+				// Obviously, there should be some text ...
+				if ( "" == $data['text'] = trim($data['text']) )
+					$errors[]= 'MessageEmpty';
+				
+			}
+			else
+			{
+				// Error reporting
+				
+			}
+		}
 		print_r($params);
 		print_r($_POST);
 		exit;
@@ -73,7 +91,7 @@ class Story extends Base
 			$errors = [];
 			$removeButton = "";
 			
-			if($_SESSION['userID']!=0 || \Base::instance()->get('CONFIG')['allow_guest_reviews'] )
+			if($_SESSION['userID']!=0 || \Config::getPublic('allow_guest_reviews') )
 			{
 				if ( isset($_POST['write']) )
 				{

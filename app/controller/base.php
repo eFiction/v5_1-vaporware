@@ -66,16 +66,16 @@ class Base extends \Prefab {
 
 	public function mailman($subject, $mailText, $rcpt_mail, $rcpt_name=NULL)
 	{
-		if ( $this->config->smtp_server!="" )
+		if ( $this->config['smtp_server']!="" )
 		{
 			$smtp = new \SMTP ( 
-						$this->config->smtp_server, 
-						$this->config->smtp_scheme, 
-						$this->config->smtp_port=="" ? ( $this->config->smtp_scheme=="ssl" ? 465 : 587 ) : $this->config->smtp_port,
-						$this->config->smtp_username, 
-						$this->config->smtp_password
+						$this->config['smtp_server'], 
+						$this->config['smtp_scheme'], 
+						$this->config['smtp_port']=="" ? ( $this->config['smtp_scheme']=="ssl" ? 465 : 587 ) : $this->config['smtp_port'],
+						$this->config['smtp_username'], 
+						$this->config['smtp_password']
 			);
-			$smtp->set('From', '"'.$this->config->page_title.'" <'.$this->config->page_mail.'>');
+			$smtp->set('From', '"'.$this->config['page_title'].'" <'.$this->config['page_mail'].'>');
 			$smtp->set('To', '"'.$rcpt_name.'" <'.$rcpt_mail.'>');
 			$smtp->set('Subject', $subject);
 			$smtp->set('content_type', 'text/html; charset="utf-8"');
@@ -89,7 +89,7 @@ class Base extends \Prefab {
 			$headers   = array();
 			$headers[] = "MIME-Version: 1.0";
 			$headers[] = "Content-Type: text/html; charset=utf-8";
-			$headers[] = "From: {$this->config->page_title} <{$this->config->page_mail}>";
+			$headers[] = "From: {$this->config['page_title']} <{$this->config['page_mail']}>";
 			$headers[] = "X-Mailer: PHP/".phpversion();
 			
 			$sent = mail(

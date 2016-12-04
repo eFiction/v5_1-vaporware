@@ -100,8 +100,12 @@ if ( FALSE === $f3->get('DB') )
 }
 
 /** Add the configuration to the framework **/
+/*
 $f3->set('CONFIG', $cfg);
-$cfg->load();
+$config = $cfg->load();
+print_r($config);
+*/
+$f3->set('CONFIG', $cfg->load());
 
 /** We have DB and Config, let's check for bad ppl **/
 if ( TRUE == $cfg->bb2_enabled )

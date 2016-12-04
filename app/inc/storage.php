@@ -26,6 +26,7 @@ class storage extends Prefab {
 				break;
 */
 				case 'MYSQL':
+				\Base::instance()->set('DBType', 'MySQL');
 				$db = new \DB\SQL(Config::getProtected('DB_MYSQL')['dsn'], Config::getProtected('DB_MYSQL')['user'], Config::getProtected('DB_MYSQL')['password']);
 				break;
 /*

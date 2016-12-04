@@ -108,7 +108,7 @@ class AdminCP extends Base {
 		$sqlUpdate = "UPDATE `tbl_config` SET `value` = :value WHERE `name` = :key and `admin_module` = :section;";
 		$sqlFile = "SELECT 1 from `tbl_config` WHERE `name`= :key and `admin_module`= :section and `to_config_file`=1";
 		
-		$mapper = \Config::instance();
+		$mapper = $this->config;
 		foreach ( $data as $section => $fields )
 		{
 			foreach($fields as $key => $value)
@@ -161,7 +161,7 @@ class AdminCP extends Base {
 
 		// Force re-caching right now
 		\Cache::instance()->clear('config');
-		\Config::instance()->load();
+		\Base::instance()->set('CONFIG', \Config::instance()->load() );
 		
 		return [ $affected, FALSE ]; // prepare for error check
 	}
@@ -716,7 +716,7 @@ class AdminCP extends Base {
 		if (sizeof($data)!=1) 
 			return NULL;
 
-		$data[0]['date_format_short'] = \Config::getPublic('date_format_short');
+		$data[0]['date_format_short'] = $this->config['date_format_short'];
 		$data[0]['datetime'] = $this->timeToUser($data[0]['datetime'], $data[0]['date_format_short']." H:i");
 
 		return $data[0];
@@ -752,7 +752,7 @@ class AdminCP extends Base {
 			[ 
 				"headline"	=> $data['headline'], 
 				"newstext"	=> $data['newstext'],
-				"datetime"	=> \DateTime::createFromFormat(\Config::getPublic('date_format_short')." H:i", $data['datetime'])->format('Y-m-d H:i'),
+				"datetime"	=> \DateTime::createFromFormat($this->config['date_format_short']." H:i", $data['datetime'])->format('Y-m-d H:i'),
 			]
 		);
 
@@ -981,7 +981,7 @@ class AdminCP extends Base {
 	
 	public function addChapter ( $storyID, $post )
 	{
-		$location = \Config::getPublic('chapter_data_location');
+		$location = $this->config['chapter_data_location'];
 		
 		// Get current chapter count and raise
 		if ( FALSE == $chapterCount = @$this->exec("SELECT COUNT(chapid) as chapters FROM `tbl_chapters` WHERE `sid` = :sid ", [ ":sid" => $storyID ])[0]['chapters'] )

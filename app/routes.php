@@ -12,10 +12,12 @@ $f3->route(
 $f3->route(
   [ 'GET /story', 'GET /story/@action', 'GET /story/@action/*', ],
 	'Controller\Story->index' );
-	/*
+
 $f3->route(
-  [ 'POST /story', 'POST /story/@action' , 'POST /story/@action/*' ],
-	'Controller\Story->save' );*/
+//  [ 'POST /story', 'POST /story/@action' , 'POST /story/@action/*' ],
+  [ 'POST /story/@action' , 'POST /story/@action/*' ],
+	'Controller\Story->save' );
+
 $f3->route(
   [ 'GET /story/search', 'GET /story/search/*', 'POST /story/search',
 	'GET /story/browse', 'GET /story/browse/*', 'POST /story/browse' ],

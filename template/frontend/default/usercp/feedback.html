@@ -60,7 +60,7 @@
 		<td>{ICON:report}</td>
 	</false>
 	</check>
-		<td>{{ date(@CONFIG->date_format_long,@row.date) }}</td>
+		<td>{{ date(@CONFIG.date_format_long,@row.date) }}</td>
 		<check if="{{@extra.type=='ST'}}">
 			<td><a href="{{@BASE}}/story/read/{{ @row['id'] }}">{{ @row['title'] }}</a> ({{@row.chapter}})</td>
 		</check>

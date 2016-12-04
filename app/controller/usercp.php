@@ -6,7 +6,7 @@ class UserCP extends Base
 	public function __construct()
 	{
 		$this->model = \Model\UserCP::instance();
-		$this->config = \Base::instance()->get('CONFIG');
+		$this->config = \Config::instance();
 		\Base::instance()->set('systempage', TRUE);
 	}
 	
@@ -64,7 +64,7 @@ class UserCP extends Base
 
 		$buffer = NULL;
 		
-		if ( $_SESSION['groups']&5 OR TRUE === $this->config->author_self )
+		if ( $_SESSION['groups']&5 OR TRUE === $this->config['author_self'] )
 		{
 			if ( array_key_exists("curator", $params) )
 				$buffer = $this->authorCurator($f3, $params);

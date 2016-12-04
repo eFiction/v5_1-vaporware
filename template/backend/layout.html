@@ -47,12 +47,12 @@
 		<div class="grid-wrapper footer">
 			<div class="gb-full">
 				{PAGE:footer}<br />
-				{{ \Base::instance()->format('eFiction v{0}, using {1}, page rendered in {2} msecs / Memory usage {3} KB',@APP_VERSION,@CONFIG->ACTIVE_DB,round(1e3*(microtime(TRUE)-$TIME),2),round(memory_get_usage(TRUE)/1e3,1)) }}
+				{{ \Base::instance()->format('eFiction v{0}, using {1}, page rendered in {2} msecs / Memory usage {3} KB',@APP_VERSION,@DBType,round(1e3*(microtime(TRUE)-$TIME),2),round(memory_get_usage(TRUE)/1e3,1)) }}
 			</div>
 		</div> <!-- end footer -->
 	</div> <!-- end container -->
 
 	<check if="{{ isset(@JS_BODY)}}">{{ @JS_BODY | raw }}</check>
-	<check if="{{ @CONFIG->debug > 0 OR isset(@DEBUGLOG) }}"><div><textarea cols=120 rows=30>{{ @DEBUGLOG }}</textarea></div></check>
+	<check if="{{ @CONFIG.debug > 0 OR isset(@DEBUGLOG) }}"><div><textarea cols=120 rows=30>{{ @DEBUGLOG }}</textarea></div></check>
 </body>
 </html>

@@ -10,8 +10,8 @@ class Base extends \Prefab {
 	{
 		$this->i = 0;
 		$this->db = \Base::instance()->get('DB');
-		$this->config = \Config::instance();
-		$this->prefix = $this->config->prefix;
+		$this->config = \Base::instance()->get('CONFIG');
+		$this->prefix = $this->config['prefix'];
 	}
 	
 	public function exec($cmds,$args=NULL,$ttl=0,$log=TRUE)
@@ -21,8 +21,7 @@ class Base extends \Prefab {
 
 	public function newPasswordQuality($password1, $password2)
 	{
-		$this->password_regex = '/^(?=^.{'.$this->config->reg_min_password.',}$)(?:.*?(?>((?(1)(?!))[a-z]+)|((?(2)(?!))[A-Z]+)|((?(3)(?!))[0-9]+)|((?(4)(?!))[^a-zA-Z0-9\s]+))){'.$this->config->reg_password_complexity.'}.*$/s';
-		
+		$this->password_regex = '/^(?=^.{'.$this->config['reg_min_password'].',}$)(?:.*?(?>((?(1)(?!))[a-z]+)|((?(2)(?!))[A-Z]+)|((?(3)(?!))[0-9]+)|((?(4)(?!))[^a-zA-Z0-9\s]+))){'.$this->config['reg_password_complexity'].'}.*$/s';		
 		// Passwords match?
 		if( $password1 == "" OR $password2 == "" )
 			return "missing";
@@ -192,7 +191,7 @@ class Base extends \Prefab {
 		$pos = (int)max(0,min($page-1,$count-1));
 		
 		// page link range, from config
-		$range = $this->config->adjacent_paginations;
+		$range = $this->config['adjacent_paginations'];
 		// build range link array
 		$current_range = array( ($page-$range < 1 ? 1 : $page-$range),
             ($page+$range > $count ? $count : $page+$range));
@@ -274,7 +273,7 @@ class Base extends \Prefab {
 	
 	public function getChapter( $story, $chapter, $counting = TRUE )
 	{
-		$location = \Config::instance()->chapter_data_location;
+		$location = $this->config['chapter_data_location'];
 
 		if ( $location == "local" )
 		{
@@ -300,7 +299,7 @@ class Base extends \Prefab {
 
 	public function saveChapter( $chapterID, $chapterText )
 	{
-		$location = \Config::instance()->chapter_data_location;
+		$location = $this->config['chapter_data_location'];
 
 		if ( $location == "local" )
 		{
@@ -414,7 +413,7 @@ class Base extends \Prefab {
 		{
 			$sql[]= "SET @bms  := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_user_favourites`F WHERE F.uid={$_SESSION['userID']} AND F.bookmark=1 GROUP BY F.type) AS F1);";
 			$sql[]= "SET @favs := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_user_favourites`F WHERE F.uid={$_SESSION['userID']} AND F.bookmark=0 GROUP BY F.type) AS F1);";
-			if(array_key_exists("recommendations", $this->config->optional_modules))
+			if(array_key_exists("recommendations", $this->config['optional_modules']))
 			{
 				$sql[]= "SET @recs := (SELECT COUNT(1) FROM `tbl_recommendations` WHERE `uid` = {$_SESSION['userID']});";
 			}
@@ -426,7 +425,7 @@ class Base extends \Prefab {
 		elseif ( $module == "feedback" )
 		{
 			$sql[]= "SET @rw  := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_feedback`F WHERE F.writer_uid={$_SESSION['userID']} AND F.type IN ('RC','SE','ST') GROUP BY F.type) AS F1);";
-			if(array_key_exists("recommendations", $this->config->optional_modules))
+			if(array_key_exists("recommendations", $this->config['optional_modules']))
 			{
 				$sql[]= "SET @rr  := (SELECT CONCAT_WS('//', SUM(SE+ST+RC), GROUP_CONCAT(type,',',IF(ST=0,IF(SE=0,RC,SE),ST) SEPARATOR '||')) FROM 
 							(SELECT F.type, COUNT(SA.lid) as ST, COUNT(Ser.seriesid) as SE, COUNT(Rec.recid) as RC
@@ -456,7 +455,7 @@ class Base extends \Prefab {
 									LEFT JOIN `tbl_news`N ON ( F.reference = N.nid AND F.type = 'N' AND N.uid = {$_SESSION['userID']} )
 							WHERE F.type IN ('C','N') GROUP BY F.type) as F1)";
 
-			if(array_key_exists("shoutbox", $this->config->optional_modules))
+			if(array_key_exists("shoutbox", $this->config['optional_modules']))
 			{
 				$sql[]= "SET @sb := (SELECT COUNT(1) FROM `tbl_shoutbox` WHERE `uid` = {$_SESSION['userID']});";
 			}

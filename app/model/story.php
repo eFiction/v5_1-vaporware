@@ -7,12 +7,12 @@ class Story extends Base
 	
 	public function intro()
 	{
-		$limit = $this->config->story_intro_items;
+		$limit = $this->config['story_intro_items'];
 		$pos = (int)\Base::instance()->get('paginate.page') - 1;
 		
 		$replacements =
 		[
-			"ORDER" => "ORDER BY ". $this->config->story_intro_order." DESC" ,
+			"ORDER" => "ORDER BY ". $this->config['story_intro_order']." DESC" ,
 			"LIMIT" => "LIMIT ".(max(0,$pos*$limit)).",".$limit,
 		];
 		$data = $this->exec($this->storySQL($replacements));
@@ -29,7 +29,7 @@ class Story extends Base
 //	public function author(int $id)
 	public function author($id)
 	{
-		$limit = $this->config->stories_per_page;
+		$limit = $this->config['stories_per_page'];
 		$author = "SELECT SQL_CALC_FOUND_ROWS U.uid, U.nickname as name, COUNT(rSA.sid) as counter FROM `tbl_stories_authors`rSA INNER JOIN `tbl_users`U ON ( rSA.aid = U.uid AND rSA.aid = :aid ) GROUP BY rSA.aid";
 		$info = $this->exec( $author, ["aid" => $id] );
 		
@@ -58,7 +58,7 @@ class Story extends Base
 		// $pos=0,$size=10,$filter=NULL,array $options=NULL
 		$data = $mapper->paginate(
 			0,
-			\Base::instance()->get('CONFIG')['story_intro_items'],
+			\Config::getPublic('story_intro_items'),
 			array(
 				'authorID = :aid',
 				':aid' => array($id, \PDO::PARAM_INT),
@@ -131,7 +131,7 @@ class Story extends Base
 
 		}
 		
-		$limit = $this->config->stories_per_page;
+		$limit = $this->config['stories_per_page'];
 		$pos = (int)\Base::instance()->get('paginate.page') - 1;
 		
 		$replacements =
@@ -193,7 +193,7 @@ class Story extends Base
 		
 		if ( sizeof($filter_date)==0 ) return FALSE;
 
-		$limit = $this->config->story_intro_items;
+		$limit = $this->config['story_intro_items'];
 		$pos = (int)\Base::instance()->get('paginate.page') - 1;
 		
 		$replacements =
@@ -290,13 +290,13 @@ class Story extends Base
 		$sql_StoryConstruct = "SELECT SQL_CALC_FOUND_ROWS
 				S.sid, S.title, S.summary, S.storynotes, S.completed, S.wordcount, UNIX_TIMESTAMP(S.date) as published, UNIX_TIMESTAMP(S.updated) as modified, 
 				S.count,GROUP_CONCAT(Ser.seriesid,',',rSS.inorder,',',Ser.title ORDER BY Ser.title DESC SEPARATOR '||') as in_series @EXTRA@,
-				".((isset($this->config->modules_enabled['contests']))?"GROUP_CONCAT(rSC.relid) as contests,":"")."
+				".((isset($this->config['modules_enabled']['contests']))?"GROUP_CONCAT(rSC.relid) as contests,":"")."
 				GROUP_CONCAT(Fav.bookmark,',',Fav.fid SEPARATOR '||') as is_favourite,
 				Ra.rating as rating_name, Edit.uid as can_edit,
 				S.cache_authors, S.cache_tags, S.cache_characters, S.cache_categories, S.cache_rating, S.chapters, S.reviews
 			FROM `tbl_stories`S
 				@JOIN@
-			".((isset($this->config->modules_enabled['contests']))?"LEFT JOIN `tbl_contest_relations`rSC ON ( rSC.relid = S.sid AND rSC.type = 'story' )":"")."
+			".((isset($this->config['modules_enabled']['contests']))?"LEFT JOIN `tbl_contest_relations`rSC ON ( rSC.relid = S.sid AND rSC.type = 'story' )":"")."
 			LEFT JOIN `tbl_series_stories`rSS ON ( rSS.sid = S.sid )
 				LEFT JOIN `tbl_series`Ser ON ( Ser.seriesid=rSS.seriesid )
 			LEFT JOIN `tbl_ratings`Ra ON ( Ra.rid = S.ratingid )
@@ -671,9 +671,9 @@ class Story extends Base
 
 		// Load or create the namespace
 		/*
-		if ( "" == @\Config::instance()->epub_namespace )
+		if ( "" == @$this->config['epub_namespace'] )
 		{
-			$cfg = \Config::instance();
+			$cfg = $this->config;
 			$cfg['epub_namespace'] = uuid_v5("6ba7b810-9dad-11d1-80b4-00c04fd430c8", \Base::instance()->get('HOST').\Base::instance()->get('BASE') );
 			$cfg->save();
 		}
@@ -688,7 +688,7 @@ class Story extends Base
 										uuid_v5
 										(
 											"6ba7b810-9dad-11d1-80b4-00c04fd430c8",
-											(""==\Config::instance()->epub_domain) ? \Base::instance()->get('HOST').\Base::instance()->get('BASE') : \Config::instance()->epub_domain
+											(""==$this->config['epub_domain']) ? \Base::instance()->get('HOST').\Base::instance()->get('BASE') : $this->config['epub_domain']
 										),
 										$epubData['title']
 									);

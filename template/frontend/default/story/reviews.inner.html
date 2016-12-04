@@ -1,8 +1,8 @@
 	<div class="review review-level-{{@item.level}}">
-		{{@item.name}}: <check if="{{@item.timestamp>0}}"> {{ date(@CONFIG->date_format_long, @item.timestamp) }}</check>
+		{{@item.name}}: <check if="{{@item.timestamp>0}}"> {{ date(@CONFIG.date_format_long, @item.timestamp) }}</check>
 		{{@item.text | raw}} <br />
 		<div align="right">
-			<check if="{{ @_SESSION.userID OR TRUE==@CONFIG->allow_guest_reviews }}">
+			<check if="{{ @_SESSION.userID OR TRUE==@CONFIG.allow_guest_reviews }}">
 				<check if="{{ @_SESSION.userID > 0 AND @_SESSION.userID == @item.uid }}">
 					<true>
 						<a href="{{@BASE}}/userCP/reviews/edit={{@item.id}}/returnpath={{@returnpath}}">{ICON:edit}</a>

@@ -28,6 +28,6 @@
 <body>
 	{{ @BODY | raw }}
 	<check if="{{ isset(@JS_BODY)}}">{{ @JS_BODY | raw }}</check>
-	<check if="{{ @CONFIG->debug > 0 OR isset(@DEBUGLOG) }}"><div><textarea cols=120 rows=30>{{ @DEBUGLOG }}</textarea></div></check>
+	<check if="{{ @CONFIG.debug > 0 OR isset(@DEBUGLOG) }}"><div><textarea cols=120 rows=30>{{ @DEBUGLOG }}</textarea></div></check>
 </body>
 </html>

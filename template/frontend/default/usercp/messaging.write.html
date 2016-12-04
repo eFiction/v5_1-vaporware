@@ -9,7 +9,7 @@
 			<td><div class="field"><input class="field input" type="text" name="recipient" id="recipient"></div></td>
 		</tr>
 		<tr><td><h6>{{@LN__PM_Subject}}:</h6></td><td><input class="text-input" type="text" name="subject" value="{{@write_data.subject}}"></td></tr>
-		<tr><td colspan="2"><textarea class="textarea" name="message"><check if="{{@write_data.message}}">&#13;&#10;&nbsp&#13;&#10;--- {{@LN__PM_ReplyMessageHeader, date(\Base::instance()->get('CONFIG')['date_format_long'],@write_data.date_sent), @write_data.sender | format}} ---&#13;&#10;|&#13;&#10;| {{ str_replace("\n", "\n| ", @write_data.message) }}</check></textarea></td></tr>
+		<tr><td colspan="2"><textarea class="textarea" name="message"><check if="{{@write_data.message}}">&#13;&#10;&nbsp&#13;&#10;--- {{@LN__PM_ReplyMessageHeader, date(@CONFIG.date_format_long,@write_data.date_sent), @write_data.sender | format}} ---&#13;&#10;|&#13;&#10;| {{ str_replace("\n", "\n| ", @write_data.message) }}</check></textarea></td></tr>
 		<tr><td colspan="2"><input class="button" type="submit"><input type="hidden" name="return" value="{RETURN}"></td></tr></table>
 	</form>
 </fieldset>

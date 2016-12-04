@@ -6,7 +6,7 @@ class Auth extends Base {
 	public function __construct()
 	{
 		$this->model = \Model\Auth::instance();
-		$this->config = \Config::instance();
+		$this->config = \Base::instance()->get('CONFIG');
 	}
 
     protected $response;
@@ -170,7 +170,7 @@ class Auth extends Base {
 	public function register(\Base $f3, $params)
 	{
 		// check if configuration is disabled
-		if( $this->config->allow_registration == FALSE )
+		if( FALSE == \Config::getPublic('allow_registration') )
 			$this->buffer( "stub *controller-auth-register* denied" );
 		
 		// check if user is already logged in

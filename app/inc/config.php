@@ -20,11 +20,17 @@ class Config extends \Prefab
 			self::$public = self::$public + self::cache();
 			\Cache::instance()->set('config', self::$public, 3600);
 		}
+		return self::$public;
 	}
 	
 	public static function getPublic($key)
     {
         return isset(self::$public[$key]) ? self::$public[$key] : false;
+    }
+
+	public static function setPublic($key, $value=NULL)
+    {
+        self::$public[$key] = $value;
     }
 
 	public static function getProtected($key)
