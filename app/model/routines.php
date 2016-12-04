@@ -54,4 +54,14 @@ class Routines extends Base {
 		} while ( $change != FALSE );
 	}
 	
+	public static function dropUserCache($uid=NULL)
+	{
+		$sql = "UPDATE `tbl_users`U SET U.feedback_cache = '' WHERE U.uid =";
+		if ( $uid )
+			parent::instance()->exec($sql . " :uid;", [ ":uid" => $uid ]);
+		
+		else
+			parent::instance()->exec($sql . " {$_SESSION['userID']};");
+	}
+	
 }

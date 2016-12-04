@@ -44,7 +44,7 @@ class AdminCP_Stories extends AdminCP
 		
 		elseif ( $params['module']=="chaptersort" )
 		{
-			if ( isset($params[2]) ) $params = $this->parametric($params[2]);
+			//if ( isset($params[2]) ) $params = $this->parametric($params[2]); // 3.6
 			$data = $this->model->ajax("chaptersort", $post);
 		}
 		
@@ -59,7 +59,7 @@ class AdminCP_Stories extends AdminCP
 	
 	protected function edit(\Base $f3, $params)
 	{
-		if ( isset($params[2]) ) $params = $this->parametric($params[2]);
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 		
 		if ( empty($params['story']) )
 		{
@@ -117,7 +117,7 @@ class AdminCP_Stories extends AdminCP
 
 	public function save(\Base $f3, $params)
 	{
-		if ( isset($params[2]) ) $params = $this->parametric($params[2]);
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 		
 		$current = $this->model->loadStoryMapper($params['story']);
 		

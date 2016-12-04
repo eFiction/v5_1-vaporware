@@ -45,7 +45,7 @@ class AdminCP_Members extends AdminCP
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Profile') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Profile') );
 
-		if ( isset($params[2]) ) $params = $this->parametric($params[2]);
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 		
 		if ( isset($params['edit']) AND is_numeric($params['edit']) )
 		{

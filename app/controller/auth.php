@@ -71,7 +71,7 @@ class Auth extends Base {
 	
 	public function login($f3,$params)
 	{
-		if ( isset($params[1]) ) $params = ($this->parametric($params[1]));
+		if ( isset($params['*']) ) $params = ($this->parametric($params['*']));  // 3.6
 		\Registry::get('VIEW')->addTitle( $f3->get('LN__Login') );
 		
 		if( $f3->exists('POST.login') && $f3->exists('POST.password') )
@@ -155,7 +155,7 @@ class Auth extends Base {
 	
 	public function logout($f3,$params)
 	{
-		$return = explode("returnpath=",$params[1]);
+		$return = explode("returnpath=",$params['*']);
 		$returnpath = ( isset($return[1]) AND $return[1]!="") ? $return[1] : "/";
 
 		$this->model->userSession(0);

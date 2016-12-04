@@ -21,10 +21,10 @@ class Story extends Base
 		switch(@$params['action'])
 		{
 			case 'read':
-				$data = $this->read($params[2]);
+				$data = $this->read($params['*']);
 				break;
 			case 'print':
-				$this->printer($params[2]);
+				$this->printer($params['*']);
 				break;
 			case 'categories':
 				$data = $this->categories($params);
@@ -129,7 +129,7 @@ class Story extends Base
 
 	protected function intro($params)
 	{
-		if ( isset($params['id']) ) $this->parametric($params['id']);
+		if ( isset($params['id']) ) $this->parametric($params['id']); // 3.6
 
 		$data = $this->model->intro();
 		
@@ -146,7 +146,7 @@ class Story extends Base
 	
 	protected function updates($params)
 	{
-		if ( isset($params[2]) ) $params = $this->parametric($params[2]);
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 		
 		if ( isset($params['date']) AND $selection = explode("-",$params['date']) )
 		{
@@ -162,7 +162,7 @@ class Story extends Base
 	
 	protected function categories($params)
 	{
-		$id = empty($params[2]) ? 0 : $params[2];
+		$id = empty($params['*']) ? 0 : $params['*'];
 		if(empty($params[3]))
 		{
 			$data = $this->model->categories( (int)$id );
@@ -171,6 +171,7 @@ class Story extends Base
 		}
 		else
 		{
+			// What was I doing here? Need more comments :/
 			return "stub *controller-story-categories*";
 		}
 	}
@@ -194,7 +195,8 @@ class Story extends Base
 	public function search(\Base $f3, $params)
 	{
 		$get = [];
-		if ( isset($params[1]) ) $get = $this->parametric($params[1]);
+		if ( isset($params['*']) ) $get = $this->parametric($params['*']); // 3.6
+
 		$searchData = ($f3->get('POST'));
 		$searchData = array_filter(array_merge($get, $searchData));
 
@@ -273,7 +275,7 @@ class Story extends Base
 		{
 			$story = $id[0];
 			if ( empty($id[1]) AND $storyData['chapters']>1 )
-				$id[1] = (TRUE===\Base::instance()->get('CONFIG')['story_toc_default']) ? "toc" : 1;
+				$id[1] = (TRUE===\Config::getPublic('story_toc_default')) ? "toc" : 1;
 
 			if ( isset($id[1]) AND $id[1] == "reviews" )
 			{
@@ -312,7 +314,11 @@ class Story extends Base
 
 		if ( $select[1] == "stats" )
 		{
-			$data = \Base::instance()->get('CONFIG')->stats;
+			if ( FALSE === $data = \Cache::instance()->get('stats') )
+			{
+				$data = $this->model->blockStats();
+				\Cache::instance()->set('stats', $data, 3600);
+			}
 
 			return \View\Story::archiveStats($data);
 		}
@@ -346,7 +352,7 @@ class Story extends Base
 		elseif ( $select[1] == "recommend" )
 		{
 			// break if module not enabled
-			if ( empty(\Config::instance()->modules_enabled['recommendations']) ) return NULL;
+			if ( empty(\Config::getPublic('modules_enabled')['recommendations']) ) return NULL;
 			/*
 				$items: 0 = all featured stories
 				$order: "random" or NULL

@@ -25,6 +25,7 @@ class Blocks extends Base
 			":guest_name"	=> ( $member ) ? NULL : $data['name'],
 			":message"		=> $data['message'],
 		];
+		if ($member) \Model\Routines::dropUserCache();
 		return $this->exec($sql, $bind);
 	}
 
@@ -34,7 +35,7 @@ class Blocks extends Base
 		$start = array ( "month"	=> date("n",$firstEvent['date']),
 									 "year"		=> date("Y",$firstEvent['date']) );
 		
-		$target=explode("-",@$params['*']);
+		$target=explode("-",@$params['*']); // 3.6
 
 		if ( sizeof($target>1 ) )
 		{

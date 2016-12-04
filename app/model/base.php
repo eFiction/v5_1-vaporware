@@ -358,13 +358,13 @@ class Base extends \Prefab {
 
 		$this->update
 		(
-			'tbl_stories_blockcache',
+			'tbl_stories',
 			[
-				'tagblock'			=> serialize($this->cleanResult($item['tagblock'])),
-				'characterblock'	=> serialize($this->cleanResult($item['characterblock'])),
-				'authorblock'		=> serialize($this->cleanResult($item['authorblock'])),
-				'categoryblock'		=> serialize($this->cleanResult($item['categoryblock'])),
-				'rating'			=> serialize(explode(",",$item['rating'])),
+				'cache_tags'		=> json_encode($this->cleanResult($item['tagblock'])),
+				'cache_characters'	=> json_encode($this->cleanResult($item['characterblock'])),
+				'cache_authors'		=> json_encode($this->cleanResult($item['authorblock'])),
+				'cache_categories'	=> json_encode($this->cleanResult($item['categoryblock'])),
+				'cache_rating'		=> json_encode(explode(",",$item['rating'])),
 				'reviews'			=> $item['reviews'],
 				'chapters'			=> $item['chapters'],
 			],
@@ -414,7 +414,7 @@ class Base extends \Prefab {
 		{
 			$sql[]= "SET @bms  := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_user_favourites`F WHERE F.uid={$_SESSION['userID']} AND F.bookmark=1 GROUP BY F.type) AS F1);";
 			$sql[]= "SET @favs := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_user_favourites`F WHERE F.uid={$_SESSION['userID']} AND F.bookmark=0 GROUP BY F.type) AS F1);";
-			if(array_key_exists("recommendations", $this->config->modules_enabled))
+			if(array_key_exists("recommendations", $this->config->optional_modules))
 			{
 				$sql[]= "SET @recs := (SELECT COUNT(1) FROM `tbl_recommendations` WHERE `uid` = {$_SESSION['userID']});";
 			}
@@ -426,7 +426,7 @@ class Base extends \Prefab {
 		elseif ( $module == "feedback" )
 		{
 			$sql[]= "SET @rw  := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_feedback`F WHERE F.writer_uid={$_SESSION['userID']} AND F.type IN ('RC','SE','ST') GROUP BY F.type) AS F1);";
-			if(array_key_exists("recommendations", $this->config->modules_enabled))
+			if(array_key_exists("recommendations", $this->config->optional_modules))
 			{
 				$sql[]= "SET @rr  := (SELECT CONCAT_WS('//', SUM(SE+ST+RC), GROUP_CONCAT(type,',',IF(ST=0,IF(SE=0,RC,SE),ST) SEPARATOR '||')) FROM 
 							(SELECT F.type, COUNT(SA.lid) as ST, COUNT(Ser.seriesid) as SE, COUNT(Rec.recid) as RC
@@ -456,7 +456,7 @@ class Base extends \Prefab {
 									LEFT JOIN `tbl_news`N ON ( F.reference = N.nid AND F.type = 'N' AND N.uid = {$_SESSION['userID']} )
 							WHERE F.type IN ('C','N') GROUP BY F.type) as F1)";
 
-			if(array_key_exists("shoutbox", $this->config->modules_enabled))
+			if(array_key_exists("shoutbox", $this->config->optional_modules))
 			{
 				$sql[]= "SET @sb := (SELECT COUNT(1) FROM `tbl_shoutbox` WHERE `uid` = {$_SESSION['userID']});";
 			}

@@ -1,4 +1,4 @@
-<h3>{{@LN__FeaturedStories}}:</h1>
+<h3>{{@LN__FeaturedStory,1 | format }}:</h1>
 <form action="{{@BASE}}/adminCP/archive/featured/sid={{ @data['sid'] }}" method="post">
 	<div class="grid-wrapper">
 		<check if="{{ @data['errors'] }}"><div class="gb-90 alert-box error">{{ @data['errors'] }}</div></check>

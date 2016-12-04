@@ -11,7 +11,7 @@ class Page extends Base {
 
 	public function getMain(\Base $f3, $params)
 	{
-		if ( empty($params[1]) OR FALSE === $page = $this->model->load($params[1])  )
+		if ( empty($params['*']) OR FALSE === $page = $this->model->load($params['*'])  )  // 3.6
 			$this->buffer ( \Template::instance()->render('main/welcome.html') );
 		else
 		{

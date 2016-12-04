@@ -67,7 +67,7 @@ class AdminCP_Home extends AdminCP
 		$this->response->addTitle( $f3->get('LN__AdminMenu_CustomPages') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_CustomPages') );
 
-		if ( isset($params[2]) ) $params = $this->parametric($params[2]);
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 
 		if ( isset($params['delete']) )
 		{
@@ -130,7 +130,7 @@ class AdminCP_Home extends AdminCP
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Shoutbox') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Shoutbox') );
 
-		if ( isset($params[2]) ) $params = $this->parametric($params[2]);
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 
 		// search/browse
 		$allow_order = array (
@@ -186,7 +186,7 @@ class AdminCP_Home extends AdminCP
 		$this->response->addTitle( $f3->get('LN__AdminMenu_News') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_News') );
 
-		if ( isset($params[2]) ) $params = $this->parametric($params[2]);
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 
 		if ( isset($params['delete']) )
 		{
@@ -198,7 +198,7 @@ class AdminCP_Home extends AdminCP
 		{
 			if ( isset($_POST['form_data']) )
 			{
-				//$changes = $this->model->saveCustompage($params['id'], $f3->get('POST.form_data') );
+				$changes = $this->model->saveNews($params['id'], $f3->get('POST.form_data') );
 			}
 			elseif ( isset($_POST['newHeadline']) )
 			{

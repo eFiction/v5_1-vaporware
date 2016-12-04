@@ -26,8 +26,9 @@ class UserCP extends Base
 			"feedback"		=> "feedback",
 			"settings"		=> "settings",
 		];
-	
-		$p = array_pad(@explode("/",$params[1]),2,NULL);
+
+		$p = array_pad(@explode("/",$params['*']),2,NULL); // 3.6
+
 		$mod = array_shift($p);
 
 		if(@array_key_exists($mod,$modules))
@@ -245,12 +246,12 @@ class UserCP extends Base
 	
 	protected function settingsProfile(\Base $f3, $params)
 	{
-		
+		$this->buffer ( \View\Base::stub("profile") );
 	}
 
 	protected function settingsArchive(\Base $f3, $params)
 	{
-		
+		$this->buffer ( \View\Base::stub("archive") );
 	}
 
 	protected function settingsChangePW(\Base $f3, $params)
@@ -275,7 +276,7 @@ class UserCP extends Base
 
 	protected function settingsUser(\Base $f3, $params)
 	{
-		
+		$this->buffer ( \View\Base::stub("user") );
 	}
 
 	public function library(\Base $f3, $params)
@@ -353,6 +354,10 @@ class UserCP extends Base
 				[ "link" => "ST", "label" => "Stories" ],
 			];
 			$this->buffer ( \View\UserCP::upperMenu($menu_upper, $counter, "library/{$params[0]}", $params[0]) );
+		}
+		else
+		{
+			$this->buffer ( "__empty" );
 		}
 		// End of menu
 

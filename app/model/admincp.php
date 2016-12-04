@@ -733,6 +733,38 @@ class AdminCP extends Base {
 		return $news->_id;
 	}
 
+//	public function saveNews(int $id, array $data)
+	public function saveNews($id, array $data)
+	{
+		if( empty($data['headline']) )
+		{
+			\Base::instance()->set('form_error', "__EmptyLabel");
+			return FALSE;
+		}
+		$news=new \DB\SQL\Mapper($this->db, $this->prefix.'news');
+		if( $news->count(array('nid!=? AND headline=?',$id,$data['headline'])) > 0 )
+		{
+			\Base::instance()->set('form_error', "__DuplicateLabel");
+			return FALSE;
+		}
+		$news->load(array('nid=?',$id));
+		$news->copyfrom( 
+			[ 
+				"headline"	=> $data['headline'], 
+				"newstext"	=> $data['newstext'],
+				"datetime"	=> \DateTime::createFromFormat(\Config::getPublic('date_format_short')." H:i", $data['datetime'])->format('Y-m-d H:i'),
+			]
+		);
+
+		$i  = $news->changed("headline");
+		$i += $news->changed("newstext");
+		$i += $news->changed("datetime");
+		
+		$news->save();
+
+		return $i;
+	}
+	
 //	public function deleteNews( int $id )
 	public function deleteNews( $id )
 	{

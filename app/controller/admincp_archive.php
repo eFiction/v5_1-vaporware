@@ -87,7 +87,7 @@ class AdminCP_Archive extends AdminCP
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Featured') );
 		$allowedSubs = $this->showMenuUpper("archive/featured");
 		
-		if ( isset($params[2]) ) $params = $this->parametric($params[2]);
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 
 		if ( isset( $_POST['sid'] ) )
 		{
@@ -148,8 +148,7 @@ class AdminCP_Archive extends AdminCP
 
 		$allowedSubs = $this->showMenuUpper("archive/tags");
 
-		//if ( isset($params[2]) ) 
-		$params = $this->parametric($params[2]);
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 		
 		if ( isset($params['groups']) )
 			$this->tagsGroups($f3, $params);
@@ -169,8 +168,6 @@ class AdminCP_Archive extends AdminCP
 	
 	protected function tagsEdit(\Base $f3, $params)
 	{
-
-		//if ( isset($params[2]) ) $params = $this->parametric($params[2]);
 
 		if ( isset($params['delete']) )
 		{
@@ -226,8 +223,6 @@ class AdminCP_Archive extends AdminCP
 		//$segment = "archive/tags/groups";
 		//if(!$this->model->checkAccess($segment)) return FALSE;
 		
-		//if ( isset($params[2]) ) $params = $this->parametric($params[2]);
-
 		if ( isset($params['delete']) )
 		{
 			if ( $this->model->deleteTagGroup( (int)$params['delete'] ) )
@@ -277,7 +272,7 @@ class AdminCP_Archive extends AdminCP
 	
 	protected function categories(\Base $f3, $params)
 	{
-		if ( isset($params[2]) ) $params = $this->parametric($params[2]);
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 		
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Categories') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Categories') );

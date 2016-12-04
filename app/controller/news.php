@@ -28,7 +28,7 @@ class News extends Base
 	public function index(\Base $f3, $params)
 	{
 		$this->model->canAdmin('home/news');
-		if ( isset($params[1]) ) $params = $this->parametric($params[1]);
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 
 		if ( isset ( $params['id']) AND (int)$params['id'] > 0 )
 		{
@@ -47,8 +47,8 @@ class News extends Base
 
 	public function save(\Base $f3, $params)
 	{
-		$params = $this->parametric($params[1]);
-		if($_SESSION['userID']!=0 || \Base::instance()->get('CONFIG')['allow_guest_comment_news'] )
+		$params = $this->parametric($params['*']);
+		if($_SESSION['userID']!=0 || \Config::getPublic('allow_guest_comment_news') )
 		{
 			$errors = [];
 			$data = $f3->get('POST.comment');

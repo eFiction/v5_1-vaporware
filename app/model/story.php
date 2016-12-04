@@ -513,7 +513,10 @@ class Story extends Base
 			":text"				=> $data['text'],
 		];
 		if ( 1== $this->exec($sql, $bind) )
+		{
+			\Model\Routines::dropUserCache();
 			return (int)$this->db->lastInsertId();
+		}
 		else return FALSE;
 		
 		//return FALSE;
@@ -540,7 +543,25 @@ class Story extends Base
 
 	public function blockStats()
 	{
-		return $this->exec('SELECT SC.field, IF(SC.name IS NULL,SC.value,SC.name) as value FROM `tbl_stats_cache`SC;');
+		
+		$statSQL = [
+			"SET @users = (SELECT COUNT(*) FROM `tbl_users`U WHERE U.groups > 0);",
+			"SET @authors = (SELECT COUNT(*) FROM `tbl_users`U WHERE ( U.groups & 4 ) );",
+			"SET @reviews = (SELECT COUNT(*) FROM `tbl_feedback`F WHERE F.type='ST');",
+			"SET @stories = (SELECT COUNT(DISTINCT sid) FROM `tbl_stories`S WHERE S.validated > 0 );",
+			"SET @chapters = (SELECT COUNT(DISTINCT chapid) FROM `tbl_chapters`C INNER JOIN `tbl_stories`S ON ( C.sid=S.sid AND S.validated > 0 AND C.validated > 0) );",
+			"SET @words = (SELECT SUM(C.wordcount) FROM `tbl_chapters`C INNER JOIN `tbl_stories`S ON ( C.sid=S.sid AND S.validated > 0 AND C.validated > 0) );",
+			"SET @newmember = (SELECT CONCAT_WS(',', U.uid, U.nickname) FROM `tbl_users`U WHERE U.groups>0 ORDER BY U.registered DESC LIMIT 1);",
+			"SELECT @users as users, @authors as authors, @reviews as reviews, @stories as stories, @chapters as chapters, @words as words, @newmember as newmember;",
+		];
+		$statsData = $this->exec($statSQL)[0];
+		
+		foreach($statsData as $statKey => $statValue)
+		{
+			$stats[$statKey] = ($statKey=="newmember") ? explode(",",$statValue) : $statValue;
+		}
+
+		return $stats;
 	}
 	
 	public function blockNewStories($items)
