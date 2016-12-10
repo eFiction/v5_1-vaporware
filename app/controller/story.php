@@ -63,7 +63,7 @@ class Story extends Base
 				
 			}
 		}
-		print_r($params);
+		echo "<pre>".print_r($params,TRUE)."</pre>";
 		print_r($_POST);
 		exit;
 	}
@@ -212,8 +212,10 @@ class Story extends Base
 
 	public function search(\Base $f3, $params)
 	{
+		$searchForm = strpos($params[0],"search");
 		$get = [];
 		if ( isset($params['*']) ) $get = $this->parametric($params['*']); // 3.6
+		unset($get['page']);
 
 		$searchData = ($f3->get('POST'));
 		$searchData = array_filter(array_merge($get, $searchData));
@@ -268,8 +270,8 @@ class Story extends Base
 					$return[] = "{$k}={$v}";
 			}
 			$return = implode(";",$return);
-			$data = $this->model->search( $searchData, $return );
-			$this->buffer ( \View\Story::searchPage($searchData) );
+			$data = $this->model->search( $searchData, $return, $searchForm );
+			if($searchForm) $this->buffer ( \View\Story::searchPage($searchData) );
 			$this->buffer ( \View\Story::viewList($data) );
 		}
 
@@ -288,8 +290,7 @@ class Story extends Base
 	protected function read($id)
 	{
 		$id = explode(",",$id);
-
-		if($storyData = $this->model->getStory($id[0],@$id[1]))
+		if($storyData = $this->model->getStory($id[0],empty($id[1])?1:$id[1]))
 		{
 			$story = $id[0];
 			if ( empty($id[1]) AND $storyData['chapters']>1 )
@@ -370,7 +371,7 @@ class Story extends Base
 		elseif ( $select[1] == "recommend" )
 		{
 			// break if module not enabled
-			if ( empty(\Config::getPublic('modules_enabled')['recommendations']) ) return NULL;
+			if ( empty(\Config::getPublic('optional_modules')['recommendations']) ) return NULL;
 			/*
 				$items: 0 = all featured stories
 				$order: "random" or NULL

@@ -28,8 +28,10 @@ class Story extends Base
 	
 	protected static function dataProcess(&$item, $key=NULL)
 	{
+		if (isset($item['modified']))	$item['modified']	= ($item['modified'] > ($item['published'] + (24*60*60) ) ) ?
+																	date(\Config::getPublic('date_format_short'),$item['modified']) :
+																	NULL;
 		if (isset($item['published']))	$item['published']	= date(\Config::getPublic('date_format_short'),$item['published']);
-		if (isset($item['modified']))	$item['modified']	= date(\Config::getPublic('date_format_short'),$item['modified']);
 										$item['number']		= isset($item['inorder']) ? "{$item['inorder']}&nbsp;" : "";
 		if (isset($item['wordcount'])) 	$item['wordcount']	= number_format($item['wordcount'], 0, '','.');
 		if (isset($item['count'])) 		$item['count']		= number_format($item['count'], 0, '','.');
@@ -113,7 +115,7 @@ class Story extends Base
 		$storyData['cache_authors'] = json_decode($storyData['cache_authors'],TRUE);
 		$storyData['published'] = date( \Config::getPublic('date_format_short'), $storyData['published']);
 		$storyData['modified'] = date( \Config::getPublic('date_format_short'), $storyData['modified']);
-		
+
 		$can_edit = ( $storyData['can_edit'] ) ? "userCP" : NULL;
 		if ( !$can_edit AND $_SESSION['groups'] & 64 ) $can_edit = "adminCP";
 		

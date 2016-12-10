@@ -16,8 +16,8 @@ class Config extends \Prefab
 	{
 		if ( FALSE === self::$public = \Cache::instance()->get('config') )
 		{
+			self::$public = self::cache();
 			self::$public['prefix'] = self::$protected['prefix'];
-			self::$public = self::$public + self::cache();
 			\Cache::instance()->set('config', self::$public, 3600);
 		}
 		return self::$public;
@@ -40,7 +40,7 @@ class Config extends \Prefab
 
 	public static function cache()
 	{
-		$sqlList = "SELECT `name`, `value` from `tbl_config` ORDER BY `admin_module`, `section_order` ASC";
+		$sqlList = "SELECT `name`, `value` from `".self::$protected['prefix']."config` ORDER BY `admin_module`, `section_order` ASC";
 		$configValues = \Model\Base::instance()->exec($sqlList);
 		$configData = [];
 		

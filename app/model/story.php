@@ -15,7 +15,7 @@ class Story extends Base
 			"ORDER" => "ORDER BY ". $this->config['story_intro_order']." DESC" ,
 			"LIMIT" => "LIMIT ".(max(0,$pos*$limit)).",".$limit,
 		];
-		$data = $this->exec($this->storySQL($replacements));
+		$data = $this->storyData($replacements);
 
 		$this->paginate(
 			(int)$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
@@ -41,7 +41,7 @@ class Story extends Base
 			"LIMIT" => "LIMIT ".(max(0,$pos*$limit)).",".$limit,
 			"JOIN" => "INNER JOIN `tbl_stories_authors`rSA ON ( rSA.sid = S.sid AND rSA.aid = :aid )"
 		];
-		$data = $this->exec($this->storySQL($replacements),["aid" => $id]);
+		$data = $this->storyData($replacements, ["aid" => $id]);
 		
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
@@ -80,7 +80,7 @@ class Story extends Base
 		return [$info, $data];
 	}
 	
-	public function search ($terms, $return)
+	public function search ($terms, $return, $searchForm=FALSE)
 	{
 		if ( $terms['rating'][0] == $terms['rating'][1] )
 		{
@@ -128,7 +128,6 @@ class Story extends Base
 		{
 			// sidebar stuff!
 			$join[] = "INNER JOIN (SELECT sid FROM `tbl_stories_authors` WHERE aid IN (".implode(",",$terms['author']).") GROUP BY sid having count(lid)=".count($terms['author']).") iA ON ( iA.sid = S.sid )";
-
 		}
 		
 		$limit = $this->config['stories_per_page'];
@@ -142,27 +141,15 @@ class Story extends Base
 			"WHERE"	=> implode(" ", $where),
 			"COMPLETED" => isset($terms['exclude_wip']) ? ">" : ">=",
 		];
-//echo $this->storySQL($replacements);exit;
-		$data = $this->exec($this->storySQL($replacements), $bind );
 
+		$data = $this->storyData($replacements, $bind);
+
+		$link = ( $searchForm ) ? "search" : "browse";
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
-			"/story/search/".$return,
+			"/story/{$link}/".$return,
 			$limit
 		);
-
-		if ( sizeof($data)>0 )
-		{
-			foreach ( $data as &$dat)
-			{
-				$favs = $this->cleanResult($dat['is_favourite']);
-				$dat['is_favourite'] = [];
-				if(!empty($favs))
-				foreach ( $favs as $value )
-					if ( isset($value[1]) ) $dat['is_favourite'][$value[0]] = $value[1];
-			}
-		}
-
 		
 		return $data;
 	}
@@ -202,7 +189,7 @@ class Story extends Base
 			"LIMIT" => "LIMIT ".(max(0,$pos*$limit)).",".$limit,
 			"WHERE" => "AND ( (".implode(" AND ",$filter_date).") OR (".implode(" AND ",$filter_updated).") )"
 		];
-		$data = $this->exec($this->storySQL($replacements));
+		$data = $this->storyData($replacements);
 
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
@@ -259,7 +246,7 @@ class Story extends Base
 			"JOIN"	=> "LEFT JOIN `tbl_chapters`C ON ( S.sid = C.sid and C.inorder = :chapter )"
 		];
 
-		$data = $this->exec($this->storySQL($replacements), [ ":sid" => $story, ":chapter" => $chapter ]);
+		$data = $this->storyData($replacements, [ ":sid" => $story, ":chapter" => $chapter ]);
 		
 		if ( !@in_array($story, @$_SESSION['viewed']) )
 		{
@@ -268,15 +255,7 @@ class Story extends Base
 		}
 
 		if ( sizeof($data)==1 )
-		{
-			$favs = $this->cleanResult($data[0]['is_favourite']);
-			$data[0]['is_favourite'] = [];
-			if(empty($favs)) return $data[0];
-			foreach ( $favs as $value )
-				if ( isset($value[1]) ) $data[0]['is_favourite'][$value[0]] = $value[1];
-
 			return $data[0];
-		}
 		else return FALSE;
 	}
 	
@@ -285,18 +264,38 @@ class Story extends Base
 		return parent::getChapter( $story, $chapter, $counting );
 	}
 	
-	public function storySQL($replacements=[])
+	public function storyData(array $replacements=[], array $bind=[])
+	{
+		$sql = $this->storySQL($replacements);
+		$data = $this->exec($sql, $bind);
+
+		if ( sizeof($data)>0 )
+		{
+			foreach ( $data as &$dat)
+			{
+				$favs = $this->cleanResult($dat['is_favourite']);
+				$dat['is_favourite'] = [];
+				if(!empty($favs))
+				foreach ( $favs as $value )
+					if ( isset($value[1]) ) $dat['is_favourite'][$value[0]] = $value[1];
+			}
+		}
+
+		return $data;
+	}
+	
+	public function storySQL(array $replacements=[])
 	{
 		$sql_StoryConstruct = "SELECT SQL_CALC_FOUND_ROWS
 				S.sid, S.title, S.summary, S.storynotes, S.completed, S.wordcount, UNIX_TIMESTAMP(S.date) as published, UNIX_TIMESTAMP(S.updated) as modified, 
 				S.count,GROUP_CONCAT(Ser.seriesid,',',rSS.inorder,',',Ser.title ORDER BY Ser.title DESC SEPARATOR '||') as in_series @EXTRA@,
-				".((isset($this->config['modules_enabled']['contests']))?"GROUP_CONCAT(rSC.relid) as contests,":"")."
+				".((isset($this->config['optional_modules']['contests']))?"GROUP_CONCAT(rSC.relid) as contests,":"")."
 				GROUP_CONCAT(Fav.bookmark,',',Fav.fid SEPARATOR '||') as is_favourite,
 				Ra.rating as rating_name, Edit.uid as can_edit,
 				S.cache_authors, S.cache_tags, S.cache_characters, S.cache_categories, S.cache_rating, S.chapters, S.reviews
 			FROM `tbl_stories`S
 				@JOIN@
-			".((isset($this->config['modules_enabled']['contests']))?"LEFT JOIN `tbl_contest_relations`rSC ON ( rSC.relid = S.sid AND rSC.type = 'story' )":"")."
+			".((isset($this->config['optional_modules']['contests']))?"LEFT JOIN `tbl_contest_relations`rSC ON ( rSC.relid = S.sid AND rSC.type = 'story' )":"")."
 			LEFT JOIN `tbl_series_stories`rSS ON ( rSS.sid = S.sid )
 				LEFT JOIN `tbl_series`Ser ON ( Ser.seriesid=rSS.seriesid )
 			LEFT JOIN `tbl_ratings`Ra ON ( Ra.rid = S.ratingid )
