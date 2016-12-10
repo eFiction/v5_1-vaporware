@@ -42,10 +42,16 @@ Sorry, can't complete registration at this point.
 			</check>
 			<div class="gb-1qrt">{{@LN__Email}}</div><div class="gb-3qrt"><input class="half" type="text" name="form[email]" value="{{ @@data['email'] }}"></div>
 			<check if="{{ isset(@error.password) }}">
-				<div class="grid-wrapper"><div class="note alert-box
-					<check if="{{ @error.password == 'missing' }}"> error">{{ @LN__Registration_PasswordTwice }}!</check>
-					<check if="{{ @error.password == 'mismatch' }}"> error">{{ @LN__Registration_PasswordMismatch }}</check>
-					<check if="{{ @error.password == 'criteria' }}"> error">{{ @LN__Registration_PasswordCriteria }}</check>
+				<div class="grid-wrapper"><div class="note alert-box error">
+					<check if="{{ @error.password == 'missing' }}">{{ @LN__Registration_PasswordTwice }}!</check>
+					<check if="{{ @error.password == 'mismatch' }}">{{ @LN__Registration_PasswordMismatch }}</check>
+					<check if="{{ @error.password == 'criteria' }}">
+						{{ @LN__Registration_PasswordCriteria }}:<br/>
+						- {{ \CONFIG::getPublic('reg_min_password') }} _characters<br/>
+						<check if="{{ 1 < \CONFIG::getPublic('reg_password_complexity') }}">
+							- {{ \CONFIG::getPublic('reg_password_complexity') }} _complex
+						</check>
+					</check>
 				</div></div>
 			</check>
 			<div class="gb-1qrt">{{@LN__Password}}</div><div class="gb-3qrt"><input class="half" type="password" name="form[password1]" value=""></div>

@@ -222,31 +222,10 @@ class Auth extends Base {
 			$error['count']++;
 			$error['password'] = $pw_error;
 		}
-		/*
-		$this->password_regex = '/^(?=^.{'.$this->configExt['reg_min_password'].',}$)(?:.*?(?>((?(1)(?!))[a-z]+)|((?(2)(?!))[A-Z]+)|((?(3)(?!))[0-9]+)|((?(4)(?!))[^a-zA-Z0-9\s]+))){'.$this->configExt['reg_password_complexity'].'}.*$/s';
-		
-		// Passwords match?
-		if( $register['password1'] == "" OR $register['password2'] == "" )
-		{
-			$error['count']++;
-			$error['password'] = "missing";
-		}
-		elseif ( $register['password1'] != $register['password2'] )
-		{
-			$error['count']++;
-			$error['password'] = "mismatch";
-		}
-		// Passwords meets the criteria required?
-		elseif ( preg_match( $this->password_regex, $register['password1'], $matches) != 1 )
-		{
-			$error['count']++;
-			$error['password'] = "criteria";
-		}
-		*/
 
 		if ( $error['count']==0 )
 		{
-			// Check with SFS database
+			// Check with SFS database?
 			if ( $this->config['reg_sfs_usage'] == TRUE )
 			{
 				$register['ip'] = $_SERVER['REMOTE_ADDR'];
@@ -276,32 +255,55 @@ class Auth extends Base {
 
 	protected function checkInputSFS($data)
 	{
-		$url = "http://api.stopforumspam.org/api?f=serial";
+		$url = "http://api.stopforumspam.org/api?f=json";
 		
 		if ( $this->config['reg_sfs_check_mail'] 		== TRUE ) $url .= "&email=".$data['email'];
 		if ( $this->config['reg_sfs_check_ip'] 			== TRUE ) $url .= "&ip=".$data['ip'];
 		if ( $this->config['reg_sfs_check_username']	== TRUE ) $url .= "&username=".$data['login'];
 		
-		$context = stream_context_create( array(
-			'http'=>array(
-			'timeout' => 1.0
-			)
-		));
 		$handle=FALSE; $i=0;
 
 		/*
 			Sometimes the api server may not respond on the first attempt (depends on webserver configuration)
 			So the timeout was set to one second and we will try up to 5 times
 		*/
-		
-		while( !$handle AND $i++ < 5 )
+
+		if ( 0 == ini_get('allow_url_fopen') )
 		{
-			$handle = @fopen($url, 'r', false, $context);
-			if ( !$handle ) {
-			  $sfs['success'] = 0;
+			$sfsCheck = @curl_init($url);
+			@curl_setopt($sfsCheck, CURLOPT_RETURNTRANSFER, true);
+			
+			while( !$handle AND $i++ < 5 )
+			{
+				$handle = @curl_exec($sfsCheck);
+
+				if ( !$handle ) {
+				  $sfs['success'] = 0;
+				  echo "Null";
+				}
+				else {
+				  $sfs = json_decode($handle,TRUE);
+				}
 			}
-			else {
-			  $sfs = json_decode(stream_get_contents($handle));
+			@curl_close($sfsCheck);			
+		}
+		else
+		{
+			$context = stream_context_create( array(
+				'http'=>array(
+				'timeout' => 1.0
+				)
+			));
+			
+			while( !$handle AND $i++ < 5 )
+			{
+				$handle = @fopen($url, 'r', false, $context);
+				if ( !$handle ) {
+				  $sfs['success'] = 0;
+				}
+				else {
+				  $sfs = json_decode(stream_get_contents($handle));
+				}
 			}
 		}
 
@@ -391,7 +393,7 @@ class Auth extends Base {
 							"nickname"		=> $register['login'],
 							"email"			=> $register['email'],
 							"registered"	=> [ "NOW", "" ],
-							"groups"		=> ($this->configExt['reg_require_email']) ? 0 : 1,
+							"groups"		=> ($this->config['reg_require_email']) ? 0 : 1,
 							//"resettoken"	=> $token."//".time(),
 						];
 		$userID = $this->insertArray("tbl_users", $data);

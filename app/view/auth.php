@@ -55,7 +55,7 @@ class Auth extends Base
 	{
 		if( isset($_SESSION['lastAction']) )
 		{
-			$f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
+			\Base::instance()->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
 			unset($_SESSION['lastAction']);
 		}
 
