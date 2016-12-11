@@ -8,7 +8,7 @@ class Auth extends Base {
 		// Load a compatibility wrapper for PHP versions prior to 5.5.0
 		if ( !function_exists("password_hash") ) include ( "app/inc/password_compat.php" );
 
-		$this->prepare("userQuery", "SELECT U.password, U.uid FROM `tbl_users` U where ( U.login = :login OR U.uid = :uid )");
+		$this->prepare("userQuery", "SELECT U.password, U.uid FROM `tbl_users` U where ( U.login = :login OR U.uid = :uid ) AND U.groups > 0");
 		$this->bindValue("userQuery", ":login", $login, \PDO::PARAM_STR);
 		$this->bindValue("userQuery", ":uid",	 $uid,	 \PDO::PARAM_INT);
 		$user = $this->execute("userQuery");
@@ -211,7 +211,6 @@ class Auth extends Base {
 					$error['email'] = "taken";
 				}
 			}
-			
 		}
 		
 		/*
@@ -230,31 +229,22 @@ class Auth extends Base {
 			{
 				$register['ip'] = $_SERVER['REMOTE_ADDR'];
 				$check = $this->checkInputSFS($register);
-				if ( is_array($check) AND $check['status'] == 2 )
-				{
-					// Registration refused
-					$error['sfs'] = 2;
-				}
-				elseif ( is_array($check) AND $check['status'] == 1 )
-				{
-					// Queued for moderation
-					$this->regModeration = $check['reason'];
-				}
-				$error['sfsreason'] = $check['reason'];
+				
+				$error = array_merge ( $error, $this->checkInputSFS($register) );
+			}
+			else
+			{
+				$error['status'] = -1;
 			}
 		}
 
-		// Check if fields have been filled
-//		print_r($register);
-//		print_r($error);
-		if
-			( $error['count']==0 AND empty( $error['sfs'] ) ) return TRUE;
-		else
-			return $error;
+		return $error;
 	}
 
 	protected function checkInputSFS($data)
 	{
+		// return: TRUE - everything fine
+		// return [int @status (1 or 2),str @reason] - something wrong (or everything)
 		$url = "http://api.stopforumspam.org/api?f=json";
 		
 		if ( $this->config['reg_sfs_check_mail'] 		== TRUE ) $url .= "&email=".$data['email'];
@@ -307,27 +297,27 @@ class Auth extends Base {
 			}
 		}
 
+		$reason = "";
 		if ( $sfs['success'] == 1 )
 		{
-			$bad = "";
 			// Successful query
-			if ( $this->config['reg_sfs_check_mail'] 	== "TRUE" && $sfs['email']['appears'] == 1 )
+			if ( $this->config['reg_sfs_check_mail'] 	== TRUE && $sfs['email']['appears'] == 1 )
 			{
-				$bad .= "E";
+				$reason .= "E";
 			}
-			if ( $this->config['reg_sfs_check_ip'] 		== "TRUE" && $sfs['ip']['appears'] == 1 )
+			if ( $this->config['reg_sfs_check_ip'] 		== TRUE && $sfs['ip']['appears'] == 1 )
 			{
-				$bad .= "I";
+				$reason .= "I";
 			}
-			if ( $this->config['reg_sfs_check_username']== "TRUE" && $sfs['username']['appears'] == 1 )
+			if ( $this->config['reg_sfs_check_username']== TRUE && $sfs['username']['appears'] == 1 )
 			{
-				$bad .= "U";
+				$reason .= "U";
 			}
 			// No occurence in spam database, pass
-			if( strlen($bad)==0 ) $save = "green";
+			if( strlen($reason)==0 ) $save = "green";
 			// Too many hits, straight kick
-			elseif( strlen($bad)>2 ) $deny = "red";
-			else $save = "suspend";
+			elseif( strlen($reason)>2 ) $deny = "red";
+			else $save = "yellow";
 		}
 		else
 		{
@@ -336,6 +326,7 @@ class Auth extends Base {
 			{
 				// Accept registration, but put member on hold
 				$save = "yellow";
+				$reason = "S";
 			}
 			elseif ( $this->config['reg_sfs_failsafe'] == 1 )
 			{
@@ -354,17 +345,14 @@ class Auth extends Base {
 			if ( $save == "green" )
 			{
 				// Everything is fine, gonna save member and continue to next step
-				return TRUE;
-			}
-			elseif ( $save == "yellow" )
-			{
-				// Failed to query server, according to config settings, will save the registration, but put on hold
-				$return = [ "status" => 1, "reason" => "S" ];
+				return [ "status" => 0, "reason" => NULL ];
 			}
 			else
 			{
+				// Failed to query server, according to config settings, will save the registration, but put on hold
+				// or
 				// At least one of the checked items was found in the SFS database, gonna put the member on hold
-				$return = [ "status" => 1, "reason" => $bad ];
+				return [ "status" => 1, "reason" => $reason ];
 			}
 		}
 		else
@@ -372,81 +360,92 @@ class Auth extends Base {
 			if ( $deny == "connect" )
 			{
 				// SFS server yould not be queried, registration was not completed
-				$return = [ "status" => 2, "reason" => "technical" ];
+				return [ "status" => 2, "reason" => "technical" ];
 			}
 			elseif ( $deny == "red" )
 			{
 				// Too many items were found in the spam database, by directive, registration was refused
-				$return = [ "status" => 2, "reason" => "refused" ];
+				return [ "status" => 2, "reason" => "refused" ];
 			}
 		}
-		return $return;
+		return FALSE;
 	}
 
-	public function addUser($register)
+	public function addUser(array $register, array $moderation=[])
 	{
-		$extra="done,";
+		$newUser = new \DB\SQL\Mapper($this->db, $this->prefix."users");
+		$newUser->login			= $register['login'];
+		$newUser->nickname		= $register['login'];
+		$newUser->email			= $register['email'];
+		$newUser->registered	= date("Y-m-d H:i:s",time());
+		$newUser->groups		= $register['groups'];
+		$newUser->save();
+		
+		return $newUser->_id;
+	}
+	
+	public function newuserSetStatus($userID, $status, $mod)
+	{
+		// $userID, $status and $mod are safe
+		$this->exec("INSERT INTO `tbl_user_info` (uid,field,info) VALUES ({$userID},'{$status}','{$mod}')
+						ON DUPLICATE KEY UPDATE info='{$mod}' ");
+	}
+	
+	public function newuserEmailLink(array $token)
+	{
+		$newInfo = new \DB\SQL\Mapper($this->db, $this->prefix."user_info");
+		$newInfo->load(array('uid=? AND field=? AND info=?',$token[0], '-2', $token[1]));
+		
+		if ( $newInfo->uid != $token[0]) return FALSE;
+		
+		$newUser = new \DB\SQL\Mapper($this->db, $this->prefix."users");
+		$newUser->load(array('uid=?',$newInfo->uid));
+		$newUser->groups = 1;
+		$newUser->save();
+		
+		$newInfo->erase();
+		
+		return TRUE;
+	}
+	
+	
+						
+/*
+
 		// Gather data for SQL insert
 		$token = md5(time());
-		$data = [
-							"login"			=> $register['login'],
-							"nickname"		=> $register['login'],
-							"email"			=> $register['email'],
-							"registered"	=> [ "NOW", "" ],
-							"groups"		=> ($this->config['reg_require_email']) ? 0 : 1,
-							//"resettoken"	=> $token."//".time(),
-						];
-		$userID = $this->insertArray("tbl_users", $data);
 		
-		//$userID = $this->DB->lastStats['insertID'];
+		$mod = json_encode($moderation);
 		
-
-		// Set password with the pre-built function
-		$this->userChangePW($userID, $register['password1']);
-
-		// If the account is set for moderation
-		if( isset($this->regModeration) )
+		// Status OK, admin requires no moderation
+		if ( $moderation['status']==0 AND FALSE == \Config::getPublic('reg_require_mod') )
 		{
-			//echo $this->regModeration;
-			
-			$this->update
-			(
-				"tbl_users",
-				[
-					"groups"		=> 0,						// Revoke login permission (if set)
-					//"resettoken"	=> NULL,				// Revoke the token
-					"about"			=> $_SERVER['REMOTE_ADDR'].'#'.$this->regModeration	// Remember why this user is on moderation
-				],
-				[ "uid=?", $userID ]
-			);
-			$extra = "moderation,";			// and tell the user (s)he is
+			// email activation required ?
+			if( FALSE == \Config::getPublic('reg_require_email') )
+			{
+				$status = FALSE;
+				$groups = 1;
+			}
+			else
+			{
+				$status = -2;
+			}
 		}
-		elseif( $this->config['reg_require_email'] )
+
+
+		$userID = $newUser->_id;
+
+
+		
+		if ( $status )
 		{
-			if 
-			(
-				!sendmail
-				(
-					array($this->request['post']['login'], $this->request['post']['email']), 
-					"__AccountActivation", 
-					$this->TPL->buildBlock
-					(
-						"controlpanel",
-						"mailActivateAccount",
-						[
-							"USERNAME"	=>	$this->request['post']['login'],
-							"TOKEN"		=>	$token,
-							"UID"		=>	$userID,
-							"BASEURL"	=>	__baseURL__
-						]
-					)
-				)
-			) $extra = "nomail,";
+			// $uid and $token are safe
+			$this->exec("INSERT INTO `tbl_user_info` (uid,field,info) VALUES ({$userID},'{$status}','{$mod}')
+							ON DUPLICATE KEY UPDATE info='{$mod}' ");
 		}
-		$hash = $this->exec("SELECT MD5(CONCAT(U.uid,U.registered)) as md5 FROM `tbl_users`U WHERE U.uid = ".$userID)[0]['md5'];
-		
-		// add a log entry
-		
-		return $extra.$hash;
+		//print_r($data);print_r($moderation);
+		return $userID;
 	}
+	
+	*/
 }

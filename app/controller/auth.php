@@ -95,6 +95,19 @@ class Auth extends Base {
 			if ( $f3->exists('POST.token') AND ""!=$f3->get('POST.token') ) $params['token'] = $f3->get('POST.token');
 			$this->recoveryForm($f3, $params['token']);
 		}
+		elseif( isset($params['activate']) )
+		{
+			if( empty($params['activate'][1]) )
+			{
+				// bad
+				$this->buffer( "Bad token" );
+				return FALSE;
+			}
+			if ( TRUE === $this->model->newuserEmailLink($params['activate']) )
+				$this->buffer( "Activating" );
+			else
+				$this->buffer( "Failing" );
+		}
 
 		else
 			$this->buffer( \View\Auth::loginError($f3) );
@@ -190,14 +203,80 @@ class Auth extends Base {
 			{
 				// We have received a form, let's work through it
 				$formData = $f3->get('POST')['form'];
-				if ( TRUE === $check = $this->model->registerCheckInput($formData) )
+
+				$check = $this->model->registerCheckInput($formData);
+				if ( $check['count']==0 )
 				{
-					$_SESSION['lastAction'] = [ "registered" => "done" ];
-					$return = $this->model->addUser($formData);
+					if ( $check['status']==2 )
+					{
+						// kicked by SFS check
+						// might want to give different replies based on $check['reason']
+						$_SESSION['lastAction'] = [ "registered" => "failed" ];
+						
+						// log this attempt
+						\Logging::addEntry("RF", json_encode([ 'name'=>$formData['login'], 'email'=>$formData['email'], 'reason'=>$check['reason'] ]),0);
+					}
+					else
+					{
+						$token = md5(time());
+						$formData['groups'] = 0;
+
+						if ( $check['status']<1 AND FALSE == \Config::getPublic('reg_require_mod') )
+						{
+							// either passed SFS check, or SFS is disabled
+							if( TRUE == \Config::getPublic('reg_require_email') )
+							{
+								$status = -2;
+								$check['next'] = "mail";
+							}
+							else
+							{
+								$status = FALSE;
+								$formData['groups'] = 1;
+								$check['next'] = "done";
+							}
+						}
+						else
+						{
+							// put on moderation by SFS check or by admin setting
+							$status = -3;
+							$check['next'] = "moderation";
+						}
+						
+						$userID = $this->model->addUser($formData);
+
+						if ( $status == -2 )
+						{
+							$token =  md5(time()+mt_rand());
+							$mailText = \View\Auth::registerMail($formData, $userID.",".$token);
+
+							if ( TRUE == $this->mailman($f3->get('LN__Registration'), $mailText, $formData['email'], $formData['login']) )
+							{
+								$mod = $token;
+							}
+							else
+							{
+								$check['reason'] = "mailfail";
+								$mod = json_encode($moderation);
+								$status = -3;
+								$check['next'] = "mailfail";
+							}
+						}
+						else $mod = json_encode($moderation);
+
+						if ( $status!==FALSE )
+							$this->model->newuserSetStatus($userID, $status, $mod);
+						
+						// Set password with the pre-built function
+						$this->model->userChangePW($userID, $formData['password1']);
+
+						$_SESSION['lastAction'] = [ "registered" => $check['next'] ];
+						
+						\Logging::addEntry("RG", json_encode([ 'name'=>$formData['login'], 'email'=>$formData['email'], 'reason'=>$check['reason'] ]),$userID);
+					}
 					$formData = [];
+					
 				}
-				elseif ( isset($check['sfs'])==2 )
-					$_SESSION['lastAction'] = [ "registered" => "failed" ];
 
 				$this->buffer( \View\Auth::register($formData, $check) );
 			}

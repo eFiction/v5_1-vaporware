@@ -102,49 +102,6 @@ class AdminCP extends Base {
 		return $this->exec($sql);
 	}
 	
-	public function saveKeys_file($data)
-	{
-		$affected=0;
-		$sqlUpdate = "UPDATE `tbl_config` SET `value` = :value WHERE `name` = :key and `admin_module` = :section;";
-		$sqlFile = "SELECT 1 from `tbl_config` WHERE `name`= :key and `admin_module`= :section and `to_config_file`=1";
-		
-		$mapper = $this->config;
-		foreach ( $data as $section => $fields )
-		{
-			foreach($fields as $key => $value)
-			{
-				if ( $res = $this->exec($sqlUpdate,[ ":value" => $value, ":key" => $key, ":section" => $section ]) )
-				{
-					if ( $this->exec($sqlFile,[ ":key" => $key, ":section" => $section ]) )
-					{
-						/* experimental */
-						if ( $value == "TRUE") $value = TRUE;
-						elseif ( $value == "FALSE") $value = FALSE;
-						
-						$key = explode("__", $key);
-
-						if ( isset($key[1]) )
-						{	
-							// nested key structures, like bb2__verbose -> bb2[verbose]
-							if ( empty( $mapper->{$key[0]} ) ) $mapper->{$key[0]} = [];
-							$mapper->{$key[0]}[$key[1]] = $value;
-						}
-						else
-						{
-							if ( NULL === $c = json_decode( $value ,TRUE ) )
-								$mapper->{$key[0]} = $value;
-							else
-								$mapper->{$key[0]} = $c;
-						}
-					}
-					$affected++;	
-				}
-			}
-		}
-		if ( $affected ) $mapper->save();
-		return [ $affected, FALSE ]; // prepare for error check
-	}
-	
 	public function saveKeys($data)
 	{
 		$affected=0;

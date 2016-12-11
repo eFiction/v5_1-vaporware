@@ -65,6 +65,14 @@ class Auth extends Base
 		return \Template::instance()->render('main/register.html');
 	}
 	
+	public static function registerMail($user, $token)
+	{
+		\Base::instance()->set('username', $user['login']);
+		\Base::instance()->set('token', $token);
+		
+		return \Template::instance()->render('email/activation.html','text/html');
+	}
+
 	public static function captchaF3()
 	{
 		$img = new \Image();

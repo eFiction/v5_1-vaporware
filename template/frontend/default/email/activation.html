@@ -1,0 +1,13 @@
+<html>
+<head>
+  <title>{{@LN__Registration}} @ {{ \Config::getPublic('page_title') }}</title>
+</head>
+<body>
+	<p>Hi {{@username}},</p>
+	<p>somebody (hopefully you) has registered an account at this website.</p>
+	<p>To activate it, click this link:</p>
+	<p><a href="http://{{@HOST}}{{@BASE}}/login/activate={{@token}}">http://{{@HOST}}{{@BASE}}/login/activate={{@token}}</a></p>
+	<p>If you did not request this, simply ignore this mail.</p>
+	<p>Yours</p>
+</body>
+</html>

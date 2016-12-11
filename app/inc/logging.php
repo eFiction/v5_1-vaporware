@@ -40,6 +40,11 @@ class Logging extends \DB\SQL\Mapper
 			"AM" => "Admin Maintenance"
 			"EB" => _EDITBIO
 		*/
+		
+		/*
+			eFiction 5 log types added:
+			"RF" => Registration failed
+		*/
 
 		// Force add entry
 		$logger->reset();
@@ -48,7 +53,7 @@ class Logging extends \DB\SQL\Mapper
 		$logger->action	 = $action;
 		// Use id of active user, unless specified
 		$logger->uid	 = ( $uid ) ? $uid : $_SESSION['userID'];
-		$logger->ip		 = $_SERVER['REMOTE_ADDR'];
+		$logger->ip		 = $ip = sprintf("%u",ip2long($_SERVER['REMOTE_ADDR']));
 		$logger->version = 2;
 		// Add entry
 		$test = $logger->save();

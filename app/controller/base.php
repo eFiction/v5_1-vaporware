@@ -99,6 +99,7 @@ class Base extends \Prefab {
 				implode("\r\n", $headers)							// headers
 			);
 		}
+		return $sent;
 	}
 	
 	/**
