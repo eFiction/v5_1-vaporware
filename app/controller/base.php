@@ -81,8 +81,6 @@ class Base extends \Prefab {
 			$smtp->set('content_type', 'text/html; charset="utf-8"');
 			
 			$sent = $smtp->send($mailText, TRUE);
-			//$mylog = $smtp->log();
-			//echo '<pre>'.$smtp->log().'</pre>';
 		}
 		else
 		{
@@ -94,9 +92,9 @@ class Base extends \Prefab {
 			
 			$sent = mail(
 				"{$rcpt_name} <{$rcpt_mail}>",	// recipient
-				$subject,							// subject
-				$mailText,											// content
-				implode("\r\n", $headers)							// headers
+				$subject,						// subject
+				$mailText,						// content
+				implode("\r\n", $headers)		// headers
 			);
 		}
 		return $sent;

@@ -129,7 +129,7 @@ class Auth extends Base {
 						WHERE S.session = '{$session_id}' AND S.ip ='{$ip_db}';";
 
 		$user = $this->exec($sql)[0];
-//		print_r($user);
+
 		if ( $user['session'] > '' && $user['userID'] > 0 )
 		{
 			$f3->set('usercount', 
@@ -407,45 +407,4 @@ class Auth extends Base {
 		
 		return TRUE;
 	}
-	
-	
-						
-/*
-
-		// Gather data for SQL insert
-		$token = md5(time());
-		
-		$mod = json_encode($moderation);
-		
-		// Status OK, admin requires no moderation
-		if ( $moderation['status']==0 AND FALSE == \Config::getPublic('reg_require_mod') )
-		{
-			// email activation required ?
-			if( FALSE == \Config::getPublic('reg_require_email') )
-			{
-				$status = FALSE;
-				$groups = 1;
-			}
-			else
-			{
-				$status = -2;
-			}
-		}
-
-
-		$userID = $newUser->_id;
-
-
-		
-		if ( $status )
-		{
-			// $uid and $token are safe
-			$this->exec("INSERT INTO `tbl_user_info` (uid,field,info) VALUES ({$userID},'{$status}','{$mod}')
-							ON DUPLICATE KEY UPDATE info='{$mod}' ");
-		}
-		//print_r($data);print_r($moderation);
-		return $userID;
-	}
-	
-	*/
 }

@@ -8,18 +8,6 @@ class Logging extends \DB\SQL\Mapper
 		parent::__construct( \Base::instance()->get('DB'), \Config::instance()->prefix."log" );
 	}
 
-	/*
-	static public function instance() {
-		if (\Registry::exists('LOGGER'))
-			$logger = \Registry::get('LOGGER');
-		else {
-			$logger = new self;
-			\Registry::set('LOGGER',$logger);
-		}
-		return $logger;
-	}
-	*/
-	
 	static public function addEntry($type, $action, $uid = FALSE)
 	{
 		if (\Registry::exists('LOGGER'))

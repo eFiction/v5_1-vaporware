@@ -78,9 +78,6 @@ class Auth extends Base {
 		{
 			if ( $userID = $this->model->userLoad($f3->get('POST.login'), $f3->get('POST.password') ) )
 			{
-				/*
-				$this->buffer( \View\Auth::loginMulti($f3, "success") );
-				*/
 				$f3->reroute($f3->get('POST')['returnpath'], false);
 				exit;
 			}
@@ -144,7 +141,6 @@ class Auth extends Base {
 			}
 			else
 			{
-				//print_r($pw_check);
 				if ( $f3->exists('POST.token') AND ""!=$f3->get('POST.token') )
 					$f3->set('resettoken',$f3->get('POST.token'));
 				elseif (TRUE===$token)
@@ -153,10 +149,7 @@ class Auth extends Base {
 					$f3->set('resettoken',$token);
 
 				$this->buffer( \View\Auth::loginMulti($f3, "tokenform") );
-				//echo $pw_check;
 			}
-			//$this->buffer( print_r($user,1) );
-			//echo $params['token'];
 		}
 		else
 		{
