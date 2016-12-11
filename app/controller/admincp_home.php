@@ -4,7 +4,7 @@ namespace Controller;
 class AdminCP_Home extends AdminCP
 {
 	var $moduleBase = "home";
-	var $submodules = [ "manual", "custompages", "news", "modules", "shoutbox" ];
+	var $submodules = [ "manual", "custompages", "news", "modules", "logs", "shoutbox" ];
 
 	public function index(\Base $f3, $params)
 	{
@@ -27,6 +27,9 @@ class AdminCP_Home extends AdminCP
 				break;
 			case "shoutbox":
 				$this->shoutbox( $f3, $params );
+				break;
+			case "logs":
+				$this->logs( $f3, $params );
 				break;
 			case "home":
 				$this->home($f3);
@@ -125,6 +128,23 @@ class AdminCP_Home extends AdminCP
 		$this->buffer ( \View\AdminCP::listCustompages($data, $sort) );
 	}
 
+	protected function logs(\Base $f3, array $params)
+	{
+		if ( !$this->model->checkAccess("home/logs") )
+		{
+			$this->buffer( "__NoAccess" );
+			return FALSE;
+		}
+		$this->response->addTitle( $f3->get('LN__AdminMenu_Logs') );
+		$f3->set('title_h3', $f3->get('LN__AdminMenu_Logs') );
+
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		
+		$menuCount = $this->model->logGetCount();
+		
+		$this->buffer( "<pre>".print_r($menuCount,TRUE)."</pre>" );
+	}
+	
 	protected function shoutbox(\Base $f3, array $params)
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Shoutbox') );

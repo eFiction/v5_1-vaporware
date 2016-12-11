@@ -1188,12 +1188,6 @@ class AdminCP extends Base {
 
 	public function loadShoutbox($id)
 	{
-		/*
-		$sql = "SELECT S.id, S.message, IF(S.guest_name IS NULL,U.nickname,S.guest_name) AS author, S.uid, S.date, UNIX_TIMESTAMP(S.date) as timestamp
-				FROM `tbl_shoutbox`S
-				LEFT JOIN `tbl_users`U ON (S.uid=U.uid)
-				WHERE `id` = :id";
-		*/
 		$sql = "SELECT S.id, S.message FROM `tbl_shoutbox`S WHERE `id` = :id";
 		$data = $this->exec($sql, [":id" => $id ]);
 		if (sizeof($data)!=1) 
@@ -1212,6 +1206,24 @@ class AdminCP extends Base {
 
 		$shout->save();
 		return $i;
+	}
+	
+	public function logGetCount()
+	{
+		$countSQL = "SELECT L.type, COUNT(L.id) as items FROM `tbl_log`L @WHERE@ GROUP BY L.type;";
+		$data = $this->exec(str_replace("@WHERE@","",$countSQL));
+		if ( sizeof($data) )
+		{
+			foreach ( $data as $dat )
+				$count[$dat['type']]['all'] = $dat['items'];
+		}
+		$data = $this->exec(str_replace("@WHERE@","WHERE L.new=1",$countSQL));
+		if ( sizeof($data) )
+		{
+			foreach ( $data as $dat )
+				$count[$dat['type']]['new'] = $dat['items'];
+		}
+		return $count;
 	}
 	
 	public function getLanguageConfig()

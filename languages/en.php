@@ -169,6 +169,7 @@ return array(
 'AdminMenu_CustomPages' => 'Custom Pages',
 'AdminMenu_News' => 'News',
 'AdminMenu_Modules' => 'Modules',
+'AdminMenu_Logs' => 'Logs',
 'AdminMenu_Shoutbox' => 'Shoutbox',
 
 'AdminMenu_Settings' => 'Settings',
