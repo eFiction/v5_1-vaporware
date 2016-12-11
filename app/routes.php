@@ -53,78 +53,79 @@ if ( FALSE == $cfg->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
 	$f3->route( 'POST /story/ajax/@segment [ajax]', 'Controller\Story->ajax' );
 }
 
-if ($_SESSION['groups'] & 1 AND ( FALSE == $cfg->getPublic('maintenance') OR $_SESSION['groups'] & 64 ) )
+if ($_SESSION['groups'] & 1)
 {
-//	if ( FALSE == $cfg->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
-//	{
-	/* --------------------
-		Member routes
-		only if not in
-		maintenance
-	-------------------- */
-	$f3->route([ 'GET|POST /login', 'GET|POST /register'] , function($f3) { $f3->reroute('/', false); } );
-
-	$f3->route(
-		[ 'GET /logout', 'GET /logout/*' ],
-		'Controller\Auth->logout' );
-
-	$f3->route(
-		[ 'GET|POST /userCP', 'GET|POST /userCP/*' ],
-		'Controller\UserCP->index' );
-
-	// Ajax routes
-	$f3->route( 'POST /userCP/ajax/@module [ajax]', 'Controller\UserCP->ajax' );
-
-	if ( $_SESSION['groups'] & 32 )
+	if ( FALSE == $cfg->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
 	{
 		/* --------------------
-			Mod routes
+			Member routes
 			only if not in
 			maintenance
 		-------------------- */
-		$f3->route(
-			[ 'GET|POST /adminCP', 'GET|POST /adminCP/*' ],
-			'Controller\AdminCP->fallback' );
+		$f3->route([ 'GET|POST /login', 'GET|POST /register'] , function($f3) { $f3->reroute('/', false); } );
 
-		// Home
 		$f3->route(
-			[ 'GET /adminCP/home', 'GET|POST /adminCP/home/@module', 'GET|POST /adminCP/home/@module/*' ],
-			'Controller\AdminCP_Home->index' );
+			[ 'GET /logout', 'GET /logout/*' ],
+			'Controller\Auth->logout' );
 
-		// Stories
 		$f3->route(
-			[ 'GET /adminCP/stories', 'GET /adminCP/stories/@module', 'GET /adminCP/stories/@module/*' ],
-			'Controller\AdminCP_Stories->index' );
-		$f3->route( 'POST /adminCP/stories/@module/*', 'Controller\AdminCP_Stories->save' );
-		$f3->route( 'POST /adminCP/ajax/stories/@module [ajax]', 'Controller\AdminCP_Stories->ajax' );
-		
+			[ 'GET|POST /userCP', 'GET|POST /userCP/*' ],
+			'Controller\UserCP->index' );
+
+		// Ajax routes
+		$f3->route( 'POST /userCP/ajax/@module [ajax]', 'Controller\UserCP->ajax' );
+
+		if ( $_SESSION['groups'] & 32 )
+		{
+			/* --------------------
+				additional Mod routes
+				only if not in
+				maintenance
+			-------------------- */
+			$f3->route(
+				[ 'GET|POST /adminCP', 'GET|POST /adminCP/*' ],
+				'Controller\AdminCP->fallback' );
+
+			// Home
+			$f3->route(
+				[ 'GET /adminCP/home', 'GET|POST /adminCP/home/@module', 'GET|POST /adminCP/home/@module/*' ],
+				'Controller\AdminCP_Home->index' );
+
+			// Stories
+			$f3->route(
+				[ 'GET /adminCP/stories', 'GET /adminCP/stories/@module', 'GET /adminCP/stories/@module/*' ],
+				'Controller\AdminCP_Stories->index' );
+			$f3->route( 'POST /adminCP/stories/@module/*', 'Controller\AdminCP_Stories->save' );
+			$f3->route( 'POST /adminCP/ajax/stories/@module [ajax]', 'Controller\AdminCP_Stories->ajax' );
+			
+		}
+	}
+
+	if ( $_SESSION['groups'] & 64 )
+	{
+		/* --------------------
+			SuperMod/Admin routes
+		-------------------- */
+		// Archive
+		$f3->route(
+			[ 'GET /adminCP/archive', 'GET|POST /adminCP/archive/@module', 'GET|POST /adminCP/archive/@module/*' ],
+			'Controller\AdminCP_Archive->index' );
+		$f3->route( 'POST /adminCP/ajax/archive/@module [ajax]', 'Controller\AdminCP_Archive->ajax' );
+
+		// Members
+		$f3->route(
+			[ 'GET /adminCP/members', 'GET /adminCP/members/@module', 'GET /adminCP/members/@module/*' ],
+			'Controller\AdminCP_Members->index' );
+		$f3->route( 'POST /adminCP/members/@module', 'Controller\AdminCP_Members->save' );
+
+		// Settings
+		$f3->route(
+			[ 'GET /adminCP/settings', 'GET|POST /adminCP/settings/@module' ],
+			'Controller\AdminCP_Settings->index' );
+		$f3->route( 'POST /adminCP/settings/@module', 'Controller\AdminCP_Settings->save' );
+
 	}
 }
-elseif ( $_SESSION['groups'] & 64 )
-{
-	/* --------------------
-		SuperMod/Admin routes
-	-------------------- */
-	// Archive
-	$f3->route(
-		[ 'GET /adminCP/archive', 'GET|POST /adminCP/archive/@module', 'GET|POST /adminCP/archive/@module/*' ],
-		'Controller\AdminCP_Archive->index' );
-	$f3->route( 'POST /adminCP/ajax/archive/@module [ajax]', 'Controller\AdminCP_Archive->ajax' );
-
-	// Members
-	$f3->route(
-		[ 'GET /adminCP/members', 'GET /adminCP/members/@module', 'GET /adminCP/members/@module/*' ],
-		'Controller\AdminCP_Members->index' );
-	$f3->route( 'POST /adminCP/members/@module', 'Controller\AdminCP_Members->save' );
-
-	// Settings
-	$f3->route(
-		[ 'GET /adminCP/settings', 'GET|POST /adminCP/settings/@module' ],
-		'Controller\AdminCP_Settings->index' );
-	$f3->route( 'POST /adminCP/settings/@module', 'Controller\AdminCP_Settings->save' );
-
-}
-//}
 else
 {
 	/* --------------------
