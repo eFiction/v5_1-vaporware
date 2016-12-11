@@ -85,9 +85,7 @@ set_error_handler('exception_error_handler');
 /** load the framework core config file **/
 $f3->config('data/config.ini');
 
-/* Test: Config cache */
-$cache = \Cache::instance();
-/* Test ende */
+//$cache = \Cache::instance();
 
 /* get database config */
 $cfg = new Config();
@@ -100,11 +98,6 @@ if ( FALSE === $f3->get('DB') )
 }
 
 /** Add the configuration to the framework **/
-/*
-$f3->set('CONFIG', $cfg);
-$config = $cfg->load();
-print_r($config);
-*/
 $f3->set('CONFIG', $cfg->load());
 
 /** We have DB and Config, let's check for bad ppl **/

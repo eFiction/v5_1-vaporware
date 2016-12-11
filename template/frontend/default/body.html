@@ -1,5 +1,6 @@
-	<div id="top-navbar"><include href="main/navbar.html" /></div>
-	<div class="grid-wrapper" id="container">
+<div id="top-navbar"><include href="main/navbar.html" /></div>
+<!-- begin container -->
+<div class="grid-wrapper" id="container">
 	<div class="grid-wrapper header"><h1>efiction 5.0</h1>
 		<div class="gb-full screen-micro">
 			<a href="{{@BASE}}"><div class="header_img"></div></a>
@@ -9,6 +10,9 @@
 		</div>
 	</div><!-- end header -->
 
+<check if="{{FALSE==\Config::getPublic('maintenance') OR @_SESSION['groups']&64}}">
+<true>
+	<check if="{{TRUE==\Config::getPublic('maintenance')}}"><div class="alert-box warning">__Maintenance</div></check>
 	<check if="{{ @@systempage }}">
 	<!-- layout for system pages (admin panel, error pages, ...) -->
 		<true>
@@ -45,7 +49,7 @@
 	</check>
 
 		{{@BODY | raw }}
-		</div>
+	</div><!-- end content -->
 
 		<!-- drop right bar for system  -->
 		<check if="{{ empty(@bigscreen) and empty(@systempage) }}">
@@ -54,12 +58,17 @@
 				{{@RIGHT|raw}}
 			</div>
 		</check>
-
-		<div class="grid-wrapper footer">
-			<div class="gb-full">
-				{PAGE:footer}<br />
-				{{ \Base::instance()->format('eFiction v{0}, using {1}, page rendered in {2} msecs / Memory usage {3} KB',@APP_VERSION,@DBType,round(1e3*(microtime(TRUE)-$TIME),2),round(memory_get_usage(TRUE)/1e3,1)) }}
-				<check if="{{isset(@bb2_stats)}}"><div>BB block {{@bb2_stats}}</div></check>
-			</div>
-		</div> <!-- end footer -->
-	</div> <!-- end container -->
+</true>
+<false>
+	__Maintenace !
+</false>
+</check>
+	<div class="grid-wrapper footer">
+		<div class="gb-full">
+			{PAGE:footer}<br />
+			{{ \Base::instance()->format('eFiction v{0}, using {1}, page rendered in {2} msecs / Memory usage {3} KB',@APP_VERSION,@DBType,round(1e3*(microtime(TRUE)-$TIME),2),round(memory_get_usage(TRUE)/1e3,1)) }}
+			<check if="{{isset(@bb2_stats)}}"><div>BB block {{@bb2_stats}}</div></check>
+		</div>
+	</div> <!-- end footer -->
+</div>
+<!-- end container -->
