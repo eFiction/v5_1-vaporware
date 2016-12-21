@@ -13,7 +13,7 @@ if ( FALSE == $cfg->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
 {
 	// Load routes if not in maintenance
 	$f3->route(
-	  [ 'GET /?/redirect/@b/@c', 'GET /redirect/@a/@b', ],
+	  [ 'GET /*/redirect/@b/@c', 'GET /redirect/@a/@b', ],
 	  'Controller\Redirect->filter' );
 
 	$f3->route(

@@ -137,12 +137,31 @@ class AdminCP_Home extends AdminCP
 		}
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Logs') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Logs') );
-
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 		
 		$menuCount = $this->model->logGetCount();
+
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+
+		// page will always be an integer > 0
+		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
+
+		// search/browse
+		$allow_order = array (
+				"date"		=>	"timestamp",
+				"user"		=>	"username",
+				"author"	=>	"author",
+		);
+
+		// sort order
+		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "date";
+		$sort["order"]		= $allow_order[$sort["link"]];
+		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
+
+		$data = $this->model->logGetData(isset($params['module'])?FALSE:$params['0'], $page, $sort);
 		
-		$this->buffer( "<pre>".print_r($menuCount,TRUE)."</pre>" );
+		
+		$this->buffer( \View\AdminCP::listLog($data, $menuCount, [] ) );
+		//$this->buffer( "<pre>".print_r($data,TRUE)."</pre>" );
 	}
 	
 	protected function shoutbox(\Base $f3, array $params)

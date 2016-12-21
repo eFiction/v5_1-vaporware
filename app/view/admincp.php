@@ -221,4 +221,14 @@ class AdminCP extends Base
 		return \Template::instance()->render('settings/layout.html');
 	}
 
+	public static function listLog(array $data, array $menu, array $sort)
+	{
+		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+
+		\Base::instance()->set('logEntries', $data);
+		\Base::instance()->set('logMenu', $menu);
+		\Base::instance()->set('sort', $sort);
+		return \Template::instance()->render('home/list_log.html');
+	}
+
 }

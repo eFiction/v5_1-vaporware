@@ -11,7 +11,7 @@ class Authors extends Base {
 
 	public function index(\Base $f3, $params)
 	{
-		//if ( isset($params['*']) ) $this->parametric($params['*']);
+		if ( isset($params['*']) ) $this->parametric($params['*']);
 		
 		// Build menu letters
 		$letters = $this->model->letters();
@@ -43,21 +43,12 @@ class Authors extends Base {
 			list($authorInfo, $content) = \Controller\Story::instance()->author($params['id']);//$this->profile();
 
 			$header[] = $authorInfo;
-
-			//$this->buffer ( $content );
-			//return TRUE;
 		}
 
 		// output
 		$this->buffer ( \View\Authors::page($header , $menu, $content) );
 	}
-	/*
-	protected function letterList($letter)
-	{
-		$data = $this->model->getAuthors($letter);
-		return  "letter";
-	}
-	*/
+
 	protected function profile()
 	{
 		return "profile";

@@ -11,6 +11,7 @@ class Redirect extends Base
 	
 	public function filter (\Base $f3, $params)
 	{
+		// This is only a visual move, but nevertheless
 		if ( empty($params['a']) )
 		{
 			if ( isset($COOKIE['redirect_seen']) )

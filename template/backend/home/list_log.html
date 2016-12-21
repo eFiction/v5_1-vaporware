@@ -1,0 +1,11 @@
+<div class="grid-wrapper">
+	<repeat group="{{ @logMenu }}" key="{{ @key }}" value="{{ @menu }}">
+		<div class="gb-10"><a href="{{@BASE}}/adminCP/home/logs/{{@key}}">{{ ${'LN__AdminMenu_Logs_'.@key} }}</a><br>{{@menu.all}} <check if="{{ isset(@menu.new) }}">({{@menu.new}})</check></div>
+	</repeat>
+</div>
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
+<repeat group="{{ @logEntries }}" value="{{ @row }}">
+	{{@row.action}}
+</repeat>
+
+<F3:check if="{{isset(@paginate.firstPage) AND sizeof(@logEntries)>10}}"><include href="paginate.html" /></F3:check>

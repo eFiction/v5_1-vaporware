@@ -155,7 +155,25 @@ class AdminCP extends Base {
 
 		foreach ( $data as $item )
 		{
-			if ( isset($menu[$item['child_of']]) ) $menu[$item['child_of']]['sub'][$item["link"]] = [ "label" => $item["label"], "icon" => $item["icon"], "requires" => $item["requires"] ];
+			/*
+			if ( $item['link']==$selected."/".\Base::instance()->get('PARAMS.module') )
+			{
+				if ( $item['link'] == "home/logs" )
+				{
+					$menuCount = $this->logGetCount();
+					foreach( $menuCount as $sub => $data )
+						$a["home/logs/".$sub] =  [ "label" => "Logs_{$sub}", "icon" => "", "requires" => $item["requires"] ];
+				}
+				//$item = "";
+			}
+			else $a = NULL;
+			*/
+			
+			if ( isset($menu[$item['child_of']]) )
+//			{
+				$menu[$item['child_of']]['sub'][$item["link"]] = [ "label" => $item["label"], "icon" => $item["icon"], "requires" => $item["requires"] ];
+//				if ( $a ) $menu[$item['child_of']]['sub'] += $a ;
+//			}
 			else $menu[$item["link"]] = [ "label" => $item["label"], "icon" => $item["icon"], "requires" => $item["requires"] ];
 			$this->access[$item['link']] = $item["requires"];
 		}
@@ -175,11 +193,9 @@ class AdminCP extends Base {
 	
 	protected function secureMenu($menu)
 	{
-		
 		foreach ( $menu as &$m )
 		{
 			if ( isset($m['sub']) ) $m['sub'] = $this->secureMenu($m['sub']);
-//			if ( $m['requires'] == 2 AND @sizeof($m['sub'])==0) $m = [];
 			if ( !((int)$_SESSION['groups']&(int)$m['requires']) AND @sizeof($m['sub'])==0) $m = [];
 		}
 		return array_filter($menu);
@@ -1224,6 +1240,35 @@ class AdminCP extends Base {
 				$count[$dat['type']]['new'] = $dat['items'];
 		}
 		return $count;
+	}
+	
+	public function logGetData($sub=FALSE, $page, array $sort)
+	{
+		$limit = 50;
+		$pos = $page - 1;
+
+		$sql = "SELECT SQL_CALC_FOUND_ROWS U.uid, U.nickname, 
+					L.id, L.action, L.ip, UNIX_TIMESTAMP(L.timestamp) as timestamp, L.type, L.version, L.new
+				FROM `tbl_log`L LEFT JOIN `tbl_users`U ON L.uid=U.uid ";
+
+		if ( $sub )
+			$sql .= "WHERE L.type = :sub ";
+
+		$sql .= "ORDER BY {$sort['order']} {$sort['direction']}
+				LIMIT ".(max(0,$pos*$limit)).",".$limit;
+
+		if ($sub)
+			$data = $this->exec($sql, [":sub" => $sub]);
+		else
+			$data = $this->exec($sql);
+				
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/adminCP/home/logs/".($sub?"{$sub}/":"")."order={$sort['link']},{$sort['direction']}",
+			$limit
+		);
+				
+		return $data;
 	}
 	
 	public function getLanguageConfig()
