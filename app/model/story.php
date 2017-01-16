@@ -304,7 +304,7 @@ class Story extends Base
 				LEFT JOIN `tbl_users`Edit ON ( ".(int)$_SESSION['userID']." = rSAE.aid OR ( Edit.uid = rSAE.aid AND Edit.curator = ".(int)$_SESSION['userID']." ) )
 
 				LEFT JOIN `tbl_user_favourites`Fav ON ( Fav.item = S.sid AND Fav. TYPE = 'ST' AND Fav.uid = ".(int)$_SESSION['userID'].")
-			WHERE S.completed @COMPLETED@ 0 AND S.validated > 0 @WHERE@
+			WHERE S.completed @COMPLETED@ 0 AND S.validated >= 20 @WHERE@
 			GROUP BY S.sid
 			@ORDER@
 			@LIMIT@";
@@ -539,9 +539,9 @@ class Story extends Base
 			"SET @users = (SELECT COUNT(*) FROM `tbl_users`U WHERE U.groups > 0);",
 			"SET @authors = (SELECT COUNT(*) FROM `tbl_users`U WHERE ( U.groups & 4 ) );",
 			"SET @reviews = (SELECT COUNT(*) FROM `tbl_feedback`F WHERE F.type='ST');",
-			"SET @stories = (SELECT COUNT(DISTINCT sid) FROM `tbl_stories`S WHERE S.validated > 0 );",
-			"SET @chapters = (SELECT COUNT(DISTINCT chapid) FROM `tbl_chapters`C INNER JOIN `tbl_stories`S ON ( C.sid=S.sid AND S.validated > 0 AND C.validated > 0) );",
-			"SET @words = (SELECT SUM(C.wordcount) FROM `tbl_chapters`C INNER JOIN `tbl_stories`S ON ( C.sid=S.sid AND S.validated > 0 AND C.validated > 0) );",
+			"SET @stories = (SELECT COUNT(DISTINCT sid) FROM `tbl_stories`S WHERE S.validated >= 20 );",
+			"SET @chapters = (SELECT COUNT(DISTINCT chapid) FROM `tbl_chapters`C INNER JOIN `tbl_stories`S ON ( C.sid=S.sid AND S.validated >= 20 AND C.validated >= 20 ) );",
+			"SET @words = (SELECT SUM(C.wordcount) FROM `tbl_chapters`C INNER JOIN `tbl_stories`S ON ( C.sid=S.sid AND S.validated >= 20 AND C.validated >= 20 ) );",
 			"SET @newmember = (SELECT CONCAT_WS(',', U.uid, U.nickname) FROM `tbl_users`U WHERE U.groups>0 ORDER BY U.registered DESC LIMIT 1);",
 			"SELECT @users as users, @authors as authors, @reviews as reviews, @stories as stories, @chapters as chapters, @words as words, @newmember as newmember;",
 		];
@@ -616,7 +616,7 @@ class Story extends Base
 			FROM `tbl_stories`S
 				INNER JOIN `tbl_stories_authors`rSA ON ( S.sid=rSA.sid ) 
 					INNER JOIN `tbl_users`U ON (rSA.aid=U.uid)
-			WHERE S.sid=:sid AND S.completed >= 0 AND validated > 0
+			WHERE S.sid=:sid AND S.completed >= 0 AND validated >= 20
 			GROUP BY S.sid";
 
 		$epubData = $this->exec( $epubSQL, array(':sid' => $id) )[0];
@@ -740,7 +740,7 @@ class Story extends Base
 			// page[n].xhtml							| epub_page
 			$chapters = $this->exec("SELECT C.title, C.inorder
 														FROM `tbl_chapters`C
-														WHERE C.validated > '0' AND C.sid = :sid
+														WHERE C.validated >= 20 AND C.sid = :sid
 														ORDER BY C.inorder ASC ",
 												[ ":sid" => $epubData['sid'] ] );
 			if(sizeof($chapters)>0)

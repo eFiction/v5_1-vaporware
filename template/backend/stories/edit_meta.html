@@ -21,17 +21,24 @@
 				<div class="gb-full"><h6>__Summary</h6><textarea placeholder="Your story summary goes here" name="form[story_summary]">{{@data.summary}}</textarea></div>
 
 				<div class="gb-half">
-					<h6>__StatusCompleted: {{ @data['states']['completed'][@data.completed] }}</h6>
+					<h6>__StatusValidated: {{ @data.states.validated[@data.validated.0] }}</h6>
+					__ChangeTo:<select id="validated" name="form[validated]">
+						<repeat group="{{ @data.states.validated }}" key="{{ @validated.key }}" value="{{ @validated.label }}"><option value="{{ @validated.key }}"<check if="{{@validated.key==@data.validated.0}}"> selected="selected"</check>>{{ @validated.label }}</option></repeat>
+					</select>
+				</div>
+				<div class="gb-half">
+					<h6>__StatusValidatedReason: {{ @data.states.reason[@data.validated.1] }}</h6>
+					__ChangeTo:<select id="validated" name="form[validated]">
+						<repeat group="{{ @data.states.reason }}" key="{{ @validated.key }}" value="{{ @validated.label }}"><option value="{{ @validated.key }}"<check if="{{@validated.key==@data.validated.1}}"> selected="selected"</check>>{{ @validated.label }}</option></repeat>
+					</select>
+				</div>
+				<div class="gb-half">
+					<h6>__StatusCompleted: {{ @data.states.completed[@data.completed] }}</h6>
 					__ChangeTo:<select id="completed" name="form[completed]">
 						<repeat group="{{ @data.states.completed }}" key="{{ @completed.key }}" value="{{ @completed.label }}"><option value="{{ @completed.key }}"<check if="{{@completed.key==@data.completed}}"> selected="selected"</check>>{{ @completed.label }}</option></repeat>
 					</select>
 				</div>
-				<div class="gb-half">
-					<h6>__StatusValidated: {{ @data['states']['validated'][@data.validated] }}</h6>
-					__ChangeTo:<select id="validated" name="form[validated]">
-						<repeat group="{{ @data.states.validated }}" key="{{ @validated.key }}" value="{{ @validated.label }}"><option value="{{ @validated.key }}"<check if="{{@validated.key==@data.validated}}"> selected="selected"</check>>{{ @validated.label }}</option></repeat>
-					</select>
-				</div>
+				<div class="gb-half">&nbsp;</div>
 
 				<div class="gb-full" align="right"><a class="delete" href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}}"><span class="fa fa-times"></span> __Delete</a>
 				<input class="button" type="reset"> <input class="button" type="submit"></div>

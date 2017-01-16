@@ -141,6 +141,7 @@ class AdminCP_Home extends AdminCP
 		$menuCount = $this->model->logGetCount();
 
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		$sub = isset($params['module'])?FALSE:$params['0'];
 
 		// page will always be an integer > 0
 		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
@@ -157,10 +158,10 @@ class AdminCP_Home extends AdminCP
 		$sort["order"]		= $allow_order[$sort["link"]];
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
 
-		$data = $this->model->logGetData(isset($params['module'])?FALSE:$params['0'], $page, $sort);
+		$data = $this->model->logGetData($sub, $page, $sort);
 		
 		
-		$this->buffer( \View\AdminCP::listLog($data, $menuCount, [] ) );
+		$this->buffer( \View\AdminCP::listLog($data, $menuCount, [], $sub ) );
 		//$this->buffer( "<pre>".print_r($data,TRUE)."</pre>" );
 	}
 	

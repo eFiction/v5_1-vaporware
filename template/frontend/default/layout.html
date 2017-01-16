@@ -8,12 +8,16 @@
 		<meta name="keywords" content="{KEYWORDS}">
 		<meta name="description" content="">
 		<meta name="robots" content="INDEX,FOLLOW">
-		<link rel="shortcut icon" href="http://treknation.net/webpics/favicon.ico" type="image/x-icon" />
 		<title>{{@TITLE}}</title>
+		<link rel="shortcut icon" href="http://treknation.net/webpics/favicon.ico" type="image/x-icon" />
 		<link rel='stylesheet' type='text/css' href="{{@UI}}css/styles.css" />
-		<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
-		<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/themes/smoothness/jquery-ui.css">
-		<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+		<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+		{* <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script> *}
+		{* <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script> *}
+		{* <script src="https://code.jquery.com/jquery-2.2.4.min.js" integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44=" crossorigin="anonymous"></script> *}
+		<script src="https://code.jquery.com/jquery-3.0.0.js"></script>
+		<script src="https://code.jquery.com/jquery-migrate-3.0.0.js"></script>
+		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
 		<script src="{{ @BASE }}/app/js/jquery.tokeninput.js"></script>
 		<!-- Begin Cookie Consent plugin by Silktide - http://silktide.com/cookieconsent -->
 			<script type="text/javascript">
@@ -28,6 +32,6 @@
 <body>
 	{{ @BODY | raw }}
 	<check if="{{ isset(@JS_BODY)}}">{{ @JS_BODY | raw }}</check>
-	<check if="{{ @CONFIG.debug > 0 OR isset(@DEBUGLOG) }}"><div><textarea cols=120 rows=30>{{ @DEBUGLOG }}</textarea></div></check>
+	<check if="{{ isset(@DEBUGLOG) }}"><div><textarea cols='120' rows='30'>{{ @DEBUGLOG }}</textarea></div></check>
 </body>
 </html>

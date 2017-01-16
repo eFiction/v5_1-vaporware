@@ -968,7 +968,7 @@ class AdminCP extends Base {
 			//'workingtext'
 			//'workingdate'
 			//'endnotes'
-			'validated'		=> "1",
+			'validated'		=> "1".($_SESSION['groups']&128)?"3":"2",
 			'wordcount'		=> $this->str_word_count_utf8($post['chapter_text']),
 			'rating'		=> "0", // allow rating later
 			'sid'			=> $storyID,
@@ -1248,7 +1248,7 @@ class AdminCP extends Base {
 		$pos = $page - 1;
 
 		$sql = "SELECT SQL_CALC_FOUND_ROWS U.uid, U.nickname, 
-					L.id, L.action, L.ip, UNIX_TIMESTAMP(L.timestamp) as timestamp, L.type, L.version, L.new
+					L.uid as uid_reg, L.id, L.action, L.ip, UNIX_TIMESTAMP(L.timestamp) as timestamp, L.type, L.version, L.new
 				FROM `tbl_log`L LEFT JOIN `tbl_users`U ON L.uid=U.uid ";
 
 		if ( $sub )
@@ -1261,6 +1261,36 @@ class AdminCP extends Base {
 			$data = $this->exec($sql, [":sub" => $sub]);
 		else
 			$data = $this->exec($sql);
+		
+		foreach ( $data as &$item )
+		{
+			if ( $item['version']==0 )
+			{
+				// eFiction 3 original, try to do some cleanup
+				if ( $item['type']=="RG" )
+				{
+					//print_r($item);
+					preg_match('/(\w+[\s\w]*)\s+\((\d*)\).*/iU', $item['action'], $matches);
+					$item['action'] = [ 'name'=>$matches[1], 'uid'=>$matches[2], 'email'=>'', 'reason'=>'', 'admin'=>($matches[2]!=$item['uid_reg']) ];
+					$this->update('tbl_log', ['action' => json_encode($item['action']), 'version'=>1], "id = {$item['id']}" );
+					//print_r($matches);
+					//print_r($item);
+				}
+			}
+			elseif ( $item['version']==1 )
+			{
+				// eFiction 3 reworked
+				$item['action'] = json_decode($item['action'], TRUE);
+			}
+			elseif ( $item['version']==2 )
+			{
+				// eFiction 5
+				$item['action'] = json_decode($item['action'], TRUE);
+			}
+			
+			$item['ip'] = long2ip($item['ip']);
+			if(function_exists('geoip_country_code_by_name')) $item['country'] = geoip_country_code_by_name($item['ip']);
+		}
 				
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],

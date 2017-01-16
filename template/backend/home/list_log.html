@@ -1,11 +1,31 @@
 <div class="grid-wrapper">
 	<repeat group="{{ @logMenu }}" key="{{ @key }}" value="{{ @menu }}">
-		<div class="gb-10"><a href="{{@BASE}}/adminCP/home/logs/{{@key}}">{{ ${'LN__AdminMenu_Logs_'.@key} }}</a><br>{{@menu.all}} <check if="{{ isset(@menu.new) }}">({{@menu.new}})</check></div>
+		<div class="gb-10">
+			<check if="{{@key==@sub}}">
+				<true>{{ ${'LN__AdminMenu_Logs_'.@key} }}</true>
+				<false><a href="{{@BASE}}/adminCP/home/logs/{{@key}}">{{ ${'LN__AdminMenu_Logs_'.@key} }}</a></false>
+			</check>
+			<br/>
+			{{@menu.all}} <check if="{{ isset(@menu.new) }}">({{@menu.new}})</check>
+		</div>
 	</repeat>
 </div>
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
 <repeat group="{{ @logEntries }}" value="{{ @row }}">
-	{{@row.action}}
+	<check if="{{is_array(@row.action)}}">
+		<true>
+			<switch expr="{{ @row.type }}">
+				<case value="RG" break="TRUE">
+					<check if="{{@row.action.uid==@row.uid}}"><true>{{@row.action.name}}</true><false><del>{{@row.action.name}}</del></false></check>
+					{*<pre>{{print_r(@row.action,TRUE)}}</pre> *}
+				</case>
+				<default>
+					Was anderes
+				</default>
+			</switch>
+		</true>
+		<false>{{@row.action|raw}}</false>
+	</check> - [{{ @row.ip }}: {{@@row.country}}] ({{@row.id}})<br/>
 </repeat>
 
 <F3:check if="{{isset(@paginate.firstPage) AND sizeof(@logEntries)>10}}"><include href="paginate.html" /></F3:check>

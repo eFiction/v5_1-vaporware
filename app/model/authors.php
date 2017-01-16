@@ -11,7 +11,7 @@ class Authors extends Base
 				FROM `tbl_users`U
 					INNER JOIN `tbl_stories_authors`rSA ON ( rSA.aid = U.uid )
 						INNER JOIN `tbl_stories`S ON ( S.sid = rSA.sid
-					AND S.validated >0
+					AND S.validated >= 20
 					AND S.completed >= 0
  					)
 					{$where} GROUP BY U.uid

@@ -7,6 +7,8 @@ class Auth extends Base {
 	{
 		$this->model = \Model\Auth::instance();
 		$this->config = \Base::instance()->get('CONFIG');
+		
+		\Base::instance()->set('AUTHPAGE', TRUE);
 	}
 
     protected $response;
@@ -265,7 +267,7 @@ class Auth extends Base {
 
 						$_SESSION['lastAction'] = [ "registered" => $check['next'] ];
 						
-						\Logging::addEntry("RG", json_encode([ 'name'=>$formData['login'], 'email'=>$formData['email'], 'reason'=>$check['reason'] ]),$userID);
+						\Logging::addEntry("RG", json_encode([ 'name'=>$formData['login'], 'uid'=>$userID, 'email'=>$formData['email'], 'reason'=>$check['reason'], 'admin'=>FALSE ]),$userID);
 					}
 					$formData = [];
 					

@@ -132,10 +132,10 @@ else
 		Guest routes
 	-------------------- */
 
-//	$f3->route( 'GET|POST /forgotpw', 'Controller\Auth->forgotpw' );
-
 	if ( FALSE == $cfg->getPublic('maintenance') )
 		$f3->route( [ 'GET|POST /register', 'GET|POST /register/@status' ], 'Controller\Auth->register' );
+	else
+		$f3->route( [ 'GET /', 'GET /*', 'GET /*' ], 'Controller\Auth->login' );
 
 	$f3->route(
 		[ 'GET|POST /logout', 'GET|POST /logout' ],

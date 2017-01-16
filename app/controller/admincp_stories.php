@@ -99,7 +99,7 @@ class AdminCP_Stories extends AdminCP
 				"chapid" 	=> "new",
 				"title"		=> "",
 				"notes"		=> "",
-				"validated"	=> 0,
+				"validated"	=> '03',
 				"rating"	=> 0,
 				"chaptertext" => "",
 			];

@@ -264,9 +264,23 @@ class Base extends \Prefab {
 		
 		$state['validated'] =
 		[
-			 0 => "__pending",
-			 1 => "__selfvalidated",
-			 2 => "__admin",
+			 0 => "__closed",
+			 1 => "__moderation",
+			 2 => "__validated",
+		];
+		
+		$state['reason'] =
+		[
+			0 => "__none",
+			1 => "__user",
+			2 => "__moderator",
+			3 => "__admin",
+			4 => "__forcedRework",
+			5 => "__minorWorking",
+			6 => "__majorWorking",
+			7 => "__minorDone",
+			8 => "__majorDone",
+			9 => "__locked",
 		];
 		return $state;
 	}

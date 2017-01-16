@@ -1,0 +1,40 @@
+<div id="top-navbar"><include href="main/navbar.html" /></div>
+<!-- begin container -->
+<div class="grid-wrapper" id="container">
+	<div class="grid-wrapper header"><h1>efiction 5.0</h1>
+		<div class="gb-full screen-micro">
+			<a href="{{@BASE}}"><div class="header_img"></div></a>
+		</div>
+		<div class="gb-full">
+			{BLOCK:menu.main}
+		</div>
+	</div><!-- end header -->
+
+	<div class="gb-20 screen-micro">
+		&nbsp;
+	</div>
+	<div class="gb-60" id="content">
+		<div class="alert-box warning">__Maintenance</div>
+
+		<check if="{{ isset(@title_h1) }}">
+			<h1>{{ @title_h1 }}</h1>
+		</check>
+			
+		<check if="{{ isset(@title_h3) }}">
+			<h3>{{ @title_h3 }}</h3>
+		</check>
+
+		{{@BODY | raw }}
+	</div><!-- end content -->
+
+	<div class="gb-20">
+		&nbsp;
+	</div>
+
+	<div class="grid-wrapper footer">
+		<div class="gb-full">
+			{PAGE:footer}<br />
+		</div>
+	</div> <!-- end footer -->
+</div>
+<!-- end container -->

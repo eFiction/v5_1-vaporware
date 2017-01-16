@@ -28,9 +28,17 @@ class Frontend extends Base
 			- process tags
 			- prepare data for outer page rendering
 		*/
-		$body =  $this->post_render(
+		
+		if ( FALSE==\Config::getPublic('maintenance') OR $_SESSION['groups']&64 )
+			$body =  $this->post_render(
 										$this->tagWork(
 												\Template::instance()->render('body.html')
+										)
+								);
+		else 
+			$body =  $this->post_render(
+										$this->tagWork(
+												\Template::instance()->render('body_maintenance.html')
 										)
 								);
 
@@ -84,8 +92,6 @@ class Frontend extends Base
 		if ( isset($this->JS['head']) ) $f3->set( 'JS_HEAD', implode("\n", $this->JS['head']) );
 		if ( isset($this->JS['body']) ) $f3->set( 'JS_BODY', implode("\n", $this->JS['body']) );
 
-		$debug[] = $f3->get('DB')->log();
-				$debug[] = "SESSION: ".print_r($_SESSION,TRUE);
 
 		if($cfg['page_title_add']=='slogan')
 		{
@@ -97,31 +103,32 @@ class Frontend extends Base
 		}
 
 		else $f3->set('TITLE', '');
-		/*
-		switch($eFI->config['show_debug'])
+
+		switch($cfg['debug'])
 		{
 			case 5:
-				$debug[] = "SESSION: ".print_r($_SESSION,TRUE);
+				$debug[] = $f3->get('DB')->log();
 			case 4:
-				$debug[] = "SQL queries: ".print_r($DB->history,TRUE);
-				$debug[] = "SQL analysis: ".print_r($DB->profiling(), TRUE);
+				//$debug[] = "SQL queries: ".print_r($DB->history,TRUE);
+				//$debug[] = "SQL analysis: ".print_r($DB->profiling(), TRUE);
 			case 3:
-				$debug[] = "request: ".print_r($eFI->request,TRUE);
+				//$debug[] = "request: ".print_r($eFI->request,TRUE);
 			case 2:
-				$debug[] = "modules used: ".print_r($this->modules,TRUE);
-				$debug[] = "SQL types: ".print_r(array_filter($DB->history['count']),TRUE);
+				$debug[] = "SESSION: ".print_r($_SESSION,TRUE);
+				//$debug[] = "modules used: ".print_r($this->modules,TRUE);
+				//$debug[] = "SQL types: ".print_r(array_filter($DB->history['count']),TRUE);
 			case 1:
-				$runtime = microtime(true)-$timeStart;
-				$debug[] = "runtime : ".round($runtime*1000)." ms";
-				$debug[] = "SQL count: ".$DB->history['total'];
-				$debug[] = "SQL time: ".round($DB->history['duration']*1000)." ms (".round(100*$DB->history['duration']/$runtime)."%)";
+				//$runtime = microtime(true)-$timeStart;
+				//$debug[] = "runtime : ".round($runtime*1000)." ms";
+				//$debug[] = "SQL count: ".$DB->history['total'];
+				//$debug[] = "SQL time: ".round($DB->history['duration']*1000)." ms (".round(100*$DB->history['duration']/$runtime)."%)";
 				// for all levels above 0:
-				$return = str_replace("{DEBUG}",html_entity_decode	( implode("\n",$debug) ),$this->blocks['main']['debug']);
+				$f3->set('DEBUGLOG', implode("\n", $debug));
 				break;
-			default:
-				$return = "";
-		*/
-		$f3->set('DEBUGLOG', implode("\n", $debug));
+		}
+			//default:
+				//$return = "";
+
 		return $buffer;
 	}
 	

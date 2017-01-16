@@ -10,8 +10,8 @@
 		</div>
 	</div><!-- end header -->
 
-<check if="{{FALSE==\Config::getPublic('maintenance') OR @_SESSION['groups']&64}}">
-<true>
+{*<check if="{{FALSE==\Config::getPublic('maintenance') OR @_SESSION['groups']&64}}">
+<true>*}
 	<check if="{{TRUE==\Config::getPublic('maintenance')}}"><div class="alert-box warning">__Maintenance</div></check>
 	<check if="{{ @@systempage }}">
 	<!-- layout for system pages (admin panel, error pages, ...) -->
@@ -58,11 +58,11 @@
 				{{@RIGHT|raw}}
 			</div>
 		</check>
-</true>
+{*</true>
 <false>
 	__Maintenace !
 </false>
-</check>
+</check> *}
 	<div class="grid-wrapper footer">
 		<div class="gb-full">
 			{PAGE:footer}<br />
