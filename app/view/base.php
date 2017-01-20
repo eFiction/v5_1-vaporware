@@ -13,13 +13,24 @@ abstract class Base {
      */
 	public function __construct() {
 		$f3 = \Base::instance();
-		$UI = $f3->get('UI');
+		$UI_BASE = $f3->get('UI');
+		$UI = "";
 
 		// develop
-		$tpl = 'default';
+		$tpl = 'newage';
 		
+		/*
 		$folder = file_exists($UI.$tpl.'/layout.html') ? $tpl : 'default';
 		$f3->set('UI', "{$UI}{$folder}/");
+		*/
+		if($tpl!="default")
+		{
+			$f3->set('CSS_UI', "{$UI_BASE}{$tpl}/");
+			$UI = "{$UI_BASE}{$tpl}/,";
+		}
+		else $f3->set('CSS_UI', "{$UI_BASE}default/");
+		$UI .= "{$UI_BASE}default/";
+		$f3->set('UI', $UI);
 
 		
 		$f3->set('SELF', rawurlencode($_SERVER["QUERY_STRING"]));

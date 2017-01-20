@@ -1,0 +1,12 @@
+/* import basic settings, IE-fixes and grids */
+@import url(../../default/css/styles.css);
+
+/*-----------------  GENERAL  -----------------*/
+
+#top-navbar {
+	background: #ff0000;
+	color: #fafafa;
+	padding: 5px;
+	width: 100%;
+	z-index: 15;
+}
