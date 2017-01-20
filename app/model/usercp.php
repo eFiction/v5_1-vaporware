@@ -77,7 +77,7 @@ class UserCP extends Base
 		{
 			$user = \User::instance();
 			
-			if ( NULL == $data = json_decode($user->feedback_cache,TRUE) )
+			if ( NULL == $data = json_decode(@$user->feedback_cache,TRUE) )
 			{
 				$data = $this->userCacheRecount("feedback");
 				$user->feedback_cache = json_encode($data);

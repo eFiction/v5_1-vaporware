@@ -10,8 +10,6 @@
 		</div>
 	</div><!-- end header -->
 
-{*<check if="{{FALSE==\Config::getPublic('maintenance') OR @_SESSION['groups']&64}}">
-<true>*}
 	<check if="{{TRUE==\Config::getPublic('maintenance')}}"><div class="alert-box warning">__Maintenance</div></check>
 	<check if="{{ @@systempage }}">
 	<!-- layout for system pages (admin panel, error pages, ...) -->
@@ -51,18 +49,14 @@
 		{{@BODY | raw }}
 	</div><!-- end content -->
 
-		<!-- drop right bar for system  -->
-		<check if="{{ empty(@bigscreen) and empty(@systempage) }}">
-	  		<div class="gb-20">
-			{BLOCK:story.stats}{BLOCK:categories}{BLOCK:calendar}
-				{{@RIGHT|raw}}
-			</div>
-		</check>
-{*</true>
-<false>
-	__Maintenace !
-</false>
-</check> *}
+	<!-- drop right bar for system  -->
+	<check if="{{ empty(@bigscreen) and empty(@systempage) }}">
+		<div class="gb-20">
+		{BLOCK:story.stats}{BLOCK:categories}{BLOCK:calendar}
+			{{@RIGHT|raw}}
+		</div>
+	</check>
+
 	<div class="grid-wrapper footer">
 		<div class="gb-full">
 			{PAGE:footer}<br />
