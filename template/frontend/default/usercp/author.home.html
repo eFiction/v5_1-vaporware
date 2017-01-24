@@ -1,0 +1,15 @@
+<check if="{{ @_SESSION['groups']&5 }}">
+	<true>
+		Stuff ...
+	</true>
+	<false>
+		<check if="{{ TRUE === \Config::getPublic('author_self') }}">
+			<true>
+				Not author
+			</true>
+			<false>
+				Moderated archive
+			</false>
+		</check>
+	</false>
+</check>

@@ -28,6 +28,11 @@ class Config extends \Prefab
         return isset(self::$public[$key]) ? self::$public[$key] : false;
     }
 
+	public static function getTree()
+    {
+        return isset(self::$public) ? self::$public : false;
+    }
+
 	public static function setPublic($key, $value=NULL)
     {
         self::$public[$key] = $value;

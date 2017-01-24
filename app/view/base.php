@@ -16,12 +16,16 @@ abstract class Base {
 		$UI_BASE = $f3->get('UI');
 		$UI = "";
 
-		// develop
-		$tpl = 'newage';
+		// get a layout to be used
+		if ( isset($_SESSION['layout']) AND in_array($_SESSION['layout'], \Config::getPublic("layout_available")) AND FALSE!==\Config::getPublic("layout_forced") )
+			$tpl = $_SESSION['layout'];
+		else
+			$tpl = \Config::getPublic("layout_default");
 		
+		if ( !file_exists( $UI_BASE.$tpl ) ) $tpl = "default";
+
 		/*
-		$folder = file_exists($UI.$tpl.'/layout.html') ? $tpl : 'default';
-		$f3->set('UI', "{$UI}{$folder}/");
+			This so needs to be reworked!
 		*/
 		if($tpl!="default")
 		{

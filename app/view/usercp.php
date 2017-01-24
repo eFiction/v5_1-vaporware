@@ -9,6 +9,23 @@ class UserCP extends Base
 		\Base::instance()->set('panel_menu', $menu);
 		return \Template::instance()->render('usercp/menu.html');
 	}
+	
+	public static function authorHome($data=[])
+	{
+		\Base::instance()->set('message', $data);
+		return \Template::instance()->render('usercp/author.home.html');
+	}
+
+	public static function authorStoryList(array $data, array $sort, array $params)
+	{
+		//\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+
+		\Base::instance()->set('storyEntries', $data);
+		\Base::instance()->set('sort', $sort);
+		\Base::instance()->set('author', $params['uid']);
+		\Base::instance()->set('select', $params[1]);
+		return \Template::instance()->render('usercp/author.storyList.html');
+	}
 
 	public static function msgInOutbox($data, $select="inbox")
 	{

@@ -137,10 +137,11 @@ class AdminCP_Settings extends AdminCP
 			if ( is_dir("./template/frontend/{$entry}") )
 			{
 				$data = (array)simplexml_load_file("./template/frontend/{$entry}/info.xml");
-				$data['active'] = array_key_exists($data['folder'], $layoutConfig['layout_available']);
+				$data['active'] = array_key_exists($entry, $layoutConfig['layout_available']);
+				$data['folder'] = $entry;
 				$layoutFiles[] = $data;
 			}
-			print_r($data);
+			//print_r($data);
 		}
 
 		return \View\AdminCP::layout($layoutFiles, $layoutConfig);

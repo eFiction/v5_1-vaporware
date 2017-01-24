@@ -18,7 +18,12 @@ class UserCP extends Base
 			if ( $selected == "author")
 			{
 				// get associated author and curator data
-				$authorData = $this->exec("SELECT U.uid, CONCAT(U.nickname, ' (',COUNT(DISTINCT SA.lid), ')') as label FROM `tbl_users`U LEFT JOIN `tbl_stories_authors`SA ON ( U.uid = SA.aid ) WHERE U.uid = {$_SESSION['userID']} OR U.curator = {$_SESSION['userID']} GROUP BY U.uid");
+				$authorData = $this->exec("SELECT U.uid, CONCAT(U.nickname, ' (',COUNT(DISTINCT SA.lid), ')') as label, IF(U.uid=336,1,0) as curator
+												FROM `tbl_users`U 
+													LEFT JOIN `tbl_stories_authors`SA ON ( U.uid = SA.aid ) 
+												WHERE U.uid = {$_SESSION['userID']} OR U.curator = {$_SESSION['userID']} 
+												GROUP BY U.uid
+												ORDER BY curator DESC, label ASC");
 				foreach ( $authorData as $aD ) $authors["AUTHORS"][$aD["uid"]] = $aD["label"];
 				$authors["ID"] = @$data['uid'];
 
@@ -30,7 +35,10 @@ class UserCP extends Base
 					$status = [ 'id' => $data['uid'], -1 => 0, 0 => 0, 1 => 0 ];
 
 					// get story count by completion status
-					$authorData = $this->exec("SELECT S.completed, COUNT(DISTINCT S.sid) as count FROM `tbl_stories`S INNER JOIN `tbl_stories_authors`SA ON (S.sid = SA.sid AND SA.aid = :aid) GROUP BY S.completed", [ ":aid" => $data['uid'] ]);
+					$authorData = $this->exec("SELECT S.completed, COUNT(DISTINCT S.sid) as count 
+													FROM `tbl_stories`S
+														INNER JOIN `tbl_stories_authors`SA ON (S.sid = SA.sid AND SA.aid = :aid) 
+													GROUP BY S.completed", [ ":aid" => $data['uid'] ]);
 					foreach ( $authorData as $aD ) $status[$aD["completed"]] = $aD["count"];
 
 					// get second sub menu segment and place under selected author
@@ -104,6 +112,58 @@ class UserCP extends Base
 			return $counter;
 		}
 		return NULL;
+	}
+	
+	public function authorStoryStatus($sid)
+	{
+		$sql = "SELECT S.title, S.validated, S.completed
+					FROM `tbl_stories`S 
+						LEFT JOIN `tbl_stories_authors`A ON ( S.sid = A.sid )
+						INNER JOIN `tbl_users`U ON ( A.aid = U.uid AND ( U.uid = {$_SESSION['userID']} OR U.curator = {$_SESSION['userID']} ) )
+					WHERE S.sid=:sid";
+		
+		$data = $this->exec($sql, [":sid" => $sid] );
+		return ( empty($data) ) ? NULL : $data[0];
+	}
+	
+	public function authorStoryList($select,$author,$sort,$page)
+	{
+		$limit = 20;
+		$pos = $page - 1;
+		
+		$sql = "SELECT SQL_CALC_FOUND_ROWS S.sid,S.title, S.validated, S.completed
+					FROM `tbl_stories`S 
+						LEFT JOIN `tbl_stories_authors`A ON ( S.sid = A.sid )
+						INNER JOIN `tbl_users`U ON ( A.aid = U.uid AND ( U.uid = {$_SESSION['userID']} OR U.curator = {$_SESSION['userID']} ) )
+					WHERE A.aid=:aid AND S.completed = ";
+
+		switch ($select)
+		{
+			case "finished":
+				$sql .= "1";
+				break;
+			case "unfinished":
+				$sql .= "0";
+				break;
+			case "drafts":
+				$sql .= "-1";
+				break;
+			default:
+				return FALSE;
+		}
+		
+		$sql .= " ORDER BY {$sort['order']} {$sort['direction']}
+					LIMIT ".(max(0,$pos*$limit)).",".$limit;
+		
+		$data = $this->exec($sql, [":aid" => $author] );
+
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/userCP/author/uid={$author}/{$select}/order={$sort['link']},{$sort['direction']}",
+			$limit
+		);
+		
+		return $data;
 	}
 	
 	public function feedbackHomeStats($data)

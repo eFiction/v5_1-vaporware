@@ -71,7 +71,20 @@ class UserCP extends Base
 			
 			elseif ( array_key_exists("uid", $params) AND isset ($params[1]) )
 			{
-				$buffer = print_r($params,1);
+				switch ( $params[1] )
+				{
+					case "add":
+						$buffer = $this->authorStoryAdd();
+						break;
+					case "finished":
+					case "unfinished":
+					case "drafts":
+						$buffer = $this->authorStorySelect($params);
+						break;
+					case "edit":
+						$buffer = $this->authorStoryEdit($params['sid']);
+				}
+				//$buffer .= print_r($params,1);
 			}
 		}
 		
@@ -82,12 +95,56 @@ class UserCP extends Base
 	
 	protected function authorCurator(\Base $f3, $params)
 	{
-		return "curator";
+		return \View\Base::stub("curator");
 	}
 
 	protected function authorHome(\Base $f3, $params)
 	{
-		return \View\Base::stub("home");
+		// Future: load stuff, like to-do, open ends ...
+		if ( $_SESSION['groups']&5 )
+		{
+			
+		}
+		
+		return \View\UserCP::authorHome();
+	}
+	
+	protected function authorStoryAdd()
+	{
+		
+	}
+	
+	protected function authorStorySelect($params)
+	{
+		if ( empty($params['uid']) ) return FALSE;
+		
+		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
+
+		// search/browse
+		$allow_order = array (
+				"sid"		=>	"sid",
+				"title"		=>	"title",
+				"validated"	=>	"validated",
+		);
+
+		// sort order
+		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "title";
+		$sort["order"]		= $allow_order[$sort["link"]];
+		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="desc") ?	"desc" : "asc";
+
+		if ( FALSE === $data = $this->model->authorStoryList($params[1],$params['uid'],$sort,$page) )
+			return FALSE;
+		
+		//print_r($data);
+		return \View\UserCP::authorStoryList($data, $sort, $params);
+	}
+
+	protected function authorStoryEdit($sid=NULL)
+	{
+		if(!$sid) return "__Error";
+		$storyStatus = $this->model->authorStoryStatus($sid);
+
+		return print_r($storyStatus,TRUE);
 	}
 
 	public function feedback(\Base $f3, $params)
