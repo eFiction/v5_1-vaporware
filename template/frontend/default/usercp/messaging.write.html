@@ -18,7 +18,7 @@
 $(document).ready(function() {
     $("#recipient").tokenInput("{{$BASE}}/userCP/ajax/messaging",{
     	method: "post",
-    	queryParam: "recipient",
+    	queryParam: "namestring",
     	prePopulate: [{{@write_data.recipient|raw}}]
     });
 });

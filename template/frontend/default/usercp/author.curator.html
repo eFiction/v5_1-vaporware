@@ -1,0 +1,33 @@
+<check if="{{sizeof(@curator.others)}}">
+<fieldset>
+	<legend>__CuratingOther</legend>
+	<table class="tbody">
+	<repeat group="{{ @curator.others }}" value="{{ @others }}">
+		<tr>
+			<td><a href="{{@BASE}}/userCP/author/curator/remove/id={{@others.uid}}">{ICON:trash}</a></td>
+			<td>{{@others.nickname}}</td>
+		</tr>
+	</repeat>
+	</table>
+</fieldset>
+</check>
+&nbsp;
+<fieldset>
+	<legend>__SELECT</legend>
+	<form method="post" action="{{@BASE}}/userCP/author/curator">
+		<div class="field"><input class="field input" type="text" name="curator_id" id="curator"></div>
+		<input class="button" type="submit">
+	</form>
+</fieldset>
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#curator").tokenInput("{{$BASE}}/userCP/ajax/messaging",{
+    	method: "post",
+    	queryParam: "namestring",
+    	prePopulate: [{{@curator.self|raw}}],
+		hintText: "__A_StartTyping ...",
+		noResultsText: "__A_NoMatches.",
+		tokenLimit: 1
+    });
+});
+</script>

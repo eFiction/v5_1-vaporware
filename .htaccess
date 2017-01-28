@@ -5,7 +5,7 @@ RewriteEngine On
 # In such cases, it should be the path (relative to the document root)
 # containing this .htaccess file
 #
-# RewriteBase /
+# RewriteBase "/"
 
 # rewrite old links v2
 RewriteCond %{REQUEST_URI}~%{QUERY_STRING} ^(.*?\/*)?(modules/challenges/)?(browse|viewpage|viewuser|viewstory|viewseries|reviews|challenges|news)\.php~?(.+)$ [NC]

@@ -27,6 +27,12 @@ class UserCP extends Base
 		return \Template::instance()->render('usercp/author.storyList.html');
 	}
 
+	public static function authorCurator($data=[])
+	{
+		\Base::instance()->set('curator', $data);
+		return \Template::instance()->render('usercp/author.curator.html');
+	}
+
 	public static function msgInOutbox($data, $select="inbox")
 	{
 		if ( $select == "outbox" )

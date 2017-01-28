@@ -1,13 +1,19 @@
-<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
 <F3:check if="{{ empty(@storyEntries) }}">
 <true>
 __Nothing
 </true>
 <false>
+<div class="grid-wrapper">
+	<div class="gb-1qrt">__all</div>
+	<div class="gb-1qrt">__closed</div>
+	<div class="gb-1qrt">__inModeration</div>
+	<div class="gb-1qrt">__validated</div>
+</div>
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
 <table class="tbody">
 	<tr>
 		<th>&nbsp;</th>
-		<th>&nbsp;</th>
+{*		<th>&nbsp;</th>	*}
 		<th><a href="{{@BASE}}/userCP/author/uid={{@author}}/{{@select}}/order=sid,
 			<check if="{{ @sort['link']!='sid' }}">
 				<true>asc">{ICON:sort}</true>
@@ -19,8 +25,8 @@ __Nothing
 				</false>
 			</check></a> __StoryID
 		</th>
-		<th><a href="{{@BASE}}/userCP/author/uid={{@author}}/{{@select}}/order=validated,
-			<check if="{{ @sort['link']!='validated' }}">
+		<th><a href="{{@BASE}}/userCP/author/uid={{@author}}/{{@select}}/order=svalidated,
+			<check if="{{ @sort['link']!='svalidated' }}">
 				<true>asc">{ICON:sort}</true>
 				<false>
 					<check if="{{ @sort['direction']=='desc' }}">
@@ -28,7 +34,18 @@ __Nothing
 						<false>desc">{ICON:sort-alpha-asc}</false>
 					</check>
 				</false>
-			</check></a> __Validated
+			</check></a> __S_Validated
+		</th>
+		<th><a href="{{@BASE}}/userCP/author/uid={{@author}}/{{@select}}/order=chvalidated,
+			<check if="{{ @sort['link']!='chvalidated' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-alpha-desc}</true>
+						<false>desc">{ICON:sort-alpha-asc}</false>
+					</check>
+				</false>
+			</check></a> __Ch_Validated
 		</th>
 		<th><a href="{{@BASE}}/userCP/author/uid={{@author}}/{{@select}}/order=title,
 			<check if="{{ @sort['link']!='title' }}">
@@ -45,9 +62,10 @@ __Nothing
 	<repeat group="{{ @storyEntries }}" value="{{ @row }}">
 	<tr>
 		<td><a href="{{@BASE}}/userCP/author/uid={{@author}}/edit/sid={{ @row['sid'] }};returnpath=/userCP/author/uid={{@author}}/{{@select}}/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
-		<td><a href="{{@BASE}}/userCP/author/uid={{@author}}/delete/sid={{ @row['sid'] }};returnpath=/userCP/author/uid={{@author}}/{{@select}}/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}" class="deleteItem" title="{{ @row.title }}">{ICON:trash}</a></td>
+{*		<td><a href="{{@BASE}}/userCP/author/uid={{@author}}/delete/sid={{ @row['sid'] }};returnpath=/userCP/author/uid={{@author}}/{{@select}}/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}" class="deleteItem" title="{{ @row.title }}">{ICON:trash}</a></td>	*}
 		<td>{{ @row.sid }}</td>
-		<td>{{ @row.validated.0 }}</td>
+		<td>{{ @row.story_validated.0 }}</td>
+		<td>{{ @row.chapter_validated.0 }}</td>
 		<td>{{ @row.title }}</td>
 	</tr>
 	</repeat>

@@ -17,9 +17,10 @@ class Config extends \Prefab
 		if ( FALSE === self::$public = \Cache::instance()->get('config') )
 		{
 			self::$public = self::cache();
-			self::$public['prefix'] = self::$protected['prefix'];
 			\Cache::instance()->set('config', self::$public, 3600);
 		}
+		self::$public['prefix'] = self::$protected['prefix'];
+
 		return self::$public;
 	}
 	

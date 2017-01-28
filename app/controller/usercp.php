@@ -49,11 +49,23 @@ class UserCP extends Base
 		if ( empty($params['module']) ) return NULL;
 		
 		$post = $f3->get('POST');
-		
+
+		switch ( $params['module'] )
+		{
+			case "messaging":
+			case "curator":
+				$data = $this->model->ajax("messaging", $post);
+				break;
+		}
+		/*
 		if ( $params['module']=="messaging" )
 		{
 			$data = $this->model->ajax("messaging", $post);
 		}
+		elseif ( $params['module']=="curator" )
+		{
+			$data = $this->model->ajax("curator", $post);
+		}*/
 		echo json_encode($data);
 		exit;
 	}
@@ -95,7 +107,23 @@ class UserCP extends Base
 	
 	protected function authorCurator(\Base $f3, $params)
 	{
-		return \View\Base::stub("curator");
+		// Get the current curator and list of people being curated
+		$data = $this->model->authorCuratorGet();
+		$change = FALSE;
+		
+		// extract the curator id from the form
+		$curator_id = $f3->get('POST.curator_id');
+
+		if ( is_numeric($curator_id) )
+			$change = $this->model->authorCuratorSet($curator_id);
+
+		elseif ( $curator_id!==NULL OR isset($params['remove']) )
+			$change = $this->model->authorCuratorRemove(@$params['id']);
+			
+		// Strip all requests and reload data
+		if ($change) $f3->reroute("/userCP/author/curator", false);
+		
+		return \View\UserCP::authorCurator($data);
 	}
 
 	protected function authorHome(\Base $f3, $params)
@@ -103,14 +131,16 @@ class UserCP extends Base
 		// Future: load stuff, like to-do, open ends ...
 		if ( $_SESSION['groups']&5 )
 		{
-			
+			$data = [];
 		}
+		else $data = FALSE;
 		
-		return \View\UserCP::authorHome();
+		return \View\UserCP::authorHome($data);
 	}
 	
 	protected function authorStoryAdd()
 	{
+		
 		
 	}
 	
@@ -122,9 +152,10 @@ class UserCP extends Base
 
 		// search/browse
 		$allow_order = array (
-				"sid"		=>	"sid",
-				"title"		=>	"title",
-				"validated"	=>	"validated",
+				"sid"			=>	"sid",
+				"title"			=>	"title",
+				"svalidated"	=>	"story_validated",
+				"chvalidated"	=>	"chapter_validated",
 		);
 
 		// sort order

@@ -131,10 +131,11 @@ class UserCP extends Base
 		$limit = 20;
 		$pos = $page - 1;
 		
-		$sql = "SELECT SQL_CALC_FOUND_ROWS S.sid,S.title, S.validated, S.completed
+		$sql = "SELECT SQL_CALC_FOUND_ROWS S.sid,S.title, S.validated as story_validated, S.completed, Ch.validated as chapter_validated
 					FROM `tbl_stories`S 
 						LEFT JOIN `tbl_stories_authors`A ON ( S.sid = A.sid )
-						INNER JOIN `tbl_users`U ON ( A.aid = U.uid AND ( U.uid = {$_SESSION['userID']} OR U.curator = {$_SESSION['userID']} ) )
+							INNER JOIN `tbl_users`U ON ( A.aid = U.uid AND ( U.uid = {$_SESSION['userID']} OR U.curator = {$_SESSION['userID']} ) )
+						LEFT JOIN `tbl_chapters`Ch ON ( Ch.sid = S.sid )
 					WHERE A.aid=:aid AND S.completed = ";
 
 		switch ($select)
@@ -152,7 +153,8 @@ class UserCP extends Base
 				return FALSE;
 		}
 		
-		$sql .= " ORDER BY {$sort['order']} {$sort['direction']}
+		$sql .= " GROUP BY S.sid
+				 ORDER BY chapter_validated ASC, {$sort['order']} {$sort['direction']}
 					LIMIT ".(max(0,$pos*$limit)).",".$limit;
 		
 		$data = $this->exec($sql, [":aid" => $author] );
@@ -164,6 +166,36 @@ class UserCP extends Base
 		);
 		
 		return $data;
+	}
+	
+	public function authorCuratorRemove($uid=NULL)
+	{
+		$this->exec("UPDATE `tbl_users`U set U.curator = NULL WHERE U.uid = :uid;", [ ":uid" => ($uid ?: $_SESSION['userID']) ]);
+		return TRUE;
+	}
+	
+	public function authorCuratorGet()
+	{
+		$data = $this->exec("SELECT C.nickname, C.uid
+								FROM `tbl_users`U 
+									INNER JOIN `tbl_users`C ON ( U.curator = C.uid AND U.uid = {$_SESSION['userID']} )
+							");
+
+		$return['self'] = ( sizeof($data) ) ? json_encode ( array ( "name"	=> $data[0]['nickname'], "id" => $data[0]['uid'] ) ) : "";
+		
+		$return['others'] = $this->exec("SELECT U.nickname, U.uid
+											FROM `tbl_users`U
+												INNER JOIN `tbl_users`C ON ( U.curator = C.uid AND C.uid = {$_SESSION['userID']} )
+											");
+		return $return;
+	}
+	
+	public function authorCuratorSet($uid)
+	{
+		$data = $this->exec("SELECT U.uid FROM `tbl_users`U WHERE U.uid = :uid AND U.groups > 0;",[":uid" => $uid]);
+		if(empty($data)) return FALSE;
+		$this->exec("UPDATE `tbl_users`U set U.curator = {$data[0]['uid']} WHERE U.uid = {$_SESSION['userID']};");
+		return TRUE;
 	}
 	
 	public function feedbackHomeStats($data)
@@ -189,10 +221,10 @@ class UserCP extends Base
 		
 		if ( $key == "messaging" )
 		{
-			if(isset($data['recipient']))
+			if(isset($data['namestring']))
 			{
 				$ajax_sql = "SELECT U.nickname as name, U.uid as id from `tbl_users`U WHERE U.nickname LIKE :nickname AND U.groups > 0 AND U.uid != {$_SESSION['userID']} ORDER BY U.nickname ASC LIMIT 10";
-				$bind = [ ":nickname" =>  "%{$data['recipient']}%" ];
+				$bind = [ ":nickname" =>  "%{$data['namestring']}%" ];
 			}
 		}
 
