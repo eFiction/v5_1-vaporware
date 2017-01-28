@@ -20,6 +20,12 @@ class Config extends \Prefab
 			\Cache::instance()->set('config', self::$public, 3600);
 		}
 		self::$public['prefix'] = self::$protected['prefix'];
+		
+		if(!self::$public['maintenance'])
+		{
+			// this will host the place where custom routes for plugins will be loaded when not in maintenance mode
+			
+		}
 
 		return self::$public;
 	}

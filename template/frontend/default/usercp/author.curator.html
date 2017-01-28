@@ -1,3 +1,5 @@
+{PAGE:curator}
+
 <check if="{{sizeof(@curator.others)}}">
 <fieldset>
 	<legend>__CuratingOther</legend>
@@ -16,6 +18,7 @@
 	<legend>__SELECT</legend>
 	<form method="post" action="{{@BASE}}/userCP/author/curator">
 		<div class="field"><input class="field input" type="text" name="curator_id" id="curator"></div>
+		<br/>&nbsp;
 		<input class="button" type="submit">
 	</form>
 </fieldset>

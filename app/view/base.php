@@ -35,7 +35,6 @@ abstract class Base {
 		else $f3->set('CSS_UI', "{$UI_BASE}default/");
 		$UI .= "{$UI_BASE}default/";
 		$f3->set('UI', $UI);
-
 		
 		$f3->set('SELF', rawurlencode($_SERVER["QUERY_STRING"]));
 

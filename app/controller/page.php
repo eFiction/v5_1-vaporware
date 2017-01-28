@@ -20,5 +20,10 @@ class Page extends Base {
 		}
 	}
 	
+	public function maintenance(\Base $f3)
+	{
+		$this->getMain($f3, ["*" => "maintenance"]);
+	}
+	
 }
 ?>

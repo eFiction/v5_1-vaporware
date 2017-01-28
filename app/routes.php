@@ -7,10 +7,11 @@
 	Common routes
 -------------------- */
 
-$f3->route( [ 'GET /', 'GET /page/*', 'GET /*' ], 'Controller\Page->getMain' );
 
 if ( FALSE == $cfg->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
 {
+	$f3->route( [ 'GET /', 'GET /page/*', 'GET /*' ], 'Controller\Page->getMain' );
+
 	// Load routes if not in maintenance
 	$f3->route(
 	  [ 'GET /*/redirect/@b/@c', 'GET /redirect/@a/@b', ],
@@ -52,9 +53,17 @@ if ( FALSE == $cfg->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
 	$f3->route( 'POST /shoutbox/* [ajax]', 'Controller\Blocks->shoutbox' );
 	$f3->route( 'POST /story/ajax/@segment [ajax]', 'Controller\Story->ajax' );
 }
+else
+	$f3->route( [ 'GET /', 'GET /page/*', 'GET /*' ], 'Controller\Page->maintenance' );
+
 
 if ($_SESSION['groups'] & 1)
 {
+	// Logout is always possible
+	$f3->route(
+	[ 'GET /logout', 'GET /logout/*' ],
+	'Controller\Auth->logout' );
+
 	if ( FALSE == $cfg->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
 	{
 		/* --------------------
@@ -63,10 +72,6 @@ if ($_SESSION['groups'] & 1)
 			maintenance
 		-------------------- */
 		$f3->route([ 'GET|POST /login', 'GET|POST /register'] , function($f3) { $f3->reroute('/', false); } );
-
-		$f3->route(
-			[ 'GET /logout', 'GET /logout/*' ],
-			'Controller\Auth->logout' );
 
 		$f3->route(
 			[ 'GET|POST /userCP', 'GET|POST /userCP/*' ],
