@@ -1,0 +1,113 @@
+<div class="grid-wrapper">
+	<div class="gb-3qrt">
+		<form method="post" action="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}}">
+			<div class="ym-grid">
+				<div class="gb-2thrd"><h6>__Title</h6><input placeholder="Your story title goes here" type="text" name="form[story_title]" value="{{@data.title}}"></div>
+				<div class="gb-1thrd"><h6>__Rating</h6>
+					<select id="ratingid" name="form[ratingid]">
+					<repeat group="{{ @data.ratings }}" value="{{ @rating }}"><option value="{{ @rating.rid }}"<check if="{{@rating.rid==@data.ratingid}}"> selected="selected"</check>>{{ @rating.rating }}</option></repeat>
+					</select>
+				</div>
+
+		<!-- The next fields will be filled by the javascript below -->
+				<div class="gb-full"><h6>__Categories</h6><input type="text" id="category-select" name="form[category]" /></div>
+				<div class="gb-half"><h6>__Author</h6><input type="text" id="author-select" name="form[author]" /></div>
+				<div class="gb-half"><h6>__CoAuthor </h6><input type="text" id="coauthor-select" name="form[coauthor]" /></div>
+				<div class="gb-full"><h6>__Tags <a class="contextual-popup" href="#tagsinfo"><i class="fa fa-info-circle"></i><span> <b>Info:</b><br />Simply start typing what you are looking for.</span></a></h6><input type="text" id="tag-select" name="form[tags]" /></div>
+				<div class="gb-full"><h6>__Characters </h6><input type="text" id="character-select" name="form[characters]" /></div>
+		<!-- end of special fields -->
+
+				<div class="gb-full"><h6>__Notes</h6><textarea placeholder="Notes and dedications go here" name="form[story_notes]">{{@data.storynotes}}</textarea></div>
+				<div class="gb-full"><h6>__Summary</h6><textarea placeholder="Your story summary goes here" name="form[story_summary]">{{@data.summary}}</textarea></div>
+
+				<div class="gb-half">
+					<h6>__StatusValidated: {{ @data.states.validated[@data.validated.0] }}</h6>
+					__ChangeTo:<select id="validated" name="form[validated]">
+						<repeat group="{{ @data.states.validated }}" key="{{ @validated.key }}" value="{{ @validated.label }}"><option value="{{ @validated.key }}"<check if="{{@validated.key==@data.validated.0}}"> selected="selected"</check>>{{ @validated.label }}</option></repeat>
+					</select>
+				</div>
+				<div class="gb-half">
+					<h6>__StatusValidatedReason: {{ @data.states.reason[@data.validated.1] }}</h6>
+					__ChangeTo:<select id="validated" name="form[validated]">
+						<repeat group="{{ @data.states.reason }}" key="{{ @validated.key }}" value="{{ @validated.label }}"><option value="{{ @validated.key }}"<check if="{{@validated.key==@data.validated.1}}"> selected="selected"</check>>{{ @validated.label }}</option></repeat>
+					</select>
+				</div>
+				<div class="gb-half">
+					<h6>__StatusCompleted: {{ @data.states.completed[@data.completed] }}</h6>
+					__ChangeTo:<select id="completed" name="form[completed]">
+						<repeat group="{{ @data.states.completed }}" key="{{ @completed.key }}" value="{{ @completed.label }}"><option value="{{ @completed.key }}"<check if="{{@completed.key==@data.completed}}"> selected="selected"</check>>{{ @completed.label }}</option></repeat>
+					</select>
+				</div>
+				<div class="gb-half">&nbsp;</div>
+
+				<div class="gb-full" align="right"><a class="delete" href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}}"><span class="fa fa-times"></span> __Delete</a>
+				<input class="button" type="reset"> <input class="button" type="submit"></div>
+			</div>
+		</form>
+	</div>
+	<div class="gb-1qrt">
+		<include href="usercp/author/chapterlist.html" />
+	</div>
+</div>
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#category-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "category",
+    	preventDuplicates: true,
+    	prePopulate: {{@prePop.cat | raw}}
+    });
+});
+
+$(document).ready(function() {
+    $("#author-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "author",
+    	preventDuplicates: true,
+    	prePopulate: {{@prePop.mainauth | raw}}
+    });
+});
+
+$(document).ready(function() {
+    $("#coauthor-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "author",
+    	preventDuplicates: true,
+    	prePopulate: {{@prePop.supauth | raw}}
+    });
+});
+
+$(document).ready(function() {
+    $("#tag-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "tag",
+    	preventDuplicates: true,
+    	prePopulate: {{@prePop.tag | raw}}
+    });
+});
+
+$(document).ready(function() {
+    $("#character-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "character",
+    	preventDuplicates: true,
+    	prePopulate: {{@prePop.char | raw}}
+    });
+});
+
+$(function () {
+	$("#chapter-sort").sortable({
+		cursor: "move",
+		containment: "parent",
+		update: function () {
+			var neworder = $('#chapter-sort').sortable('toArray');
+			$.ajax({
+				type: "post",
+				url: "{{@BASE}}/adminCP/ajax/stories/chaptersort",
+				data: { story: {{@data.sid}}, neworder: neworder },
+				dataType: "html"
+			});
+		}
+	});
+});
+</script>

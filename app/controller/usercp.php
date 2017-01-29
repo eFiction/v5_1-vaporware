@@ -86,7 +86,7 @@ class UserCP extends Base
 				switch ( $params[1] )
 				{
 					case "add":
-						$buffer = $this->authorStoryAdd();
+						$buffer = $this->authorStoryAdd($f3, $params['uid']);
 						break;
 					case "finished":
 					case "unfinished":
@@ -94,7 +94,8 @@ class UserCP extends Base
 						$buffer = $this->authorStorySelect($params);
 						break;
 					case "edit":
-						$buffer = $this->authorStoryEdit($params['sid']);
+						$buffer = $this->authorStoryEdit($params);
+						break;
 				}
 				//$buffer .= print_r($params,1);
 			}
@@ -138,10 +139,20 @@ class UserCP extends Base
 		return \View\UserCP::authorHome($data);
 	}
 	
-	protected function authorStoryAdd()
+	protected function authorStoryAdd(\Base $f3, $uid)
 	{
+		$data = [ "uid" => $uid ];
+		// Check data
+		if ( sizeof($_POST) )
+		{
+			if( "" != $data['new_title'] = $f3->get('POST.new_title') )
+			{
+				if ( $newID = $this->model->authorStoryAdd($data) )
+					$f3->reroute("/userCP/author/uid={$uid}/edit/sid={$newID};returnpath=/userCP/author/uid={$uid}/drafts", false);
+			}
+		}
 		
-		
+		return \View\UserCP::authorStoryAdd($data);
 	}
 	
 	protected function authorStorySelect($params)
@@ -170,12 +181,25 @@ class UserCP extends Base
 		return \View\UserCP::authorStoryList($data, $sort, $params);
 	}
 
-	protected function authorStoryEdit($sid=NULL)
+	protected function authorStoryEdit(array $params)
 	{
-		if(!$sid) return "__Error";
-		$storyStatus = $this->model->authorStoryStatus($sid);
-
-		return print_r($storyStatus,TRUE);
+		if(empty($params['sid'])) return "__Error";
+		$uid = isset($params['uid']) ? $params['uid'] : $_SESSION['userID'];
+		if ( $storyData = $this->model->authorStoryLoadInfo((int)$params['sid'], $uid) )
+		{
+			//$storyStatus = $this->model->authorStoryStatus($sid);
+			if ( isset($params['chapter']) )
+			{
+				return "working ...";
+			}
+			else
+			{
+				$chapterList = $this->model->loadChapterList($storyData['sid']);
+				$prePopulate = $this->model->storyEditPrePop($storyData);
+				return \View\UserCP::authorStoryMetaEdit($storyData,$chapterList,$prePopulate);
+			}
+		}
+		else return "__Error";
 	}
 
 	public function feedback(\Base $f3, $params)

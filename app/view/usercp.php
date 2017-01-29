@@ -13,7 +13,7 @@ class UserCP extends Base
 	public static function authorHome($data=[])
 	{
 		\Base::instance()->set('message', $data);
-		return \Template::instance()->render('usercp/author.home.html');
+		return \Template::instance()->render('usercp/author/home.html');
 	}
 
 	public static function authorStoryList(array $data, array $sort, array $params)
@@ -24,13 +24,32 @@ class UserCP extends Base
 		\Base::instance()->set('sort', $sort);
 		\Base::instance()->set('author', $params['uid']);
 		\Base::instance()->set('select', $params[1]);
-		return \Template::instance()->render('usercp/author.storyList.html');
+		return \Template::instance()->render('usercp/author/storyList.html');
+	}
+	
+	public static function authorStoryAdd(array $data)
+	{
+		\Base::instance()->set('storyAdd', $data);
+		
+		return \Template::instance()->render('usercp/author/storyAdd.html');
 	}
 
-	public static function authorCurator($data=[])
+	public static function authorStoryMetaEdit(array $storyData, array $chapterList, array $prePop)
+	{
+		$storyData['storynotes'] = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $storyData['storynotes']);
+		$storyData['summary'] = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $storyData['summary']);
+
+		\Base::instance()->set('prePop', $prePop);
+		\Base::instance()->set('data', $storyData);
+		\Base::instance()->set('chapterList', $chapterList);
+		
+		return \Template::instance()->render('usercp/author/storyEditMeta.html');
+	}
+
+	public static function authorCurator(array $data=[])
 	{
 		\Base::instance()->set('curator', $data);
-		return \Template::instance()->render('usercp/author.curator.html');
+		return \Template::instance()->render('usercp/author/curator.html');
 	}
 
 	public static function msgInOutbox($data, $select="inbox")
@@ -105,7 +124,7 @@ class UserCP extends Base
 		\Base::instance()->set('sub', $sub);
 		\Base::instance()->set('path', $path);
 
-		return \Template::instance()->render('usercp/menu_upper.html');
+		return \Template::instance()->render('usercp/menu.upper.html');
 	}
 	
 	public static function feedbackHome(array $data)

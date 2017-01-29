@@ -906,7 +906,6 @@ class AdminCP extends Base {
 		);
 		if (sizeof($data)>0) return $data;
 		return FALSE;
-
 	}
 	
 	public function loadStoryMapper($sid)

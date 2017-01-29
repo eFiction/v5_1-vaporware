@@ -163,7 +163,7 @@ class Auth extends Base {
 	
 	public function logout($f3,$params)
 	{
-		$return = explode("returnpath=",$params['*']);
+		$return = explode("returnpath=",@$params['*']);
 		$returnpath = ( isset($return[1]) AND $return[1]!="") ? $return[1] : "/";
 
 		$this->model->userSession(0);

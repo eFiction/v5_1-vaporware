@@ -388,7 +388,7 @@ class Base extends \Prefab {
 
 	protected static function cleanResult($messy)
 	{
-		if ( $messy == "" ) return "";
+		if ( empty($messy) ) return NULL;
 		$mess = explode("||",$messy);
 		$mess = (array_unique($mess));
 		foreach ( $mess as $element )

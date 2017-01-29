@@ -20,7 +20,7 @@ class UserCP extends Base
 				// get associated author and curator data
 				$authorData = $this->exec("SELECT U.uid, CONCAT(U.nickname, ' (',COUNT(DISTINCT SA.lid), ')') as label, IF(U.uid=336,1,0) as curator
 												FROM `tbl_users`U 
-													LEFT JOIN `tbl_stories_authors`SA ON ( U.uid = SA.aid ) 
+													LEFT JOIN `tbl_stories_authors`SA ON ( U.uid = SA.aid AND SA.type='M' ) 
 												WHERE U.uid = {$_SESSION['userID']} OR U.curator = {$_SESSION['userID']} 
 												GROUP BY U.uid
 												ORDER BY curator DESC, label ASC");
@@ -37,7 +37,7 @@ class UserCP extends Base
 					// get story count by completion status
 					$authorData = $this->exec("SELECT S.completed, COUNT(DISTINCT S.sid) as count 
 													FROM `tbl_stories`S
-														INNER JOIN `tbl_stories_authors`SA ON (S.sid = SA.sid AND SA.aid = :aid) 
+														INNER JOIN `tbl_stories_authors`SA ON (S.sid = SA.sid AND SA.aid = :aid AND SA.type='M') 
 													GROUP BY S.completed", [ ":aid" => $data['uid'] ]);
 					foreach ( $authorData as $aD ) $status[$aD["completed"]] = $aD["count"];
 
@@ -94,7 +94,7 @@ class UserCP extends Base
 			return (array)$data;
 		}
 
-		if ( isset($data) ) //and sizeof($data>0) )
+		if ( isset($data) )
 		{
 			foreach( $data as $key => $count )
 				list($counter[$key]['sum'], $counter[$key]['details']) = array_pad(explode("//",$count), 2, '');
@@ -114,11 +114,108 @@ class UserCP extends Base
 		return NULL;
 	}
 	
+	public function authorStoryAdd($data)
+	{
+		$newStory = new \DB\SQL\Mapper($this->db, $this->prefix."stories");
+		$newStory->title		= $data['new_title'];
+		$newStory->completed	= -1;
+		$newStory->validated	= 11;
+		$newStory->save();
+		
+		$newID = $newStory->_id;
+		
+		// add the story-author relation
+		$newRelation = new \DB\SQL\Mapper($this->db, $this->prefix."stories_authors");
+		$newRelation->sid	= $newID;
+		$newRelation->aid	= $data['uid'];
+		$newRelation->type	= 'M';
+		$newRelation->save();
+		
+		// already counting as author? mainly for stats ...
+		$editUser = new \DB\SQL\Mapper($this->db, $this->prefix."users");
+		$editUser->load(array("uid=?",$data['uid']));
+		if ( $editUser->groups < 4 )
+			$editUser->groups += 4;
+		$editUser->save();
+
+		return $newID;
+	}
+	
+	public function authorStoryLoadInfo($sid, $uid)
+	{
+		
+		$data = $this->exec
+		(
+			"SELECT S.*, COUNT(DISTINCT Ch.chapid) as chapters
+				FROM `tbl_stories`S
+					INNER JOIN `tbl_stories_authors`A ON ( S.sid = A.sid AND A.type='M' AND A.aid = :aid )
+					LEFT JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid)
+				WHERE S.sid = :sid",
+			[":sid" => $sid, ":aid" => $uid ]
+		);
+		if (sizeof($data)==1)
+		{
+			$data[0]['states']  = $this->storyStates();
+			$data[0]['ratings'] = $this->exec("SELECT rid, rating, ratingwarning FROM `tbl_ratings`");
+			return $data[0];
+		}
+		return FALSE;
+	}
+	
+	public function loadChapterList($sid)
+	{
+		$data = $this->exec
+		(
+			"SELECT Ch.sid,Ch.chapid,Ch.title
+				FROM `tbl_chapters`Ch
+			WHERE Ch.sid = :sid ORDER BY Ch.inorder ASC",
+			[":sid" => $sid ]
+		);
+		return $data;
+		if (sizeof($data)>0) return $data;
+		return FALSE;
+	}
+
+	public function storyEditPrePop(array $storyData)
+	{
+		$categories = json_decode($storyData['cache_categories']);
+		if(sizeof($categories))
+		{
+			foreach ( $categories as $tmp ) $pre['cat'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
+			$pre['cat'] = json_encode($pre['cat']);
+		}
+		else $pre['cat'] = '""';
+
+		$tags = json_decode($storyData['cache_tags'],TRUE);
+		if(sizeof($tags)>0)
+		{
+			foreach ( $tags as $tmp ) $pre['tag'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
+			$pre['tag'] = json_encode($pre['tag']);
+		}
+		else $pre['tag'] = '""';
+
+		$characters = json_decode($storyData['cache_characters']);
+		if(sizeof($characters))
+		{
+			foreach ( $characters as $tmp ) $pre['char'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
+			$pre['char'] = json_encode($pre['char']);
+		}
+		else $pre['char'] = '""';
+		
+		$authors = $this->exec ( "SELECT U.uid as id, U.nickname as name FROM `tbl_users`U INNER JOIN `tbl_stories_authors`Rel ON ( U.uid = Rel.aid AND Rel.sid = :sid AND Rel.type = 'M' );", [ ":sid" => $storyData['sid'] ]);
+		$pre['mainauth'] = json_encode($authors);
+
+		$supauthors = $this->exec ( "SELECT U.uid as id, U.nickname as name FROM `tbl_users`U INNER JOIN `tbl_stories_authors`Rel ON ( U.uid = Rel.aid AND Rel.sid = :sid AND Rel.type = 'S' );", [ ":sid" => $storyData['sid'] ]);
+		$pre['supauth'] = json_encode($supauthors);
+
+		return $pre;
+	}
+
 	public function authorStoryStatus($sid)
 	{
 		$sql = "SELECT S.title, S.validated, S.completed
 					FROM `tbl_stories`S 
-						LEFT JOIN `tbl_stories_authors`A ON ( S.sid = A.sid )
+						LEFT JOIN `tbl_stories_authors`A ON ( S.sid = A.sid AND A.type='M' )
 						INNER JOIN `tbl_users`U ON ( A.aid = U.uid AND ( U.uid = {$_SESSION['userID']} OR U.curator = {$_SESSION['userID']} ) )
 					WHERE S.sid=:sid";
 		
@@ -133,7 +230,7 @@ class UserCP extends Base
 		
 		$sql = "SELECT SQL_CALC_FOUND_ROWS S.sid,S.title, S.validated as story_validated, S.completed, Ch.validated as chapter_validated
 					FROM `tbl_stories`S 
-						LEFT JOIN `tbl_stories_authors`A ON ( S.sid = A.sid )
+						LEFT JOIN `tbl_stories_authors`A ON ( S.sid = A.sid AND A.type='M' )
 							INNER JOIN `tbl_users`U ON ( A.aid = U.uid AND ( U.uid = {$_SESSION['userID']} OR U.curator = {$_SESSION['userID']} ) )
 						LEFT JOIN `tbl_chapters`Ch ON ( Ch.sid = S.sid )
 					WHERE A.aid=:aid AND S.completed = ";
