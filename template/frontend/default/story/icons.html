@@ -10,4 +10,5 @@
 <span class="fa fa-flag"></span>&nbsp;
 <span class="fa fa-download"></span>&nbsp;
 <a href="{{@BASE}}/story/print/{{@data.story.sid}},epub">epub</a>&nbsp;
-<check if="{{ @data.can_edit }}"> / <a href="{{@BASE}}/{{ @data.can_edit }}/stories/edit/story={{@data.story.sid}}">{ICON:edit}</a></check>
+<check if="{{ is_numeric(@data.story.can_edit) }}"> / <a href="{{@BASE}}/userCP/author/uid={{@data.story.can_edit}}/edit/sid={{@data.story.sid}};returnpath={{@PATH}}">{ICON:edit}</a></check>
+<check if="{{ @_SESSION.groups&64 }}"> / <a href="{{@BASE}}/adminCP/stories/edit/story={{@data.story.sid}}" target="_blank">{ICON:edit}</a></check>

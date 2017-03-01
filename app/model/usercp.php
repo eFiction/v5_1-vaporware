@@ -17,14 +17,20 @@ class UserCP extends Base
 		{
 			if ( $selected == "author")
 			{
+				$allowed=[];
 				// get associated author and curator data
-				$authorData = $this->exec("SELECT U.uid, CONCAT(U.nickname, ' (',COUNT(DISTINCT SA.lid), ')') as label, IF(U.uid=336,1,0) as curator
+				$authorData = $this->exec("SELECT U.uid, CONCAT(U.nickname, ' (',COUNT(DISTINCT SA.lid), ')') as label, IF(U.uid={$_SESSION['userID']},1,0) as curator
 												FROM `tbl_users`U 
 													LEFT JOIN `tbl_stories_authors`SA ON ( U.uid = SA.aid AND SA.type='M' ) 
 												WHERE U.uid = {$_SESSION['userID']} OR U.curator = {$_SESSION['userID']} 
 												GROUP BY U.uid
 												ORDER BY curator DESC, label ASC");
-				foreach ( $authorData as $aD ) $authors["AUTHORS"][$aD["uid"]] = $aD["label"];
+				foreach ( $authorData as $aD )
+				{
+					$authors["AUTHORS"][$aD["uid"]] = $aD["label"];
+					$allowed[$aD["uid"]] = TRUE;
+				}
+				\Base::instance()->set('allowed_authors', $allowed);
 				$authors["ID"] = @$data['uid'];
 
 				$sub = $this->panelMenu($selected, $authors);
@@ -153,7 +159,7 @@ class UserCP extends Base
 				WHERE S.sid = :sid",
 			[":sid" => $sid, ":aid" => $uid ]
 		);
-		if (sizeof($data)==1)
+		if (sizeof($data)==1 AND $data[0]['sid']!="")
 		{
 			$data[0]['states']  = $this->storyStates();
 			$data[0]['ratings'] = $this->exec("SELECT rid, rating, ratingwarning FROM `tbl_ratings`");
@@ -186,7 +192,7 @@ class UserCP extends Base
 		}
 		else $pre['cat'] = '""';
 
-		$tags = json_decode($storyData['cache_tags'],TRUE);
+		$tags = json_decode($storyData['cache_tags'],TRUE)['simple'];
 		if(sizeof($tags)>0)
 		{
 			foreach ( $tags as $tmp ) $pre['tag'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
@@ -265,6 +271,27 @@ class UserCP extends Base
 		return $data;
 	}
 	
+	public function authorStoryChapterAdd($sid, $uid)
+	{
+		return parent::storyChapterAdd($sid, $uid);
+	}
+	
+	public function authorStoryChapterLoad( $story, $chapter )
+	{
+		$data = $this->exec
+		(
+			"SELECT Ch.sid,Ch.chapid,Ch.inorder,Ch.title,Ch.notes,Ch.validated,Ch.rating
+				FROM `tbl_chapters`Ch
+			WHERE Ch.sid = :sid AND Ch.chapid = :chapter",
+			[":sid" => $story, ":chapter" => $chapter ]
+		);
+		if (empty($data)) return FALSE;
+		$data = $data[0];
+		$data['chaptertext'] = parent::getChapter( $story, $data['inorder'], FALSE );
+		
+		return $data;
+	}
+
 	public function authorCuratorRemove($uid=NULL)
 	{
 		$this->exec("UPDATE `tbl_users`U set U.curator = NULL WHERE U.uid = :uid;", [ ":uid" => ($uid ?: $_SESSION['userID']) ]);
@@ -322,6 +349,57 @@ class UserCP extends Base
 			{
 				$ajax_sql = "SELECT U.nickname as name, U.uid as id from `tbl_users`U WHERE U.nickname LIKE :nickname AND U.groups > 0 AND U.uid != {$_SESSION['userID']} ORDER BY U.nickname ASC LIMIT 10";
 				$bind = [ ":nickname" =>  "%{$data['namestring']}%" ];
+			}
+		}
+		elseif ( $key == "stories" )
+		{
+			if(isset($data['author']))
+			{
+				$ajax_sql = "SELECT U.nickname as name, U.uid as id from `tbl_users`U WHERE U.nickname LIKE :nickname AND (U.groups&5) ORDER BY U.nickname ASC LIMIT 10";
+				$bind = [ ":nickname" =>  "%{$data['author']}%" ];
+			}
+			elseif(isset($data['category']))
+			{
+				$ajax_sql = "SELECT category as name, cid as id from `tbl_categories`C WHERE C.category LIKE :category ORDER BY C.category ASC LIMIT 5";
+				$bind = [ ":category" =>  "%{$data['category']}%" ];
+			}
+			elseif(isset($data['tag']))
+			{
+				$ajax_sql = "SELECT label as name, tid as id from `tbl_tags`T WHERE T.label LIKE :tag ORDER BY T.label ASC LIMIT 5";
+				$bind = [ ":tag" =>  "%{$data['tag']}%" ];
+			}
+			elseif(isset($data['character']))
+			{
+				$ajax_sql = "SELECT Ch.charname as name, Ch.charid as id from `tbl_characters`Ch WHERE Ch.charname LIKE :charname ORDER BY Ch.charname ASC LIMIT 5";
+				$bind = [ ":charname" =>  "%{$data['character']}%" ];
+			}
+			elseif(isset($data['chaptersort']))
+			{
+				if(sizeof($_SESSION['allowed_authors']))
+				{
+					$authors = $this->exec("SELECT rel.aid FROM `tbl_stories_authors`rel WHERE rel.sid = :sid AND rel.type='M' AND rel.aid IN (".implode(",",$_SESSION['allowed_authors']).")", [ ":sid" => $data['chaptersort']] );
+					if(empty($authors)) return NULL;
+
+					$chapters = new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
+					if ( $this->config['chapter_data_location'] == "local" )
+						$chaptersLocal = new \DB\SQL\Mapper(\storage::instance()->localChapterDB(), "chapters");
+
+					foreach ( $data["neworder"] as $order => $id )
+					{
+						if ( is_numeric($order) && is_numeric($id) && is_numeric($data["chaptersort"]) )
+						{
+							$chapters->load(array('chapid = ? AND sid = ?',$id, $data['chaptersort']));
+							$chapters->inorder = $order+1;
+							$chapters->save();
+							if ( $this->config['chapter_data_location'] == "local" )
+							{
+								$chaptersLocal->load(array('chapid = ? AND sid = ?',$id, $data['chaptersort']));
+								$chaptersLocal->inorder = $order+1;
+								$chaptersLocal->save();
+							}
+						}
+					}
+				}
 			}
 		}
 

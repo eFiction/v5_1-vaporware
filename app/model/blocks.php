@@ -65,7 +65,7 @@ class Blocks extends Base
 		
 		$this->prepare ( "queryEvents", "SELECT COUNT( S.title ) AS per_day, DAY( S.updated ) AS day_nr
 												FROM `tbl_stories` S
-												WHERE MONTH(S.updated) = :month AND YEAR(S.updated) = :year AND S.validated >= 20
+												WHERE MONTH(S.updated) = :month AND YEAR(S.updated) = :year AND S.validated >= 30
 												GROUP BY DAY( S.updated ) " );
 		$this->bindValue("queryEvents", ":month", $c['month'], \PDO::PARAM_INT);
 		$this->bindValue("queryEvents", ":year",  $c['year'],	\PDO::PARAM_INT);

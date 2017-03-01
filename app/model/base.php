@@ -254,33 +254,35 @@ class Base extends \Prefab {
 	
 	protected function storyStates()
 	{
+		// Commented lines are for later versions, providing more options
 		$state['completed'] =
 		[
-			-2 => "__deleted",
-			-1 => "__draft",
-			 0 => "__wip",
-			 1 => "__completed",
+			-2 => "deleted",
+			-1 => "draft",
+			 0 => "wip",
+			 1 => "completed",
 		];
 		
 		$state['validated'] =
 		[
-			 0 => "__closed",
-			 1 => "__moderation",
-			 2 => "__validated",
+		//	 0 => "closed",
+			 1 => "moderationStatic",
+			 2 => "moderationPending",
+			 3 => "validated",
 		];
 		
 		$state['reason'] =
 		[
-			0 => "__none",
-			1 => "__user",
-			2 => "__moderator",
-			3 => "__admin",
-			4 => "__forcedRework",
-			5 => "__minorWorking",
-			6 => "__majorWorking",
-			7 => "__minorDone",
-			8 => "__majorDone",
-			9 => "__locked",
+			0 => "none",
+			1 => "user",
+			2 => "moderator",
+			3 => "admin",
+		//	4 => "__forcedRework",
+		//	5 => "__minorWorking",
+		//	6 => "__majorWorking",
+		//	7 => "__minorDone",
+		//	8 => "__majorDone",
+		//	9 => "__locked",
 		];
 		return $state;
 	}
@@ -309,6 +311,81 @@ class Base extends \Prefab {
 			$this->exec($sql_tracker);
 		}
 		return nl2br($chapterText);
+	}
+
+	public function storyChapterAdd($storyID, $userID=FALSE)
+	{
+		if ( $userID )
+		{
+			// coming from userCP, $userID is safe
+			$countSQL = "SELECT COUNT(chapid) as chapters, U.uid
+							FROM `tbl_stories`S
+								LEFT JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid )
+								INNER JOIN `tbl_stories_authors`SA ON ( SA.sid = S.sid AND SA.type='M' )
+									INNER JOIN `new5_users`U ON ( ( U.uid=SA.aid ) AND ( U.uid={$userID} OR U.curator={$userID} ) )
+						WHERE S.sid = :sid ";
+			$countBind = [ ":sid" => $storyID ];
+			
+			$chapterCount = $this->exec($countSQL, $countBind);
+
+			if ( empty($chapterCount) OR  $chapterCount[0]['uid']==NULL )
+				return FALSE;
+
+			// Get current chapter count and raise
+			$chapterCount = $chapterCount[0]['chapters'] + 1;
+		}
+		else
+		{
+			if ( FALSE == $chapterCount = $this->exec("SELECT COUNT(chapid) as chapters FROM `tbl_chapters` WHERE `sid` = :sid ", [ ":sid" => $storyID ])[0]['chapters'] )
+				return FALSE;
+
+			// Get current chapter count and raise
+			$chapterCount++;
+		}
+
+		$validated = 1;
+		if ( $_SESSION['groups']&32 ) $validated = 2;
+		if ( $_SESSION['groups']&128 ) $validated = 3;
+		
+		$kv = [
+			'title'			=> \Base::instance()->get('LN__Chapter')." #{$chapterCount}",
+			'inorder'		=> $chapterCount,
+			//'notes'			=> '',
+			//'workingtext'
+			//'workingdate'
+			//'endnotes'
+			'validated'		=> "1".$validated,
+			'wordcount'		=> 0,
+			'rating'		=> "0", // allow rating later
+			'sid'			=> $storyID,
+		];
+
+		$chapterID = $this->insertArray($this->prefix.'chapters', $kv );
+
+
+
+		if ( "local" == $this->config['chapter_data_location'] )
+		{
+			$db = \storage::instance()->localChapterDB();
+			$chapterAdd= @$db->exec('INSERT INTO "chapters" ("chapid","sid","inorder","chaptertext") VALUES ( :chapid, :sid, :inorder, :chaptertext )', 
+								[
+									':chapid' 		=> $chapterID,
+									':sid' 			=> $storyID,
+									':inorder' 		=> $chapterCount,
+									':chaptertext'	=> '',
+								]
+			);
+		}
+
+		/*
+		
+		
+		
+		*/
+		// ???
+		$this->rebuildStoryCache($storyID);
+		
+		return $chapterID;
 	}
 
 	public function saveChapter( $chapterID, $chapterText )

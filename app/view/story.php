@@ -116,14 +116,14 @@ class Story extends Base
 		$storyData['published'] = date( \Config::getPublic('date_format_short'), $storyData['published']);
 		$storyData['modified'] = date( \Config::getPublic('date_format_short'), $storyData['modified']);
 
-		$can_edit = ( $storyData['can_edit'] ) ? "userCP" : NULL;
-		if ( !$can_edit AND $_SESSION['groups'] & 64 ) $can_edit = "adminCP";
+//		$can_edit = ( $storyData['can_edit'] ) ? "userCP" : NULL;
+//		if ( !$can_edit AND $_SESSION['groups'] & 64 ) $can_edit = "adminCP";
 		
 		\Base::instance()->set('data', [
 												"story" 	=> $storyData,
 												"content" 	=> $content,
 												"dropdown" 	=> $dropdown,
-												"can_edit" 	=> $can_edit,
+											//	"can_edit" 	=> $can_edit,
 												"infoblock" => ( $storyData['chapters'] > 1 ) ? "" : \View\Story::buildInfoblock($storyData),
 												"feedback_form_label" => "__Review",
 												]);

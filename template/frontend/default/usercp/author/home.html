@@ -1,6 +1,7 @@
 <check if="{{ @_SESSION['groups']&5 }}">
 	<true>
-		Stuff ...
+		You are an author, this is your landing page.<br>
+		So far, it's empty. Sorry.
 	</true>
 	<false>
 		<check if="{{ TRUE === \Config::getPublic('author_self') }}">

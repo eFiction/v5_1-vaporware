@@ -48,10 +48,11 @@ class Auth extends Base {
 		if ( isset($session_id) && $user = \Model\Auth::instance()->validateSession($session_id,$ip_db) AND $user['userID']>0 )
 		{
 			$_SESSION['groups'] 		= $user['groups'];
-			$_SESSION['admin_active'] 	= $user['admin_active'];
+			//$_SESSION['admin_active'] 	= $user['admin_active'];
 			$_SESSION['userID']			= $user['userID'];
 			$_SESSION['username']		= $user['nickname'];
 			$_SESSION['mail']			= array($user['mail'],$user['unread']);
+			$_SESSION['allowed_authors']= explode(",",$user['allowed_authors']);
 			$_SESSION['tpl']			= [ "default", 1];
 			
 			return TRUE;
@@ -61,10 +62,11 @@ class Auth extends Base {
 			//getStats();
 			//
 			$_SESSION['groups'] 		= bindec('0');
-			$_SESSION['admin_active'] 	= FALSE;
+			//$_SESSION['admin_active'] 	= FALSE;
 			$_SESSION['userID']			= FALSE;
 			$_SESSION['username']		= "__Guest";
 			$_SESSION['mail']			= FALSE;
+			$_SESSION['allowed_authors']= [];
 			$_SESSION['tpl']			= [ "default", 1];
 			
 			return FALSE;

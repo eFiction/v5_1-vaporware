@@ -21,6 +21,16 @@ return array(
 							'zero	{Keine Fehler},'.
 							'one	{Beim Verarbeiten des Formulars ist ein Fehler aufgetreten},'.
 							'other	{Beim Verarbeiten des Formulars sind Fehler aufgetreten} }',
+'UnknowError'	=> 'There was an unknown error',
+'MainAuthor'	=> 'Autor',
+'MainAuthors'	=> 'Autoren',
+'SupAuthor'		=> 'Nebenautor',
+'SupAuthors'	=> 'Nebenautoren',
+'TokenInputHint' => 'Suchwort eingeben',
+// 'StoryNotes'			=>
+'StoryNotesExplained'	=>	'Platz für Widmungen und Anmerkungen',
+// 'StorySummary'			=>
+// 'StorySummaryExplained'	=>
 
 // Login
 'Login'			=> 'Anmelden',
@@ -31,7 +41,9 @@ return array(
 'Guest'			=> 'Gast',
 'ForgotPW'		=> 'Passwort vergessen',
 'ResetPW'		=> 'Passwort zurücksetzen',
+'ResetPWMail'	=> 'Falls ein Benutzer mit diesem Namen oder dieser E-Mail Adresse existiert, wurde eine E-Mail mit weiteren Anweisungen verschickt',
 'ChangePW'		=> 'Passwort ändern',
+'PWRecovery'	=> 'Passwort Wiederherstellung',
 'Login_NoMatch'	=> 'Anmeldung nicht möglich, Benutzername oder Passwort ungültig!',
 'Login_NoData'	=> 'Anmeldung nicht möglich, keine Daten!',
 
@@ -89,15 +101,6 @@ return array(
 'Month_Calendar' => '{0,date,custom,%B %Y}',
 'Weekday' => '{0,date,custom,%A}',
 
-/*
-'Menu_Profile' => 'Profil',
-'Menu_Messaging' => 'Nachrichten (PM)',
-'Menu_Authoring' => 'Authoring',
-'Menu_MyLibrary' => 'Mein Archiv',
-'Menu_Reviews' => 'Bewertungen',
-'Menu_Preferences' => 'Preferences',
-*/
-
 // User elements
 'UserField_Type1'	=> 'URL',			// _FIELDURL
 'UserField_Type2'	=> 'Auswahlfeld',	// _FIELDSELECT
@@ -116,11 +119,17 @@ return array(
 'Stories'	=> 'Geschichten',
 
 // UserCP elements
+'ChangeTo'	=> 'Ändern in',
 'UserMenu_Profile' => 'Profil',
 'UserMenu_Message' => 'Nachrichten',
 'UserMenu_PMInbox' => 'Posteingang',
 'UserMenu_PMOutbox' => 'Postausgang',
 'UserMenu_PMWrite' => 'Verfassen',
+	'MSG_deletedSuccess'	=> 'Nachricht gelöscht',
+	'MSG_deleteRead'	=> 'Löschen nicht möglich, Nachricht wurde bereits gelesen',
+	'MSG_deleteNotFound' => 'Löschen nicht möglich, Nachricht wurde nicht gefunden',
+	'MSG_deleteNoAccess' => 'Du kannst auf diese Nachricht nicht zugreifen',
+
 'UserMenu_Authoring' => 'Authoring',
 	'Authoring_Finished' => '{0, plural,'.
 		'other	{Abgeschlossen (#)}}',
@@ -140,14 +149,36 @@ return array(
 	'Library_Recommendations' => '{0, plural,'.
 		'other	{Empfehlungen (#)}
 	}',
+'UserMenu_Feedback' => 'Feedback',
 'UserMenu_Reviews' => 'Bewertungen',
-	'UserMenu_RevWritten' => 'Bewertungen geschrieben',
-	'UserMenu_RevReceived' => 'Bewertungen erhalten',
+	'UserMenu_ReviewsWritten'	=> '{0, plural,'. 'other {Bewertungen geschrieben (#)} }',
+	'UserMenu_ReviewsReceived'	=> '{0, plural,'. 'other {Bewertungen erhalten (#)} }', 
+	'UserMenu_CommentsWritten'	=> '{0, plural,'. 'other {Kommentare geschrieben (#)} }',
+	'UserMenu_CommentsReceived'	=> '{0, plural,'. 'other {Kommentare erhalten (#)} }', 
+	'UserMenu_Shoutbox'			=> '{0, plural,'. 'other {Shoutbox (#)} }', 
 'UserMenu_Settings' => 'Einstellungen',
-	'UserMenu_Preferences' => 'Preferences',
+//	'UserMenu_Preferences' => 
 
 'UserMenu_AddStory' => 'Hinzufügen',
+'AddChapter'	=> 'Kapitel hinzufügen',
+'UCP_statusValidated' => 'Freigabe',
+	'UCP_statusValidated_closed'	=> 'Geschlossen',
+	'UCP_statusValidated_moderationStatic'	=> 'Offen, Autor arbeitet',
+	'UCP_statusValidated_moderationPending'	=> 'Offen, Autor fertig',
+	'UCP_statusValidated_validated'	=> 		   'Bestätigt',
+'UCP_statusValidatedReason' => 'Details zur Freigabe',
+	'UCP_statusValidated_none'	=> 'Kein Grund angegeben',
+	'UCP_statusValidated_user'		=> 'Durch Autor',
+	'UCP_statusValidated_moderator'	=> 'Durch Moderator',
+	'UCP_statusValidated_admin'		=> 'Durch Admin',
+'UCP_statusCompleted'	=> 'Status',
+	'UCP_statusCompleted_deleted'	=> 'Gelöscht',
+	'UCP_statusCompleted_draft'		=> 'Entwurf',
+	'UCP_statusCompleted_wip'		=> 'Unvollendet',
+	'UCP_statusCompleted_completed'	=> 'Abgeschlossen',
 'UserMenu_Curator' => 'Betreuer',
+'UCP_ExplainMainAuthor'	=> 'Alle (Haupt)Autoren können die Geschichte bearbeiten',
+'UCP_ExplainSupAuthor'	=> 'Nebenautoren werden in der Geschichte aufgeführt, können sie aber nicht bearbeiten',
 
 // AdminCP Home elements
 'AdminMenu_General' => 'Allgemeine Einstellungen',

@@ -46,6 +46,26 @@ class UserCP extends Base
 		return \Template::instance()->render('usercp/author/storyEditMeta.html');
 	}
 
+	public static function authorStoryChapterEdit(array $chapterData, array $chapterList, $plain = FALSE)
+	{
+		if ($plain)
+		{
+			$chapterData['notes']		= preg_replace("/<br\\s*\\/>\\s*/i", "\n", $chapterData['notes']);
+			$chapterData['chaptertext']	= html_entity_decode(preg_replace("/<br\\s*\\/>\\s*/i", "\n", $chapterData['chaptertext']));
+			$chapterData['editmode']	= "plain";
+		}
+		else
+		{
+			\Registry::get('VIEW')->javascript( 'head', TRUE, "ckeditor/ckeditor.js" );
+			$chapterData['editmode']	= "visual";
+		}
+
+		\Base::instance()->set('data', $chapterData);
+		\Base::instance()->set('chapterList', $chapterList);
+		
+		return \Template::instance()->render('usercp/author/storyEditChapter.html');
+	}
+
 	public static function authorCurator(array $data=[])
 	{
 		\Base::instance()->set('curator', $data);

@@ -22,6 +22,17 @@ return array(
 							'one	{There was an error while processing this form},'.
 							'other	{There were errors while processing this form} }',
 'UnknowError'	=> 'There was an unknown error',
+'MainAuthor'	=> 'Main author',
+'MainAuthors'	=> 'Main authors',
+'SupAuthor'		=> 'Supporting author',
+'SupAuthors'	=> 'Supporting authors',
+'TokenInputHint' => 'Enter search term',
+'StoryNotes'			=> 'Notes',
+'StoryNotesExplained'	=> 'Notes and dedications go here',
+'StorySummary'			=> 'Summary',
+'StorySummaryExplained'	=> 'Your story summary goes here',
+'ChapterText'			=> 'Chapter text',
+'ChapterTextExplained'	=> 'Your chapter\'s content goes here',
 
 // Login related
 'Login'			=> 'Login',
@@ -92,15 +103,6 @@ return array(
 'Month_Calendar' => '{0,date,custom,%B %Y}',
 'Weekday' => '{0,date,custom,%A}',
 
-/*
-'Menu_Profile' => 'Profile',
-'Menu_Messaging' => 'Messaging',
-'Menu_Authoring' => 'Authoring',
-'Menu_MyLibrary' => 'My Library',
-'Menu_Reviews' => 'Reviews',
-'Menu_Preferences' => 'Preferences',
-*/
-
 // User elements
 'UserField_Type1'	=> 'URL',			// _FIELDURL
 'UserField_Type2'	=> 'Select box',	// _FIELDSELECT
@@ -119,6 +121,7 @@ return array(
 'Stories'	=> 'Stories',
 
 // UserCP elements
+'ChangeTo'	=> 'Change to',
 'UserMenu_Profile' => 'Profile',
 'UserMenu_Message' => 'Messaging',
 'UserMenu_PMInbox' => 'Inbox',
@@ -159,7 +162,25 @@ return array(
 	'UserMenu_Preferences' => 'Preferences',
 
 'UserMenu_AddStory' => 'Add Story',
+'AddChapter'	=> 'Kapitel hinzufügen',
+'UCP_statusValidated' => 'Validation status',
+	'UCP_statusValidated_closed'	=> 'Closed',
+	'UCP_statusValidated_moderationStatic'	=> 'Pending, author working',
+	'UCP_statusValidated_moderationPending'	=> 'Pending, author done',
+	'UCP_statusValidated_validated'	=> 		   'Validated',
+'UCP_statusValidatedReason' => 'Validation details',
+	'UCP_statusValidated_none'	=> 'No reason provided',
+	'UCP_statusValidated_user'		=> 'Set by user',
+	'UCP_statusValidated_moderator'	=> 'Set by moderator',
+	'UCP_statusValidated_admin'		=> 'Set by admin',
+'UCP_statusCompleted'	=> 'Completion status',
+	'UCP_statusCompleted_deleted'	=> 'Deleted',
+	'UCP_statusCompleted_draft'		=> 'Draft',
+	'UCP_statusCompleted_wip'		=> 'W.i.P.',
+	'UCP_statusCompleted_completed'	=> 'Completed',
 'UserMenu_Curator' => 'Curator',
+'UCP_ExplainMainAuthor'	=> 'All main authors can edit the story, unlike supporting authors',
+'UCP_ExplainSupAuthor'	=> 'Supporting authors are mentioned along the other authors, but cannot edit the story',
 
 // AdminCP Home elements
 'AdminMenu_General' => 'General settings',

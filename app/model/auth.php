@@ -121,13 +121,23 @@ class Auth extends Base {
 															NOT (S.session = '{$session_id}' AND S.ip ='{$ip_db}')
 											);";
 		$sql[] = "UPDATE `tbl_sessions`S SET lastvisited = CURRENT_TIMESTAMP WHERE S.session = '{$session_id}' AND S.ip ='{$ip_db}';";
-		$sql[] = "SELECT S.session,UNIX_TIMESTAMP(lastvisited) as time, ip, IF(user,user,0) as userID, U.nickname, U.groups, IF(admin,IF(TIMESTAMPDIFF(MINUTE,`admin`,NOW())<15,1,0),0) as admin_active, COUNT(P1.mid) as mail, COUNT(P2.mid) as unread, @guests, @members
+
+		$sql[] = "SELECT S.session,UNIX_TIMESTAMP(lastvisited) as time, ip, IF(user,user,0) as userID, U.nickname, U.groups, GROUP_CONCAT(DISTINCT U2.uid) as allowed_authors, COUNT(P1.mid) as mail, COUNT(P2.mid) as unread, @guests, @members
+							FROM `tbl_sessions`S 
+							INNER JOIN `tbl_users` U ON ( IF(S.user,S.user = U.uid,U.uid=0) )
+								LEFT JOIN `tbl_users`U2 ON ( (U.uid = U2.uid OR U.uid = U2.curator) AND U.groups&5 )
+							LEFT JOIN `tbl_messaging` P1 ON ( U.uid = P1.recipient )
+							LEFT JOIN `tbl_messaging` P2 ON ( U.uid = P2.recipient AND P2.date_read IS NULL )
+						WHERE S.session = '{$session_id}' AND S.ip ='{$ip_db}';";
+// IF(admin,IF(TIMESTAMPDIFF(MINUTE,`admin`,NOW())<15,1,0),0) as admin_active, 
+/*
+		$sql[] = "SELECT S.session,UNIX_TIMESTAMP(lastvisited) as time, ip, IF(user,user,0) as userID, U.nickname, U.groups, COUNT(P1.mid) as mail, COUNT(P2.mid) as unread, @guests, @members
 							FROM `tbl_sessions`S 
 							INNER JOIN `tbl_users` U ON ( IF(S.user,S.user = U.uid,U.uid=0) )
 							LEFT JOIN `tbl_messaging` P1 ON ( U.uid = P1.recipient )
 							LEFT JOIN `tbl_messaging` P2 ON ( U.uid = P2.recipient AND P2.date_read IS NULL )
 						WHERE S.session = '{$session_id}' AND S.ip ='{$ip_db}';";
-
+*/
 		$user = $this->exec($sql)[0];
 
 		if ( $user['session'] > '' && $user['userID'] > 0 )

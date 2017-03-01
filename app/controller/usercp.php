@@ -56,7 +56,14 @@ class UserCP extends Base
 			case "curator":
 				$data = $this->model->ajax("messaging", $post);
 				break;
+			case "stories":
+				$data = $this->model->ajax("stories", $post);
+				break;
+			case "chaptersort":
+				$data = $this->model->ajax("chaptersort", $post);
+				break;
 		}
+		
 		/*
 		if ( $params['module']=="messaging" )
 		{
@@ -73,6 +80,11 @@ class UserCP extends Base
 	public function author(\Base $f3, $params)
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_MyLibrary') );
+		// Menu must be built at first because it also generates the list of allowed authors
+		// This way, we save one SQL query *thumbs up*
+		$this->showMenu("author", $params);
+
+		$allowed_authors = $f3->get('allowed_authors');
 
 		$buffer = NULL;
 		
@@ -81,7 +93,7 @@ class UserCP extends Base
 			if ( array_key_exists("curator", $params) )
 				$buffer = $this->authorCurator($f3, $params);
 			
-			elseif ( array_key_exists("uid", $params) AND isset ($params[1]) )
+			elseif ( array_key_exists("uid", $params) AND isset($allowed_authors[$params['uid']]) AND isset ($params[1]) )
 			{
 				switch ( $params[1] )
 				{
@@ -94,7 +106,7 @@ class UserCP extends Base
 						$buffer = $this->authorStorySelect($params);
 						break;
 					case "edit":
-						$buffer = $this->authorStoryEdit($params);
+						$buffer = $this->authorStoryEdit($f3, $params);
 						break;
 				}
 				//$buffer .= print_r($params,1);
@@ -103,7 +115,6 @@ class UserCP extends Base
 		
 		$this->buffer ( ($buffer) ?: $this->authorHome( $f3, $params) );
 
-		$this->showMenu("author", $params);
 	}
 	
 	protected function authorCurator(\Base $f3, $params)
@@ -181,20 +192,40 @@ class UserCP extends Base
 		return \View\UserCP::authorStoryList($data, $sort, $params);
 	}
 
-	protected function authorStoryEdit(array $params)
+	protected function authorStoryEdit(\Base $f3, array $params)
 	{
 		if(empty($params['sid'])) return "__Error";
-		$uid = isset($params['uid']) ? $params['uid'] : $_SESSION['userID'];
-		if ( $storyData = $this->model->authorStoryLoadInfo((int)$params['sid'], $uid) )
+		//$uid = isset($params['uid']) ? $params['uid'] : $_SESSION['userID'];
+		if ( FALSE !== $storyData = $this->model->authorStoryLoadInfo((int)$params['sid'], (int)$params['uid']) )
 		{
-			//$storyStatus = $this->model->authorStoryStatus($sid);
+			if (isset($_POST) )
+			{
+				//
+				
+			}
+
+			// Chapter list is always needed, load after POST to catch chapter name changes
+			$chapterList = $this->model->loadChapterList($storyData['sid']);
+
 			if ( isset($params['chapter']) )
 			{
-				return "working ...";
+				if ( $params['chapter']=="new" )
+				{
+					$newChapterID = $this->model->authorStoryChapterAdd($params['sid'], $params['uid'] );
+					$reroute = "/userCP/author/uid={$params['uid']}/edit/sid={$params['sid']}/chapter={$newChapterID};returnpath=".$params['returnpath'];
+					$f3->reroute($reroute, false);
+					exit;
+				}
+				$chapterData = $this->model->authorStoryChapterLoad($storyData['sid'],(int)$params['chapter']);
+				// abusing $chapterData to carry a few more details
+				$chapterData['form'] = [ "uid" => $params['uid'], "returnpath" => $params['returnpath'], "storytitle" => $storyData['title'] ];
+				$plain = isset($params['plain']);
+				return \View\UserCP::authorStoryChapterEdit($chapterData,$chapterList,$plain);
 			}
 			else
 			{
-				$chapterList = $this->model->loadChapterList($storyData['sid']);
+				// abusing $storyData to carry a few more details
+				$storyData['form'] = [ "uid" => $params['uid'], "returnpath" => $params['returnpath'] ];
 				$prePopulate = $this->model->storyEditPrePop($storyData);
 				return \View\UserCP::authorStoryMetaEdit($storyData,$chapterList,$prePopulate);
 			}
