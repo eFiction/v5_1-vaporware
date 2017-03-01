@@ -11,6 +11,7 @@ return array(
 'No'		=>	'Nein',
 'Cancel'	=>	'Abbrechen',
 'Submit'	=>	'Absenden',
+'Return'	=>	'Zurück',
 'CaptchaMismatch'	=>	'Captcha stimmt nicht überein',
 'GuestURL'		=>	'Gäste dürfen keine URLs posten',
 'GuestNameEmpty' => 'Gäste müssen einen Namen angeben',
@@ -31,6 +32,8 @@ return array(
 'StoryNotesExplained'	=>	'Platz für Widmungen und Anmerkungen',
 // 'StorySummary'			=>
 // 'StorySummaryExplained'	=>
+// 'ChapterText'			=>
+// 'ChapterTextExplained' =>
 
 // Login
 'Login'			=> 'Anmelden',
@@ -160,7 +163,13 @@ return array(
 //	'UserMenu_Preferences' => 
 
 'UserMenu_AddStory' => 'Hinzufügen',
+'StoryTitle'	=>	'Titel der Geschichte',
+'ChapterTitle'	=>	'Titel des Kapitels',
 'AddChapter'	=> 'Kapitel hinzufügen',
+'EditHeader'	=> 'Kopfdaten bearbeiten',
+'DragdropSort'	=> 'Ziehen um zu sortieren',
+'SwitchPlainHTML'	=> 'Zum einfachen Modus wechseln',
+'SwitchVisual'		=> 'Zum Editor wechseln',
 'UCP_statusValidated' => 'Freigabe',
 	'UCP_statusValidated_closed'	=> 'Geschlossen',
 	'UCP_statusValidated_moderationStatic'	=> 'Offen, Autor arbeitet',

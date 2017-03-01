@@ -1,5 +1,6 @@
 # Ignore everything in this directory
 *.php
+*.json
 # Except this file
 !.gitignore
 # Directory must exists

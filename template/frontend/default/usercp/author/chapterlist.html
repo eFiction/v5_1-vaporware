@@ -1,7 +1,7 @@
-		<check if="{{isset(@data.chapid)}}"><a class="button" href="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}};returnpath={{@data.form.returnpath}}">__editHeader</a> <br /><br /></check>
+		<check if="{{isset(@data.chapid)}}"><a class="button" href="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}};returnpath={{@data.form.returnpath}}">{{@LN__EditHeader}}</a> <br /><br /></check>
 		<h6>{{@LN__Chapters}}</h6>
 		<check if="{{ sizeof(@chapterList) }}">
-		<small>__Dragdropsort</small>
+		<small>{{@LN__DragdropSort}}</small>
 		<br /><br />
 		<ul id="chapter-sort">
 		<repeat group="{{ @chapterList }}" value="{{ @row }}" counter="{{ @ctr }}">

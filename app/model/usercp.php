@@ -271,6 +271,184 @@ class UserCP extends Base
 		return $data;
 	}
 	
+	public function authorStoryHeaderSave( $storyID, array $post )
+	{
+		$story=new \DB\SQL\Mapper($this->db, $this->prefix.'stories');
+		$story->load(array('sid=?',$storyID));
+		
+		// Step one: save the plain data
+		$story->title		= $post['story_title'];
+		$story->summary		= str_replace("\n","<br />",$post['story_summary']);
+		$story->storynotes	= str_replace("\n","<br />",$post['story_notes']);
+		$story->ratingid	= $post['ratingid'];
+		$story->completed	= $post['completed'];
+		/*
+		$story->validated 	= $post['validated'];
+		*/
+		$story->save();
+		
+		// Step two: check for changes in relation tables
+
+		// Check tags:
+		$post['tags'] = explode(",",$post['tags']);
+		$tags = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_tags');
+
+		foreach ( $tags->find(array('`sid` = ? AND `character` = ?',$story->sid,0)) as $X )
+		{
+			$temp=array_search($X['tid'], $post['tags']);
+			if ( $temp===FALSE )
+			{
+				// Excess relation, drop from table
+				$tags->erase(['lid=?',$X['lid']]);
+			}
+			else unset($post['tags'][$temp]);
+		}
+		
+		// Insert any tag IDs not already present
+		if ( sizeof($post['tags'])>0 )
+		{
+			foreach ( $post['tags'] as $temp)
+			{
+				// Add relation to table
+				$tags->reset();
+				$tags->sid = $story->sid;
+				$tags->tid = $temp;
+				$tags->character = 0;
+				$tags->save();
+			}
+		}
+		unset($tags);
+		
+		// Check Characters:
+		$post['characters'] = explode(",",$post['characters']);
+		$characters = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_tags');
+
+		foreach ( $characters->find(array('`sid` = ? AND `character` = ?',$story->sid,1)) as $X )
+		{
+			$temp=array_search($X['tid'], $post['characters']);
+			if ( $temp===FALSE )
+			{
+				// Excess relation, drop from table
+				$characters->erase(['lid=?',$X['lid']]);
+			}
+			else unset($post['characters'][$temp]);
+		}
+		
+		// Insert any character IDs not already present
+		if ( sizeof($post['characters'])>0 )
+		{
+			foreach ( $post['characters'] as $temp)
+			{
+				// Add relation to table
+				$characters->reset();
+				$characters->sid = $story->sid;
+				$characters->tid = $temp;
+				$characters->character = 1;
+				$characters->save();
+			}
+		}
+		unset($characters);
+		
+		// Check Categories:
+		$post['category'] = explode(",",$post['category']);
+		$categories = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_categories');
+
+		foreach ( $categories->find(array('`sid` = ?',$story->sid)) as $X )
+		{
+			$temp=array_search($X['cid'], $post['category']);
+			if ( $temp===FALSE )
+			{
+				// Excess relation, drop from table
+				$categories->erase(['lid=?',$X['lid']]);
+			}
+			else unset($post['category'][$temp]);
+		}
+		
+		// Insert any character IDs not already present
+		if ( sizeof($post['category'])>0 )
+		{
+			foreach ( $post['category'] as $temp)
+			{
+				// Add relation to table
+				$categories->reset();
+				$categories->sid = $story->sid;
+				$categories->cid = $temp;
+				$categories->save();
+			}
+		}
+		unset($categories);
+
+		// Author and co-Author preparation:
+		$post['mainauthor'] = array_filter(explode(",",$post['mainauthor']));
+		$post['supauthor'] = array_filter(explode(",",$post['supauthor']));
+		// remove co-authors, that are already in the author field
+		$post['supauthor'] = array_diff($post['supauthor'], $post['mainauthor']);
+
+		// Check Authors:
+		$mainauthor = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors');
+
+		// refuse to leave an empty author list behind
+		if(sizeof($post['mainauthor']))
+		{
+			foreach ( $mainauthor->find(array('`sid` = ? AND `type` = ?',$story->sid,'M')) as $X )
+			{
+				$temp=array_search($X['aid'], $post['mainauthor']);
+				if ( $temp===FALSE )
+				{
+					// Excess relation, drop from table
+					$mainauthor->erase(['lid=?',$X['lid']]);
+				}
+				else unset($post['mainauthor'][$temp]);
+			}
+		}
+
+		// Insert any character IDs not already present
+		if ( sizeof($post['mainauthor'])>0 )
+		{
+			foreach ( $post['mainauthor'] as $temp)
+			{
+				// Add relation to table
+				$mainauthor->reset();
+				$mainauthor->sid = $story->sid;
+				$mainauthor->aid = $temp;
+				$mainauthor->type = 'M';
+				$mainauthor->save();
+			}
+		}
+		unset($mainauthor);
+		
+		// Check co-Authors:
+		$supauthor = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors');
+
+		foreach ( $supauthor->find(array('`sid` = ? AND `type` = ?',$story->sid,'S')) as $X )
+		{
+			$temp=array_search($X['aid'], $post['supauthor']);
+			if ( $temp===FALSE )
+			{
+				// Excess relation, drop from table
+				$supauthor->erase(['lid=?',$X['lid']]);
+			}
+			else unset($post['supauthor'][$temp]);
+		}
+
+		// Insert any character IDs not already present
+		if ( sizeof($post['supauthor'])>0 )
+		{
+			foreach ( $post['supauthor'] as $temp)
+			{
+				// Add relation to table
+				$supauthor->reset();
+				$supauthor->sid = $story->sid;
+				$supauthor->aid = $temp;
+				$supauthor->type = 'S';
+				$supauthor->save();
+			}
+		}
+		unset($supauthor);
+
+		$this->rebuildStoryCache($story->sid);
+	}
+
 	public function authorStoryChapterAdd($sid, $uid)
 	{
 		return parent::storyChapterAdd($sid, $uid);
@@ -292,6 +470,26 @@ class UserCP extends Base
 		return $data;
 	}
 
+	public function authorStoryChapterSave( $chapterID, array $post )
+	{
+		$chapter=new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
+		$chapter->load(array('chapid=?',$chapterID));
+		
+		$chapter->title = $post['chapter_title'];
+		$chapter->notes = $post['chapter_notes'];
+		$chapter->save();
+		
+		// plain and visual return different newline representations, this will bring things to standard.
+		$post['chapter_text'] = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $post['chapter_text']);
+		
+		parent::saveChapter($chapterID, $post['chapter_text']);
+	}
+/*	
+	public function saveChapter( $chapterID, $chapterText )
+	{
+		return parent::saveChapter( $chapterID, $chapterText );
+	}
+*/
 	public function authorCuratorRemove($uid=NULL)
 	{
 		$this->exec("UPDATE `tbl_users`U set U.curator = NULL WHERE U.uid = :uid;", [ ":uid" => ($uid ?: $_SESSION['userID']) ]);

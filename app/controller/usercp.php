@@ -198,8 +198,22 @@ class UserCP extends Base
 		//$uid = isset($params['uid']) ? $params['uid'] : $_SESSION['userID'];
 		if ( FALSE !== $storyData = $this->model->authorStoryLoadInfo((int)$params['sid'], (int)$params['uid']) )
 		{
-			if (isset($_POST) )
+			if (isset($_POST) and sizeof($_POST) )
 			{
+				if ( isset($params['chapter']) )
+				{
+					$this->model->authorStoryChapterSave($params['chapter'], $f3->get('POST.form'));
+					$reroute = "/userCP/author/uid={$params['uid']}/edit/sid={$params['sid']}/chapter={$params['chapter']};returnpath=".$params['returnpath'];
+					$f3->reroute($reroute, false);
+					exit;
+				}
+				else
+				{
+					$this->model->authorStoryHeaderSave($params['sid'], $f3->get('POST.form'));
+					$reroute = "/userCP/author/uid={$params['uid']}/edit/sid={$params['sid']};returnpath=".$params['returnpath'];
+					$f3->reroute($reroute, false);
+					exit;
+				}
 				//
 				
 			}

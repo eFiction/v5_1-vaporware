@@ -943,13 +943,16 @@ class AdminCP extends Base {
 		// plain and visual return different newline representations, this will bring things to standard.
 		$post['chapter_text'] = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $post['chapter_text']);
 		
-		$this->saveChapter($chapterID, $post['chapter_text']);
+		//$this->saveChapter($chapterID, $post['chapter_text']);
+		parent::saveChapter($chapterID, $post['chapter_text']);
 	}
 	
+/*
 	public function saveChapter( $chapterID, $chapterText )
 	{
 		return parent::saveChapter( $chapterID, $chapterText );
 	}
+*/
 	
 	public function addChapter ( $storyID, $post )
 	{
@@ -1111,7 +1114,7 @@ class AdminCP extends Base {
 		// Check Authors:
 		$author = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors');
 
-		foreach ( $author->find(array('`sid` = ? AND `ca` = ?',$current->sid,0)) as $X )
+		foreach ( $author->find(array('`sid` = ? AND `ca` = ?',$current->sid,'M')) as $X )
 		{
 			$temp=array_search($X['aid'], $post['author']);
 			if ( $temp===FALSE )
@@ -1140,7 +1143,7 @@ class AdminCP extends Base {
 		// Check co-Authors:
 		$coauthor = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors');
 
-		foreach ( $coauthor->find(array('`sid` = ? AND `ca` = ?',$current->sid,1)) as $X )
+		foreach ( $coauthor->find(array('`sid` = ? AND `ca` = ?',$current->sid,'S')) as $X )
 		{
 			$temp=array_search($X['aid'], $post['coauthor']);
 			if ( $temp===FALSE )

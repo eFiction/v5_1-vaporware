@@ -408,7 +408,7 @@ class Base extends \Prefab {
 	public function rebuildStoryCache($sid)
 	{
 		$sql = "SELECT SELECT_OUTER.sid,
-					GROUP_CONCAT(DISTINCT tid,',',tag,',',description ORDER BY `order`,tgid,tag ASC SEPARATOR '||') AS tagblock,
+					GROUP_CONCAT(DISTINCT tid,',',tag,',',description,',',tgid ORDER BY `order`,tgid,tag ASC SEPARATOR '||') AS tagblock,
 					GROUP_CONCAT(DISTINCT charid,',',charname ORDER BY charname ASC SEPARATOR '||') AS characterblock,
 					GROUP_CONCAT(DISTINCT uid,',',nickname ORDER BY nickname ASC SEPARATOR '||' ) as authorblock,
 					GROUP_CONCAT(DISTINCT cid,',',category ORDER BY category ASC SEPARATOR '||' ) as categoryblock,
@@ -446,11 +446,15 @@ class Base extends \Prefab {
 		
 		$item = $item[0];
 
+		$tagblock['simple'] = $this->cleanResult($item['tagblock']);
+		if($tagblock['simple']!==NULL) foreach($tagblock['simple'] as $t)
+			$tagblock['structured'][$t[2]][] = [ $t[0], $t[1], $t[2], $t[3] ];
+
 		$this->update
 		(
 			'tbl_stories',
 			[
-				'cache_tags'		=> json_encode($this->cleanResult($item['tagblock'])),
+				'cache_tags'		=> json_encode($tagblock),
 				'cache_characters'	=> json_encode($this->cleanResult($item['characterblock'])),
 				'cache_authors'		=> json_encode($this->cleanResult($item['authorblock'])),
 				'cache_categories'	=> json_encode($this->cleanResult($item['categoryblock'])),
