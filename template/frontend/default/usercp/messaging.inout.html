@@ -29,9 +29,9 @@
 		</colgroup>
 		<tr>
 			<td>&nbsp;</td>
-			<td><span class="fa fa-calendar"></span> {{ ${"LN__PM_".@DATE_MEANS} }}</td>
-			<td><span class="fa fa-file-text-o"></span> {{@LN__PM_Subject}}</td>
-			<td><span class="fa fa-user"></span> {{ ${"LN__PM_".@PERSON_IS} }}</td>
+			<td>{ICON:calendar} {{ ${"LN__PM_".@DATE_MEANS} }}</td>
+			<td>{ICON:text} {{@LN__PM_Subject}}</td>
+			<td>{ICON:member} {{ ${"LN__PM_".@PERSON_IS} }}</td>
 			<td>&nbsp;</td>
 		</tr>
 
@@ -42,8 +42,8 @@
 		<tr>
 			{* check if mail has been read *}
 			<td><check if="{{ @pm_line['date_read']!==NULL }}">
-					<true><span class="fa fa-envelope-o" title="{{ date(@CONFIG.date_format_short,@pm_line['date_read']) }}"></span></true>
-					<false><span class="fa fa-envelope" title="{{@LN__PM_unread}}"></span></false>
+					<true>{ICON:mail-read:{{ date(@CONFIG.date_format_short,@pm_line['date_read']) }}}</true>
+					<false>{ICON:mail:{{@LN__PM_unread}}}</false>
 			</check></td>
 			<td>{{ date(@CONFIG.date_format_short,@pm_line['date_sent']) }}</td>
 			<td><a href="{{@BASE}}/userCP/messaging/read/id={{ @pm_line['mid'] }}">{{ @pm_line['subject'] }}</a></td>

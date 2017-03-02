@@ -1,0 +1,45 @@
+<form>
+	<table>
+		<repeat group="{{ @fields }}" value="{{ @field }}">
+		<tr>
+			<td>{{@field.title}}</td>
+			<switch expr="{{ @field.type }}">
+				<case value="1" break="TRUE">
+					<td><input type="text" name="form[{{ @field.name }}]" value="{{htmlspecialchars(@field.info)}}" /></td>
+					<td><check if="{{@field.info>NULL}}"><a href="{{@field.info}}" target="_blank">{{@field.info}}</a> {ICON:external-link}</check>&nbsp;</td>
+				</case>
+				<case value="2" break="TRUE">
+					<td>
+						<select name="form[{{ @field.name }}]">
+						<repeat group="{{ @field.options }}" value="{{@value}}"><option value="{{ @value }}"<check if="{{@field.info==@value}}"> selected="selected"</check>>{{@value}}</option></repeat>
+						</select>
+					</td>
+					<td><check if="{{@field.info>NULL}}">{{@field.info}}</check>&nbsp;</td>
+				</case>
+				<case value="3" break="TRUE">
+					<td>
+						<input type="radio" id="{{ @field.name }}yes" name="form[{{ @field.name }}]" value="1" <check if="{{ @field.info==1 }}">checked="checked"</check>><label for="{{ @field.name }}yes"> {{@LN__yes}}</label>
+						<input type="radio" id="{{ @field.name }}no" name="form[{{ @field.name }}]" value="0" <check if="{{ @field.info==0 }}">checked="checked"</check>><label for="{{ @field.name }}no"> {{@LN__no}}</label>
+					</td>
+					<td>
+						<check if="{{@field.info==1}}">{{@LN__Yes}}</check>&nbsp;
+						<check if="{{@field.info==0}}">{{@LN__No}}</check>&nbsp;
+					</td>
+				</case>
+				<case value="4" break="TRUE">
+					<td><input type="text" name="form[{{ @field.name }}]" value="{{htmlspecialchars(@field.info)}}" /></td>
+					<td><check if="{{@field.info>NULL}}">{{str_replace('{info}', @field.info, @field.options) | raw}} {ICON:external-link}</check>&nbsp;</td>
+				</case>
+				<case value="4" break="TRUE">
+					<td>*** working ***&nbsp;</td>
+					<td><check if="{{@field.info>NULL}}">{{@field.info}}</check>&nbsp;</td>
+				</case>
+				<case value="6" break="TRUE">
+					<td><input type="text" name="form[{{ @field.name }}]" value="{{htmlspecialchars(@field.info)}}" /></td>
+					<td><check if="{{@field.info>NULL}}">{{@field.info}}</check>&nbsp;</td>
+				</case>
+			</switch>
+		</tr>
+		</repeat>
+	</table>
+</form>

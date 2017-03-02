@@ -966,4 +966,23 @@ class UserCP extends Base
 		
 		return FALSE;
 	}
+	
+	public function settingsLoadProfile()
+	{
+/* 		$sql = "SELECT F.field_type as type, F.field_name as name, F.field_title as title, F.field_options as options, I.info 
+					FROM `tbl_user_fields`F 
+						LEFT OUTER JOIN `tbl_user_info`I ON ( F.field_id = I.field AND I.uid={$_SESSION['userID']} )
+				WHERE F.enabled=1";
+ */		$sql = "SELECT F.field_type as type, F.field_name as name, F.field_title as title, F.field_options as options, I.info 
+					FROM `tbl_user_fields`F 
+						LEFT OUTER JOIN `tbl_user_info`I ON ( F.field_id = I.field AND I.uid=1 )
+				WHERE F.enabled=1";
+		if([]==$data=$this->exec($sql)) return NULL;
+		foreach($data as &$dat)
+		{
+			if ($dat['type']==2) $dat['options'] = json_decode($dat['options'],TRUE);
+		}
+		return $data;
+	}
+
 }

@@ -20,11 +20,6 @@ class storage extends Prefab {
 		//$cfg = Config::instance();
 		$type = strtoupper(Config::getProtected('ACTIVE_DB'));
 		switch ($type) {
-/*
-			case 'JIG':
-				$db = new \DB\Jig($cfg->DB_JIG['dir'],$cfg->DB_JIG['format']);
-				break;
-*/
 				case 'MYSQL':
 				\Base::instance()->set('DBType', 'MySQL');
 				$db = new \DB\SQL(Config::getProtected('DB_MYSQL')['dsn'], Config::getProtected('DB_MYSQL')['user'], Config::getProtected('DB_MYSQL')['password']);

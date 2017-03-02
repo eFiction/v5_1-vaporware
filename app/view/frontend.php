@@ -43,10 +43,11 @@ class Frontend extends Base
 								);
 
 		$body = preg_replace_callback(
-								'/\{ICON:([\w-]+)\}/s',
+//								'/\{ICON:([\w-]+)\}/s',
+								'/\{ICON:([\w-]+):?(.*?)\}/s',
 								function ($icon)
 								{
-									return Iconset::instance()->{$icon[1]};
+									return Iconset::parse($icon);
 								}
 								, $body
 							);

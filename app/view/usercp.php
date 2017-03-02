@@ -184,4 +184,11 @@ class UserCP extends Base
 		return \Template::instance()->render('usercp/changepw.html');
 	}
 	
+	public static function settingsProfile($fields)
+	{
+		\Base::instance()->set('fields', $fields);
+		
+		return \Template::instance()->render('usercp/settings.profile.html');
+	}
+	
 }

@@ -403,7 +403,17 @@ class UserCP extends Base
 	
 	protected function settingsProfile(\Base $f3, $params)
 	{
-		$this->buffer ( \View\Base::stub("profile") );
+		/*
+			1 = URL
+			2 = Options
+			3 = yes/no
+			4 = URL with ID
+			5 = code -> now tpl field
+			6 = text
+		*/
+		$profile = $this->model->settingsLoadProfile();
+		
+		$this->buffer ( \View\UserCP::settingsProfile($profile) );
 	}
 
 	protected function settingsArchive(\Base $f3, $params)

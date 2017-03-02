@@ -93,6 +93,11 @@ class Iconset extends \DB\Jig\Mapper {
 		}
 	}
 	
+	static public function parse($key)
+	{
+		return str_replace("@T@", $key[2], self::instance()->{$key[1]});
+	}
+	
 	static protected function rebuild($icon)
 	{
 		$set = $_SESSION['tpl'][1];

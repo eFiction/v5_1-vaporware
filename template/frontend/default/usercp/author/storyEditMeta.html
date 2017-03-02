@@ -21,7 +21,7 @@
 				<div class="gb-full"><h6>{{@LN__StoryNotes}}</h6><textarea placeholder="{{@LN__StoryNotesExplained}}" name="form[story_notes]">{{@data.storynotes}}</textarea></div>
 				<div class="gb-full"><h6>{{@LN__StorySummary}}</h6><textarea placeholder="{{@LN__StorySummaryExplained}}" name="form[story_summary]">{{@data.summary}}</textarea></div>
 
-				<div class="gb-1thrd">
+				<div class="gb-1thrd">** this is not active yet **
 					<h6>{{@LN__UCP_statusValidated}}:<br />{{ ${"LN__UCP_statusValidated_".@data.states.validated[@data.validated.0]} }}</h6>
 					{{@LN__ChangeTo}}:<select id="validated" name="form[validated]">
 						<repeat group="{{ @data.states.validated }}" key="{{ @validated.key }}" value="{{ @validated.label }}">
@@ -42,8 +42,10 @@
 					</select>
 				</div>
 
-				<div class="gb-full" align="right"><a class="delete" href="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}};returnpath={{@data.form.returnpath}}"><span class="fa fa-times"></span> __Delete</a>
-				<input class="button" type="reset"> <input class="button" type="submit"></div>
+				<div class="gb-full" align="right">
+					{* <a class="delete" href="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}};returnpath={{@data.form.returnpath}}"><span class="fa fa-times"></span> __Delete</a> *}
+					<input class="button" type="reset"> <input class="button" type="submit">
+				</div>
 			</div>
 		</form>
 	</div>
