@@ -10,7 +10,7 @@
 			<div class="gb-full"><h6>{{@LN__ChapterText}}</h6>
 			<check if="{{@data.editmode=='visual'}}">
 				<true><a href="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}}/chapter={{@data.chapid}}/plain;returnpath={{@data.form.returnpath}}">{{@LN__SwitchPlainHTML}}</a></true>
-				<false><a href="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}}/chapter={{@data.chapid}};returnpath={{@data.form.returnpath}}">{{@LN__SwitchVisual}}</a></false>
+				<false><a href="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}}/chapter={{@data.chapid}}/visual;returnpath={{@data.form.returnpath}}">{{@LN__SwitchVisual}}</a></false>
 			</check>
 			<textarea placeholder="{{@LN__ChapterTextExplained}}" name="form[chapter_text]" id="editor1">{{@data.chaptertext}}</textarea></div>
 			<check if="{{@data.editmode=='visual'}}"><script>

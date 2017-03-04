@@ -53,6 +53,7 @@ class Auth extends Base {
 			$_SESSION['username']		= $user['nickname'];
 			$_SESSION['mail']			= array($user['mail'],$user['unread']);
 			$_SESSION['allowed_authors']= explode(",",$user['allowed_authors']);
+			$_SESSION['preferences']	= $user['preferences'];
 			$_SESSION['tpl']			= [ "default", 1];
 			
 			return TRUE;
@@ -67,6 +68,7 @@ class Auth extends Base {
 			$_SESSION['username']		= "__Guest";
 			$_SESSION['mail']			= FALSE;
 			$_SESSION['allowed_authors']= [];
+			$_SESSION['preferences']	= ["language" => $f3->get('CONFIG.language_default')];
 			$_SESSION['tpl']			= [ "default", 1];
 			
 			return FALSE;

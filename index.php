@@ -108,9 +108,10 @@ if ( TRUE == $cfg->bb2_enabled )
 require('app/routes.php');
 
 /** Define the basic language **/
-$f3->set('LANGUAGE','de.UTF-8');
+$f3->set('ENCODING','UTF-8');
+$f3->set('LANGUAGE',$_SESSION['preferences']['language']);
+setlocale(LC_ALL, __transLocale);		// http://www.php.net/setlocale
 //$f3->set('DEBUG', 1);
-setlocale(LC_ALL, __transLocale);
 /** Knock on wood and set sails **/
 $f3->run();
 /** S.D.G. **/

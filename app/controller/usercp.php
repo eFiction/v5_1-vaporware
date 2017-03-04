@@ -233,8 +233,12 @@ class UserCP extends Base
 				$chapterData = $this->model->authorStoryChapterLoad($storyData['sid'],(int)$params['chapter']);
 				// abusing $chapterData to carry a few more details
 				$chapterData['form'] = [ "uid" => $params['uid'], "returnpath" => $params['returnpath'], "storytitle" => $storyData['title'] ];
-				$plain = isset($params['plain']);
-				return \View\UserCP::authorStoryChapterEdit($chapterData,$chapterList,$plain);
+
+				if ( isset($params['plain']) ) $editor = "plain";
+				elseif ( isset($params['visual']) ) $editor = "visual";
+				else $editor = ($_SESSION['preferences']['useEditor']==0) ? "plain" : "visual";
+
+				return \View\UserCP::authorStoryChapterEdit($chapterData,$chapterList,$editor);
 			}
 			else
 			{
@@ -389,7 +393,7 @@ class UserCP extends Base
 				$this->settingsProfile($f3, $params);
 				break;
 			case "preferences":
-				$this->settingsArchive($f3, $params);
+				$this->settingsPreferences($f3, $params);
 				break;
 			case "changepw":
 				$this->settingsChangePW($f3, $params);
@@ -420,9 +424,15 @@ class UserCP extends Base
 		$this->buffer ( \View\UserCP::settingsProfile($profile) );
 	}
 
-	protected function settingsArchive(\Base $f3, $params)
+	protected function settingsPreferences(\Base $f3, $params)
 	{
-		$this->buffer ( \View\Base::stub("archive") );
+		if( NULL != $post = $f3->get('POST') )
+		{
+			// $this->model->settingsSavePreferences($post['form']);
+		}
+		//$preferences = $this->model->settingsLoadPreferences();
+		
+		$this->buffer ( print_r($_SESSION,TRUE) );
 	}
 
 	protected function settingsChangePW(\Base $f3, $params)

@@ -5,10 +5,10 @@ $this->modules =
 					/*
 						Namespace
 						function
-						(bool) static
+						[(bool) static = FALSE]
 					*/
 						"calendar"		=> [ "\\View\Blocks", "calendarInit", TRUE ],
-						"shoutbox"	=> [ "\\View\Blocks", "shoutboxInit", TRUE ],
+						"shoutbox"		=> [ "\\View\Blocks", "shoutboxInit", TRUE ],
 						"menu"			=> [ "\\Controller\Blocks", "buildMenu" ],
 						"tagcloud"		=> [ "\\Controller\Blocks", "tagcloud" ],
 						"story"			=> [ "\\Controller\Story", "storyBlocks" ],
