@@ -1,5 +1,5 @@
 {
-    "58b8acfbb30586.24504763": {
+    "58bb2658efcdd8.40486596": {
         "_name": "Font Awesome CSS Icons",
         "archive": "<span class=\"fa fa-university\" title=\"@T@\"><\/span>",
         "arrow-down": "<span class=\"fa fa-arrow-down\" title=\"@T@\"><\/span>",
@@ -24,6 +24,8 @@
         "favourite": "<span class=\"fa fa-heart\" title=\"@T@\"><\/span>",
         "heart": "<span class=\"fa fa-heart\" title=\"@T@\"><\/span>",
         "favourite-off": "<span class=\"fa fa-heart-o\" title=\"@T@\"><\/span>",
+        "flag": "<span class=\"fa fa-flag\" title=\"@T@\"><\/span>",
+        "report": "<span class=\"fa fa-flag\" title=\"@T@\"><\/span>",
         "folder": "<span class=\"fa fa-folder-open\" title=\"@T@\"><\/span>",
         "following": "<span class=\"fa fa-reply fa-rotate-180\" title=\"@T@\"><\/span>",
         "home": "<span class=\"fa fa-home\" title=\"@T@\"><\/span>",
@@ -64,6 +66,7 @@
         "text": "<span class=\"fa fa-file-text-o\" title=\"@T@\"><\/span>",
         "time": "<span class=\"fa fa-clock-o\" title=\"@T@\"><\/span>",
         "trash": "<span class=\"fa fa-trash-o\" title=\"@T@\"><\/span>",
+        "twitter": "<span class=\"fa fa-twitter\" title=\"@T@\"><\/span>",
         "unlock": "<span class=\"fa fa-unlock\" title=\"@T@\"><\/span>",
         "waiting": "<span class=\"fa fa-spin fa-spinner\" title=\"@T@\"><\/span>",
         "wrench": "<span class=\"fa fa-wrench\" title=\"@T@\"><\/span>"
