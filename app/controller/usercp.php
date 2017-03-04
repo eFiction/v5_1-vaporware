@@ -411,6 +411,10 @@ class UserCP extends Base
 			5 = code -> now tpl field
 			6 = text
 		*/
+		if( NULL != $post = $f3->get('POST') )
+		{
+			$this->model->settingsSaveProfile($post['form']);
+		}
 		$profile = $this->model->settingsLoadProfile();
 		
 		$this->buffer ( \View\UserCP::settingsProfile($profile) );

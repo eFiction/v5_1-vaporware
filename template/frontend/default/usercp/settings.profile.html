@@ -1,4 +1,6 @@
-<form>
+<fieldset>
+<legend>LEGEND</legend>
+<form method="post" action="{{@BASE}}/userCP/settings/profile">
 	<table>
 		<repeat group="{{ @fields }}" value="{{ @field }}">
 		<tr>
@@ -20,18 +22,19 @@
 					<td>
 						<input type="radio" id="{{ @field.name }}yes" name="form[{{ @field.name }}]" value="1" <check if="{{ @field.info==1 }}">checked="checked"</check>><label for="{{ @field.name }}yes"> {{@LN__yes}}</label>
 						<input type="radio" id="{{ @field.name }}no" name="form[{{ @field.name }}]" value="0" <check if="{{ @field.info==0 }}">checked="checked"</check>><label for="{{ @field.name }}no"> {{@LN__no}}</label>
+						<input type="radio" id="{{ @field.name }}empty" name="form[{{ @field.name }}]" value="" <check if="{{ @field.info=='' }}">checked="checked"</check>><label for="{{ @field.name }}empty"> leer</label>
 					</td>
-					<td>
-						<check if="{{@field.info==1}}">{{@LN__Yes}}</check>&nbsp;
-						<check if="{{@field.info==0}}">{{@LN__No}}</check>&nbsp;
+					<td>{{@field.info}}
+						<check if="{{@field.info===1}}">{{@LN__Yes}}</check>&nbsp;
+						<check if="{{@field.info===0}}">{{@LN__No}}</check>&nbsp;
 					</td>
 				</case>
 				<case value="4" break="TRUE">
 					<td><input type="text" name="form[{{ @field.name }}]" value="{{htmlspecialchars(@field.info)}}" /></td>
 					<td><check if="{{@field.info>NULL}}">{{str_replace('{info}', @field.info, @field.options) | raw}} {ICON:external-link}</check>&nbsp;</td>
 				</case>
-				<case value="4" break="TRUE">
-					<td>*** working ***&nbsp;</td>
+				<case value="5" break="TRUE">
+					<td>*** working on it ***&nbsp;</td>
 					<td><check if="{{@field.info>NULL}}">{{@field.info}}</check>&nbsp;</td>
 				</case>
 				<case value="6" break="TRUE">
@@ -42,4 +45,6 @@
 		</tr>
 		</repeat>
 	</table>
+	<input class="button" type="submit"><input class="button" type="reset">
 </form>
+</fieldset>

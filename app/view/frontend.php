@@ -43,8 +43,8 @@ class Frontend extends Base
 								);
 
 		$body = preg_replace_callback(
-//								'/\{ICON:([\w-]+)\}/s',
-								'/\{ICON:([\w-]+):?(.*?)\}/s',
+							//	'/\{ICON:([\w]+):?(.*?)\}/s',
+								'/\{ICON:([\w-]+)(:|\!)?(.*?)\}/s',	// for use with forced visibility
 								function ($icon)
 								{
 									return Iconset::parse($icon);

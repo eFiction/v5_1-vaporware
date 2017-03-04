@@ -969,13 +969,9 @@ class UserCP extends Base
 	
 	public function settingsLoadProfile()
 	{
-/* 		$sql = "SELECT F.field_type as type, F.field_name as name, F.field_title as title, F.field_options as options, I.info 
+		$sql = "SELECT F.field_type as type, F.field_name as name, F.field_title as title, F.field_options as options, I.info 
 					FROM `tbl_user_fields`F 
 						LEFT OUTER JOIN `tbl_user_info`I ON ( F.field_id = I.field AND I.uid={$_SESSION['userID']} )
-				WHERE F.enabled=1";
- */		$sql = "SELECT F.field_type as type, F.field_name as name, F.field_title as title, F.field_options as options, I.info 
-					FROM `tbl_user_fields`F 
-						LEFT OUTER JOIN `tbl_user_info`I ON ( F.field_id = I.field AND I.uid=1 )
 				WHERE F.enabled=1";
 		if([]==$data=$this->exec($sql)) return NULL;
 		foreach($data as &$dat)
@@ -983,6 +979,39 @@ class UserCP extends Base
 			if ($dat['type']==2) $dat['options'] = json_decode($dat['options'],TRUE);
 		}
 		return $data;
+	}
+	
+	public function settingsSaveProfile($data)
+	{
+		$fields = $this->exec("SELECT F.field_id as id, F.field_type as type, F.field_name as label
+								FROM `tbl_user_fields`F
+								WHERE F.enabled=1;");
+		
+		$mapper = new \DB\SQL\Mapper( $this->db, $this->prefix."user_info" );
+		foreach($fields as $field)
+		{
+			$mapper->load(['uid = ? AND field = ?', $_SESSION['userID'], $field['id'] ]);
+			
+			// Delete empty field
+			if ( $data[$field['label']]==="" )
+			{
+				// ... but only if it already exists
+				if($mapper->uid>0)$mapper->erase();
+			}
+			else
+			{
+				// New or newly populated field
+				if ( NULL == $mapper->uid )
+				{
+					$mapper->uid = $_SESSION['userID'];
+					$mapper->field = $field['id'];
+				}
+				$mapper->info = $data[$field['label']];
+				$mapper->save();
+			}
+			$mapper->reset();
+		}
+		
 	}
 
 }

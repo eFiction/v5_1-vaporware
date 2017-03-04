@@ -95,7 +95,9 @@ class Iconset extends \DB\Jig\Mapper {
 	
 	static public function parse($key)
 	{
-		return str_replace("@T@", $key[2], self::instance()->{$key[1]});
+		list(, $label, $visibility, $text) = $key;
+		if (empty($label)) return NULL;
+		return str_replace("@T@", $text, self::instance()->{$label});
 	}
 	
 	static protected function rebuild($icon)
