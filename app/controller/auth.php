@@ -43,7 +43,6 @@ class Auth extends Base {
 				$f3->set('SESSION.session_id', $session_id);
 		}
 		else $session_id = \Model\Auth::instance()->createSession($ip_db);
-//		echo "<br>old: ".$_SESSION['session_id'];
 
 		if ( isset($session_id) && $user = \Model\Auth::instance()->validateSession($session_id,$ip_db) AND $user['userID']>0 )
 		{

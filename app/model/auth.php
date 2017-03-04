@@ -152,8 +152,10 @@ class Auth extends Base {
 					]
 			);
 			$user['preferences'] = json_decode($user['preferences'],TRUE);
+			// Check if language is available
 			$user['preferences']['language'] = ( FALSE===$f3->get('CONFIG.language_forced') AND array_key_exists($user['preferences']['language'], $f3->get('CONFIG.language_available' )) )
 									? $user['preferences']['language']
+									// Fallback to page default
 									: $f3->get('CONFIG. language_default');
 			return $user;
 		}

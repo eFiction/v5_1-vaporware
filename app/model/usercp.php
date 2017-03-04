@@ -1011,7 +1011,16 @@ class UserCP extends Base
 			}
 			$mapper->reset();
 		}
+	}
+	
+	public function settingsLoadPreferences()
+	{
+		$data = $this->exec("SELECT `alert_feedback`, `alert_comment`, `alert_favourite`, `preferences` FROM `new5_users`U WHERE U.uid = ".$_SESSION['userID']);
+		if(empty($data)) return FALSE;
 		
+		$data = $data[0];
+		$data['p'] = json_decode($data['preferences'],TRUE);
+		return $data;
 	}
 
 }

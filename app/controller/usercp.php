@@ -430,9 +430,9 @@ class UserCP extends Base
 		{
 			// $this->model->settingsSavePreferences($post['form']);
 		}
-		//$preferences = $this->model->settingsLoadPreferences();
+		$preferences = $this->model->settingsLoadPreferences();
 		
-		$this->buffer ( print_r($_SESSION,TRUE) );
+		$this->buffer ( \View\UserCP::settingsPreferences($preferences) );
 	}
 
 	protected function settingsChangePW(\Base $f3, $params)

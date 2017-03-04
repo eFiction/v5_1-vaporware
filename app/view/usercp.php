@@ -191,4 +191,12 @@ class UserCP extends Base
 		return \Template::instance()->render('usercp/settings.profile.html');
 	}
 	
+	public static function settingsPreferences($data)
+	{
+		\Base::instance()->set('data', $data);
+		\Base::instance()->set('language_available', \Base::instance()->get('CONFIG.language_available'));
+		
+		return \Template::instance()->render('usercp/settings.preferences.html');
+	}
+	
 }
