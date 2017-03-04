@@ -91,15 +91,6 @@ $(document).ready(function() {
     });
 });
 
-{* $(document).ready(function() {
-    $("#character-select").tokenInput("{{$BASE}}/userCP/ajax/stories",{
-    	method: "post",
-    	queryParam: "character",
-    	preventDuplicates: true,
-    	prePopulate: {{@prePop.char | raw}}
-    });
-});
- *}
 $(document).ready(function() {
     $("#character-select").tokenInput(function(){
     return "{{$BASE}}/userCP/ajax/stories/"+$("#category-select").val()},{
