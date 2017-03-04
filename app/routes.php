@@ -78,7 +78,7 @@ if ($_SESSION['groups'] & 1)
 			'Controller\UserCP->index' );
 
 		// Ajax routes
-		$f3->route( 'POST /userCP/ajax/@module [ajax]', 'Controller\UserCP->ajax' );
+		$f3->route( ['POST /userCP/ajax/@module [ajax]', 'POST /userCP/ajax/@module/@sub [ajax]'], 'Controller\UserCP->ajax' );
 
 		if ( $_SESSION['groups'] & 32 )
 		{
@@ -101,7 +101,7 @@ if ($_SESSION['groups'] & 1)
 				[ 'GET /adminCP/stories', 'GET /adminCP/stories/@module', 'GET /adminCP/stories/@module/*' ],
 				'Controller\AdminCP_Stories->index' );
 			$f3->route( 'POST /adminCP/stories/@module/*', 'Controller\AdminCP_Stories->save' );
-			$f3->route( 'POST /adminCP/ajax/stories/@module [ajax]', 'Controller\AdminCP_Stories->ajax' );
+			$f3->route( [ 'POST /adminCP/ajax/stories/@module [ajax]', 'POST /adminCP/ajax/stories/@module/* [ajax]' ], 'Controller\AdminCP_Stories->ajax' );
 			
 		}
 	}

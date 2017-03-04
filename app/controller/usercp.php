@@ -57,13 +57,12 @@ class UserCP extends Base
 				$data = $this->model->ajax("messaging", $post);
 				break;
 			case "stories":
-				$data = $this->model->ajax("stories", $post);
+				$data = $this->model->ajax("stories", $post, @$params['sub']);
 				break;
 			case "chaptersort":
 				$data = $this->model->ajax("chaptersort", $post);
 				break;
 		}
-		
 		/*
 		if ( $params['module']=="messaging" )
 		{

@@ -537,7 +537,7 @@ class UserCP extends Base
 		return $stats;
 	}
 	
-	public function ajax($key, $data)
+	public function ajax($key, $data, $limitation=NULL)
 	{
 		$bind = NULL;
 		
@@ -568,7 +568,16 @@ class UserCP extends Base
 			}
 			elseif(isset($data['character']))
 			{
-				$ajax_sql = "SELECT Ch.charname as name, Ch.charid as id from `tbl_characters`Ch WHERE Ch.charname LIKE :charname ORDER BY Ch.charname ASC LIMIT 5";
+				$where[] = " Ch.catid=-1 ";
+				if ( $limitation )
+				{
+					$limitation = explode(",",$limitation);
+					foreach ( $limitation as $limit )
+						$where[] = " FIND_IN_SET({$limit}, Ch.catid)";
+				}
+				$where = " AND ( ".implode(" OR", $where) .") ";
+				
+				$ajax_sql = "SELECT Ch.charname as name, Ch.charid as id from `tbl_characters`Ch WHERE Ch.charname LIKE :charname {$where} ORDER BY Ch.charname ASC LIMIT 5";
 				$bind = [ ":charname" =>  "%{$data['character']}%" ];
 			}
 			elseif(isset($data['chaptersort']))
