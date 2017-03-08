@@ -19,8 +19,6 @@ class Auth extends Base {
      */
     static public function isLoggedIn(\Base $f3)
 	{
-		$ip_db = sprintf("%u", ip2long($_SERVER['REMOTE_ADDR']));
-
 		/*
 		Session mask (bit-wise)
 
@@ -42,9 +40,9 @@ class Auth extends Base {
 				$session_id = $_COOKIE['session_id'];
 				$f3->set('SESSION.session_id', $session_id);
 		}
-		else $session_id = \Model\Auth::instance()->createSession($ip_db);
+		else $session_id = \Model\Auth::instance()->createSession();
 
-		if ( isset($session_id) && $user = \Model\Auth::instance()->validateSession($session_id,$ip_db) AND $user['userID']>0 )
+		if ( isset($session_id) && $user = \Model\Auth::instance()->validateSession($session_id) AND $user['userID']>0 )
 		{
 			$_SESSION['groups'] 		= $user['groups'];
 			//$_SESSION['admin_active'] 	= $user['admin_active'];
@@ -120,9 +118,7 @@ class Auth extends Base {
 		$recovery = $this->model->userRecovery($f3->get('POST.username'), $f3->get('POST.email'));
 		if ( $recovery )
 		{
-			$token = md5(time());
-			$dbtoken = $token."//".ip2long($_SERVER["REMOTE_ADDR"])."//".time();
-			$this->model->setRecoveryToken($recovery['uid'], $dbtoken);
+			$token = $this->model->setRecoveryToken($recovery['uid']);
 			
 			$this->buffer( \View\Auth::loginMulti($f3, "lostpw") );
 			
@@ -135,7 +131,7 @@ class Auth extends Base {
 	
 	protected function recoveryForm(\Base $f3, $token)
 	{
-		if ( TRUE === $token OR $user = $this->model->getRecoveryToken($token, ip2long($_SERVER["REMOTE_ADDR"])) )
+		if ( TRUE === $token OR $user = $this->model->getRecoveryToken($token) )
 		{
 			// valid token, proceed
 			if ( TRUE !== $token AND $f3->exists('POST.newpassword1') AND ( TRUE === $pw_check = $this->model->newPasswordQuality( $f3->get('POST.newpassword1'), $f3->get('POST.newpassword2')) ) )

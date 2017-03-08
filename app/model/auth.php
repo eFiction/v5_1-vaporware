@@ -46,11 +46,17 @@ class Auth extends Base {
 		return NULL;
 	}
 	
-	public function setRecoveryToken($uid, $token)
+	public function setRecoveryToken($uid)
 	{
+		$token = md5(time());
+		$dbtoken = $token."//".sprintf('%u',ip2long($_SERVER["REMOTE_ADDR"]))."//".time();
 		// $uid and $token are safe
-		$this->exec("INSERT INTO `tbl_user_info` (uid,field,info) VALUES ({$uid},-1,'{$token}')
-						ON DUPLICATE KEY UPDATE info='{$token}' ");
+		$this->exec("INSERT INTO `tbl_user_info` (uid,field,info) VALUES ({$uid},-1,CONCAT_WS( '//', :token , INET_ATON('{$_SERVER['REMOTE_ADDR']}'), :time ) )
+						ON DUPLICATE KEY UPDATE info=CONCAT_WS( '//', :token , INET_ATON('{$_SERVER['REMOTE_ADDR']}'), :time ) ",
+						[":token" => $token, ":time" => time() ]
+					);
+
+		return $token;
 	}
 	
 	public function dropRecoveryToken($uid)
@@ -59,14 +65,14 @@ class Auth extends Base {
 		$this->exec("DELETE FROM `tbl_user_info` WHERE `uid` = {$uid} AND `field` = -1;");
 	}
 	
-	public function getRecoveryToken($token, $ip)
+	public function getRecoveryToken($token)
 	{
 		// $ip is safe
 		$recovery = $this->exec(
 			"SELECT U.uid, I.info as token
 				FROM `tbl_users`U 
 					INNER JOIN `tbl_user_info`I ON (U.uid=I.uid AND I.field=-1)
-				WHERE I.info LIKE CONCAT( :token , '//{$ip}//%');",
+				WHERE I.info LIKE CONCAT_WS( '//', :token , INET_ATON('{$_SERVER['REMOTE_ADDR']}'), '%' );",
 			[":token" => $token]
 		);
 		// no token found
@@ -90,7 +96,7 @@ class Auth extends Base {
 		$session->save();
 	}
 
-	public function createSession($ip_db)
+	public function createSession()
 	{
         $f3 = \Base::instance();
 		
@@ -99,13 +105,13 @@ class Auth extends Base {
 		$f3->set('SESSION.session_id', $session_id );
 //		echo "<br>new: ".$_SESSION['session_id'];
 		$this->exec("INSERT INTO `tbl_sessions`(`session`, `user`, `lastvisited`, `ip`) VALUES
-				('{$_SESSION['session_id']}', '{NULL}', NOW(), '{$ip_db}');");
+				('{$_SESSION['session_id']}', '{NULL}', NOW(), INET_ATON('{$_SERVER['REMOTE_ADDR']}') );");
 
 	  setcookie("session_id", $session_id, time()+31536000, $f3->get('BASE') );
 	  return $session_id;
 	}
 
-	public function validateSession($session_id,$ip_db)
+	public function validateSession($session_id)
 	{
         $f3 = \Base::instance();
 
@@ -113,14 +119,14 @@ class Auth extends Base {
 																						OR 
 																						TIMESTAMPDIFF(MONTH,`lastvisited`,NOW())>1;";
 		$sql[] = "SET @guests  := (SELECT COUNT(DISTINCT S.session) 
-																	FROM `tbl_sessions`S WHERE S.user IS NULL AND NOT (S.session = '{$session_id}' AND S.ip ='{$ip_db}')
+																	FROM `tbl_sessions`S WHERE S.user IS NULL AND NOT (S.session = '{$session_id}' AND S.ip = INET_ATON('{$_SERVER['REMOTE_ADDR']}') )
 															);";
 		$sql[] = "SET @members := (SELECT COUNT(DISTINCT user) FROM (SELECT * FROM `tbl_sessions` GROUP BY user ORDER BY `lastvisited` DESC) as S WHERE 
 															S.user IS NOT NULL AND 
 															TIMESTAMPDIFF(MINUTE,S.lastvisited,NOW())<60 AND
-															NOT (S.session = '{$session_id}' AND S.ip ='{$ip_db}')
+															NOT (S.session = '{$session_id}' AND S.ip = INET_ATON('{$_SERVER['REMOTE_ADDR']}') )
 											);";
-		$sql[] = "UPDATE `tbl_sessions`S SET lastvisited = CURRENT_TIMESTAMP WHERE S.session = '{$session_id}' AND S.ip ='{$ip_db}';";
+		$sql[] = "UPDATE `tbl_sessions`S SET lastvisited = CURRENT_TIMESTAMP WHERE S.session = '{$session_id}' AND S.ip = INET_ATON('{$_SERVER['REMOTE_ADDR']}');";
 
 		$sql[] = "SELECT S.session, UNIX_TIMESTAMP(S.lastvisited) as time, S.ip, IF(S.user,S.user,0) as userID, 
 						U.nickname, U.groups, U.preferences, 
@@ -133,7 +139,7 @@ class Auth extends Base {
 								LEFT JOIN `tbl_users`U2 ON ( (U.uid = U2.uid OR U.uid = U2.curator) AND U.groups&5 )
 							LEFT JOIN `tbl_messaging` P1 ON ( U.uid = P1.recipient )
 							LEFT JOIN `tbl_messaging` P2 ON ( U.uid = P2.recipient AND P2.date_read IS NULL )
-						WHERE S.session = '{$session_id}' AND S.ip ='{$ip_db}';";
+						WHERE S.session = '{$session_id}' AND S.ip = INET_ATON('{$_SERVER['REMOTE_ADDR']}');";
 						
 /*
 	To do: create a cache field, move message status, curator to that field to reduce DB usage
