@@ -71,7 +71,7 @@ class AdminCP extends Base {
 	{
 		$f3 = \Base::instance();
 		
-		$sql = "SELECT `name`, `value`, `comment`, `form_type`
+		$sql = "SELECT `name`, `value`, `form_type`
 					FROM `tbl_config` 
 					WHERE 
 						`admin_module` LIKE :module 
@@ -80,10 +80,7 @@ class AdminCP extends Base {
 		$data = $this->exec($sql,[ ":module" => $select ]);
 		foreach ( $data as &$d )
 		{
-			if($d['comment']==NULL)
-				list ( $d['comment'], $d['comment_small'] ) = array_merge ( explode("@SMALL@", $f3->get('LN__CFG_'.$d['name'])), array(FALSE) );
-			else
-				list ( $d['comment'], $d['comment_small'] ) = array_merge ( explode("@SMALL@", $d['comment']), array(FALSE) );
+			list ( $d['comment'], $d['comment_small'] ) = array_merge ( explode("@SMALL@", $f3->get('LN__CFG_'.$d['name'])), array(FALSE) );
 
 			$d['form_type'] = explode("//", $d['form_type']);
 			$d['type'] = @array_shift($d['form_type']);
@@ -1311,7 +1308,7 @@ class AdminCP extends Base {
 	
 	public function getLanguageConfig()
 	{
-		$sql = "SELECT `name`, `value`, `comment`, `form_type`
+		$sql = "SELECT `name`, `value`, `form_type`
 					FROM `tbl_config` 
 					WHERE 
 						`admin_module` LIKE 'settings_language_file'";
@@ -1348,7 +1345,7 @@ class AdminCP extends Base {
 
 	public function getLayoutConfig()
 	{
-		$sql = "SELECT `name`, `value`, `comment`, `form_type`
+		$sql = "SELECT `name`, `value`, `form_type`
 					FROM `tbl_config` 
 					WHERE 
 						`admin_module` LIKE 'settings_layout_file'";

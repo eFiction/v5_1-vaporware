@@ -273,17 +273,109 @@ return array(
 'Shoutbox' => 'Shoutbox',
 
 // Config explain
-	// archive_general
-'CFG_stories_per_page'		=> 'Stories per page in the Archive.',
-'CFG_stories_recent'		=> 'Days for recent stories',
-'CFG_stories_default_order'	=> 'Default sorting for stories',
-'CFG_story_toc_default'		=> 'Show to table of contents by default for stories with multiple chapters.',
-'CFG_epub_domain'			=> 'ePub Domain@SMALL@Used to calculate your epub UUID v5. Leave blank for default (Archive URL)',
-	// archive_intro
-'CFG_story_intro_items' => 'Stories to show on the archive entry page.',
-'CFG_story_intro_order' => 'Order in which stories appear on the archive entry page.',
-	// members_general
-'CFG_agestatement'		=>	'Have members set their age to show rating warnings',
+// archive_general
+	'CFG_stories_per_page'		=> 'Stories per page in the Archive.',
+	'CFG_stories_recent'		=> 'Days for recent stories',
+	'CFG_stories_default_order'	=> 'Default sorting for stories',
+	'CFG_story_toc_default'		=> 'Show to table of contents by default for stories with multiple chapters.',
+	'CFG_epub_domain'			=> 'ePub Domain@SMALL@Used to calculate your epub UUID v5. Leave blank for default (Archive URL)',
+// archive_images
+	'CFG_images_allowed' 		=> 'Allow posting of story images (cover art)',
+	'CFG_images_height'			=> 'Allowed image height.',
+	'CFG_images_width'			=> 'Allowed image width.',
+// archive_intro
+	'CFG_story_intro_items' 	=> 'Stories to show on the archive entry page.',
+	'CFG_story_intro_order' 	=> 'Order in which stories appear on the archive entry page.',
+// archive_reviews
+	'CFG_allow_reviews'			=> 'Allow reviews',
+	'CFG_allow_guest_reviews'	=> 'Allow guests to write reviews',
+	'CFG_allow_review_delete'	=> 'Authors can delete reviews',
+	'CFG_allow_rateonly'		=> 'Allow ratings without review (including kudos)',
+// archive_submit
+	'CFG_author_self' 			=> 'Every member can post stories@SMALL@If set to no, members must be added to group Authors to allow them to post stories',
+	'CFG_story_validation'	 	=> 'Stories require validation@SMALL@This does not apply to trusted authors.',
+	'CFG_stories_min_words'		=> 'Minimum amount of words for a chapter',
+	'CFG_stories_max_words'		=> 'Maximum amount of words for a chapter@SMALL@(0 = unlimited)',
+	'CFG_advanced_editor' 		=> 'Allow use of graphical editor',
+	'CFG_allow_co_author' 		=> 'Allow addition of other authors to stories',
+	'CFG_stories_min_tags'		=> 'Minimum amount of tags required',
+	'CFG_allow_series'	 		=> 'Allow authors to create series@SMALL@Member series are now collections',
+	'CFG_allow_roundrobin'	 	=> 'Allow roundrobins',
+// archive_tags_cloud
+	'CFG_tagcloud_basesize'		=> 'Base size in percent relative to normal font size.',
+	'CFG_tagcloud_elements'		=> 'Maximum number of elements in the tag cloud@SMALL@Elements are ordered by count.',
+	'CFG_tagcloud_minimum_elements'	=>  'Minimum amount of elements required to show tag cloud@SMALL@0 = always show',
+	'CFG_tagcloud_spread'		=> 'Maximum size spread:@SMALL@spread*100 is the maximum percentage for the most used tag.<br>2.5 would convert to 250%.<br>(Realistic values are somewhere between 3 and 5)',
+// bad_behaviour
+	'CFG_bb2_enabled' 			=> 'Screen access\n<a href="http://bad-behavior.ioerror.us/support/configuration/" target="_blank">Bad Behaviour manual</a>@SMALL@(default <b>"{{@LN__yes}}"</b>)',
+	'CFG_bb2__display_stats' 	=> 'Display Statistics@SMALL@(default <b>"{{@LN__yes}}"</b>) (this causes extra load, turn off to save power)',
+	'CFG_bb2__logging' 			=> 'Logging@SMALL@(default <b>"{{@LN__yes}}"</b>)',
+	'CFG_bb2__strict'	 		=> 'Strict Mode@SMALL@(default <b>"{{@LN__no}}"</b>)',
+// bad_behaviour_ext
+	'CFG_bb2__verbose' 			=> 'Verbose Logging@SMALL@(default <b>"{{@LN__no}}"</b>)',
+	'CFG_bb2__offsite_forms' 	=> 'Allow Offsite Forms@SMALL@(default <b>"{{@LN__no}}"</b>)',
+	'CFG_bb2__eu_cookie' 		=> 'EU Cookie@SMALL@(default <b>"{{@LN__no}}"</b>)',
+	'CFG_bb2__httpbl_key' 		=> 'http:BL API Key@SMALL@Screen requests through Project Honey Pot.\r\nLeave empty to disable.',
+	'CFG_bb2__httpbl_threat' 	=> 'http:BL Threat Level@SMALL@(default <b>"25"</b>)',
+	'CFG_bb2__httpbl_maxage' 	=> 'http:BL Maximum Age@SMALL@(default <b>"30"</b>)',
+	'CFG_bb2__reverse_proxy' 	=> 'Reverse Proxy@SMALL@(default <b>"{{@LN__no}}"</b>)',
+	'CFG_bb2__reverse_proxy_header' 	=> 'Reverse Proxy Header@SMALL@(default "X-Forwarded-For")\r\nOnly required when using reverse proxy!',
+	'CFG_bb2__reverse_proxy_addresses'	=> 'Reverse Proxy Addresses@SMALL@(no default)\r\nOnly required when using reverse proxy!',
+// members_general
+	'CFG_agestatement'		=>	'Have members set their age to show rating warnings',
+// settings_datetime
+	'CFG_date_format_short'		=> 'Default short date.@SMALL@(See <a href="http://php.net/manual/en/function.date.php" target="_blank">php.net documentation</a> for syntax)',
+	'CFG_date_format_long'		=> 'Default long date.@SMALL@(See <a href="http://php.net/manual/en/function.date.php" target="_blank">php.net documentation</a> for syntax)',
+	'CFG_time_format'			=> 'Default time format.',
+	'CFG_monday_first_day'		=> 'Weeks in calendar start with ...',
+// settings_language
+	'CFG_language_forced'		=> 'Disable custom language selection:@SMALL@Default is <b>no</b>',
+	'CFG_language_available'	=> 'List all languages that are available to common members.',
+// settings_layout
+	'CFG_layout_forced'			=> 'Disable custom layout selection:@SMALL@Default is <b>no</b>',
+	'CFG_layout_available'		=> '',
+// settings_general
+	'CFG_page_title'			=> 'Website title',
+	'CFG_page_mail'				=> 'Webmaster e-mail address',
+	'CFG_page_slogan'			=> 'Site slogan',
+	'CFG_page_title_add'		=> 'Show page path or slogan in title',
+	'CFG_page_title_reverse'	=> 'Reverse sort order of page title elements.@SMALL@(Default is <b>no</b>)',
+	'CFG_page_title_separator'	=> 'Separator for page title elements',
+	'CFG_adjacent_paginations' 	=> 'Contiguous page links to display@SMALL@"1" to display: 1 ... 4 [5] 6 ... 9<br>\n"2" to display: 1 ... 3 4 [5] 6 7 ... 9<br>"0" to display all links',
+	'CFG_shoutbox_entries'		=> 'Number of shoutbox items to display',
+	'CFG_shoutbox_guest'		=> 'Allow guest posts in shoutbox',
+	'CFG_allow_comment_news'	=> 'Allow news comments',
+	'CFG_allow_guest_comment_news'	=> 'Allow guest news comments',
+// settings_registration
+	'CFG_allow_registration'		=> 'Allow registration?',
+	'CFG_reg_require_email'			=> 'User must activate their account via eMail link.',
+	'CFG_reg_require_mod'			=> 'User registrations require moderation.',
+	'CFG_reg_min_username'			=> 'Minimum characters for usernames',
+	'CFG_reg_min_password'			=> 'Minimum characters for passwords',
+	'CFG_reg_password_complexity'	=> 'Password complexity:@SMALL@see wiki',
+	'CFG_reg_use_captcha'			=> 'Select CAPTCHA to be used@SMALL@Configure under <a href="{{@BASE}}/adminCP/settings/security">Settings - Security</a>',
+// settings_registration_sfs
+	'CFG_reg_sfs_usage'				=> 'Use the "Stop Forumspam" Service.@SMALL@<a href="http://www.stopforumspam.com/faq" target="_blank">FAQ @ http://www.stopforumspam.com</a>',
+	'CFG_reg_sfs_check_ip'			=> 'Check IP',
+	'CFG_reg_sfs_check_mail'		=> 'Check mail address',
+	'CFG_reg_sfs_check_username'	=> 'Check username',
+	'CFG_reg_sfs_check_advice'		=> 'You may turn off username checking if you encounter false positives.<br>Turning off IP and mail check is not advised, however.',
+	'CFG_reg_sfs_failsafe'			=> 'How to behave if the SFS Service cannot be reached upon registration@SMALL@Default is to hold.',
+	'CFG_reg_sfs_explain_api'		=> '__AdminRegExplainSFSApi',
+	'CFG_reg_sfs_api_key'			=> 'Your API key (optional)',
+// settings_mail
+	'CFG_mail_notifications'		=> 'Members can opt-in to receive mail notifications.',
+	'CFG_smtp_advice'				=> 'Leave SMTP server fields empty to send through PHP and sendmail.@SMALL@<a href="http://efiction.org/wiki/Server#Working_settings_for_common_mail_providers" target="_blank">Documentation in the wiki. {ICON:external-link}</a>',
+	'CFG_smtp_server'				=> 'SMTP server@SMALL@See WIKI for GMail!',
+	'CFG_smtp_scheme' 				=> 'SMTP security scheme',
+	'CFG_smtp_port'					=> 'Port number (if not using default)',
+	'CFG_smtp_username'				=> 'SMTP username',
+	'CFG_smtp_password'				=> 'SMTP password',
+// settings_maintenance
+	'CFG_chapter_data_location' 	=> 'Chapter storage (Database Server or local file storage)@SMALL@Read-only - Local file is being handled by SQLite',
+	'CFG_debug'						=> 'Debug level',
+	'CFG_maintenance'				=> 'Archive closed for maintenance',
+	'CFG_logging'					=> 'Log actions',
 
 // Story view'
 'Title' =>	'Title',

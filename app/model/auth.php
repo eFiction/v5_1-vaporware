@@ -173,7 +173,7 @@ class Auth extends Base {
 						"guest"		=>	$user['@guests']+1
 					]
 			);
-			if ( $user['session'] == '' )	Auth::instance()->createSession($ip_db);
+			if ( $user['session'] == '' )	Auth::instance()->createSession();
 			return FALSE;
 		}
 	}
