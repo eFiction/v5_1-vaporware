@@ -237,6 +237,7 @@ return array(
 	'AdminMenu_Intro' => 'Intro',
 'AdminMenu_Submission' => 'Submissions',
 	'AdminMenu_Stories' => 'Stories',
+	'AdminMenu_Images' => 'Cover art',
 	'AdminMenu_Reviews' => 'Reviews',
 'AdminMenu_Featured' => 'Featured',
 	'AdminMenu_Future' => 'Future',
@@ -270,6 +271,19 @@ return array(
 
 'Welcome' => 'Welcome',
 'Shoutbox' => 'Shoutbox',
+
+// Config explain
+	// archive_general
+'CFG_stories_per_page'		=> 'Stories per page in the Archive.',
+'CFG_stories_recent'		=> 'Days for recent stories',
+'CFG_stories_default_order'	=> 'Default sorting for stories',
+'CFG_story_toc_default'		=> 'Show to table of contents by default for stories with multiple chapters.',
+'CFG_epub_domain'			=> 'ePub Domain@SMALL@Used to calculate your epub UUID v5. Leave blank for default (Archive URL)',
+	// archive_intro
+'CFG_story_intro_items' => 'Stories to show on the archive entry page.',
+'CFG_story_intro_order' => 'Order in which stories appear on the archive entry page.',
+	// members_general
+'CFG_agestatement'		=>	'Have members set their age to show rating warnings',
 
 // Story view'
 'Title' =>	'Title',
@@ -374,6 +388,7 @@ Click here to unset.',
 	'one	{An error occurred while saving data.},'.
 	'other	{# errors occurred while saving data.}
 }',
+
 );
 
 ?>

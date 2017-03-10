@@ -1031,5 +1031,29 @@ class UserCP extends Base
 		$data['p'] = json_decode($data['preferences'],TRUE);
 		return $data;
 	}
+	
+	public function settingsSavePreferences($data)
+	{
+		$mapper = new \DB\SQL\Mapper( $this->db, $this->prefix."users" );
+		$mapper->load(['uid = ?', $_SESSION['userID'] ]);
+		
+		$mapper->alert_feedback 	= (int)$data['alert_feedback'];
+		$mapper->alert_comment		= (int)$data['alert_comment'];
+		$mapper->alert_favourite	= (int)$data['alert_favourite'];
+		
+		$mapper->preferences		= json_encode
+										([
+											"ageconsent"	=> $data['p']['ageconsent'],
+											"useEditor"		=> $data['p']['useEditor'],
+											"sortNew"		=> $data['p']['sortNew'],
+											"showTOC"		=> $data['p']['showTOC'],
+											"language"		=> $data['p']['language'],
+											"layout"		=> $data['p']['layout'],
+											"hideTags"		=> $data['p']['hideTags'],
+										]);
+		$mapper->save();
+		//print_r($data);
+	}
+
 
 }

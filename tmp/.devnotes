@@ -1,0 +1,58 @@
+Hi, for a community-related project I am trying to setup a friend system.
+
+The table is simply consisting of 
+
+row name   | contains
+---------- | --------
+link_id    | unique link ID
+user_id    | user ID of user that did the friendship
+friend_id  | friend ID
+
+assuming we have this data:
+
+link_id | user_id | friend_id
+------- | ------- | ---------
+1       | 10      | 12
+2       | 10      | 13
+3       | 10      | 14
+4       | 13      | 10
+5       | 15      | 10
+6       | 15      | 13
+
+Now I have seen ways to find 2-way relations, but I am trying to get all possible relations:
+
+User 10 has listed 12, 13, 14 as friends, but only 13 has also friended 10. User 15 has friended our user 10 (and user 13, but when showing user 10 we want to hide that)
+
+Now I was hoping to get anywhere near something like:
+
+user | friend_out | friend_in
+---- | ---------- | ---------
+10   | 12         | NULL
+10   | 13         | 13
+10   | 14         | NULL
+10   | NULL       | 15
+
+If it's not possible, no problem, it's an open project so using multiple 
+
+
+
+
+
+
+
+
+
+
+
+SELECT * FROM
+(
+	SELECT F0.*, F1.user_id as u1, F2.user_id as u2,
+			CASE WHEN F2.user_id IS NULL THEN 'out' WHEN F1.user_id IS NULL THEN 'in' WHEN (F0.user_id = 1 AND F0.friend_id = F2.user_id) THEN 'both' ELSE '-' END AS link_type
+		FROM `new5_friends`F0
+			LEFT JOIN `new5_friends`F1 ON ( F0.user_id = F1.friend_id )
+			LEFT JOIN `new5_friends`F2 ON ( F0.friend_id = F2.user_id )
+	WHERE (F0.user_id = 1 OR F0.friend_id = 1 ) 
+--	GROUP BY F0.user_id, F0.friend_id, F2.user_id
+) as F
+WHERE user_id = 1 OR link_type = 'in'
+ORDER BY link_type

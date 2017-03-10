@@ -38,20 +38,29 @@
 		<div class="gb-3qrt">
 			<select name="form[p][language]">
 				<repeat group="{{ @CONFIG.language_available }}" key="{{@lang}}" value="{{@language}}">
-					<option value="{{@lang}}"<check if="{{@data.p.language==@lang}}"> selected="selected"</check>>{{@language}}</option>
+					<option value="{{@lang}}"<check if="{{ (@data.p.language!='' AND @data.p.language==@lang) OR (@data.p.language=='' AND @CONFIG.language_default==@lang) }}"> selected="selected"</check>>{{@language}}</option>
 				</repeat>
 			</select>
 		</div>
 		<div class="gb-1qrt">__layout</div>
 		<div class="gb-3qrt">
-			<select name="form[p][language]">
+			<select name="form[p][layout]">
 				<repeat group="{{ @CONFIG.layout_available }}" key="{{@lay}}" value="{{@layout}}">
-					<option value="{{@lay}}"<check if="{{@data.p.layout==@lay}}"> selected="selected"</check>>{{@layout}}</option>
+					<option value="{{@lay}}"<check if="{{ (@data.p.layout!='' AND @data.p.layout==@lay) OR (@data.p.layout=='' AND @CONFIG.layout_default==@lay) }}"> selected="selected"</check>>{{@layout}}</option>
 				</repeat>
 			</select>
 		</div>
-		<div class="gb-full">__ageconsent</div>
-		<div class="gb-full">__hideTags</div>
+		<div class="gb-1qrt">__editor</div>
+		<div class="gb-3qrt">
+			<input type="radio" id="useEditor_yes" name="form[p][useEditor]" value="1" <check if="{{ @data.p.useEditor==1 }}">checked="checked"</check>><label for="useEditor_yes"> {{@LN__yes}}</label>
+			<input type="radio" id="useEditor_no" name="form[p][useEditor]" value="0" <check if="{{ @data.p.useEditor==0 }}">checked="checked"</check>><label for="useEditor_no"> {{@LN__no}}</label>
+		</div>
+		<div class="gb-1qrt">__ageconsent</div>
+		<div class="gb-3qrt">
+			<input type="radio" id="ageconsent_yes" name="form[p][ageconsent]" value="1" <check if="{{ @data.p.ageconsent==1 }}">checked="checked"</check>><label for="ageconsent_yes"> {{@LN__yes}}</label>
+			<input type="radio" id="ageconsent_no" name="form[p][ageconsent]" value="0" <check if="{{ @data.p.ageconsent==0 }}">checked="checked"</check>><label for="ageconsent_no"> {{@LN__no}}</label>
+		</div>
+		<div class="gb-full">__hideTags</div><input type="hidden" name="form[p][hideTags]" value="{{@data.p.hideTags}}">
 	</div>
 	</fieldset>
 	<input class="button" type="submit"><input class="button" type="reset">

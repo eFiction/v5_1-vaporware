@@ -197,11 +197,23 @@ return array(
 'AdminMenu_CustomPages' => 'Custom Pages',
 'AdminMenu_News' => 'News',
 'AdminMenu_Modules' => 'Module',
+//'AdminMenu_Logs' => 'Logs',
+	// 'AdminMenu_Logs_AM' => 'Admin Maintenance',
+	// 'AdminMenu_Logs_DL' => 'Deletions',
+	// 'AdminMenu_Logs_EB' => 'Edit Member',
+	// 'AdminMenu_Logs_ED' => 'Edit Story',
+	// 'AdminMenu_Logs_LP' => 'Lost Password',
+	// 'AdminMenu_Logs_RE' => 'Reviews',
+	// 'AdminMenu_Logs_RG' => 'Registration',
+	// 'AdminMenu_Logs_RF' => 'Registration failure',
+	// 'AdminMenu_Logs_VS' => 'Validations',
 'AdminMenu_Shoutbox' => 'Shoutbox',
 
 'AdminMenu_Settings' => 'Einstellungen',
 'AdminMenu_Server' => 'Server',
 	'AdminMenu_DateTime'	=> 'Datum und Uhrzeit',
+	// 'AdminMenu_Mail'		=> 'Mail and mail server',
+	// 'AdminMenu_Maintenance'	=> 'Maintenance',
 'AdminMenu_Registration' => 'Registrierung',
 	'AdminMenu_AntiSpam'	=> 'Spam-Schutz',
 'AdminMenu_Security'	=> 'Sicherheit',
@@ -223,6 +235,10 @@ return array(
 
 'AdminMenu_Archive' => 'Archive',
 	'AdminMenu_Intro' => 'Intro',
+// 'AdminMenu_Submission' => 'Submissions',
+	// 'AdminMenu_Stories' => 'Stories',
+	// 'AdminMenu_Images' => 'Cover art',
+	// 'AdminMenu_Reviews' => 'Reviews',
 'AdminMenu_Featured' => 'Featured',
 	'AdminMenu_Future' => 'Zukünftige',
 	'AdminMenu_Current' => 'Current',
@@ -238,6 +254,15 @@ return array(
 'ACP_Categories_Error_DBError' => 'Konnte Kategories "{0}" wegen Datenbankfehler nicht löschen!',
 'ACP_Categories_Error_badID' => 'Kann die Kategories nicht löschen, keine gültige ID gefunden!',
 
+// 'ACP_Tags'				=> 'Tags',
+// 'ACP_TagName'			=> 'Tag name',
+// 'ACP_TagLabel'			=> 'Tag label',
+// 'ACP_TagDescription'	=> 'Tag description',
+// 'ACP_TagLabel_Advice'	=> 'Only change when required',
+// 'ACP_TagGroupLabel'		=> 'Tag group label',
+// 'ACP_TagGroup'			=> 'Tag group',
+// 'ACP_TagGroups'			=> 'Tag groups',
+
 'AdminMenu_Stories' => 'Stories',
 'AdminMenu_Pending' => 'Pending',
 'AdminMenu_Edit' => 'Edit',
@@ -246,6 +271,19 @@ return array(
 
 'Welcome' => 'Willkommen',
 'Shoutbox' => 'Shoutbox',
+
+// Config explain
+	// archive_general
+'CFG_stories_per_page'		=> 'Stories je Seite im Archiv.',
+//'CFG_stories_recent'		=> 'Days for recent stories',
+'CFG_stories_default_order'	=> 'Standardsortierung für Stories',
+//'CFG_story_toc_default'		=> 'Show to table of contents by default for stories with multiple chapters.',
+//'CFG_epub_domain'			=> 'ePub Domain@SMALL@Used to calculate your epub UUID v5. Leave blank for default (Archive URL)',
+	// archive_intro
+'CFG_story_intro_items' => 'Anzahl der Stories auf der Archiv Startseite.',
+'CFG_story_intro_order' => 'Sortierung der Stories auf der Archiv Startseite.',
+	// members_general
+//'CFG_agestatement'		=>	'Have members set their age to show rating warnings',
 
 // Story view'
 'Title' =>	'Titel',
@@ -345,6 +383,12 @@ Hier klicken um zu entfernen.',
 	'one	{Ein Element geändert.},'.
 	'other	{# Elemente geändert.}
 }',
+// 'Status_Errors' => '{0, plural,'.
+	// 'zero	{No errors.},'.
+	// 'one	{An error occurred while saving data.},'.
+	// 'other	{# errors occurred while saving data.}
+// }',
+
 );
 
 ?>

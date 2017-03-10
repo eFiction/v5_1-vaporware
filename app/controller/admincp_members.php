@@ -35,9 +35,15 @@ class AdminCP_Members extends AdminCP
 		}
 	}
 
-	protected function home(\Base $f3)
+	protected function home(\Base $f3, $feedback = [ NULL, NULL ])
 	{
-		$this->buffer( \View\Base::stub() );
+		if ( isset($_POST['form_data']) )
+		{
+			$feedback = $this->model->saveKeys($f3->get('POST.form_data'));
+		}
+		$this->response->addTitle( $f3->get('LN__AdminMenu_Members') );
+		$data['General'] = $this->model->settingsFields('members_general');
+		$this->buffer( \View\AdminCP::settingsFields($data, "members/home", $feedback) );
 	}
 
 	protected function profile(\Base $f3, $params)

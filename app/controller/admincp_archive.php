@@ -74,9 +74,9 @@ class AdminCP_Archive extends AdminCP
 		{
 			$feedback = $this->model->saveKeys($f3->get('POST.form_data'));
 		}
-		//$this->response->addTitle( $f3->get('LN__AdminMenu_Archive') );
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Submission') );
 		$data['Stories'] = $this->model->settingsFields('archive_submit');
+		$data['Images'] = $this->model->settingsFields('archive_images');
 		$data['Reviews'] = $this->model->settingsFields('archive_reviews');
 		$this->buffer( \View\AdminCP::settingsFields($data, "archive/submit", $feedback) );
 	}

@@ -69,6 +69,8 @@ class AdminCP extends Base {
 	
 	public function settingsFields($select)
 	{
+		$f3 = \Base::instance();
+		
 		$sql = "SELECT `name`, `value`, `comment`, `form_type`
 					FROM `tbl_config` 
 					WHERE 
@@ -78,7 +80,11 @@ class AdminCP extends Base {
 		$data = $this->exec($sql,[ ":module" => $select ]);
 		foreach ( $data as &$d )
 		{
-			list ( $d['comment'], $d['comment_small'] ) = array_merge ( explode("@SMALL@", $d['comment']), array(FALSE) );
+			if($d['comment']==NULL)
+				list ( $d['comment'], $d['comment_small'] ) = array_merge ( explode("@SMALL@", $f3->get('LN__CFG_'.$d['name'])), array(FALSE) );
+			else
+				list ( $d['comment'], $d['comment_small'] ) = array_merge ( explode("@SMALL@", $d['comment']), array(FALSE) );
+
 			$d['form_type'] = explode("//", $d['form_type']);
 			$d['type'] = @array_shift($d['form_type']);
 			if ($d['type']=="select")

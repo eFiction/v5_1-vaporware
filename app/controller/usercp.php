@@ -427,7 +427,7 @@ class UserCP extends Base
 	{
 		if( NULL != $post = $f3->get('POST') )
 		{
-			// $this->model->settingsSavePreferences($post['form']);
+			$this->model->settingsSavePreferences($post['form']);
 		}
 		$preferences = $this->model->settingsLoadPreferences();
 		
