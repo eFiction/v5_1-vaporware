@@ -13,7 +13,14 @@
 	</div>
 	<!-- misc -->	
 	<div class="grid-wrapper">
-<br /><br />(*) {{@LN__Rating}} from <select class="search" name="rating[0]">
+<br />
+__SavedStories: <select class="search" name="saved">
+		<option value="">{{@LN__no}}</option>
+		<option value="both"<check if="{{isset(@searchForm.saved) AND @searchForm.saved=='both'}}"> selected="selected"</check>>Fav+BM</option>
+		<option value="fav"<check if="{{isset(@searchForm.saved) AND @searchForm.saved=='fav'}}"> selected="selected"</check>>Fav</option>
+		<option value="bm"<check if="{{isset(@searchForm.saved) AND @searchForm.saved=='bm'}}"> selected="selected"</check>>BM</option>
+	</select>
+<br />(*) {{@LN__Rating}} from <select class="search" name="rating[0]">
 	<repeat group="{{ @searchRatings }}" value="{{ @rating }}">
 		<option value="{{ @rating.rid }}" <check if="{{@rating.rid==@searchForm.rating.0}}">selected="selected" </check> >{{ @rating.rating }}</option>
 	</repeat>

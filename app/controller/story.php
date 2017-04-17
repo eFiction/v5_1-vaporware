@@ -219,7 +219,6 @@ class Story extends Base
 
 		$searchData = ($f3->get('POST'));
 		$searchData = array_filter(array_merge($get, $searchData));
-
 		$ratings = $this->model->ratings();
 		$f3->set('searchRatings', $ratings);
 

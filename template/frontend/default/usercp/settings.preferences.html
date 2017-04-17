@@ -1,67 +1,68 @@
 <form method="post" action="{{@BASE}}/userCP/settings/preferences">
 	<fieldset>
-	<legend>__Alerts</legend>
-	<div class="grid-wrapper">
-		<div class="gb-1qrt">__feedback</div>
-		<div class="gb-3qrt">
+	<legend>{{@LN__UCP_Pref_Alerts}}</legend>
+	<dl class="settings">
+		<dt class="settings_title">{{@LN__UCP_Pref_AlertOn}}</dt>
+		<dt>{{@LN__UCP_Pref_AlertFeedback}}</dt>
+		<dd>
 			<input type="radio" id="feedback_yes" name="form[alert_feedback]" value="1" <check if="{{ @data.alert_feedback==1 }}">checked="checked"</check>><label for="feedback_yes"> {{@LN__yes}}</label>
 			<input type="radio" id="feedback_no" name="form[alert_feedback]" value="0" <check if="{{ @data.alert_feedback==0 }}">checked="checked"</check>><label for="feedback_no"> {{@LN__no}}</label>
-		</div>
-		<div class="gb-1qrt">__comment</div>
-		<div class="gb-3qrt">
+		</dd>
+		<dt>{{@LN__UCP_Pref_AlertComment}}</dt>
+		<dd>
 			<input type="radio" id="comment_yes" name="form[alert_comment]" value="1" <check if="{{ @data.alert_comment==1 }}">checked="checked"</check>><label for="comment_yes"> {{@LN__yes}}</label>
 			<input type="radio" id="comment_no" name="form[alert_comment]" value="0" <check if="{{ @data.alert_comment==0 }}">checked="checked"</check>><label for="comment_no"> {{@LN__no}}</label>
-		</div>
-		<div class="gb-1qrt">__favourite</div>
-		<div class="gb-3qrt">
+		</dd>
+		<dt>{{@LN__UCP_Pref_AlertFavourite}}</dt>
+		<dd>
 			<input type="radio" id="favourite_yes" name="form[alert_favourite]" value="1" <check if="{{ @data.alert_favourite==1 }}">checked="checked"</check>><label for="favourite_yes"> {{@LN__yes}}</label>
 			<input type="radio" id="favourite_no" name="form[alert_favourite]" value="0" <check if="{{ @data.alert_favourite==0 }}">checked="checked"</check>><label for="favourite_no"> {{@LN__no}}</label>
-		</div>
-	</div>
+		</dd>
+	</dl>
 	</fieldset>
 	<fieldset>
-	<legend>__View</legend>
-	<div class="grid-wrapper">
-		<div class="gb-1qrt">__toc</div>
-		<div class="gb-3qrt">
+	<legend>{{@LN__UCP_Pref_View}}</legend>
+	<dl class="settings">
+		<dt>{{@LN__UCP_Pref_TOC}}</dt>
+		<dd>
 			<input type="radio" id="showTOC_yes" name="form[p][showTOC]" value="1" <check if="{{ @data.p.showTOC==1 }}">checked="checked"</check>><label for="showTOC_yes"> {{@LN__yes}}</label>
 			<input type="radio" id="showTOC_no" name="form[p][showTOC]" value="0" <check if="{{ @data.p.showTOC==0 }}">checked="checked"</check>><label for="showTOC_no"> {{@LN__no}}</label>
-		</div>
-		<div class="gb-1qrt">__sort</div>
-		<div class="gb-3qrt">
+		</dd>
+		<dt>{{@LN__UCP_Pref_Sort}}</dt>
+		<dd>
 			<select name="form[p][sortNew]">
-				<option value="0"<check if="{{@data.p.sortNew==0}}"> selected="selected"</check>>__sortAZ</option>
-				<option value="1"<check if="{{@data.p.sortNew==1}}"> selected="selected"</check>>__sortNew</option>
+				<option value="0"<check if="{{@data.p.sortNew==0}}"> selected="selected"</check>>{{@LN__UCP_Pref_sortAZ}}</option>
+				<option value="1"<check if="{{@data.p.sortNew==1}}"> selected="selected"</check>>{{@LN__UCP_Pref_sortNew}}</option>
 			</select>
-		</div>
-		<div class="gb-1qrt">__language</div>
-		<div class="gb-3qrt">
+		</dd>
+		<dt>{{@LN__UCP_Pref_Language}}</dt>
+		<dd>
 			<select name="form[p][language]">
 				<repeat group="{{ @CONFIG.language_available }}" key="{{@lang}}" value="{{@language}}">
 					<option value="{{@lang}}"<check if="{{ (@data.p.language!='' AND @data.p.language==@lang) OR (@data.p.language=='' AND @CONFIG.language_default==@lang) }}"> selected="selected"</check>>{{@language}}</option>
 				</repeat>
 			</select>
-		</div>
-		<div class="gb-1qrt">__layout</div>
-		<div class="gb-3qrt">
+		</dd>
+		<dt>{{@LN__UCP_Pref_Layout}}</dt>
+		<dd>
 			<select name="form[p][layout]">
 				<repeat group="{{ @CONFIG.layout_available }}" key="{{@lay}}" value="{{@layout}}">
 					<option value="{{@lay}}"<check if="{{ (@data.p.layout!='' AND @data.p.layout==@lay) OR (@data.p.layout=='' AND @CONFIG.layout_default==@lay) }}"> selected="selected"</check>>{{@layout}}</option>
 				</repeat>
 			</select>
-		</div>
-		<div class="gb-1qrt">__editor</div>
-		<div class="gb-3qrt">
+		</dd>
+		<dt>{{@LN__UCP_Pref_Editor}}</dt>
+		<dd>
 			<input type="radio" id="useEditor_yes" name="form[p][useEditor]" value="1" <check if="{{ @data.p.useEditor==1 }}">checked="checked"</check>><label for="useEditor_yes"> {{@LN__yes}}</label>
 			<input type="radio" id="useEditor_no" name="form[p][useEditor]" value="0" <check if="{{ @data.p.useEditor==0 }}">checked="checked"</check>><label for="useEditor_no"> {{@LN__no}}</label>
-		</div>
-		<div class="gb-1qrt">__ageconsent</div>
-		<div class="gb-3qrt">
+		</dd>
+		<dt>{{@LN__UCP_Pref_Age}}</dt>
+		<dd>
 			<input type="radio" id="ageconsent_yes" name="form[p][ageconsent]" value="1" <check if="{{ @data.p.ageconsent==1 }}">checked="checked"</check>><label for="ageconsent_yes"> {{@LN__yes}}</label>
 			<input type="radio" id="ageconsent_no" name="form[p][ageconsent]" value="0" <check if="{{ @data.p.ageconsent==0 }}">checked="checked"</check>><label for="ageconsent_no"> {{@LN__no}}</label>
-		</div>
-		<div class="gb-full">__hideTags</div><input type="hidden" name="form[p][hideTags]" value="{{@data.p.hideTags}}">
-	</div>
+		</dd>
+		<dt class="gb-full">{{@LN__UCP_Pref_hideTags}}</dt><input type="hidden" name="form[p][hideTags]" value="{{@data.p.hideTags}}">
+	</dl>
 	</fieldset>
 	<input class="button" type="submit"><input class="button" type="reset">
 </form>

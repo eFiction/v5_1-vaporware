@@ -109,3 +109,42 @@ textarea {
     resize: none;
     font-family: 'Open Sans', sans-serif;
 }
+
+/* For user CP forms
+---------------------------------------- */
+
+dl.settings {
+	width: 100%;
+	float:left;
+	margin: 0 0 10px 0;
+	padding: 0;
+}
+
+dl.settings dt {
+	float:left;
+	width: 30%;
+	clear:both;
+	margin: 5px 0 3px 10px;
+	padding: 5px;
+}
+dl.settings dd {
+	width: 66%;
+	float: left;
+	margin: 0 0 3px 0;
+	padding: 5px;
+}
+
+dl.settings dt.note {
+	width: 96%;
+	float: left;
+	margin: 0 0 10px 0;
+	padding: 5px 0 5px 20px;
+	clear: both;
+}
+
+dl.settings dt.settings_title {
+	width: 100%;
+	float: none;
+	font-weight: bold;
+	clear: both;
+}

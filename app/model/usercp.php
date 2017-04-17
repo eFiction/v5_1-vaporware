@@ -1024,7 +1024,7 @@ class UserCP extends Base
 	
 	public function settingsLoadPreferences()
 	{
-		$data = $this->exec("SELECT `alert_feedback`, `alert_comment`, `alert_favourite`, `preferences` FROM `new5_users`U WHERE U.uid = ".$_SESSION['userID']);
+		$data = $this->exec("SELECT `alert_feedback`, `alert_comment`, `alert_favourite`, `preferences` FROM `tbl_users`U WHERE U.uid = ".$_SESSION['userID']);
 		if(empty($data)) return FALSE;
 		
 		$data = $data[0];

@@ -129,6 +129,17 @@ class Story extends Base
 			// sidebar stuff!
 			$join[] = "INNER JOIN (SELECT sid FROM `tbl_stories_authors` WHERE aid IN (".implode(",",$terms['author']).") GROUP BY sid having count(lid)=".count($terms['author']).") iA ON ( iA.sid = S.sid )";
 		}
+		if ( isset($terms['saved']) AND $_SESSION['userID']>0 )
+		{
+			// bookmarks & favourites
+			$saved_sql = "INNER JOIN `tbl_user_favourites`FavS ON (FavS.uid=".(int)$_SESSION['userID']." AND FavS.item=S.sid AND FavS.type='ST'";
+			if ($terms['saved']=="both")
+				$join[] = $saved_sql.")";
+			elseif ($terms['saved']=="fav")
+				$join[] = $saved_sql." AND FavS.bookmark=0)";
+			elseif ($terms['saved']=="bm")
+				$join[] = $saved_sql." AND FavS.bookmark=1)";
+		}
 		
 		$limit = $this->config['stories_per_page'];
 		$pos = (int)\Base::instance()->get('paginate.page') - 1;

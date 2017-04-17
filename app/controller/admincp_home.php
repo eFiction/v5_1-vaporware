@@ -14,7 +14,7 @@ class AdminCP_Home extends AdminCP
 		switch( $this->moduleInit(@$params['module']) )
 		{
 			case "manual":
-				$this->buffer( \View\Base::stub() );
+				$this->manual( $f3, $params );
 				break;
 			case "custompages":
 				$this->custompages( $f3, $params );
@@ -65,6 +65,11 @@ class AdminCP_Home extends AdminCP
 		$this->buffer( \View\AdminCP::homeWelcome($version, $compare) );
 	}
 
+	protected function manual(\Base $f3)
+	{
+		$this->buffer( "<a href='http://efiction.org/wiki/Main_Page'>http://efiction.org/wiki/Main_Page</a>" );
+	}
+	
 	protected function custompages(\Base $f3, array $params)
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_CustomPages') );
