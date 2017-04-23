@@ -7,7 +7,7 @@ class Story extends Base
 	{
 		while ( list($key, $value) = each($data) )
 			Story::dataProcess($data[$key], $key);
-		
+
 		\Base::instance()->set('stories', $data);
 		
 		return parent::render( 'story/listing.html' );

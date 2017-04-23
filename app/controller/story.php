@@ -271,6 +271,7 @@ class Story extends Base
 			$return = implode(";",$return);
 			$data = $this->model->search( $searchData, $return, $searchForm );
 			if($searchForm) $this->buffer ( \View\Story::searchPage($searchData) );
+
 			$this->buffer ( \View\Story::viewList($data) );
 		}
 
