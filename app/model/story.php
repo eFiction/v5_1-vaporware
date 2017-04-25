@@ -646,8 +646,11 @@ class Story extends Base
 
 		if ( $ebook )
 		{
+			// http://stackoverflow.com/questions/93551/how-to-encode-the-filename-parameter-of-content-disposition-header-in-http
+			$filename = rawurlencode ( $epubData['title']." by ".$epubData['authors'].".epub" );
+			
 			header("Content-type: application/epub+zip; charset=utf-8");
-			header("Content-Disposition: filename=\"".$epubData['title']." by ".$epubData['authors'].".epub\"");
+			header("Content-Disposition: attachment; filename=\"{$filename}\"; filename*=utf-8''".$filename);
 			header("Content-length: ".$filesize);
 			header("Cache-control: private");
 
