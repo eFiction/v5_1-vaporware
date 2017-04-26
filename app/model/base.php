@@ -550,13 +550,23 @@ class Base extends \Prefab {
 									LEFT JOIN `tbl_news`N ON ( F.reference = N.nid AND F.type = 'N' AND N.uid = {$_SESSION['userID']} )
 							WHERE F.type IN ('C','N') GROUP BY F.type) as F1)";
 
+			$sql[]= "SELECT @rw as rw, @rr as rr, @rq as rq, @st as st, @cw as cw, @cr as cr;";
+
+			$data = $this->exec($sql)[0];
+		}
+		elseif ( $module == "messaging" )
+		{
+			$sql[]= "SET @inbox  := (SELECT COUNT(1) FROM `tbl_messaging`M WHERE M.recipient = {$_SESSION['userID']});";
+			$sql[]= "SET @unread := (SELECT COUNT(1) FROM `tbl_messaging`M WHERE M.recipient = {$_SESSION['userID']} AND M.date_read IS NULL);";
+			$sql[]= "SET @outbox := (SELECT COUNT(1) FROM `tbl_messaging`M WHERE M.sender = {$_SESSION['userID']});";
+			
 			if(array_key_exists("shoutbox", $this->config['optional_modules']))
 			{
-				$sql[]= "SET @sb := (SELECT COUNT(1) FROM `tbl_shoutbox` WHERE `uid` = {$_SESSION['userID']});";
+				$sql[]= "SET @shoutbox := (SELECT COUNT(1) FROM `tbl_shoutbox` WHERE `uid` = {$_SESSION['userID']});";
 			}
-			else $sql[]= "SET @sb := NULL";
-
-			$sql[]= "SELECT @rw as rw, @rr as rr, @rq as rq, @st as st, @cw as cw, @cr as cr, @sb as sb;";
+			else $sql[]= "SET @shoutbox := NULL";
+			
+			$sql[]= "SELECT @inbox as inbox, @unread as unread, @outbox as outbox, @shoutbox as shoutbox;";
 
 			$data = $this->exec($sql)[0];
 		}

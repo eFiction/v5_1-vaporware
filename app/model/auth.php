@@ -129,16 +129,12 @@ class Auth extends Base {
 		$sql[] = "UPDATE `tbl_sessions`S SET lastvisited = CURRENT_TIMESTAMP WHERE S.session = '{$session_id}' AND S.ip = INET_ATON('{$_SERVER['REMOTE_ADDR']}');";
 
 		$sql[] = "SELECT S.session, UNIX_TIMESTAMP(S.lastvisited) as time, S.ip, IF(S.user,S.user,0) as userID, 
-						U.nickname, U.groups, U.preferences, 
+						U.nickname, U.groups, U.preferences, U.cache, 
 						GROUP_CONCAT(DISTINCT U2.uid) as allowed_authors, 
-						COUNT(P1.mid) as mail, 
-						COUNT(P2.mid) as unread, 
 						@guests, @members
 							FROM `tbl_sessions`S 
 							INNER JOIN `tbl_users` U ON ( IF(S.user,S.user = U.uid,U.uid=0) )
 								LEFT JOIN `tbl_users`U2 ON ( (U.uid = U2.uid OR U.uid = U2.curator) AND U.groups&5 )
-							LEFT JOIN `tbl_messaging` P1 ON ( U.uid = P1.recipient )
-							LEFT JOIN `tbl_messaging` P2 ON ( U.uid = P2.recipient AND P2.date_read IS NULL )
 						WHERE S.session = '{$session_id}' AND S.ip = INET_ATON('{$_SERVER['REMOTE_ADDR']}');";
 						
 /*
@@ -157,6 +153,17 @@ class Auth extends Base {
 						"guest"		=>	$user['@guests']
 					]
 			);
+
+			$user['cache'] = json_decode($user['cache'],TRUE);
+			if ( empty($user['cache']['messaging']) )
+			{
+				$user['cache']['messaging'] = $this->userCacheRecount("messaging");
+				
+				$userInstance = \User::instance();
+				$userInstance->cache = json_encode($user['cache']);
+				$userInstance->save();
+			}
+
 			$user['preferences'] = json_decode($user['preferences'],TRUE);
 			// Check if language is available
 			$user['preferences']['language'] = ( FALSE===$f3->get('CONFIG.language_forced') AND array_key_exists($user['preferences']['language'], $f3->get('CONFIG.language_available' )) )

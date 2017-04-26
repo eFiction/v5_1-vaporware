@@ -87,17 +87,37 @@ class UserCP extends Base
 
 			$data = $this->exec($sql)[0];
 		}
+		elseif ( $module == "messaging" )
+		{
+			$user = \User::instance();
+			
+			$cache = json_decode(@$user->cache,TRUE);
+			
+			if ( empty($cache['messaging']) )
+			{
+				$data = $this->userCacheRecount("messaging");
+				$cache['messaging'] = $data;
+				$user->cache = json_encode($cache);
+				$user->save();
+				return (array)$data;
+			}
+			return (array)$cache['messaging'];
+		}
 		elseif ( $module == "feedback" )
 		{
 			$user = \User::instance();
 			
-			if ( NULL == $data = json_decode(@$user->feedback_cache,TRUE) )
+			$cache = json_decode(@$user->cache,TRUE);
+			
+			if ( empty($cache['feedback']) )
 			{
 				$data = $this->userCacheRecount("feedback");
-				$user->feedback_cache = json_encode($data);
+				$cache['feedback'] = $data;
+				$user->cache = json_encode($cache);
 				$user->save();
+				return (array)$data;
 			}
-			return (array)$data;
+			return (array)$cache['feedback'];
 		}
 
 		if ( isset($data) )

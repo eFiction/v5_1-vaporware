@@ -48,11 +48,11 @@ class Auth extends Base {
 			//$_SESSION['admin_active'] 	= $user['admin_active'];
 			$_SESSION['userID']			= $user['userID'];
 			$_SESSION['username']		= $user['nickname'];
-			$_SESSION['mail']			= array($user['mail'],$user['unread']);
+			$_SESSION['mail']			= array($user['cache']['messaging']['inbox']['sum'],$user['cache']['messaging']['unread']['sum']);
 			$_SESSION['allowed_authors']= explode(",",$user['allowed_authors']);
 			$_SESSION['preferences']	= $user['preferences'];
 			$_SESSION['tpl']			= [ "default", 1];
-			
+
 			return TRUE;
 		}
 		else

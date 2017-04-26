@@ -59,3 +59,4 @@ class AdminCP extends Base
 		$f3->reroute('/adminCP/home', false);
 	}
 }
+

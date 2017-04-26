@@ -292,7 +292,6 @@ class UserCP extends Base
 								"RR" => $this->counter['rr']['sum'],
 								"CW" => $this->counter['cw']['sum'],
 								"CR" => $this->counter['cr']['sum'],
-								"SB" => $this->counter['sb']['sum'],
 							]
 						);
 
@@ -302,9 +301,6 @@ class UserCP extends Base
 				$this->buffer ( $this->feedbackReviews($f3, $params) );
 				break;
 			case "comments":
-				$this->buffer ( \View\Base::stub("reviews") );
-				break;
-			case "shoutbox":
 				$this->buffer ( \View\Base::stub("reviews") );
 				break;
 			default:
@@ -367,11 +363,9 @@ class UserCP extends Base
 	{
 		if ( FALSE !== $data = $this->model->loadReview($params) )
 		{
-			//print_r($data);
 			$this->buffer ( \View\UserCP::libraryFeedbackEdit($data, $params) );
 		}
 	}
-
 
 	protected function feedbackHome(\Base $f3, $params)
 	{
@@ -379,7 +373,7 @@ class UserCP extends Base
 		$this->buffer ( \View\UserCP::feedbackHome($stats) );
 		//return "Noch nix";
 	}
-
+	
 	public function settings(\Base $f3, $params)
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Settings') );
@@ -586,7 +580,7 @@ class UserCP extends Base
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Message') );
 		
-		$sub = [ "outbox", "read", "write", "delete" ];
+		$sub = [ "outbox", "read", "write", "delete", "shoutbox" ];
 		if ( !in_array(@$params[0], $sub) ) $params[0] = "";
 
 		switch ( $params[0] )
@@ -604,11 +598,22 @@ class UserCP extends Base
 				$data = $this->model->msgOutbox();
 				$this->buffer ( \View\UserCP::msgInOutbox($data, "outbox") );
 				break;
+			case "shoutbox":
+				$this->buffer ( \View\Base::stub("shoutbox") );
+				break;
 			default:
 				$data = $this->model->msgInbox();
 				$this->buffer ( \View\UserCP::msgInOutbox($data, "inbox") );
 		}
-		$this->showMenu("messaging");
+
+		$this->counter = $this->model->getCount("messaging");
+		$this->showMenu("messaging",
+							[
+								"UN" => $this->counter['unread']['sum'],
+								"SB" => $this->counter['shoutbox']['sum'],
+							]
+						);
+
 	}
 	
 	public function msgRead(\Base $f3, $params)

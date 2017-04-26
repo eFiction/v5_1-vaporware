@@ -125,13 +125,16 @@ return array(
 'ChangeTo'	=> 'Change to',
 'UserMenu_Profile' => 'Profile',
 'UserMenu_Message' => 'Messaging',
-'UserMenu_PMInbox' => 'Inbox',
+'UserMenu_PMInbox' => '{0, plural,'.
+							'zero	{Inbox},'.
+							'other	{Inbox (# new)} }',
 'UserMenu_PMOutbox' => 'Outbox',
 'UserMenu_PMWrite' => 'Write',
 	'MSG_deletedSuccess'	=> 'Message deleted',
 	'MSG_deleteRead'	=> 'Unable to delete, this message has been read',
 	'MSG_deleteNotFound' => 'Unable to delete, Message not found',
 	'MSG_deleteNoAccess' => 'You have no access to this message',
+'UserMenu_Shoutbox'			=> '{0, plural,'. 'other {Shoutbox (#)} }', 
 	
 'UserMenu_Authoring' => 'Authoring',
 	'Authoring_Finished' => '{0, plural,'.
@@ -158,7 +161,6 @@ return array(
 	'UserMenu_ReviewsReceived'	=> '{0, plural,'. 'other {Reviews received (#)} }', 
 	'UserMenu_CommentsWritten'	=> '{0, plural,'. 'other {Comments written (#)} }',
 	'UserMenu_CommentsReceived'	=> '{0, plural,'. 'other {Comments received (#)} }', 
-	'UserMenu_Shoutbox'			=> '{0, plural,'. 'other {Shoutbox (#)} }', 
 'UserMenu_Settings' => 'Settings',
 	'UserMenu_Preferences' => 'Preferences',
 	
