@@ -1,0 +1,51 @@
+<check if="{{isset(@deleted)}}">
+	<switch expr="{{ @deleted }}">
+		<case value="success" break="TRUE">
+			<div class="alert-box-half success">{{@LN__MSG_deletedSuccess}}</div>
+		</case>
+		<case value="notfound" break="TRUE">
+			<div class="alert-box-half warning">{{@LN__MSG_deleteNotFound}}</div>
+		</case>
+		<case value="noaccess" break="TRUE">
+			<div class="alert-box-half error">{{@LN__MSG_deleteNoAccess}}</div>
+		</case>
+		<case value="unknown" break="TRUE">
+			<div class="alert-box-half error">{{@LN__UnknowError}}</div>
+		</case>
+	</switch>
+</check>
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
+<table class="tbody">
+	<tr>
+		<th>&nbsp;</th>
+		<th>&nbsp;</th>
+		<th>&nbsp;</th>
+		<th>&nbsp;</th>
+	</tr>
+	<repeat group="{{ @shouts }}" value="{{ @row }}">
+	<tr>
+		<td><a href="{{@BASE}}/userCP/messaging/shoutbox/edit/message={{ @row['id'] }};returnpath=/userCP/messaging/shoutbox/page={{@@paginate.page}}">{ICON:edit}</a></td>
+		<td><a href="{{@BASE}}/userCP/messaging/shoutbox/delete/message={{ @row['id'] }};returnpath=/userCP/messaging/shoutbox/page={{@@paginate.page}}" class="deleteItem" title="Shout #{{ @row['id'] }}" id="{{ @row['id'] }}">{ICON:trash}</a></td>
+		<td>{{ date(@CONFIG.date_format_long,@row.timestamp) }}</td>
+		<td>{{ @row.message | raw }}</td>
+	</tr>
+	</repeat>
+</table>
+<F3:check if="{{isset(@paginate.firstPage) AND sizeof(@shouts)>10}}"><include href="paginate.html" /></F3:check>
+<script type="text/javascript">
+$(document).ready (function () {
+	$('.deleteItem').click (function (event) {
+		event.preventDefault();
+		var href = $( this ).attr("href");
+		var id = $( this ).attr("id");
+		var title = $( this ).attr("title");
+		if ( confirm ("Are you sure you want to delete entry: \n\n" + title + "?") )
+		{
+			$('<form action="'+href+'" method="POST"/>')
+			.append($('<input type="hidden" name="confirmed" value="'+id+'">'))
+			.appendTo($(document.body)) //it has to be added somewhere into the <body>
+			.submit();
+		}
+	})
+}) ; 
+</script>

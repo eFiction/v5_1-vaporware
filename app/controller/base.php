@@ -107,11 +107,15 @@ class Base extends \Prefab {
 	 * and do something else with it.
 	 * @return string
 	 */
-	public function afterroute() {
+	public function afterroute()
+	{
 		if (!$this->response)
 			trigger_error('No View has been set.');
 		
 		$this->response->data = $this->data;
 		echo $this->response->finish();
+		
+		// drop lastAction from session, it's either handled right after being set or never
+		unset($_SESSION['lastAction']);
 	}
 }

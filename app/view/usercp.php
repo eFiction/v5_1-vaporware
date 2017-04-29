@@ -116,6 +116,20 @@ class UserCP extends Base
 		return \Template::instance()->render('usercp/messaging.write.html');
 	}
 	
+	public static function msgShoutboxList($data)
+	{
+		//\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+
+		if( isset($_SESSION['lastAction']) )
+		{
+			\Base::instance()->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
+			unset($_SESSION['lastAction']);
+		}
+		
+		\Base::instance()->set('shouts', $data);
+		return \Template::instance()->render('usercp/shoutbox.list.html');
+	}
+	
 	public static function libraryBookFavEdit($data, $params)
 	{
 		\Registry::get('VIEW')->javascript( 'head', TRUE, "jquery.are-you-sure.js" );

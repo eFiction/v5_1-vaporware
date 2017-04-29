@@ -25,7 +25,7 @@ class Blocks extends Base
 			":guest_name"	=> ( $member ) ? NULL : $data['name'],
 			":message"		=> $data['message'],
 		];
-		if ($member) \Model\Routines::dropUserCache();
+		if ($member) \Model\Routines::dropUserCache("messaging");
 		return $this->exec($sql, $bind);
 	}
 

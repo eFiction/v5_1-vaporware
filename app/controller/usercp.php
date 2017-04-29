@@ -266,11 +266,6 @@ class UserCP extends Base
 				//$f3->reroute($params['returnpath'], false);
 				//exit;
 			}
-			elseif ( $params[0] == "shoutbox" )
-			{
-				//
-				
-			}
 			else
 			{
 				if ( FALSE === $result = $this->model->saveFeedback($post, $params) )
@@ -678,19 +673,35 @@ class UserCP extends Base
 		// Check for form data
 		if( NULL != $post = $f3->get('POST') )
 		{
-			//
+			// check if the delete confirmation was triggered
+			if ( array_key_exists("confirmed",$post) )
+			{
+				// delete message
+				$result = $this->model->msgShoutboxDelete(@$params['message']);
+				// remember last Action, show via template
+				$_SESSION['lastAction'] = [ "deleted" => $result ];
+				// reroute
+				if ( $params['returnpath']=="" ) $params['returnpath'] = "/userCP/messaging/shoutbox";
+				$f3->reroute($params['returnpath'], false);
+			}
 			
-		}
-		elseif( isset($params['delete']) )
-		{
-			//
-			$result = $this->model->msgShoutboxDelete($params['message']);
-
-			$_SESSION['lastAction'] = [ "deleted" => $result===TRUE ? "success" : $result ];
+			// save changes - to come
+			
+			
+			// reroute
+			if ( $params['returnpath']=="" ) $params['returnpath'] = "/userCP/messaging/shoutbox";
 			$f3->reroute($params['returnpath'], false);
 		}
+		elseif( isset($params['edit']) )
+		{
+			// load message
+
+		}
 		
-		print_r($params);
+		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
+		$data = $this->model->msgShoutboxList($page);
+		
+		$this->buffer( \View\UserCP::msgShoutboxList($data) );
 	}
 	
 	protected function showMenu($selected=FALSE, array $data=[])

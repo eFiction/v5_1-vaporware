@@ -91,33 +91,25 @@ class UserCP extends Base
 		{
 			$user = \User::instance();
 			
-			$cache = json_decode(@$user->cache,TRUE);
-			
-			if ( empty($cache['messaging']) )
+			if ( NULL == $data = json_decode(@$user->cache_messaging,TRUE) )
 			{
 				$data = $this->userCacheRecount("messaging");
-				$cache['messaging'] = $data;
-				$user->cache = json_encode($cache);
+				$user->cache_messaging = json_encode($data);
 				$user->save();
-				return (array)$data;
 			}
-			return (array)$cache['messaging'];
+			return (array)$data;
 		}
 		elseif ( $module == "feedback" )
 		{
 			$user = \User::instance();
 			
-			$cache = json_decode(@$user->cache,TRUE);
-			
-			if ( empty($cache['feedback']) )
+			if ( NULL == $data = json_decode(@$user->cache_feedback,TRUE) )
 			{
 				$data = $this->userCacheRecount("feedback");
-				$cache['feedback'] = $data;
-				$user->cache = json_encode($cache);
+				$user->cache_feedback = json_encode($data);
 				$user->save();
-				return (array)$data;
 			}
-			return (array)$cache['feedback'];
+			return (array)$data;
 		}
 
 		if ( isset($data) )
@@ -758,12 +750,48 @@ class UserCP extends Base
 		return "unknown";
 	}
 	
+	public function msgShoutboxList($page)
+	{
+		$limit = 25;
+		$pos = $page - 1;
+
+		$sql = "SELECT SQL_CALC_FOUND_ROWS S.id, S.message, UNIX_TIMESTAMP(S.date) as timestamp
+					FROM `tbl_shoutbox`S WHERE S.uid = {$_SESSION['userID']}
+					ORDER BY S.date DESC
+					LIMIT ".(max(0,$pos*$limit)).",".$limit;
+		
+		$data = $this->exec($sql);
+
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/userCP/messaging/shoutbox",
+			$limit
+		);
+		return $data;
+	}
+	
 	public function msgShoutboxDelete($message)
 	{
 		$sql = "DELETE FROM `tbl_shoutbox` WHERE id = :message AND uid = {$_SESSION['userID']};";
 		if ( 1 === $this->exec($sql, [ ":message" => $message ]) )
-			return TRUE;
-		else return FALSE;
+		{
+			// drop user cache for messages
+			\Model\Routines::dropUserCache("messaging");
+			return "success";
+		}
+		
+		$trouble = $this->exec("SELECT S.uid FROM `tbl_shoutbox`S WHERE id=:message;", [ ":message" => $message ]);
+
+		// message doesn't exist
+		if ( sizeof($trouble)==0 )
+			return "notfound";
+		else $trouble = $trouble[0];
+
+		// <jedi>This is not your message</jedi>
+		if ( $trouble['uid'] != $_SESSION['userID'] )
+			return "noaccess";
+		// might not happen, but let's cover this
+		return "unknown";
 	}
 	
 	public function libraryBookFavDelete($params)
