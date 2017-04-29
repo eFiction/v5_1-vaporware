@@ -758,6 +758,14 @@ class UserCP extends Base
 		return "unknown";
 	}
 	
+	public function msgShoutboxDelete($message)
+	{
+		$sql = "DELETE FROM `tbl_shoutbox` WHERE id = :message AND uid = {$_SESSION['userID']};";
+		if ( 1 === $this->exec($sql, [ ":message" => $message ]) )
+			return TRUE;
+		else return FALSE;
+	}
+	
 	public function libraryBookFavDelete($params)
 	{
 		if ( empty($params['id'][0]) OR empty($params['id'][1]) ) return FALSE;

@@ -556,6 +556,9 @@ class Base extends \Prefab {
 		}
 		elseif ( $module == "messaging" )
 		{
+			// we should not get here without a userID in session, but if we do, better bail out before zeeee error strikes
+			if(empty($_SESSION['userID'])) return NULL;
+			
 			$sql[]= "SET @inbox  := (SELECT COUNT(1) FROM `tbl_messaging`M WHERE M.recipient = {$_SESSION['userID']});";
 			$sql[]= "SET @unread := (SELECT COUNT(1) FROM `tbl_messaging`M WHERE M.recipient = {$_SESSION['userID']} AND M.date_read IS NULL);";
 			$sql[]= "SET @outbox := (SELECT COUNT(1) FROM `tbl_messaging`M WHERE M.sender = {$_SESSION['userID']});";

@@ -580,7 +580,11 @@ class UserCP extends Base
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Message') );
 		
-		$sub = [ "outbox", "read", "write", "delete", "shoutbox" ];
+		if ( TRUE == $this->config->optional_modules['shoutbox'] )
+			$sub = [ "outbox", "read", "write", "delete", "shoutbox" ];
+		else
+			$sub = [ "outbox", "read", "write", "delete" ];
+		
 		if ( !in_array(@$params[0], $sub) ) $params[0] = "";
 
 		switch ( $params[0] )
@@ -599,7 +603,8 @@ class UserCP extends Base
 				$this->buffer ( \View\UserCP::msgInOutbox($data, "outbox") );
 				break;
 			case "shoutbox":
-				$this->buffer ( \View\Base::stub("shoutbox") );
+				$this->msgShoutbox($f3, $params);
+				//$this->buffer ( \View\Base::stub("shoutbox") );
 				break;
 			default:
 				$data = $this->model->msgInbox();
@@ -666,6 +671,26 @@ class UserCP extends Base
 			*/
 			$status = $this->model->msgSave($save); // return TRUE
 		}
+	}
+	
+	protected function msgShoutbox(\Base $f3, $params)
+	{
+		// Check for form data
+		if( NULL != $post = $f3->get('POST') )
+		{
+			//
+			
+		}
+		elseif( isset($params['delete']) )
+		{
+			//
+			$result = $this->model->msgShoutboxDelete($params['message']);
+
+			$_SESSION['lastAction'] = [ "deleted" => $result===TRUE ? "success" : $result ];
+			$f3->reroute($params['returnpath'], false);
+		}
+		
+		print_r($params);
 	}
 	
 	protected function showMenu($selected=FALSE, array $data=[])

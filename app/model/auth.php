@@ -147,6 +147,8 @@ class Auth extends Base {
 
 		if ( $user['session'] > '' && $user['userID'] > 0 )
 		{
+			$_SESSION['userID']	= $user['userID'];
+			
 			$f3->set('usercount', 
 					[
 						"member"	=>	$user['@members']+1,
@@ -169,11 +171,13 @@ class Auth extends Base {
 			$user['preferences']['language'] = ( FALSE===$f3->get('CONFIG.language_forced') AND array_key_exists($user['preferences']['language'], $f3->get('CONFIG.language_available' )) )
 									? $user['preferences']['language']
 									// Fallback to page default
-									: $f3->get('CONFIG. language_default');
+									: $f3->get('CONFIG.language_default');
 			return $user;
 		}
 		else
 		{
+			$_SESSION['userID']	= FALSE;
+			
 			$f3->set('usercount', 
 					[
 						"member"	=>	$user['@members'],

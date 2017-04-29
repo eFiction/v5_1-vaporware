@@ -46,7 +46,7 @@ class Auth extends Base {
 		{
 			$_SESSION['groups'] 		= $user['groups'];
 			//$_SESSION['admin_active'] 	= $user['admin_active'];
-			$_SESSION['userID']			= $user['userID'];
+			//$_SESSION['userID']			= $user['userID'];
 			$_SESSION['username']		= $user['nickname'];
 			$_SESSION['mail']			= array($user['cache']['messaging']['inbox']['sum'],$user['cache']['messaging']['unread']['sum']);
 			$_SESSION['allowed_authors']= explode(",",$user['allowed_authors']);
@@ -61,7 +61,7 @@ class Auth extends Base {
 			//
 			$_SESSION['groups'] 		= bindec('0');
 			//$_SESSION['admin_active'] 	= FALSE;
-			$_SESSION['userID']			= FALSE;
+			//$_SESSION['userID']			= FALSE;
 			$_SESSION['username']		= "__Guest";
 			$_SESSION['mail']			= FALSE;
 			$_SESSION['allowed_authors']= [];
