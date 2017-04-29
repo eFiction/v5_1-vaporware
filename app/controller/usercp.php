@@ -108,7 +108,6 @@ class UserCP extends Base
 						$buffer = $this->authorStoryEdit($f3, $params);
 						break;
 				}
-				//$buffer .= print_r($params,1);
 			}
 		}
 		
@@ -187,7 +186,6 @@ class UserCP extends Base
 		if ( FALSE === $data = $this->model->authorStoryList($params[1],$params['uid'],$sort,$page) )
 			return FALSE;
 		
-		//print_r($data);
 		return \View\UserCP::authorStoryList($data, $sort, $params);
 	}
 

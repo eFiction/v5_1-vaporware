@@ -50,13 +50,11 @@ class UserCP extends Base
 					// get second sub menu segment and place under selected author
 					$sub2 = $this->panelMenu('author_sub', $status);
 					
-//					$menu = [];
 					foreach ( $sub as $sKey => $sData )
 					{
 						if ( $sKey == "sub" ) $menu = array_merge($menu, $sub2);
 						else $menu[$sKey] = $sData;
 					}
-//					print_r($menu);
 				}
 				else
 				{
@@ -544,8 +542,6 @@ class UserCP extends Base
 			"reviewsPerStoryTotal"	=> $data['st']['sum'] > 0 ? round(($data['rr']['details']['ST']/$data['st']['sum']),1) : NULL,
 			"reviewsPerChapter"		=> $chapters > 0 ?			round(($data['rr']['details']['ST']/$chapters),1) : NULL,
 		];
-//		print_r($stats);
-//		print_r($data);
 		return $stats;
 	}
 	
@@ -1108,7 +1104,6 @@ class UserCP extends Base
 											"hideTags"		=> $data['p']['hideTags'],
 										]);
 		$mapper->save();
-		//print_r($data);
 	}
 
 
