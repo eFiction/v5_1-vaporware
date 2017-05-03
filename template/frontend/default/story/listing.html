@@ -18,7 +18,7 @@
 				</check>
 			</a>&nbsp;
 		</check>
-		<a href="{{@BASE}}/story/read/{{@story.sid}},reviews" title="{{@LN__TitleReadReviews, @story.title | format}}">{{@story.reviews}}</a>
+		<a href="{{@BASE}}/story/read/{{@story.sid}},reviews" title="{{@LN__TitleReadReviews, @story.title | format}}"><span class="fa fa-comments-o"></span> {{@story.reviews}}</a>
 	</div>
 	<div class="story-info2"><span class="fa fa-folder-open"></span> <repeat group="{{@story.cache_categories}}" value="{{@category}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check>{{@category.1}}</repeat></div>
 	<div class="story-info2">{{@story.summary |raw}}</div>
@@ -28,7 +28,7 @@
 			<false>{{@LN__NoTags}}</false>
 		</check>
 	</div>
-	<div class="story-info3"><small>{{@LN__Published}}: {{@story.published}} &bull; <check if="{{@story.modified}}">{{@LN__Updated}}: {{@story.modified}} &bull; </check>{{@LN__Chapters}}: {{@story.chapters}} &bull; {{@LN__Words}}: {{@story.wordcount}} &bull; {{@LN__Status}}: {{@story.completed==0 ? @LN__WIP : @LN__Completed }} &bull; {{@LN__Rating}}: {{@story.rating_name}} &bull; {{@LN__Clicks}}: {{@story.count}} <span class="fa fa-flag-o"></span></small></div>
+	<div class="story-info3"><small>{{@LN__Published}}: {{@story.published}} &bull; <check if="{{@story.modified}}">{{@LN__Updated}}: {{@story.modified}} &bull; </check>{{@LN__Chapters}}: {{@story.chapters}} &bull; {{@LN__Words}}: {{@story.wordcount}} &bull; {{@LN__Status}}: {{@story.completed==0 ? @LN__WIP : @LN__Completed }} &bull; {{@LN__Rating}}: {{@story.rating_name}} &bull; {{@LN__Clicks}}: {{@story.count}} &bull; <span class="fa fa-flag-o"></span></small></div>
 	</div>
 </repeat>
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="story/paginate.html" /></F3:check>
