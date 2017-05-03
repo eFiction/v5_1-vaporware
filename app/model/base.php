@@ -4,7 +4,7 @@ namespace Model;
 class Base extends \Prefab {
 
 	// persistence settings
-	protected $table, $db, $fieldConf, $sqlTmp;
+	protected $table, $db, $fieldConf, $sqlTmp, $menuCount;
 
 	public function __construct()
 	{
@@ -216,42 +216,6 @@ class Base extends \Prefab {
 		]);
 	}
 
-	protected function panelMenu($selected=FALSE, array $data=[])
-	{
-		$f3 = \Base::instance();
-		$sql = "SELECT M.label, M.link, M.icon, M.evaluate FROM `tbl_menu_userpanel`M WHERE M.child_of @WHERE@ ORDER BY M.order ASC";
-
-		$menuItems = $this->exec(str_replace("@WHERE@", ($selected?"= :selected;":"IS NULL;"), $sql) , [":selected"=> $selected]);
-		foreach ( $menuItems as $item )
-		{
-			$item["label"] = explode("%%",$item["label"]);
-			if ( empty($item["label"][1]) OR $data[$item["label"][1]]!== FALSE )
-			{
-				if ( $item["label"][0] == "" )
-				{
-					foreach ( $data[$item["label"][1]] as $id => $label )
-					{
-						$link = str_replace("%ID%", $id, $item["link"]);
-						$menu[$link] = [ "label" => $label, "icon" => $item["icon"] ];
-						if ( $data['ID'] == $id ) $menu['sub'] = FALSE;
-					}	
-				}
-				else
-				{
-					if ( isset($item["label"][1]) )
-					{
-						$label = $f3->get('LN__'.$item["label"][0],$data[$item["label"][1]]);
-					}
-					else $label = $f3->get('LN__'.$item["label"][0]);
-					
-					if ( isset ( $data['id']) ) $item["link"] = str_replace('%ID%', $data['id'], $item["link"]);
-					$menu[$item["link"]] = [ "label" => $label, "icon" => $item["icon"] ];
-				}
-			}
-		}
-		return $menu;
-	}
-	
 	protected function storyStates()
 	{
 		// Commented lines are for later versions, providing more options

@@ -19,15 +19,15 @@
 	<tr>
 		<th>&nbsp;</th>
 		<th>&nbsp;</th>
-		<th>&nbsp;</th>
+		<th>{{@LN__Date}}</th>
 		<th>&nbsp;</th>
 	</tr>
 	<repeat group="{{ @shouts }}" value="{{ @row }}">
 	<tr>
-		<td><a href="{{@BASE}}/userCP/messaging/shoutbox/edit/message={{ @row['id'] }};returnpath=/userCP/messaging/shoutbox/page={{@@paginate.page}}">{ICON:edit}</a></td>
-		<td><a href="{{@BASE}}/userCP/messaging/shoutbox/delete/message={{ @row['id'] }};returnpath=/userCP/messaging/shoutbox/page={{@@paginate.page}}" class="deleteItem" title="Shout #{{ @row['id'] }}" id="{{ @row['id'] }}">{ICON:trash}</a></td>
+		<td><check if="{{@row['uid']==@_SESSION['userID']}}"><true><a href="{{@BASE}}/userCP/shoutbox/edit/message={{ @row['id'] }};returnpath=/userCP/shoutbox/page={{@@paginate.page}}">{ICON:edit}</a></true><false>&nbsp;</false></check></td>
+		<td><check if="{{@row['uid']==@_SESSION['userID']}}"><true><a href="{{@BASE}}/userCP/shoutbox/delete/message={{ @row['id'] }};returnpath=/userCP/shoutbox/page={{@@paginate.page}}" class="deleteItem" title="Shout #{{ @row['id'] }}" id="{{ @row['id'] }}">{ICON:trash}</a></true><false>&nbsp;</false></check></td>
 		<td>{{ date(@CONFIG.date_format_long,@row.timestamp) }}</td>
-		<td>{{ @row.message | raw }}</td>
+		<td>{{ @row.nickname | raw }}: {{ @row.message | raw }}</td>
 	</tr>
 	</repeat>
 </table>

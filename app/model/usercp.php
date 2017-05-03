@@ -13,6 +13,7 @@ class UserCP extends Base
 
 	public function showMenu($selected=FALSE, array $data=[])
 	{
+		//if ( empty($this->menu) ) $this->menu = $this->panelMenu();
 		if ( $selected )
 		{
 			if ( $selected == "author")
@@ -70,9 +71,57 @@ class UserCP extends Base
 		return $this->menu;
 	}
 	
-	public function getCount($module="")
+	protected function panelMenu($selected=FALSE, array $data=[])
 	{
-		if ( $module == "library" )
+		$f3 = \Base::instance();
+		$sql = "SELECT M.label, M.link, M.icon, M.evaluate FROM `tbl_menu_userpanel`M WHERE M.child_of @WHERE@ ORDER BY M.order ASC";
+		$menu = [];
+
+		$menuItems = $this->exec(str_replace("@WHERE@", ($selected?"= :selected;":"IS NULL;"), $sql) , [":selected"=> $selected]);
+		foreach ( $menuItems as $item )
+		{
+			if ( $item['evaluate']=="" OR $this->config['optional_modules'][$item['evaluate']] )
+			{
+				$item["label"] = explode("%%",$item["label"]);
+				
+				// Get count for an item if not already available
+				if( isset($item['label'][2]) AND empty($this->menuCount[$item['label'][1]]) )
+					$this->getMenuCount($item['label'][1]);
+				
+				if ( $item["label"][0] == "" )
+				{
+					// Authoring sub-menu
+					foreach ( $data[$item["label"][1]] as $id => $label )
+					{
+						$link = str_replace("%ID%", $id, $item["link"]);
+						$menu[$link] = [ "label" => $label, "icon" => $item["icon"] ];
+						if ( $data['ID'] == $id ) $menu['sub'] = FALSE;
+					}	
+				}
+				else
+				{
+					// Item with count
+					if ( isset($item["label"][1]) AND isset($item["label"][2]) )
+						$label = $f3->get('LN__'.$item["label"][0],$this->menuCount[$item["label"][1]][$item["label"][2]]);
+					
+					// Authoring sub-menu
+					elseif ( isset($item["label"][1]) AND isset($data[$item["label"][1]]) )
+						$label = $f3->get('LN__'.$item["label"][0],$data[$item["label"][1]]);
+					
+					// Simple menu entry
+					else $label = $f3->get('LN__'.$item["label"][0]);
+					
+					if ( isset ( $data['id']) ) $item["link"] = str_replace('%ID%', $data['id'], $item["link"]);
+					$menu[$item["link"]] = [ "label" => $label, "icon" => $item["icon"] ];
+				}
+			}
+		}
+		return $menu;
+	}
+	
+	public function getMenuCount($module="")
+	{
+		if ( $module == "LIB" )
 		{
 			$sql[]= "SET @bms  := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_user_favourites`F WHERE F.uid={$_SESSION['userID']} AND F.bookmark=1 GROUP BY F.type) AS F1);";
 			$sql[]= "SET @favs := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_user_favourites`F WHERE F.uid={$_SESSION['userID']} AND F.bookmark=0 GROUP BY F.type) AS F1);";
@@ -84,8 +133,32 @@ class UserCP extends Base
 			$sql[]= "SELECT @bms as bookmark,@favs as favourite,@recs as recommendation;";
 
 			$data = $this->exec($sql)[0];
+
+			if ( isset($data) )
+			{
+				foreach( $data as $key => $count )
+					list($counter[$key]['sum'], $counter[$key]['details']) = array_pad(explode("//",$count), 2, '');
+
+				foreach ( $counter as &$count )
+				{
+					$cc = $this->cleanResult($count['details']);
+					if(is_array($cc))
+					{
+						$count['details'] = [];
+						foreach ( $cc as $c ) $count['details'][$c[0]] = $c[1];
+					}
+					else $count['details'] = "";
+				}
+				$this->menuCount['data']['library'] = $counter;
+				
+				$this->menuCount['LIB']  = 	[
+												"BMS"	=> $counter['bookmark']['sum'],
+												"FAVS"	=> $counter['favourite']['sum'],
+												"RECS"	=> is_numeric($counter['recommendation']['sum']) ? $counter['recommendation']['sum'] : FALSE,
+											];
+			}
 		}
-		elseif ( $module == "messaging" )
+		elseif ( $module == "MSG" OR $module == "SB" )
 		{
 			$user = \User::instance();
 			
@@ -95,9 +168,12 @@ class UserCP extends Base
 				$user->cache_messaging = json_encode($data);
 				$user->save();
 			}
-			return (array)$data;
+			$this->menuCount['data']['messaging'] = $data;
+			
+			$this->menuCount['SB']  = [ "SB" => $data['shoutbox']['sum'] ];
+			$this->menuCount['MSG'] = [ "UN" => $data['unread']['sum'] ];
 		}
-		elseif ( $module == "feedback" )
+		elseif ( $module == "FB" )
 		{
 			$user = \User::instance();
 			
@@ -107,27 +183,20 @@ class UserCP extends Base
 				$user->cache_feedback = json_encode($data);
 				$user->save();
 			}
-			return (array)$data;
+			$this->menuCount['data']['feedback'] = $data;
+			
+			$this->menuCount['FB']	=	[
+											"RW" => $data['rw']['sum'],
+											"RR" => $data['rr']['sum'],
+											"CW" => $data['cw']['sum'],
+											"CR" => $data['cr']['sum'],
+										];
 		}
-
-		if ( isset($data) )
-		{
-			foreach( $data as $key => $count )
-				list($counter[$key]['sum'], $counter[$key]['details']) = array_pad(explode("//",$count), 2, '');
-
-			foreach ( $counter as &$count )
-			{
-				$cc = $this->cleanResult($count['details']);
-				if(is_array($cc))
-				{
-					$count['details'] = [];
-					foreach ( $cc as $c ) $count['details'][$c[0]] = $c[1];
-				}
-				else $count['details'] = "";
-			}
-			return $counter;
-		}
-		return NULL;
+	}
+	
+	public function getCounter($module)
+	{
+		return @$this->menuCount['data'][$module];
 	}
 	
 	public function authorStoryAdd($data)
@@ -666,6 +735,8 @@ class UserCP extends Base
 		{
 			$this->exec("UPDATE `tbl_messaging`m SET m.date_read = CURRENT_TIMESTAMP WHERE m.mid = {$data[0]['mid']};");
 			$_SESSION['mail'][1]--;
+			// Drop user messaging cache
+			\Model\Routines::dropUserCache("messaging");
 		}
 		return $data[0];
 	}
@@ -719,6 +790,8 @@ class UserCP extends Base
 				":message"		=> $save['message']
 			];
 			$data = $this->exec($saveSQL, $bind);
+			// Drop the messaging cache of all recipients
+			\Model\Routines::dropUserCache("messaging", (int)$recipient);
 		}
 		return TRUE;
 	}
@@ -746,27 +819,29 @@ class UserCP extends Base
 		return "unknown";
 	}
 	
-	public function msgShoutboxList($page)
+	public function shoutboxList($page,$user=FALSE)
 	{
 		$limit = 25;
 		$pos = $page - 1;
 
-		$sql = "SELECT SQL_CALC_FOUND_ROWS S.id, S.message, UNIX_TIMESTAMP(S.date) as timestamp
-					FROM `tbl_shoutbox`S WHERE S.uid = {$_SESSION['userID']}
-					ORDER BY S.date DESC
+		$sql = "SELECT SQL_CALC_FOUND_ROWS S.id, S.uid, U.nickname, S.message, UNIX_TIMESTAMP(S.date) as timestamp
+					FROM `tbl_shoutbox`S 
+						LEFT JOIN `tbl_users`U ON ( S.uid = U.uid )
+					".
+					(($user)?"WHERE S.uid = {$_SESSION['userID']} ":"")
+					."ORDER BY S.date DESC
 					LIMIT ".(max(0,$pos*$limit)).",".$limit;
-		
 		$data = $this->exec($sql);
 
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
-			"/userCP/messaging/shoutbox",
+			"/userCP/shoutbox",
 			$limit
 		);
 		return $data;
 	}
 	
-	public function msgShoutboxDelete($message)
+	public function shoutboxDelete($message)
 	{
 		$sql = "DELETE FROM `tbl_shoutbox` WHERE id = :message AND uid = {$_SESSION['userID']};";
 		if ( 1 === $this->exec($sql, [ ":message" => $message ]) )

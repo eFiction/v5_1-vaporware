@@ -12,6 +12,8 @@ return array(
 'Cancel'	=>	'Cancel',
 'Submit'	=>	'Submit',
 'Return'	=>	'Return',
+'Date'		=>	'Date',
+'Message'	=>	'Message',
 'CaptchaMismatch'	=>	'Captcha did not match',
 'GuestURL'		=>	'Guests are not allowed to post URLs',
 'GuestNameEmpty' => 'Name field cannot be empty',
@@ -424,15 +426,12 @@ return array(
 'RecommendedStory'	=> '{0, plural,'.
 	'one	{Recommended Story},'.
 	'other	{Recommended Stories} }',
+'TitleReadReviews' => '{0, plural, other {Read reviews for \'#\'} }',
 
-'BookmarkAdd'		=> 'This story has no bookmark.
-Click here to add one now.',
-'BookmarkRemove'		=> 'This story has a bookmark.
-Click here to remove it.',
-'FavouriteAdd'		=> 'This story is not a favourite.
-Click here to set.',
-'FavouriteRemove'	=> 'This story is a favourite.
-Click here to unset.',
+'BookmarkAdd'		=> '{0, plural, other {\'#\' has no bookmark, click to add.} }',
+'BookmarkRemove'	=> '{0, plural, other {\'#\' has a bookmark, click to remove.} }',
+'FavouriteAdd'		=> '{0, plural, other {\'#\' is not a favourite, click to make it one.} }',
+'FavouriteRemove'	=> '{0, plural, other {\'#\' is a favourite, click to remove.} }',
 
 'TOC'	=> 'Table of content',
 'NoTags' => 'No tags defined',

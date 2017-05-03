@@ -116,7 +116,7 @@ class UserCP extends Base
 		return \Template::instance()->render('usercp/messaging.write.html');
 	}
 	
-	public static function msgShoutboxList($data)
+	public static function shoutboxList($data)
 	{
 		//\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 

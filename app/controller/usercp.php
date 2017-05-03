@@ -18,25 +18,21 @@ class UserCP extends Base
 
 	public function index(\Base $f3, $params)
 	{
-		$modules =
-		[
-			"library"		=> "library",
-			"messaging"		=> "messaging",
-			"author"		=> "author",
-			"feedback"		=> "feedback",
-			"settings"		=> "settings",
-		];
+		$modules = [ "library", "messaging", "author", "feedback", "settings" ];
+
+		if ( TRUE == $this->config->optional_modules['shoutbox'] )
+			$modules[] = "shoutbox";
 
 		$p = array_pad(@explode("/",$params['*']),2,NULL); // 3.6
 
 		$mod = array_shift($p);
 
-		if(@array_key_exists($mod,$modules))
+		if ( in_array($mod, $modules) )
 		{
 			list($params, $returnpath) = array_pad(explode(";returnpath=",implode("/",$p)), 2, '');
 			$params = $this->parametric($params);
 			$params['returnpath'] = $returnpath;
-			$this->{$modules[$mod]}($f3, $params);
+			$this->{$mod}($f3, $params);
 		}
 		// Just show default menu
 		else
@@ -279,14 +275,7 @@ class UserCP extends Base
 			}
 		}
 
-		$this->counter = $this->model->getCount("feedback");
-		$this->showMenu("feedback", [
-								"RW" => $this->counter['rw']['sum'],
-								"RR" => $this->counter['rr']['sum'],
-								"CW" => $this->counter['cw']['sum'],
-								"CR" => $this->counter['cr']['sum'],
-							]
-						);
+		$this->showMenu("feedback");
 
 		switch ( $params[0] )
 		{
@@ -482,14 +471,7 @@ class UserCP extends Base
 			}
 		}
 
-		$this->counter = $this->model->getCount("library");
-
-		$this->showMenu("library", [
-									"BMS"	=> $this->counter['bookmark']['sum'],
-									"FAVS"	=> $this->counter['favourite']['sum'],
-									"RECS"	=> is_numeric($this->counter['recommendation']['sum']) ? $this->counter['recommendation']['sum'] : FALSE,
-								   ]
-						);
+		$this->showMenu("library");
 
 		switch ( $params[0] )
 		{
@@ -503,11 +485,11 @@ class UserCP extends Base
 			default:
 				$this->buffer ( "Empty page");
 		}
-
 	}
 	
 	private function libraryBookFav(\Base $f3, $params)
 	{
+		print_r($this->counter);
 		// Build upper micro-menu
 		$counter = $this->counter[$params[0]]['details'];
 
@@ -573,12 +555,11 @@ class UserCP extends Base
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Message') );
 		
-		if ( TRUE == $this->config->optional_modules['shoutbox'] )
-			$sub = [ "outbox", "read", "write", "delete", "shoutbox" ];
-		else
-			$sub = [ "outbox", "read", "write", "delete" ];
+		$sub = [ "outbox", "read", "write", "delete" ];
 		
 		if ( !in_array(@$params[0], $sub) ) $params[0] = "";
+
+		$this->showMenu("messaging");
 
 		switch ( $params[0] )
 		{
@@ -595,23 +576,10 @@ class UserCP extends Base
 				$data = $this->model->msgOutbox();
 				$this->buffer ( \View\UserCP::msgInOutbox($data, "outbox") );
 				break;
-			case "shoutbox":
-				$this->msgShoutbox($f3, $params);
-				//$this->buffer ( \View\Base::stub("shoutbox") );
-				break;
 			default:
 				$data = $this->model->msgInbox();
 				$this->buffer ( \View\UserCP::msgInOutbox($data, "inbox") );
 		}
-
-		$this->counter = $this->model->getCount("messaging");
-		$this->showMenu("messaging",
-							[
-								"UN" => $this->counter['unread']['sum'],
-								"SB" => $this->counter['shoutbox']['sum'],
-							]
-						);
-
 	}
 	
 	public function msgRead(\Base $f3, $params)
@@ -666,8 +634,12 @@ class UserCP extends Base
 		}
 	}
 	
-	protected function msgShoutbox(\Base $f3, $params)
+	protected function shoutbox(\Base $f3, $params)
 	{
+		$this->response->addTitle( $f3->get('LN__UserMenu_Shoutbox',0) );
+		
+		$this->showMenu("shoutbox");
+
 		// Check for form data
 		if( NULL != $post = $f3->get('POST') )
 		{
@@ -675,7 +647,7 @@ class UserCP extends Base
 			if ( array_key_exists("confirmed",$post) )
 			{
 				// delete message
-				$result = $this->model->msgShoutboxDelete(@$params['message']);
+				$result = $this->model->shoutboxDelete(@$params['message']);
 				// remember last Action, show via template
 				$_SESSION['lastAction'] = [ "deleted" => $result ];
 				// reroute
@@ -697,9 +669,9 @@ class UserCP extends Base
 		}
 		
 		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
-		$data = $this->model->msgShoutboxList($page);
+		$data = $this->model->shoutboxList($page);
 		
-		$this->buffer( \View\UserCP::msgShoutboxList($data) );
+		$this->buffer( \View\UserCP::shoutboxList($data) );
 	}
 	
 	protected function showMenu($selected=FALSE, array $data=[])
@@ -711,5 +683,7 @@ class UserCP extends Base
 			\View\UserCP::showMenu($menu), 
 			"LEFT"
 		);
+		
+		if($selected) $this->counter = $this->model->getCounter($selected);
 	}
 }

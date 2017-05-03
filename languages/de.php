@@ -12,6 +12,8 @@ return array(
 'Cancel'	=>	'Abbrechen',
 'Submit'	=>	'Absenden',
 'Return'	=>	'Zurück',
+'Date'		=>	'Datum',
+'Message'	=>	'Nachricht',
 'CaptchaMismatch'	=>	'Captcha stimmt nicht überein',
 'GuestURL'		=>	'Gäste dürfen keine URLs posten',
 'GuestNameEmpty' => 'Gäste müssen einen Namen angeben',
@@ -424,13 +426,11 @@ return array(
 'RecommendedStory'	=> '{0, plural,'.
 	'one	{Externe Empfehlung},'.
 	'other	{Externe Empfehlungen} }',
+'TitleReadReviews' => '{0, plural, other {Read reviews for \'#\'} }',
 
-'BookmarkAdd'		=> 'Diese Geschichte hat kein Lesezeichen.
-Hier klicken um eines zu setzen.',
-'BookmarkRemove'		=> 'Diese Geschichte hat ein Lesezeichen.
-Hier klicken um es zu entfernen.',
-'FavouriteAdd'		=> 'Diese Geschichte gehört nicht zu den Favoriten.
-Hier klicken um hinzuzufügen.',
+'BookmarkAdd'		=> '{0, plural, other {\'#\' hat kein Lesezeichen, hier klicken um eines zu setzen.} }',
+'BookmarkRemove'		=> '{0, plural, other {\'#\' hat ein Lesezeichen, hier klicken um es zu entfernen.} }',
+'FavouriteAdd'		=> '{0, plural, other {\'#\' gehört nicht zu deinen Favoriten, hier klicken um sie hinzuzufügen.} }',
 'FavouriteRemove'	=> 'Diese Geschichte gehört zu den Favoriten.
 Hier klicken um zu entfernen.',
 

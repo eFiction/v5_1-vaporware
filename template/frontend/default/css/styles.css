@@ -420,60 +420,32 @@ span.count {
 	
 	
 /*-----------------  REVIEWS  -----------------*/
-.review {
+.review:nth-child(odd) {
 	border: 1px solid #dcdcdc;
 	padding: 10px;
-}
-/*
-.review {
-	position: relative;
-	padding: 10px;
-	background: #fafafa;
-	-webkit-border-radius: 4px;
-	-moz-border-radius: 4px;
-	border-radius: 4px;
-	margin: 5px;
-}
-.review:after {
-	content: '';
-	position: absolute;
-	border-style: solid;
-	border-width: 15px 15px 15px 0;
-	border-color: transparent #fafafa;
-	display: block;
-	width: 0;
-	z-index: 1;
-	margin-top: -15px;
-	left: -15px;
-	top: 25px;
+	margin: 2px 0;
 }
 
-.review-comment {
-	background: #efefef;
-	margin: 5px 5px 5px 50px;
+.review:nth-child(even) {
+	background-color: #efefef;
+	padding: 10px;
+	margin: 2px 0;
 }
-.review-comment:after {
-	content: '';
-	position: absolute;
-	border-style: solid;
-	border-width: 15px 15px 15px 0;
-	border-color: transparent #efefef;
-	display: block;
-	width: 0;
-	z-index: 1;
-	margin-top: -15px;
-	left: -15px;
-	top: 25px;
+
+.review-name {
+	font-weight: bold;
+
 }
-.write-review {
-	width: 80%;
-	margin: 0 auto;
+
+.review-date {
+	text-align: right;
 }
-.user-icon {
-	margin: 0;
-	padding: 0 0 0 5px;
+
+.review-text {
+	padding: 4px 6px;
+	text-align: justify;
 }
-*/
+
 /*----------------- CONTEXTUAL POPUP -----------------*/
 
 a.contextual-popup { text-decoration: none; }
