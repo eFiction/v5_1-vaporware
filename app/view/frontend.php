@@ -3,13 +3,6 @@ namespace View;
 
 class Frontend extends Base
 {
-/*
-	public function __construct()
-	{
-		parent::__construct();
-		//$this->iconset = Iconset::instance();
-	}
-*/
 	/*
 		Base render function wrapper
 	*/
@@ -43,7 +36,6 @@ class Frontend extends Base
 								);
 
 		$body = preg_replace_callback(
-							//	'/\{ICON:([\w]+):?(.*?)\}/s',
 								'/\{ICON:([\w-]+)(:|\!)?(.*?)\}/s',	// for use with forced visibility
 								function ($icon)
 								{
@@ -63,10 +55,16 @@ class Frontend extends Base
 
 		if( preg_match($expression,$tpl,$match) )
 		{
-			// Array (     [0] => {BLOCK:menu.main}     [1] => BLOCK    [2] => menu    [3] => .main )
+			/*
+				$match = array
+					[0] => {BLOCK:menu.main}
+					[1] => BLOCK
+					[2] => menu
+					[3] => .main
+			*/
 			if ( $match[1] == "BLOCK" AND isset( $this->modules[$match[2]] ) )
 			{
-				$call = $this->modules[$match[2]][0];//'\\'.$m[0].'\Block';
+				$call = $this->modules[$match[2]][0];
 				// call or recall block module
 				$qq = $this->modules[$match[2]][1];
 				if ( isset($this->modules[$match[2]][2]) )
@@ -90,8 +88,11 @@ class Frontend extends Base
 		$f3 = \Base::instance();
 		$cfg = $f3->get('CONFIG');
 		
-		if ( isset($this->JS['head']) ) $f3->set( 'JS_HEAD', implode("\n", $this->JS['head']) );
+/* 		if ( isset($this->JS['head']) ) $f3->set( 'JS_HEAD', implode("\n", $this->JS['head']) );
 		if ( isset($this->JS['body']) ) $f3->set( 'JS_BODY', implode("\n", $this->JS['body']) );
+ */		
+		$f3->set( 'JS_HEAD', implode("\n", @$this->JS['head']) );
+		$f3->set( 'JS_BODY', implode("\n", @$this->JS['body']) );
 
 
 		if($cfg['page_title_add']=='slogan')

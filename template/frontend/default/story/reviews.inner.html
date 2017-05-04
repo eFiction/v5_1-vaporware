@@ -1,4 +1,5 @@
 	<div class="review review-level-{{@item.level}}">
+		{* {{@iteration}}<set iteration="{{@iteration++}}"> *}
 		<div class="review-name">{{@item.name}}</div> <div class="review-date"><check if="{{@item.timestamp>0}}"> {{ date(@CONFIG.date_format_long, @item.timestamp) }}</check></div>
 		<div class="review-text">{{@item.text | raw}}</div> <br />
 		<div align="right">

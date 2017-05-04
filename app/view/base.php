@@ -3,7 +3,7 @@ namespace View;
 abstract class Base {
 	
     public $data = array();
-	public $JS = [ ];
+	public $JS = [ "head" => [], "body" => [] ];
     public $modules = [];
 	protected $title = [];
 
@@ -17,11 +17,11 @@ abstract class Base {
 		$UI = "";
 
 		// get a layout to be used
-		if ( isset($_SESSION['layout']) AND in_array($_SESSION['layout'], \Config::getPublic("layout_available")) AND FALSE!==\Config::getPublic("layout_forced") )
-			$tpl = $_SESSION['layout'];
+		if ( isset($_SESSION['preferences']['layout']) AND isset(\Config::getPublic("layout_available")[$_SESSION['preferences']['layout']]) AND FALSE==\Config::getPublic("layout_forced") )
+			$tpl = $_SESSION['preferences']['layout'];
 		else
 			$tpl = \Config::getPublic("layout_default");
-		
+
 		if ( !file_exists( $UI_BASE.$tpl ) ) $tpl = "default";
 
 		/*
