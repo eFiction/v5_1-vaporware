@@ -1,6 +1,5 @@
 <span id="review-container">
 	<set last_level="0">
-	<set odd_even="1">
 	<ul class="review">
 	<repeat group="{{ @story_reviews }}" value="{{ @item }}">
 		<check if="{{@last_level==@item.level}}">
@@ -12,11 +11,7 @@
 		<check if="{{@last_level>@item.level}}">
 			<loop from="{{ @k=@last_level }}" to="{{ @k > @item.level }}" step="{{ @k-- }}"></li></ul></loop>
 		</check>
-		<check if="{{(@odd_even++) % 2 == 0}}">
-			<true><li class="review even"></true>
-			<false><li class="review odd"></false>
-		</check>
-		<a id="r{{@item.id}}"></a>{{@item.name}} - {{ @item.level }} __Chapter {{@item.chapternr}}/{{@item.id}}
+		<li class="review"><a id="r{{@item.id}}"></a>{{@item.name}} - {{ @item.level }} __Chapter {{@item.chapter}}/{{@item.id}}
 			<check if="{{ @_SESSION.userID OR TRUE==@CONFIG.allow_guest_reviews }}">
 				<check if="{{ @_SESSION.userID > 0 AND @_SESSION.userID == @item.uid }}">
 					<true>
@@ -27,9 +22,6 @@
 					</false>
 				</check>
 			</check>
-			<check if="{{isset(@item.elements) AND @item.elements>0}}"><a href="{{@BASE}}/story/read/{{@item.story}},{{@selection}},{{@item.id}}#r{{@item.id}}">XXX {{@item.elements}}</a></check>
-			<br/>
-			{{@item.text}}
 			<div class="ajaxform"></div>
 		<set last_level="{{@item.level}}">
 	</repeat>

@@ -4,15 +4,17 @@ function changeChapter() {
 window.location=url+selectedValue;
 }
 
-$('#story-container').on("click", ".openform", function(e) { 
-	var form = $(this).parent();
-	var all = $(this).parents('.review');
+$('#story-container').on("click", ".openform", function(e)
+{ 
+	var form = $(this);
+	var review_container = document.getElementById('review-container');
+
 	if ( form.nextAll('.ajaxform:first').html() == '' )
 	{
 		//clear all old forms
-		$(this).parents('.review_container').find('.ajaxform').hide('slow').html('');
+		$(review_container).find('.ajaxform').hide('slow').html('');
 		var ajaxurl = base + '/story/ajax/review_comment_form';
-		var data = { childof: $(this).attr('id'), level: $(this).data("level") };
+		var data = { childof: $(this).attr('id'), level: $(this).data("level"), story: $(this).data("story") };
 		review_data ( ajaxurl, data, form );
 	}
 });
@@ -28,11 +30,10 @@ function review_data ( ajax_url, ajax_data, ajax_form )
 			number = 0;
 			//create the new form and make it visible
 			ajax_form.nextAll('.ajaxform:first').hide().html(html[1]).show('slow');
-			if ( html[2] != "" )
+			if ( html[2] == 1 )
 			{
-				var span = document.getElementById(html[2]);
-				span.removeChild( span.firstChild );
-				//console.log(html[2]);
+				var redirect = $(location).attr('href');
+				$.redirectPost(redirect, {s_data: ajax_data});
 			}
 			$('.reviewButton').click(function(review) {
 				review.preventDefault();

@@ -75,11 +75,12 @@ class Auth extends Base
 
 	public static function captchaF3()
 	{
+		ob_start();
 		$img = new \Image();
 		$img->captcha('template/captchaFonts/Browning.ttf',16,5,'SESSION.captcha');
 		$_SESSION['captcha'] = password_hash($_SESSION['captcha'], PASSWORD_DEFAULT);
 
-		ob_start();
+		
 		$img->render();
 		$image_data = ob_get_contents();
 		ob_end_clean();

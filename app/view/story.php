@@ -72,14 +72,16 @@ class Story extends Base
 		return parent::render('story/information.html');
 	}
 
-	public static function buildReviews($reviewData)
+/*	public static function buildReviews($reviewData,$selection)
 	{
 		\Base::instance()->set('returnpath', \Base::instance()->get('PATH') );
 		\Base::instance()->set('story_reviews', $reviewData);
+		\Base::instance()->set('selection', $selection);
 
 		return parent::render('story/reviews.html');
-	}
+	}		*/
 
+	// for AJAX purposes - requires reviews.inner
 	public static function buildReviewCell($data, $level = 1, $insert_id = NULL)
 	{
 		$item =
@@ -102,31 +104,37 @@ class Story extends Base
 		\Base::instance()->set('childof', $parentID);
 		\Base::instance()->set('level', isset($_POST['level']) ? (int)$_POST['level'] : 1);
 		\Base::instance()->set('element', NULL);
-		\Base::instance()->set('data', [ "cancel" => TRUE, "feedback_form_label" => "__Comment" ]);
+		\Base::instance()->set('data', [ 
+											"cancel" 				=> TRUE,
+											"feedback_form_label"	=> "__Comment",
+											"postText"				=> \Base::instance()->get('POST.write.text'),
+											"postName"				=> \Base::instance()->get('POST.write.text'),
+										]
+							);
 		
 		return parent::render('main/feedback_form.html');
 	}
 
-	public static function buildStory($storyData,$content,$dropdown)
+	public static function buildStory($storyData,$content,$dropdown,$view=1)
 	{
-		\Registry::get('VIEW')->javascript('body', TRUE, 'chapter.js' );
+		\Registry::get('VIEW')->javascript('body', TRUE, 'chapter.js?'.microtime() );
 		\Registry::get('VIEW')->javascript('body', FALSE, "var url='".\Base::instance()->get('BASE')."/story/read/{$storyData['sid']},'" );
 
 		$storyData['cache_authors'] = json_decode($storyData['cache_authors'],TRUE);
 		$storyData['published'] = date( \Config::getPublic('date_format_short'), $storyData['published']);
 		$storyData['modified'] = date( \Config::getPublic('date_format_short'), $storyData['modified']);
 
-//		$can_edit = ( $storyData['can_edit'] ) ? "userCP" : NULL;
-//		if ( !$can_edit AND $_SESSION['groups'] & 64 ) $can_edit = "adminCP";
-		
 		\Base::instance()->set('data', [
 												"story" 	=> $storyData,
 												"content" 	=> $content,
 												"dropdown" 	=> $dropdown,
-											//	"can_edit" 	=> $can_edit,
 												"infoblock" => ( $storyData['chapters'] > 1 ) ? "" : \View\Story::buildInfoblock($storyData),
 												"feedback_form_label" => "__Review",
+												"view"		=> $view,
+												"postName"	=> '',
+												"postText"	=> '',
 												]);
+		\Base::instance()->set('returnpath', \Base::instance()->get('PATH') );
 		
 		return parent::render('story/single.html');
 	}

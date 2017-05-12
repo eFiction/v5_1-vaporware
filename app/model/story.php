@@ -388,9 +388,9 @@ class Story extends Base
 		return $data;
 	}
 
-	public function loadReviews($storyID,$chapter=NULL)
+	public function loadReviews($storyID,$selectedReview,$chapter=NULL)
 	{
-		$limit=5;
+		$limit=1000;
 		$sql = "SELECT 
 						F1.*, 
 						F2.fid as comment_id, 
@@ -405,20 +405,20 @@ class Story extends Base
 							F.fid as review_id, 
 							Ch.inorder,
 							F.text as review_text, 
-							F.reference as review_chapter, 
-							F.reference_sub as review_chapterid, 
+							F.reference as review_story, 
+							F.reference_sub as review_chapter, 
 							IF(F.writer_uid>0,U.nickname,F.writer_name) as review_writer_name, 
 							F.writer_uid as review_writer_uid, 
 							UNIX_TIMESTAMP(F.datetime) as date_review
 						FROM `tbl_feedback`F 
 							JOIN `tbl_users`U ON ( F.writer_uid = U.uid )
-							LEFT JOIN `tbl_chapters`Ch ON ( Ch.chapid = F.reference )
+							LEFT JOIN `tbl_chapters`Ch ON ( Ch.chapid = F.reference_sub )
 						WHERE F.reference = :storyid @CHAPTER@ AND F.type='ST' 
 						ORDER BY F.datetime 
 						DESC LIMIT 0,".$limit."
 					) F1
-				LEFT JOIN `tbl_feedback`F2  ON (F1.review_id = F2.reference AND F2.type='C')
-					LEFT JOIN `tbl_users`U2 ON ( F2.writer_uid = U2.uid )
+					LEFT JOIN `tbl_feedback`F2  ON (F1.review_id = F2.reference AND F2.type='C')
+						LEFT JOIN `tbl_users`U2 ON ( F2.writer_uid = U2.uid )
 				ORDER BY F1.date_review DESC, F2.datetime ASC";
 
 		if ( $chapter )
@@ -430,6 +430,7 @@ class Story extends Base
 
 		$current_id = NULL;
 		$tree = [];
+
 		foreach ( $flat as $item )
 		{
 			// new review root element
@@ -440,12 +441,15 @@ class Story extends Base
 				$data['r'.$current_id] =
 				[
 					"level"		=>	1,
+					"story"		=>	$item['review_story'],
 					"chapter"	=>	$item['review_chapter'],
+					"chapternr"	=>	$item['inorder'],
 					"id"		=>	$item['review_id'],
 					"text"		=>	$item['review_text'],
 					"name"		=>	$item['review_writer_name'],
 					"uid"		=>	$item['review_writer_uid'],
 					"timestamp"	=>	$item['date_review'],
+					"elements"	=> 0,
 				];
 			}
 			
@@ -454,35 +458,44 @@ class Story extends Base
 			// Add the comment to the data structure
 			if ( $item['comment_id'] != NULL )
 			{
-				// Check parent level and remember this node's level
-				if ( isset($depth[$item['parent_item']]) )
-					$depth[$item['comment_id']] = $depth[$item['parent_item']] + 1;
-				else
-					$depth[$item['comment_id']] = 2;
+				if ( $item['review_id']==(int)$selectedReview OR $selectedReview=="all" )
+				{
+					// showing this branch, so make sure we don't offer a link to show it ... again
+					$data['r'.$current_id]['elements'] = NULL;
+					// Check parent level and remember this node's level
+					if ( isset($depth[$item['parent_item']]) )
+						$depth[$item['comment_id']] = $depth[$item['parent_item']] + 1;
+					else
+						$depth[$item['comment_id']] = 2;
 
-				// tell the tree where this item originates from
-				if ( $item['parent_item'] == "" )
-					$tree += [ 'c'.$item['comment_id'] => 'r'.$current_id ];
+					// tell the tree where this item originates from
+					if ( $item['parent_item'] == "" )
+						$tree += [ 'c'.$item['comment_id'] => 'r'.$current_id ];
+					else
+						$tree += [ 'c'.$item['comment_id'] => 'c'.$item['parent_item'] ];
+					
+					$data['c'.$item['comment_id']] = 
+					[
+						"level"		=>	min ($depth[$item['comment_id']], 4),
+						"story"		=>	$item['review_story'],
+						"chapter"	=>	$item['review_chapter'],
+						"chapternr"	=>	$item['inorder'],
+						"id"		=>	$item['comment_id'],
+						"parent"	=>	$item['parent_item'],
+						"text"		=>	$item['comment_text'],
+						"name"		=>	$item['comment_writer_name'],
+						"uid"		=>	$item['comment_writer_uid'],
+						"timestamp"	=>	$item['date_comment'],
+					];
+				}
 				else
-					$tree += [ 'c'.$item['comment_id'] => 'c'.$item['parent_item'] ];
-				
-				$data['c'.$item['comment_id']] = 
-				[
-					"level"		=>	min ($depth[$item['comment_id']], 4),
-					"chapter"	=>	$item['review_chapter'],
-					"id"		=>	$item['comment_id'],
-					"parent"	=>	$item['parent_item'],
-					"text"		=>	$item['comment_text'],
-					"name"		=>	$item['comment_writer_name'],
-					"uid"		=>	$item['comment_writer_uid'],
-					"timestamp"	=>	$item['date_comment'],
-				];
+					$data['r'.$current_id]['elements']++;
 			}
 		}
 		
 		// build an index-tree of all elements on their proper location
 		$indexTree = $this->parseTree($tree);
-		
+
 		// flatten the tree and use it to order the data
 		// based on http://stackoverflow.com/questions/21516892/flatten-a-multdimensional-tree-array-in-php/21517018#21517018
 		array_walk_recursive($indexTree, function($item, $key) use (&$indexFlat, &$i, $data)
@@ -515,7 +528,7 @@ class Story extends Base
 		];
 		if ( 1== $this->exec($sql, $bind) )
 		{
-			\Model\Routines::dropUserCache();
+			\Model\Routines::dropUserCache("feedback");
 			\Cache::instance()->clear('stats');
 			return (int)$this->db->lastInsertId();
 		}

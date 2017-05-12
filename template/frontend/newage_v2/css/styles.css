@@ -10,3 +10,8 @@
 	width: 100%;
 	z-index: 15;
 }
+
+.review ul
+{
+	padding: 0px 0px 0px 30px;
+}

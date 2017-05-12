@@ -45,17 +45,31 @@ class Story extends Base
 	
 	public function save(\Base $f3, $params)
 	{
-		if ( $params['action']=="write" )
-		{
-			// write review or reply to a review
-			if($_SESSION['userID']!=0 || \Config::getPublic('allow_guest_reviews') )
-			{
-				$data = $f3->get('POST.write');
+		list($origin, $returnpath) = array_pad(explode(";returnpath=",$params['*']), 2, '');
+		$params['returnpath'] = $returnpath;
 
-				// Obviously, there should be some text ...
-				if ( "" == $data['text'] = trim($data['text']) )
-					$errors[]= 'MessageEmpty';
+		if ( $params['action']=="read" )
+		{
+			if ( isset($_POST['s_data']) )
+			{
+				parse_str($f3->get('POST.s_data'), $data);
+				//print_r($data);
+			}
+			elseif ( isset($_POST['write']) )
+				$data = $f3->get('POST');
+			
+			// write review or reply to a review
+			if( isset($data) AND ($_SESSION['userID']!=0 || \Config::getPublic('allow_guest_reviews')) )
+			{
+				$errors = $this->validateReview($data['write']);
 				
+				if ( sizeof($errors)==0 )
+				{
+					$insert_id = $this->model->saveComment($data['childof'], $data['write'], ($_SESSION['userID']!=0));
+					$return = (empty($params['returnpath']) ? $origin."#r".$insert_id : $returnpath);
+					$f3->reroute($params['returnpath'], false);
+					exit;
+				}	
 			}
 			else
 			{
@@ -63,8 +77,9 @@ class Story extends Base
 				
 			}
 		}
-		echo "<pre>".print_r($params,TRUE)."</pre>";
-		print_r($_POST);
+		
+		//echo "<pre>".print_r($params,TRUE).print_r(@$data,TRUE).print_r(@$errors,TRUE)."</pre>";
+		
 		exit;
 	}
 	
@@ -89,60 +104,52 @@ class Story extends Base
 			$id = (int)$f3->get('POST.childof');
 
 			$errors = [];
-			$removeButton = "";
+			$saveData = "";
 			
 			if($_SESSION['userID']!=0 || \Config::getPublic('allow_guest_reviews') )
 			{
 				if ( isset($_POST['write']) )
 				{
 					$data = $f3->get('POST.write');
+					
+					$errors = $this->validateReview($data);
 
-					// Obviously, there should be some text ...
-					if ( "" == $data['text'] = trim($data['text']) )
-						$errors[]= 'MessageEmpty';
-
-					if ( $_SESSION['userID'] )
-					{
-						if ( empty($errors) AND $insert_id = $this->model->saveComment($id, $data, TRUE) )
-						{
-							$removeButton = $id;
-							$view = \View\Story::buildReviewCell($data, (int)$_POST['level'], $insert_id);
-							//$f3->reroute('news/id='.$params['id'], false);
-						}
-						else $errors[] = "CannotSave";
-					}
-					else
-					{
-						// Check if captcha is initialized and matches user entry
-						if ( empty($_SESSION['captcha']) OR !password_verify(strtoupper($data['captcha']),$_SESSION['captcha']) )
-							$errors[]= 'CaptchaMismatch';
-
-						// Guest can't post with an empty name
-						if ( "" == $data['name'] = trim($data['name']) )
-							$errors[]= 'GuestNameEmpty';
-
-						// guest can't post URL (reg ex is not perfect, but it's a start)
-						if (preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i",$data['text']))
-							$errors[]= 'GuestURL';
-
-						if ( empty($errors) AND $insert_id = $this->model->saveComment($id, $data) )
-						{
-							// destroy this session captcha
-							unset($_SESSION['captcha']);
-							$removeButton = $id;
-							$view = \View\Story::buildReviewCell($data, (int)$_POST['level']);
-						}
-
-						//$f3->set('formError.1', "CaptchaMismatch");
-					}
-					// If no data was saved, we end up here, so we show the page again and it will display the errors
 					$f3->set('formError', $errors);
+					if ( empty($errors) ) $saveData = 1;
 				}
 			}
 			
 			if(empty($view)) $view = \View\Story::commentForm($id);
-			$this->buffer( array ( "", $view, $removeButton, ($_SESSION['userID']==0) ) , "BODY", TRUE );
+			$this->buffer( [ "", $view, $saveData, ($_SESSION['userID']==0) ], "BODY", TRUE );
+			//$this->buffer( array ( "", $view, (sizeof($errors)>0?"":1), ($_SESSION['userID']==0) ) , "BODY", TRUE );
+			//$this->buffer( array ( "", $view, (int)empty($errors), ($_SESSION['userID']==0) ) , "BODY", TRUE );
 		}
+	}
+	
+	protected function validateReview($data)
+	{
+		$errors = [];
+
+		// Obviously, there should be some text ...
+		if ( "" == $data['text'] = trim($data['text']) )
+			$errors[]= 'MessageEmpty';
+
+		if ( !$_SESSION['userID'] )
+		{
+			// Check if captcha is initialized and matches user entry
+			if ( empty($_SESSION['captcha']) OR !password_verify(strtoupper($data['captcha']),$_SESSION['captcha']) )
+				$errors[]= 'CaptchaMismatch';
+
+			// Guest can't post with an empty name
+			if ( "" == $data['name'] = trim($data['name']) )
+				$errors[]= 'GuestNameEmpty';
+
+			// guest can't post URL (reg ex is not perfect, but it's a start)
+			if (preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i",$data['text']))
+				$errors[]= 'GuestURL';
+		}
+		
+		return $errors;
 	}
 
 	protected function intro($params)
@@ -289,39 +296,64 @@ class Story extends Base
 
 	protected function read($id)
 	{
-		$id = explode(",",$id);
-		if($storyData = $this->model->getStory($id[0],empty($id[1])?1:$id[1]))
-		{
-			$story = $id[0];
-			if ( empty($id[1]) AND $storyData['chapters']>1 )
-				$id[1] = (TRUE===\Config::getPublic('story_toc_default')) ? "toc" : 1;
+		@list($story, $view, $selected) = explode(",",$id);
 
-			if ( isset($id[1]) AND $id[1] == "reviews" )
+		if($storyData = $this->model->getStory($story,empty($view)?1:$view))
+		{
+			if ( empty($view) AND $storyData['chapters']>1 )
+				$view = (TRUE===\Config::getPublic('story_toc_default')) ? "toc" : 1;
+
+/* 			if ( isset($view) AND $view == "reviews" )
 			{
 				$content = "*No reviews found";
 				$tocData = $this->model->getMiniTOC($story);
-				if ( $reviewData = $this->model->loadReviews($story) )
-					$content = \View\Story::buildReviews($reviewData);
+				if ( $reviewData = $this->model->loadReviews($story,$selected) )
+					$content = \View\Story::buildReviews($reviewData,$view);
 			}
-			elseif ( isset($id[1]) AND $id[1] == "toc" AND $storyData['chapters']>1 )
+			elseif ( isset($view) AND $view == "toc" AND $storyData['chapters']>1 )
 			{
 				$tocData = $this->model->getTOC($story);
 				$content = \View\Story::buildTOC($tocData,$storyData);
 			}
 			else
 			{
-				if( empty($id[1]) OR !is_numeric($id[1]) ) $id[1] = 1;
-				$chapter = $id[1] = max ( 1, min ( $id[1], $storyData['chapters']) );
+				if( empty($view) OR !is_numeric($view) ) $view = 1;
+				$chapter = $view = max ( 1, min ( $view, $storyData['chapters']) );
 				$tocData = $this->model->getMiniTOC($story);
 				\Base::instance()->set('bigscreen',TRUE);
 				$content = ($content = $this->model->getChapter( $story, $chapter )) ? : "Error";
 
-				if ( $reviewData = $this->model->loadReviews($story,$storyData['chapid']) )
-					$content .= \View\Story::buildReviews($reviewData);
+				if ( $reviewData = $this->model->loadReviews($story,$selected,$storyData['chapid']) )
+					$content .= \View\Story::buildReviews($reviewData,$view);
+			}
+ */			
+			if ( isset($view) AND $view == "toc" AND $storyData['chapters']>1 )
+			{
+				$tocData = $this->model->getTOC($story);
+				$content = \View\Story::buildTOC($tocData,$storyData);
+			}
+			else
+			{
+				$tocData = $this->model->getMiniTOC($story);
+
+				if ( isset($view) AND $view == "reviews" )
+				{
+					$content = NULL;
+					$storyData['reviewData'] = $this->model->loadReviews($story,$selected);
+				}
+				else
+				{
+					if( empty($view) OR !is_numeric($view) ) $view = 1;
+					$chapter = $view = max ( 1, min ( $view, $storyData['chapters']) );
+					\Base::instance()->set('bigscreen',TRUE);
+					$content = ($content = $this->model->getChapter( $story, $chapter )) ? : "Error";
+
+					$storyData['reviewData'] = $this->model->loadReviews($story,$selected,$storyData['chapid']);
+				}
 			}
 
-			$dropdown = \View\Story::dropdown($tocData,$id[1]);
-			$view = \View\Story::buildStory($storyData,$content,$dropdown);
+			$dropdown = \View\Story::dropdown($tocData,$view);
+			$view = \View\Story::buildStory($storyData,$content,$dropdown,$view);
 			$this->buffer($view);
 		}
 		else $this->buffer("Error, not found");

@@ -1,16 +1,5 @@
 <div class="write-review">
-	<check if="{{isset(@formError)}}">
-		<check if="{{sizeof(@formError)>0}}">
-			<true>
-				<div class="note alert-box error">{{ @LN__FormErrors, sizeof(@formError) | format }}:<br>
-				<repeat group="{{@formError}}" value="{{@error}}">{ICON:close} {{ ${'LN__'.@error} }}<br /></repeat>
-			</true>
-			<false>
-				<div class="note alert-box success">__FormSavingData
-			</false>
-		</check>
-		</div>
-	</check>
+	<check if="{{isset(@formError)}}"><div class="note alert-box-half error">{{ @LN__FormErrors, sizeof(@formError) | format }}:<br><repeat group="{{@formError}}" value="{{@error}}">{ICON:close} {{ ${'LN__'.@error} }}<br /></repeat></div></check>
 	<check if="{{@_SESSION.userID OR TRUE==\Config::instance()->allow_guest_reviews }}">
 	<true>
 		<fieldset>
@@ -19,12 +8,12 @@
 					<true>
 						<legend>{{@data.feedback_form_label}}</legend>
 						<div>{ICON:member} {{@_SESSION['username']}}</div>
-						<div class="field textarea"><textarea class="message" name="write[text]" placeholder="enter text here">{{@data.postText}}</textarea></div>
+						<div class="field textarea"><textarea class="message" name="write[text]" placeholder="enter text here">{{@@POST.write.text}}</textarea></div>
 					</true>
 					<false>
 						<legend>__Review / Anonymous</legend>
-						<div class="field">{ICON:member} __yourName: <input type="text" name="write[name]" placeholder="your name" value="{{@data.postName}}"></div>
-						<div class="field">{ICON:keyboard} __yourComment: <textarea id="shout" rows="10" cols="29" name="write[text]" placeholder="__yourTextHere">{{@data.postText}}</textarea></div>
+						<div class="field">{ICON:member} __yourName: <input type="text" name="write[name]" placeholder="your name" value="{{@@POST.write.name}}"></div>
+						<div class="field">{ICON:keyboard} __yourComment: <textarea id="shout" rows="10" cols="29" name="write[text]" placeholder="__yourTextHere">{{@@POST.write.text}}</textarea></div>
 						<div>{ICON:key}
 							<input type="text" name="write[captcha]" class="half" placeholder="captcha" value=""><div class="captchaBox">&nbsp;**cap**</div>
 						</div>

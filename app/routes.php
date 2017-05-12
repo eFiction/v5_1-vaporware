@@ -22,7 +22,6 @@ if ( FALSE == $cfg->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
 		'Controller\Story->index' );
 
 	$f3->route(
-	//  [ 'POST /story', 'POST /story/@action' , 'POST /story/@action/*' ],
 	  [ 'POST /story/@action' , 'POST /story/@action/*' ],
 		'Controller\Story->save' );
 

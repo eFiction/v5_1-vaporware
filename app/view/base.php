@@ -97,7 +97,12 @@ class Iconset extends \DB\Jig\Mapper {
 	{
 		list(, $label, $visibility, $text) = $key;
 		if (empty($label)) return NULL;
-		return str_replace("@T@", $text, self::instance()->{$label});
+		
+		// Empty $text should not overwrite a title tag of a parent item
+		if ($text)
+			return str_replace("@T@", "title='{$text}'", self::instance()->{$label});
+		else
+			return str_replace("@T@", "", self::instance()->{$label});
 	}
 	
 	static protected function rebuild($icon)
