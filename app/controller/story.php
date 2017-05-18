@@ -48,33 +48,37 @@ class Story extends Base
 	public function save(\Base $f3, $params)
 	{
 		list($requestpath, $returnpath) = array_pad(explode(";returnpath=",$params['*']), 2, '');
+		@list($story, $view, $selected) = explode(",",$requestpath);
 		$params['returnpath'] = $returnpath;
 
 		if ( $params['action']=="read" )
 		{
 			if ( isset($_POST['s_data']) )
-			{
 				parse_str($f3->get('POST.s_data'), $data);
-				//print_r($data);
-			}
+
 			elseif ( isset($_POST['write']) )
 				$data = $f3->get('POST');
 			
 			// write review or reply to a review
-			if( isset($data) AND ($_SESSION['userID']!=0 || \Config::getPublic('allow_guest_reviews')) )
+			if( is_numeric($story) AND isset($data) AND ($_SESSION['userID']!=0 || \Config::getPublic('allow_guest_reviews')) )
 			{
 				$errors = $this->validateReview($data['write']);
 				
 				if ( sizeof($errors)==0 )
 				{
-					$insert_id = $this->model->saveComment($data['childof'], $data['write'], ($_SESSION['userID']!=0));
+					// For now let's assume this always returns a proper result
+					@list($insert_id, $routine_type, $routine_id) = $this->model->saveComment($story, $data);
+					// Run notification routines
+					Routines::instance()->notification($routine_type, $routine_id);
+					
+					// return to where we came from
 					$return = (empty($params['returnpath']) ? $requestpath."#r".$insert_id : $returnpath);
 					$f3->reroute($params['returnpath'], false);
 					exit;
 				}
 				else
 				{
-					echo "<pre>".print_r($params,TRUE).print_r(@$data,TRUE).print_r(@$errors,TRUE)."</pre>";
+					//echo "<pre>".print_r($params,TRUE).print_r(@$data,TRUE).print_r(@$errors,TRUE)."</pre>";
 				}
 			}
 			else
@@ -87,7 +91,7 @@ class Story extends Base
 		//echo "<pre>".print_r($params,TRUE).print_r(@$data,TRUE).print_r(@$errors,TRUE)."</pre>";
 
 		// If nothing else has worked so far, return to where we came from and pretend this was intentional
-		//$f3->reroute($requestpath, false);
+		$f3->reroute($requestpath, false);
 		exit;
 	}
 	
@@ -110,6 +114,7 @@ class Story extends Base
 		{
 			// This is a comment to an element
 			$id = (int)$f3->get('POST.childof');
+			$chapter = (int)$f3->get('POST.chapter');
 
 			$errors = [];
 			$saveData = "";
@@ -127,7 +132,7 @@ class Story extends Base
 				}
 			}
 			
-			if(empty($view)) $view = \View\Story::commentForm($id);
+			if(empty($view)) $view = \View\Story::commentForm($id,$chapter);
 			$this->buffer( [ "", $view, $saveData, ($_SESSION['userID']==0) ], "BODY", TRUE );
 			//$this->buffer( array ( "", $view, (sizeof($errors)>0?"":1), ($_SESSION['userID']==0) ) , "BODY", TRUE );
 			//$this->buffer( array ( "", $view, (int)empty($errors), ($_SESSION['userID']==0) ) , "BODY", TRUE );
@@ -339,36 +344,13 @@ class Story extends Base
 	protected function read($id)
 	{
 		@list($story, $view, $selected) = explode(",",$id);
+		//Routines::notification("review", $story)
 
 		if($storyData = $this->model->getStory($story,empty($view)?1:$view))
 		{
 			if ( empty($view) AND $storyData['chapters']>1 )
 				$view = (TRUE===\Config::getPublic('story_toc_default')) ? "toc" : 1;
 
-/* 			if ( isset($view) AND $view == "reviews" )
-			{
-				$content = "*No reviews found";
-				$tocData = $this->model->getMiniTOC($story);
-				if ( $reviewData = $this->model->loadReviews($story,$selected) )
-					$content = \View\Story::buildReviews($reviewData,$view);
-			}
-			elseif ( isset($view) AND $view == "toc" AND $storyData['chapters']>1 )
-			{
-				$tocData = $this->model->getTOC($story);
-				$content = \View\Story::buildTOC($tocData,$storyData);
-			}
-			else
-			{
-				if( empty($view) OR !is_numeric($view) ) $view = 1;
-				$chapter = $view = max ( 1, min ( $view, $storyData['chapters']) );
-				$tocData = $this->model->getMiniTOC($story);
-				\Base::instance()->set('bigscreen',TRUE);
-				$content = ($content = $this->model->getChapter( $story, $chapter )) ? : "Error";
-
-				if ( $reviewData = $this->model->loadReviews($story,$selected,$storyData['chapid']) )
-					$content .= \View\Story::buildReviews($reviewData,$view);
-			}
- */			
 			if ( isset($view) AND $view == "toc" AND $storyData['chapters']>1 )
 			{
 				$tocData = $this->model->getTOC($story);

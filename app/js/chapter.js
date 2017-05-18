@@ -14,7 +14,7 @@ $('#story-container').on("click", ".openform", function(e)
 		//clear all old forms
 		$(review_container).find('.ajaxform').hide('slow').html('');
 		var ajaxurl = base + '/story/ajax/review_comment_form';
-		var data = { childof: $(this).attr('id'), level: $(this).data("level"), story: $(this).data("story") };
+		var data = { childof: $(this).attr('id'), level: $(this).data("level"), story: $(this).data("story"), chapter: $(this).data("chapter") };
 		review_data ( ajaxurl, data, form );
 	}
 });

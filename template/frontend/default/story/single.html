@@ -25,7 +25,7 @@
 			<a name="review"></a>
 			
 			<check if="{{ is_array(@@data.story.reviewData) }}">
-				<include href="story/reviews.html" with="story_reviews={{@data.story.reviewData}},selection={{@data.view}}" />
+				<include href="story/reviews.html" with="story_reviews={{@data.story.reviewData}},selection={{@data.view}},chapter={{@data.story.chapid}}" />
 			</check>
 			<check if="{{empty($no_review)}}">
 				{* <include href="main/feedback_form.html" with="element={{@data.story.chapid}},childof={{@data.story.sid}},level=NULL" /> *}

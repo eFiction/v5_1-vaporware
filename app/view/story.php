@@ -105,16 +105,16 @@ class Story extends Base
 	}
 	*/
 
-	public static function commentForm($parentID)
+	public static function commentForm($parentID,$chapter)
 	{
 		\Base::instance()->set('childof', $parentID);
 		\Base::instance()->set('level', isset($_POST['level']) ? (int)$_POST['level'] : 1);
-		\Base::instance()->set('element', NULL);
+		\Base::instance()->set('element', $chapter);
 		\Base::instance()->set('data', [ 
 											"cancel" 				=> TRUE,
 											"feedback_form_label"	=> "__Comment",
 											"postText"				=> \Base::instance()->get('POST.write.text'),
-											"postName"				=> \Base::instance()->get('POST.write.text'),
+											"postName"				=> \Base::instance()->get('POST.write.name'),
 										]
 							);
 		
@@ -123,7 +123,7 @@ class Story extends Base
 
 	public static function buildStory($storyData,$content,$dropdown,$view=1)
 	{
-		\Registry::get('VIEW')->javascript('body', TRUE, 'chapter.js?'.microtime() );
+		\Registry::get('VIEW')->javascript('body', TRUE, 'chapter.js?' );
 		\Registry::get('VIEW')->javascript('body', FALSE, "var url='".\Base::instance()->get('BASE')."/story/read/{$storyData['sid']},'" );
 
 		$storyData['cache_authors'] = json_decode($storyData['cache_authors'],TRUE);

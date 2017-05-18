@@ -390,7 +390,7 @@ class Story extends Base
 
 	public function loadReviews($storyID,$selectedReview,$chapter=NULL)
 	{
-		$limit=1000;
+		$limit=5;
 		$sql = "SELECT 
 						F1.*, 
 						F2.fid as comment_id, 
@@ -506,34 +506,75 @@ class Story extends Base
 		return $indexFlat;
 	}
 
-	public function saveComment($id, $data, $member=FALSE)
+	public function saveComment($storyID, $data)
 	{
-		$reference_sub = NULL;
-		if ( $parent = $this->exec("SELECT reference as parent_id FROM `tbl_feedback` WHERE fid = :fid AND type='C';", [":fid"=>$id]) )
+		/*
+			$data['childof']:
+				0 => new review
+				int => comment
+				
+			$data['write']['element']:
+				0 => story
+				int => chapter
+		*/
+		if ( $data['childof']==0 )
 		{
-			$reference_sub = $id;
-			$id = $parent[0]['parent_id'];
-			
+			// new review
+			$sql = "SELECT 1 FROM `tbl_chapters`Ch WHERE Ch.sid = :sid";
+			$bind[":sid"] = $storyID;
+			if ($data['write']['element']>0)
+			{
+				$sql .= " AND Ch.chapid = :chapid";
+				$bind[":chapid"] = $data['write']['element'];
+			}
+			// drop out if chapter doesn't exist
+			if ( empty($this->exec($sql, $bind)) )
+				return FALSE;
+
+			$bind =
+			[
+				":reference"		=> $storyID,
+				":reference_sub"	=> ( $data['write']['element']>0 ) ? $data['write']['element'] : NULL,
+				":guest_name"		=> ( $_SESSION['userID']!=0 ) ? NULL : $data['name'],
+				":uid"				=> (int)$_SESSION['userID'],
+				":text"				=> $data['write']['text'],
+				":type"				=> "ST",
+			];
 		}
-		
-		print_r($data);exit;
-		
+		else
+		{
+			// write a comment
+			if ( $parent = $this->exec("SELECT reference as parent_id FROM `tbl_feedback` WHERE fid = :fid AND type='C';", [":fid"=>$data['childof']]) )
+			{
+				$reference = $parent[0]['parent_id'];
+				$reference_sub = $data['childof'];
+			}
+			else
+			{
+				$reference = $data['childof'];
+				$reference_sub = NULL;
+			}
+
+			$bind =
+			[
+				":reference"		=> $reference,
+				":reference_sub"	=> $reference_sub,
+				":guest_name"		=> ( $_SESSION['userID']!=0 ) ? NULL : $data['name'],
+				":uid"				=> (int)$_SESSION['userID'],
+				":text"				=> $data['write']['text'],
+				":type"				=> "C",
+			];
+		}
+
 		$sql = "INSERT INTO `tbl_feedback`
 					(`reference`, `reference_sub`, `writer_name`, `writer_uid`, `text`, `datetime`,        `type`) VALUES 
-					(:reference,  :reference_sub,  :guest_name,   :uid,         :text,  CURRENT_TIMESTAMP, 'C')";
-		$bind =
-		[
-			":reference"		=> $id,
-			":reference_sub"	=> $reference_sub,
-			":uid"				=> ( $member ) ? $_SESSION['userID'] : 0,
-			":guest_name"		=> ( $member ) ? NULL : $data['name'],
-			":text"				=> $data['text'],
-		];
+					(:reference,  :reference_sub,  :guest_name,   :uid,         :text,  CURRENT_TIMESTAMP, :type)";
+
 		if ( 1== $this->exec($sql, $bind) )
 		{
 			\Model\Routines::dropUserCache("feedback");
 			\Cache::instance()->clear('stats');
-			return (int)$this->db->lastInsertId();
+			return [ (int)$this->db->lastInsertId(), $bind[':type'], ($bind[':type']=="ST")?$storyID:$data['childof'] ] ;
 		}
 		else return FALSE;
 		
