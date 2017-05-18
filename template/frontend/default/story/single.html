@@ -28,7 +28,8 @@
 				<include href="story/reviews.html" with="story_reviews={{@data.story.reviewData}},selection={{@data.view}}" />
 			</check>
 			<check if="{{empty($no_review)}}">
-				<include href="main/feedback_form.html" with="element={{@data.story.chapid}},childof={{@data.story.sid}},level=NULL" />
+				{* <include href="main/feedback_form.html" with="element={{@data.story.chapid}},childof={{@data.story.sid}},level=NULL" /> *}
+				<div class="ajaxform"></div>
 			</check>
 		</div>
 	</div>

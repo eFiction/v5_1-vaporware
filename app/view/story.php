@@ -81,7 +81,9 @@ class Story extends Base
 		return parent::render('story/reviews.html');
 	}		*/
 
-	// for AJAX purposes - requires reviews.inner
+	// for AJAX purposes	- requires reviews.inner
+	// currently unused
+	/*
 	public static function buildReviewCell($data, $level = 1, $insert_id = NULL)
 	{
 		$item =
@@ -98,6 +100,7 @@ class Story extends Base
 
 		return parent::render('story/reviews.inner.html');
 	}
+	*/
 
 	public static function commentForm($parentID)
 	{

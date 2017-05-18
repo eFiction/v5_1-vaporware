@@ -7,11 +7,12 @@
 			</li>
 		</check>
 		<check if="{{@last_level<@item.level}}">
-			<ul>
+			<ul class="review">
 		</check>
 		<check if="{{@last_level>@item.level}}">
 			<loop from="{{ @k=@last_level }}" to="{{ @k > @item.level }}" step="{{ @k-- }}"></li></ul></loop>
 		</check>
+		{* make sure odd and even iterate from top to bottom, not my the DOM structure *}
 		<check if="{{(@odd_even++) % 2 == 0}}">
 			<true><li class="review even"></true>
 			<false><li class="review odd"></false>
@@ -29,9 +30,12 @@
 			</check>
 			<check if="{{isset(@item.elements) AND @item.elements>0}}"><a href="{{@BASE}}/story/read/{{@item.story}},{{@selection}},{{@item.id}}#r{{@item.id}}">XXX {{@item.elements}}</a></check>
 			<br/>
-			{{@item.text}}
+			{{@item.text |raw}}
 			<div class="ajaxform"></div>
 		<set last_level="{{@item.level}}">
 	</repeat>
 	</ul>
+	<check if="{{empty($no_review)}}">
+		<span id="{{@@item.id}}" data-level=0 data-story="{{@data.story.sid}}" class="openform"><input class="button" type="submit" value="__Comment"></span>
+	</check>
 </span>

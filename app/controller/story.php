@@ -45,7 +45,7 @@ class Story extends Base
 	
 	public function save(\Base $f3, $params)
 	{
-		list($origin, $returnpath) = array_pad(explode(";returnpath=",$params['*']), 2, '');
+		list($requestpath, $returnpath) = array_pad(explode(";returnpath=",$params['*']), 2, '');
 		$params['returnpath'] = $returnpath;
 
 		if ( $params['action']=="read" )
@@ -66,10 +66,14 @@ class Story extends Base
 				if ( sizeof($errors)==0 )
 				{
 					$insert_id = $this->model->saveComment($data['childof'], $data['write'], ($_SESSION['userID']!=0));
-					$return = (empty($params['returnpath']) ? $origin."#r".$insert_id : $returnpath);
+					$return = (empty($params['returnpath']) ? $requestpath."#r".$insert_id : $returnpath);
 					$f3->reroute($params['returnpath'], false);
 					exit;
-				}	
+				}
+				else
+				{
+					echo "<pre>".print_r($params,TRUE).print_r(@$data,TRUE).print_r(@$errors,TRUE)."</pre>";
+				}
 			}
 			else
 			{
@@ -79,7 +83,9 @@ class Story extends Base
 		}
 		
 		//echo "<pre>".print_r($params,TRUE).print_r(@$data,TRUE).print_r(@$errors,TRUE)."</pre>";
-		
+
+		// If nothing else has worked so far, return to where we came from and pretend this was intentional
+		//$f3->reroute($requestpath, false);
 		exit;
 	}
 	
@@ -207,8 +213,41 @@ class Story extends Base
 		$printer = ($id[1]=="") ? "paper" : $id[1];
 		$id = $id[0];
 		
-		if ( $printer == "epub" ) $this->model->printEPub($id);
+		if ( $printer == "epub" )
+		{
+			$epubData = $this->model->printEPub($id);
+			
+			if($file = realpath("tmp/epub/s{$epubData['sid']}.zip"))
+			{
+				$filesize = filesize($file);
+				$ebook = @fopen($file,"rb");
+			}
+			else
+			{
+				list($ebook, $filesize) = $this->model->createEPub($epubData['sid']);
+			}
+			
+			if ( $ebook )
+			{
+				// http://stackoverflow.com/questions/93551/how-to-encode-the-filename-parameter-of-content-disposition-header-in-http
+				$filename = rawurlencode ( $epubData['title']." by ".$epubData['authors'].".epub" );
+				
+				header("Content-type: application/epub+zip; charset=utf-8");
+				header("Content-Disposition: attachment; filename=\"{$filename}\"; filename*=utf-8''".$filename);
+				header("Content-length: ".$filesize);
+				header("Cache-control: private");
 
+				while(!feof($ebook))
+				{
+					$buffer = fread($ebook, 8*1024);
+					echo $buffer;
+				}
+				fclose ($ebook);
+
+				exit;
+			}
+		}
+		
 	}
 	
 	public function series($params)

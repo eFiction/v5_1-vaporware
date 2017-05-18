@@ -515,6 +515,9 @@ class Story extends Base
 			$id = $parent[0]['parent_id'];
 			
 		}
+		
+		print_r($data);exit;
+		
 		$sql = "INSERT INTO `tbl_feedback`
 					(`reference`, `reference_sub`, `writer_name`, `writer_uid`, `text`, `datetime`,        `type`) VALUES 
 					(:reference,  :reference_sub,  :guest_name,   :uid,         :text,  CURRENT_TIMESTAMP, 'C')";
@@ -647,38 +650,10 @@ class Story extends Base
 
 		$epubData = $this->exec( $epubSQL, array(':sid' => $id) )[0];
 		
-		if($file = realpath("tmp/epub/s{$epubData['sid']}.zip"))
-		{
-			$filesize = filesize($file);
-			$ebook = @fopen($file,"rb");
-		}
-		else
-		{
-			list($ebook, $filesize) = $this->createEPub($epubData['sid']);
-		}
-
-		if ( $ebook )
-		{
-			// http://stackoverflow.com/questions/93551/how-to-encode-the-filename-parameter-of-content-disposition-header-in-http
-			$filename = rawurlencode ( $epubData['title']." by ".$epubData['authors'].".epub" );
-			
-			header("Content-type: application/epub+zip; charset=utf-8");
-			header("Content-Disposition: attachment; filename=\"{$filename}\"; filename*=utf-8''".$filename);
-			header("Content-length: ".$filesize);
-			header("Cache-control: private");
-
-			while(!feof($ebook))
-			{
-				$buffer = fread($ebook, 8*1024);
-				echo $buffer;
-			}
-			fclose ($ebook);
-
-			exit;
-		}
+		return $epubData;
 	}
 	
-	protected function createEPub($id)
+	public function createEPub($id)
 	{
 		$epubSQL =	"SELECT 
 			S.sid, S.title, S.storynotes, S.summary, UNIX_TIMESTAMP(S.date) as written, UNIX_TIMESTAMP(S.date) as updated, 
@@ -696,16 +671,6 @@ class Story extends Base
 
 		\Base::instance()->set('UI', "template/epub/");
 		$filename = realpath("tmp/epub")."/s{$epubData['sid']}.zip";
-
-		// Load or create the namespace
-		/*
-		if ( "" == @$this->config['epub_namespace'] )
-		{
-			$cfg = $this->config;
-			$cfg['epub_namespace'] = uuid_v5("6ba7b810-9dad-11d1-80b4-00c04fd430c8", \Base::instance()->get('HOST').\Base::instance()->get('BASE') );
-			$cfg->save();
-		}
-		*/
 
 		/*
 		This must be coming from admin panel at some point, right now we will fake it
@@ -732,6 +697,16 @@ class Story extends Base
 
 		// The folder *should* exist, but creating it and ignoring the outcome is the quickest way of making sure it really is there
 		@mkdir("tmp/epub",0777,TRUE);
+		
+		// Auto-detect TidyHTML class
+		if ( TRUE === class_exists('tidy') )
+		{
+			$tidy = new \tidy();
+			$tidyConfig = [
+							"doctype"		=> "omit",
+							"output-xml"	=> "false",
+						];
+		}
 
 		/*
 		Create the Archive
@@ -792,6 +767,13 @@ class Story extends Base
 		    												)
 													);
 					
+					if ( isset($tidyConfig) )
+					{
+						$tidy->parseString($body, $tidyConfig, 'utf8');
+						$tidy->cleanRepair();
+						$body = $tidy->html();
+					}
+
 					$zip->addFromString('content/chapter'.($n++).'.xhtml', 
 											$xml.\View\Story::epubPage(
 															$body,
