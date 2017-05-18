@@ -7,13 +7,15 @@ class Story extends Base
 	public function __construct()
 	{
 		$this->model = \Model\Story::instance();
+		$this->template = new \View\Story();
 	}
 
 	public function beforeroute()
 	{
 		parent::beforeroute();
-		$this->view  = \Registry::get('VIEW');
-		$this->view->addTitle( \Base::instance()->get('LN__Stories') );
+		//$this->view  = \Registry::get('VIEW');
+		//$this->view->addTitle( \Base::instance()->get('LN__Stories') );
+		$this->template->addTitle( \Base::instance()->get('LN__Stories') );
 	}
 
 	public function index(\Base $f3, $params)
@@ -278,7 +280,8 @@ class Story extends Base
 									$ratingMaxID
 									);
 		
-		$this->view->addTitle($f3->get('LN__Search'));
+		//\Registry::get('VIEW')->addTitle($f3->get('LN__Search'));
+		$this->template->addTitle($f3->get('LN__Search'));
 		
 		// Author
 		if ( empty($searchData['author']) )
@@ -369,7 +372,7 @@ class Story extends Base
 			if ( isset($view) AND $view == "toc" AND $storyData['chapters']>1 )
 			{
 				$tocData = $this->model->getTOC($story);
-				$content = \View\Story::buildTOC($tocData,$storyData);
+				$content = $this->template->buildTOC($tocData,$storyData);
 			}
 			else
 			{

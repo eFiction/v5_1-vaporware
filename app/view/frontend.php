@@ -1,7 +1,7 @@
 <?php
 namespace View;
 
-class Frontend extends Base
+class Frontend extends Template
 {
 	/*
 		Base render function wrapper
@@ -85,31 +85,25 @@ class Frontend extends Base
 	
 	private function post_render($buffer)
 	{
-		$f3 = \Base::instance();
-		$cfg = $f3->get('CONFIG');
-		
-/* 		if ( isset($this->JS['head']) ) $f3->set( 'JS_HEAD', implode("\n", $this->JS['head']) );
-		if ( isset($this->JS['body']) ) $f3->set( 'JS_BODY', implode("\n", $this->JS['body']) );
- */		
-		$f3->set( 'JS_HEAD', implode("\n", @$this->JS['head']) );
-		$f3->set( 'JS_BODY', implode("\n", @$this->JS['body']) );
+		$this->f3->set( 'JS_HEAD', implode("\n", @$this->f3->JS['head']) );
+		$this->f3->set( 'JS_BODY', implode("\n", @$this->f3->JS['body']) );
 
 
-		if($cfg['page_title_add']=='slogan')
+		if($this->config['page_title_add']=='slogan')
 		{
-			$f3->set('TITLE', $cfg['page_title'].$cfg['page_title_separator'].$cfg['page_slogan']);
+			$this->f3->set('TITLE', $this->config['page_title'].$this->config['page_title_separator'].$this->config['page_slogan']);
 		}
-		elseif($cfg['page_title_add']=='path')
+		elseif($this->config['page_title_add']=='path')
 		{
-			$f3->set('TITLE', implode($cfg['page_title_separator'], array_merge([$cfg['page_title']],$this->title) ) );
+			$this->f3->set('TITLE', implode($this->config['page_title_separator'], array_merge([$this->config['page_title']],$this->title) ) );
 		}
 
-		else $f3->set('TITLE', '');
+		else $this->f3->set('TITLE', '');
 
-		switch($cfg['debug'])
+		switch($this->config['debug'])
 		{
 			case 5:
-				$debug[] = $f3->get('DB')->log();
+				$debug[] = $this->f3->get('DB')->log();
 			case 4:
 				//$debug[] = "SQL queries: ".print_r($DB->history,TRUE);
 				//$debug[] = "SQL analysis: ".print_r($DB->profiling(), TRUE);
@@ -125,7 +119,7 @@ class Frontend extends Base
 				//$debug[] = "SQL count: ".$DB->history['total'];
 				//$debug[] = "SQL time: ".round($DB->history['duration']*1000)." ms (".round(100*$DB->history['duration']/$runtime)."%)";
 				// for all levels above 0:
-				$f3->set('DEBUGLOG', implode("\n", $debug));
+				$this->f3->set('DEBUGLOG', implode("\n", $debug));
 				break;
 		}
 			//default:

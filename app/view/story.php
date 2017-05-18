@@ -47,29 +47,32 @@ class Story extends Base
 		if (isset($item['cache_tags'])) 		$item['cache_tags']			= json_decode($item['cache_tags'],TRUE);
 		if (isset($item['cache_characters'])) 	$item['cache_characters']	= json_decode($item['cache_characters'],TRUE);
 	}
-
-	public static function buildTOC($tocData, $storyData)
+	
+	public function vTest()
 	{
-		\Registry::get('VIEW')->javascript('body', TRUE, 'jquery.columnizer.js' );
-		\Registry::get('VIEW')->javascript('body', FALSE, "$(function(){ $('.columnize').columnize({ columns: 2 }); });" );
-		
-		$infoblock = \View\Story::buildInfoblock($storyData);
+		return "nichts";
+	}
 
-		\Base::instance()->set('tocData', $tocData);
-		\Base::instance()->set('storyID', $storyData['sid']);
+	public function buildTOC($tocData, $storyData)
+	{
+		$this->javascript('body', TRUE, 'jquery.columnizer.js' );
+		$this->javascript('body', FALSE, "$(function(){ $('.columnize').columnize({ columns: 2 }); });" );
 		
-		return $infoblock.parent::render('story/toc.html');
+		$this->f3->set('tocData', $tocData);
+		$this->f3->set('storyID', $storyData['sid']);
+		
+		return $this->buildInfoblock($storyData) . $this->render('story/toc.html');
 	}
 	
-	public static function buildInfoblock($storyData)
+	public function buildInfoblock($storyData)
 	{
 		$storyData['cache_categories'] = json_decode($storyData['cache_categories'],TRUE);
 		$storyData['cache_tags'] = json_decode($storyData['cache_tags'],TRUE);
 		$storyData['cache_characters'] = json_decode($storyData['cache_characters'],TRUE);
 
-		\Base::instance()->set('storyData', $storyData);
+		$this->f3->set('storyData', $storyData);
 
-		return parent::render('story/information.html');
+		return $this->render('story/information.html');
 	}
 
 /*	public static function buildReviews($reviewData,$selection)

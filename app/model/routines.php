@@ -1,7 +1,7 @@
 <?php
 namespace Model;
 /*
-	This class offers maintenance routines
+	This class offers database routines
 */
 class Routines extends Base {
 	

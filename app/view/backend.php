@@ -1,19 +1,14 @@
 <?php
 namespace View;
 
-class Backend extends Base
+class Backend extends Template
 {
 
 	public function __construct()
 	{
-		$f3 = \Base::instance();
-
-		$f3->copy('BACKEND_UI','UI');
+		parent::__construct();
 		
-		$f3->set('SELF', rawurlencode($_SERVER["QUERY_STRING"]));
-
-		//\View\Base::javascript('body', TRUE, 'global.js' );
-		//$this->iconset = Iconset::instance();
+		$this->f3->copy('BACKEND_UI','UI');
 	}
 
 	/*
@@ -22,29 +17,22 @@ class Backend extends Base
     public function finish()
 	{
         /** @var \Base $f3 */
-        $f3 = \Base::instance();
-		$cfg = $f3->get('CONFIG');
-
 		if($this->data)
-            $f3->mset($this->data);
+            $this->f3->mset($this->data);
 
-		if ( isset($this->JS['head']) ) $f3->set( 'JS_HEAD', implode("\n", $this->JS['head']) );
-		if ( isset($this->JS['body']) ) $f3->set( 'JS_BODY', implode("\n", $this->JS['body']) );
+		$this->f3->set( 'JS_HEAD', implode("\n", @$this->f3->JS['head']) );
+		$this->f3->set( 'JS_BODY', implode("\n", @$this->f3->JS['body']) );
 		
-		$f3->set('TITLE', implode($cfg['page_title_separator'], array_merge([$cfg['page_title']],$this->title) ) );
+		$this->f3->set('TITLE', $this->config['page_title'].$this->config['page_title_separator'].$this->config['page_slogan']);
 
-		$f3->set('DEBUGLOG', $f3->get('DB')->log());
-		
+		$this->f3->set('DEBUGLOG', $this->f3->get('DB')->log());
 		$Iconset = Iconset::instance();
-
+		
 		return preg_replace_callback(
-								'/\{ICON:([\w-]+)\}/s',
-								function ($icon) use($Iconset)
+								'/\{ICON:([\w-]+)(:|\!)?(.*?)\}/s',	// for use with forced visibility
+								function ($icon)
 								{
-									if ( $Iconset->exists($icon[1]) )
-										return $Iconset->get($icon[1]);
-									return "";
-									//return "#";
+									return Iconset::parse($icon);
 								}
 								, \Template::instance()->render('layout.html')
 							);

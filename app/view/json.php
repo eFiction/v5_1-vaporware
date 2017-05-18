@@ -1,7 +1,7 @@
 <?php
 
 namespace View;
-class JSON extends Base {
+class JSON extends Template {
 	public function finish() {
 		header('Content-Type: application/json');
 
@@ -12,12 +12,6 @@ class JSON extends Base {
 								{
 									return addslashes ( Iconset::parse($icon) );
 								}
-/*								, $body
-								'/\{ICON:([\w-]+)\}/s',
-								function ($icon)
-								{
-									return addslashes( Iconset::instance()->{$icon[1]} );
-								}*/
 								, $this->data
 							);
 		return $this->data;
