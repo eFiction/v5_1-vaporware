@@ -121,7 +121,7 @@ class Story extends Base
 		return parent::render('main/feedback_form.html');
 	}
 
-	public static function buildStory($storyData,$content,$dropdown,$view=1)
+	public function buildStory($storyData,$content,$dropdown,$view=1)
 	{
 		\Registry::get('VIEW')->javascript('body', TRUE, 'chapter.js?' );
 		\Registry::get('VIEW')->javascript('body', FALSE, "var url='".\Base::instance()->get('BASE')."/story/read/{$storyData['sid']},'" );
@@ -134,7 +134,7 @@ class Story extends Base
 												"story" 	=> $storyData,
 												"content" 	=> $content,
 												"dropdown" 	=> $dropdown,
-												"infoblock" => ( $storyData['chapters'] > 1 ) ? "" : \View\Story::buildInfoblock($storyData),
+												"infoblock" => ( $storyData['chapters'] > 1 ) ? "" : $this->buildInfoblock($storyData),
 												"feedback_form_label" => "__Review",
 												"view"		=> $view,
 												"postName"	=> '',
@@ -145,7 +145,7 @@ class Story extends Base
 		return parent::render('story/single.html');
 	}
 
-	public static function dropdown($data,$chapter)
+	public function dropdown($data,$chapter)
 	{
 		$i=1;
 		if(sizeof($data) > 1) $dropDown[] = array ( FALSE, "toc", FALSE, \Base::instance()->get("LN__TOC") );

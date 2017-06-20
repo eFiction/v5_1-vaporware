@@ -451,6 +451,9 @@ class Story extends Base
 					"timestamp"	=>	$item['date_review'],
 					"elements"	=> 0,
 				];
+				// When there is a review from the user, we don't want a new on - there's always the edit button
+				if ( $_SESSION['userID']>0 AND $_SESSION['userID']==$item['review_writer_uid'] )
+					\Base::instance()->set('nocomment',1);
 			}
 			
 			$tree += [ 'r'.$current_id => null ];
@@ -489,7 +492,16 @@ class Story extends Base
 					];
 				}
 				else
-					$data['r'.$current_id]['elements']++;
+
+				$data['r'.$current_id]['elements']++;
+				// When there is a comment from the user, we don't want a new on - there's always the edit button
+				if ( $_SESSION['userID']>0 AND $_SESSION['userID']==$item['comment_writer_uid'] )
+				{
+					if ( $item['parent_item']=="" )
+						$data['r'.$current_id]['nocomment'] = 1;
+					else
+						$data['c'.$item['parent_item']]['nocomment'] = 1;
+				}
 			}
 		}
 		

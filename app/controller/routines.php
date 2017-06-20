@@ -27,21 +27,21 @@ class Routines extends Base {
 			{
 				foreach ( $authorData as $author )
 				{
-					$subject = "Test Review";
+					$subject = $this->config['page_title']."Test Review";
 					$mailText = "Test eMail, sinnlos";
 					//$this->mailman($subject, $mailText, $author['email'], $author['mailname']);
 				}
 			}
 			return sizeof($authorData);
 		}
-		if ( $type == "C" )
+		elseif ( $type == "C" )
 		{
 			// an author has received a comment for a review
 			// @ $id = feedback ID
 			$authorData = $this->model->noteComment( $id );
 			if ( sizeof($authorData)>0 )
 			{
-				$subject = "Test Comment";
+				$subject = $this->config['page_title']."Test Comment";
 				$mailText = "Test eMail, sinnlos";
 				//$this->mailman($subject, $mailText, $authorData[0]['email'], $authorData[0]['mailname']);
 			}

@@ -24,7 +24,7 @@
 						<a href="{{@BASE}}/userCP/feedback/reviews/written/edit/id=ST,{{@item.id}}/returnpath={{@returnpath}}">{ICON:edit}</a>
 					</true>
 					<false>
-						<check if="{{isset(@item.id)}}"><span id="{{@item.id}}" data-level="{{@item.level}}" data-story="{{@item.story}}" data-chapter="{{@chapter}}" class="openform"><input class="button" type="submit" value="__Comment"></span></check>
+						<check if="{{isset(@item.id) AND empty(@item.nocomment)}}"><span id="{{@item.id}}" data-level="{{@item.level}}" data-story="{{@item.story}}" data-chapter="{{@chapter}}" class="openform"><input class="button" type="submit" value="__Comment"></span></check>
 					</false>
 				</check>
 			</check>
@@ -35,7 +35,7 @@
 		<set last_level="{{@item.level}}">
 	</repeat>
 	</ul>
-	<check if="{{empty($no_review)}}">
+	<check if="{{empty(@nocomment)}}">
 		<span id="new" data-level=0 data-story="{{@data.story.sid}}" data-chapter="{{@chapter}}" class="openform"><input class="button" type="submit" value="__Comment"></span>
 	</check>
 </span>

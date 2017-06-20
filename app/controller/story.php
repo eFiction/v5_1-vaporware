@@ -13,8 +13,6 @@ class Story extends Base
 	public function beforeroute()
 	{
 		parent::beforeroute();
-		//$this->view  = \Registry::get('VIEW');
-		//$this->view->addTitle( \Base::instance()->get('LN__Stories') );
 		$this->template->addTitle( \Base::instance()->get('LN__Stories') );
 	}
 
@@ -40,7 +38,6 @@ class Story extends Base
 			case 'archive':
 			default:
 				$data = $this->intro($params);
-				//$data = "";
 		}
 		$this->buffer ($data);
 	}
@@ -134,8 +131,6 @@ class Story extends Base
 			
 			if(empty($view)) $view = \View\Story::commentForm($id,$chapter);
 			$this->buffer( [ "", $view, $saveData, ($_SESSION['userID']==0) ], "BODY", TRUE );
-			//$this->buffer( array ( "", $view, (sizeof($errors)>0?"":1), ($_SESSION['userID']==0) ) , "BODY", TRUE );
-			//$this->buffer( array ( "", $view, (int)empty($errors), ($_SESSION['userID']==0) ) , "BODY", TRUE );
 		}
 	}
 	
@@ -285,7 +280,6 @@ class Story extends Base
 									$ratingMaxID
 									);
 		
-		//\Registry::get('VIEW')->addTitle($f3->get('LN__Search'));
 		$this->template->addTitle($f3->get('LN__Search'));
 		
 		// Author
@@ -344,7 +338,6 @@ class Story extends Base
 	protected function read($id)
 	{
 		@list($story, $view, $selected) = explode(",",$id);
-		//Routines::notification("review", $story)
 
 		if($storyData = $this->model->getStory($story,empty($view)?1:$view))
 		{
@@ -376,8 +369,8 @@ class Story extends Base
 				}
 			}
 
-			$dropdown = \View\Story::dropdown($tocData,$view);
-			$view = \View\Story::buildStory($storyData,$content,$dropdown,$view);
+			$dropdown = $this->template->dropdown($tocData,$view);
+			$view = $this->template->buildStory($storyData,$content,$dropdown,$view);
 			$this->buffer($view);
 		}
 		else $this->buffer("Error, not found");
