@@ -83,12 +83,10 @@ return array(
 							'zero	{Your Outbox is empty!},'.
 							'one	{One message:},'.
 							'other	{# messages:} }',
-'PM_Outbox_empty' 		=> 'Your Outbox is empty',
 'PM_Inbox_Items' 		=> '{0, plural,'.
 							'zero	{Your Inbox is empty!},'.
 							'one	{One message:},'.
 							'other	{# messages:} }',
-'PM_Inbox_empty' 		=> 'Your Inbox is empty',
 'PM_Subject'			=> 'Subject',
 'PM_Sender'				=> 'Sender',
 'PM_Sent'				=> 'Sent',
@@ -431,12 +429,14 @@ return array(
 'BookmarkAdd'		=> '{0, plural, other {\'#\' has no bookmark, click to add.} }',
 'BookmarkRemove'	=> '{0, plural, other {\'#\' has a bookmark, click to remove.} }',
 'FavouriteAdd'		=> '{0, plural, other {\'#\' is not a favourite, click to make it one.} }',
-'FavouriteRemove'	=> '{0, plural, other {\'#\' is a favourite, click to remove.} }',
+'FavouriteRemove'	=> '{0, plural, other {\'#\' is a favourite.
+Click to remove.} }',
 
 'TOC'	=> 'Table of content',
 'NoTags' => 'No tags defined',
 'Published' => 'Published',
 'Updated'	=> 'Last update',
+'Chapter' => 'Chapter',
 'Chapters' => 'Chapters',
 'Words' => 'Words',
 'WIP' => 'Work in progress',
@@ -465,11 +465,16 @@ return array(
 
 // Feedback
 'Feedback_Not_Logged_In' => 'You need to be logged in to write a review or comment',
+'Button_reviewStory'	=> 'Write review for the story',
+'Button_reviewChapter'	=> 'Write review for this chapter',
+'Button_writeComment'	=> 'Write comment',
 
 // Archive News
 'News_Box' => 'Archive News',
 'News_Archive' => 'News Archive',
 'News_writtenby' => 'written by',
+'Reply' => 'Reply',
+'Comment' => 'Comment',
 'CommentsC' => '{0, plural,'.
 	'zero	{No comments yet},'.
 	'one	{One comment},'.
@@ -497,6 +502,21 @@ return array(
 	'one	{An error occurred while saving data.},'.
 	'other	{# errors occurred while saving data.}
 }',
+
+'ReviewHeadline' => 'On {1} at {2}, {0} wrote a review for chapter {3}',
+/*
+'ReviewHeadline' => '{3, plural,'.
+	'zero  {On {1} at {2}, {0} wrote a review},'.
+	'other {On {1} at {2}, {0} wrote a review for chapter {3}}
+}',
+*/
+'ReplyHeadline_noDate' => '{0} replied:',
+'ReplyHeadline' => 'On {1} at {2}, {0} replied:',
+'ReviewCommentsLink' => '{0, plural,'.
+	'one	{One comment.},'.
+	'other	{# comments.}
+}',
+
 
 );
 

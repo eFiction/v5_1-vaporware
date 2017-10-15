@@ -23,6 +23,9 @@ class Story extends Base
 			case 'read':
 				$data = $this->read($params['*']);
 				break;
+			case 'reviews':
+				$data = $this->reviews($params['*']);
+				break;
 			case 'print':
 				$this->printer($params['*']);
 				break;
@@ -64,7 +67,7 @@ class Story extends Base
 				if ( sizeof($errors)==0 )
 				{
 					// For now let's assume this always returns a proper result
-					@list($insert_id, $routine_type, $routine_id) = $this->model->saveComment($story, $data);
+					@list($insert_id, $routine_type, $routine_id) = $this->model->saveReview($story, $data);
 					// Run notification routines
 					Routines::instance()->notification($routine_type, $routine_id);
 					
@@ -109,27 +112,70 @@ class Story extends Base
 
 		elseif ( isset($params['segment']) AND $params['segment']=="review_comment_form" )
 		{
+			$structure = 
+			[
+				"level"		=> (int)$f3->get('POST.structure.level'),
+				"story"		=> (int)$f3->get('POST.structure.story'),
+				"chapter"	=> (int)$f3->get('POST.structure.chapter'),
+				"childof"	=> (int)$f3->get('POST.structure.childof'),
+			];
 			// This is a comment to an element
-			$id = (int)$f3->get('POST.childof');
-			$chapter = (int)$f3->get('POST.chapter');
+			/*
+				params: Array
+				(
+					[segment] => review_comment_form
+					[0] => /story/ajax/review_comment_form
+				)
+				POST: Array
+				(
+					[structure] => Array
+						(
+							[childof] => 3553
+							[level] => 1
+							[story] => 1259
+							[chapter] => 4059
+						)
+
+				)
+			*/
 
 			$errors = [];
 			$saveData = "";
+
+			//print_r($params);
+			//print_r($_POST);
 			
 			if($_SESSION['userID']!=0 || \Config::getPublic('allow_guest_reviews') )
 			{
 				if ( isset($_POST['write']) )
 				{
 					$data = $f3->get('POST.write');
-					
+					print_r($data);
 					$errors = $this->validateReview($data);
 
 					$f3->set('formError', $errors);
-					if ( empty($errors) ) $saveData = 1;
+					//if ( empty($errors) ) 
+					if ( sizeof($errors)==0 )
+					{
+						//$data['childof'] = (int)$f3->get('POST.childof');
+						/*
+							$data['childof']:
+								0 => new review
+								int => comment
+								
+							$data['write']['element']:
+								0 => story
+								int => chapter
+						*/
+						$saveData = 1;
+						// For now let's assume this always returns a proper result
+						@list($insert_id, $routine_type, $routine_id) = $this->model->saveReview($story, $data);
+						// Run notification routines
+						Routines::instance()->notification($routine_type, $routine_id);
+					}
 				}
 			}
-			
-			if(empty($view)) $view = \View\Story::commentForm($id,$chapter);
+			if(empty($view)) $view = $this->template->commentForm($structure, $f3->get('POST.write'));
 			$this->buffer( [ "", $view, $saveData, ($_SESSION['userID']==0) ], "BODY", TRUE );
 		}
 	}
@@ -344,7 +390,7 @@ class Story extends Base
 			if ( empty($view) AND $storyData['chapters']>1 )
 				$view = (TRUE===\Config::getPublic('story_toc_default')) ? "toc" : 1;
 
-			if ( isset($view) AND $view == "toc" AND $storyData['chapters']>1 )
+			if ( $view == "toc" )
 			{
 				$tocData = $this->model->getTOC($story);
 				$content = $this->template->buildTOC($tocData,$storyData);
@@ -353,24 +399,32 @@ class Story extends Base
 			{
 				$tocData = $this->model->getMiniTOC($story);
 
-				if ( isset($view) AND $view == "reviews" )
-				{
-					$content = NULL;
-					$storyData['reviewData'] = $this->model->loadReviews($story,$selected);
-				}
-				else
-				{
-					if( empty($view) OR !is_numeric($view) ) $view = 1;
-					$chapter = $view = max ( 1, min ( $view, $storyData['chapters']) );
-					\Base::instance()->set('bigscreen',TRUE);
-					$content = ($content = $this->model->getChapter( $story, $chapter )) ? : "Error";
+				if( empty($view) OR !is_numeric($view) ) $view = 1;
+				$chapter = $view = max ( 1, min ( $view, $storyData['chapters']) );
+				\Base::instance()->set('bigscreen',TRUE);
+				$content = ($content = $this->model->getChapter( $story, $chapter )) ? : "Error";
 
-					$storyData['reviewData'] = $this->model->loadReviews($story,$selected,$storyData['chapid']);
-				}
+				$storyData['chapternr'] = $chapter;
 			}
 
 			$dropdown = $this->template->dropdown($tocData,$view);
 			$view = $this->template->buildStory($storyData,$content,$dropdown,$view);
+			$this->buffer($view);
+		}
+		else $this->buffer("Error, not found");
+	}
+	
+	protected function reviews($id)
+	{
+		@list($story, $chapter, $selected) = explode(",",$id);
+
+		if($storyData = $this->model->getStory($story,(int)$chapter))
+		{
+			//$this->buffer("Bei der Arbeit!");
+			$chapter = max ( 0, min ( $chapter, $storyData['chapters']) );
+			$reviewData = $this->model->loadReviews($story,$selected,$storyData['chapid']);
+
+			$view = $this->template->buildReviews($storyData, $reviewData, $chapter, $selected);
 			$this->buffer($view);
 		}
 		else $this->buffer("Error, not found");

@@ -19,10 +19,10 @@
 	</head>
 <body>
 	<div class="grid-wrapper" id="container">
-	<div class="grid-wrapper header"><h1>efiction 5.0 {{@LN__AdminCP}}</h1></div><!-- end header -->
+	<div class="grid-wrapper" id="header"><h1><a href="http://dev.efiction.org/mvc">efiction 5.0</a> {{@LN__AdminCP}}</h1></div><!-- end header -->
 
 	<!-- layout for system pages (admin panel, error pages, ...) -->
-			<div class="gb-20 screen-micro">
+			<div class="gb-20" id="sidebar">
 				<div class="cp-menu-wrapper">{{@LEFT|raw}}</div>
 			</div>
 			<div class="gb-80" id="content">
@@ -44,7 +44,7 @@
 				{{@BODY | raw }}
 			</div>
 
-		<div class="grid-wrapper footer">
+		<div class="grid-wrapper" id="footer">
 			<div class="gb-full">
 				{PAGE:footer}<br />
 				{{ \Base::instance()->format('eFiction v{0}, using {1}, page rendered in {2} msecs / Memory usage {3} KB',@APP_VERSION,@DBType,round(1e3*(microtime(TRUE)-$TIME),2),round(memory_get_usage(TRUE)/1e3,1)) }}

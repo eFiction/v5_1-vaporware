@@ -399,19 +399,19 @@ span.count {
 
 /*----------------- STORY DETAILS/LISTING -----------------*/
 .story-info1 {
-  text-align: right;
-  padding: 2px;
-  margin: 2px;
+	text-align: right;
+	padding: 2px;
+	margin: 2px;
 }
 .story-info2 {
-  text-align: justify;
-  padding: 2px;
-  margin: 2px;
+	text-align: justify;
+	padding: 2px;
+	margin: 2px;
 }
 .story-info3 {
-  text-align: center;
-  padding: 2px;
-  margin: 2px;
+	text-align: center;
+	padding: 2px;
+	margin: 2px;
 }
 
 .toc-wrapper {
@@ -426,7 +426,8 @@ span.count {
 }
 
 .review .odd {
-	background-color: #dcdcdc;
+	background-color: #fafafa;
+	border: 1px solid #ededed;
 }
 
 .review .even {

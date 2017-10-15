@@ -11,7 +11,7 @@
 
 .grid-wrapper {
 	width: 100%;
-	max-width: 1440px;
+	max-width: 100%;
 	min-width: 755px;
 	margin: 0 auto;
 	padding: 6px;

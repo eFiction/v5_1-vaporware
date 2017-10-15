@@ -1,5 +1,6 @@
 <div class="write-review">
 	<check if="{{isset(@formError)}}">
+	{* BEGIN: Error reporting *}
 		<check if="{{sizeof(@formError)>0}}">
 			<true>
 				<div class="note alert-box error">{{ @LN__FormErrors, sizeof(@formError) | format }}:<br>
@@ -10,6 +11,7 @@
 			</false>
 		</check>
 		</div>
+	{* END: Error reporting *}
 	</check>
 	<check if="{{@_SESSION.userID OR TRUE==\Config::instance()->allow_guest_reviews }}">
 	<true>
@@ -30,12 +32,9 @@
 						</div>
 					</false>
 				</check>
-				<check if="{{@element}}"><true>
-					__reviewChapter</true>
-					<false>__reviewStory</false>
-				</check>
+				<input class="reviewButton" data-action="submit" type="submit" value="{{@data.submit_button_label}}">
 				<check if="{{isset(@data.cancel)}}">
-					<input class="button" type="submit" value="__Cancel" id="cancelreview">
+					<input class="button" type="submit" value="{{@LN__Cancel}}" id="cancelreview">
 					<script type="text/javascript">
 						$('#cancelreview').click(function (c) {
 							$(this).parents('.ajaxform').hide('slow').html('');
@@ -43,10 +42,14 @@
 						});
 					</script>
 				</check>
-				<input class="reviewButton" data-action="submit" type="submit" value="__Submit">
-				<input type="hidden" name="write[element]" value="{{@element}}">
-				<input type="hidden" name="childof" value="{{@childof}}">
-				<input type="hidden" name="level" value="{{@level}}">
+			{* BEGIN: Transport the originating structure *}
+				<input type="hidden" name="structure[element]" value="{{@structure.element}}">
+				<check if="{{@structure.subelement>0}}">
+				<input type="hidden" name="structure[subelement]" value="{{@structure.subelement}}">
+				</check>
+				<input type="hidden" name="structure[childof]" value="{{@structure.childof}}">
+				<input type="hidden" name="structure[level]" value="{{@structure.level}}">
+			{* END: Transport the originating structure *}
 			</form>
 		</fieldset>
 	</true>

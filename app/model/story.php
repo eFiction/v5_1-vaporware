@@ -392,7 +392,7 @@ class Story extends Base
 	{
 		$limit=5;
 		$sql = "SELECT 
-						F1.*, 
+						SQL_CALC_FOUND_ROWS F1.*, 
 						F2.fid as comment_id, 
 						F2.text as comment_text, 
 						F2.reference_sub as parent_item, 
@@ -425,6 +425,7 @@ class Story extends Base
 			$flat = $this->exec( str_replace("@CHAPTER@", "AND F.reference_sub = :chapter", $sql), [':storyid' => $storyID, ':chapter' => $chapter] );
 
 		else $flat = $this->exec( str_replace("@CHAPTER@", "", $sql), [':storyid' => $storyID] );
+		//echo $this->exec("SELECT FOUND_ROWS() as found")[0]['found'];
 		
 		if ( sizeof($flat) == 0 ) return FALSE;
 
@@ -442,6 +443,9 @@ class Story extends Base
 				[
 					"level"		=>	1,
 					"story"		=>	$item['review_story'],
+					"date"		=>	date( \Config::getPublic('date_format_short'), $item['date_review']),
+					"date_long"	=>	date( \Config::getPublic('date_format_long'), $item['date_review']),
+					"time"		=>	date( \Config::getPublic('time_format'), $item['date_review']),
 					"chapter"	=>	$item['review_chapter'],
 					"chapternr"	=>	$item['inorder'],
 					"id"		=>	$item['review_id'],
@@ -481,6 +485,9 @@ class Story extends Base
 					[
 						"level"		=>	min ($depth[$item['comment_id']], 4),
 						"story"		=>	$item['review_story'],
+						"date"		=>	date( \Config::getPublic('date_format_short'), $item['date_review']),
+						"date_long"	=>	date( \Config::getPublic('date_format_long'), $item['date_review']),
+						"time"		=>	date( \Config::getPublic('time_format'), $item['date_review']),
 						"chapter"	=>	$item['review_chapter'],
 						"chapternr"	=>	$item['inorder'],
 						"id"		=>	$item['comment_id'],
@@ -518,7 +525,7 @@ class Story extends Base
 		return $indexFlat;
 	}
 
-	public function saveComment($storyID, $data)
+	public function saveReview($storyID, $data)
 	{
 		/*
 			$data['childof']:
@@ -588,7 +595,12 @@ class Story extends Base
 			\Cache::instance()->clear('stats');
 			return [ (int)$this->db->lastInsertId(), $bind[':type'], ($bind[':type']=="ST")?$storyID:$data['childof'] ] ;
 		}
-		else return FALSE;
+		else
+		{
+			//echo "Fehler";exit;
+			
+			return FALSE;
+		}
 		
 		//return FALSE;
 	}

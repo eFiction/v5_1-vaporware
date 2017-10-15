@@ -614,6 +614,38 @@ class UserCP extends Base
 		return $stats;
 	}
 	
+	public function reviewHasChildren($reference)
+	{
+		$children = $this->exec("SELECT COUNT(1) FROM `tbl_feedback` WHERE `reference` = :reference AND `type` = 'C' ", [ ":reference" => $reference ] )[0]["COUNT(1)"];
+		return (bool)$children;
+	}
+	
+	public function reviewDelete($fid)
+	{
+		$bind = [ ":fid" => $fid ];
+		if ( $storyID = $this->exec("SELECT F.reference FROM `tbl_feedback`F WHERE F.fid = :fid AND type='ST';", $bind ) )
+			$storyID = $storyID[0]['reference'];
+		else
+		{
+			// Set a session note to show after reroute
+			$_SESSION['lastAction'] = [ "error" => "badID" ];
+			return FALSE;
+		}
+		
+		if ( $result = $this->exec("DELETE FROM `tbl_feedback` WHERE `fid` = :fid", $bind) )
+		{
+			// if something was deleted, decrement review counter and trigger recount
+			$this->exec( "UPDATE `tbl_stories` SET reviews=reviews-1 WHERE sid = :sid", [ ":sid" => $storyID ] );
+			\Model\Routines::dropUserCache("feedback");
+			\Cache::instance()->clear('stats');
+			return TRUE;
+		}
+
+		// Set a session note to show after reroute
+		$_SESSION['lastAction'] = [ "error" => "unknown" ];
+		return FALSE;
+	}
+	
 	public function ajax($key, $data, $limitation=NULL)
 	{
 		$bind = NULL;
@@ -946,7 +978,7 @@ class UserCP extends Base
 		if ( in_array($params[2],["RC","SE","ST"]) )
 		{
 			$sql = $this->sqlMaker("feedback".$params[1], $params[2]) . 
-					( $params[1]=="written" ? "GROUP BY F.reference " : "") .
+					( $params[1]=="written" ? "GROUP BY F.reference_sub " : "") .
 					"ORDER BY {$sort['order']} {$sort['direction']}
 					LIMIT ".(max(0,$pos*$limit)).",".$limit;
 					//echo $sql;exit;
@@ -980,7 +1012,7 @@ class UserCP extends Base
 		
 		$data = $this->exec($sql,[ ":id"=>$params['id'][1] ]);
 
-		if ( sizeof($data)==1 )
+		if ( sizeof($data)==1 AND $data[0]['type']!="" )
 			return $data[0];
 		return FALSE;
 	}

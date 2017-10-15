@@ -1,7 +1,7 @@
 		<div class="story-info2"><b>{{@LN__Rating}}:</b> {{@storyData.rating_name}}</div>
 		<div class="story-info2"><b>{{@LN__Categories}}:</b> <repeat group="{{ @storyData['cache_categories'] }}" value="{{ @group }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check><a href="__baseURL?action=story,browse&amp;categories={{ @group[0] }}">{{ @group[1] }}</a></repeat></div>
 		<div class="story-info2"><b>{{@LN__Status}}:</b> <check if="{{@storyData.completed==1}}"><true>{{@LN__Completed}}</true><false>{{@LN__WIP}}</false></check></div>
-		<div class="story-info2"><b>{{@LN__Reviews}}:</b> <a href="{{@BASE}}/story/read/{{ @storyData.sid}},reviews">{{ @LN__Review_Link, @storyData['reviews'] | format }}</a></div>
+		<div class="story-info2"><b>{{@LN__Reviews}}:</b> <a href="{{@BASE}}/story/reviews/{{ @storyData.sid}}">{{ @LN__Review_Link, @storyData['reviews'] | format }}</a></div>
 	{* Different tag views: uncomment the one you prefer *}
 	{* Simple view, all tags in one list *}
 		{* 

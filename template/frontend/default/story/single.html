@@ -18,18 +18,15 @@
 		</check>
 		<div class="story-text">
 			<a name="rev"></a>
-			{{@data.infoblock | raw}}
 			{{@data.content | raw }}
-			<br />
-			<br />
-			<a name="review"></a>
-			
-			<check if="{{ is_array(@@data.story.reviewData) }}">
-				<include href="story/reviews.html" with="story_reviews={{@data.story.reviewData}},selection={{@data.view}},chapter={{@data.story.chapid}}" />
-			</check>
-			<check if="{{empty($no_review)}}">
-				{* <include href="main/feedback_form.html" with="element={{@data.story.chapid}},childof={{@data.story.sid}},level=NULL" /> *}
-				<div class="ajaxform"></div>
-			</check>
 		</div>
+
+		<check if="isset(@data.story.chapternr)">
+			<check if="@data.story.chapternr > 1">
+				<a href="{{@BASE}}/story/read/{{@data.story.sid}},{{@data.story.chapternr-1}}">back</a>
+			</check>
+			<check if="@data.story.chapternr < @data.story.chapters">
+				<a href="{{@BASE}}/story/read/{{@data.story.sid}},{{@data.story.chapternr+1}}">forward</a>
+			</check>
+		</check>
 	</div>

@@ -10,69 +10,51 @@
 /*-----------------  GENERAL  -----------------*/
 
 
-body {
-	background: #efefef;
-	background-image: url();
-	background-repeat: repeat;
-	padding: 0;
-	margin: 0 auto;
-}
-
 #top-navbar {
 	background: #2e2e2e;
 	color: #fafafa;
 	padding: 5px;
 	width: 100%;
 	z-index: 15;
-}
+	}
 
-.header {
-
+body {
+	background: #efefef;
+	background-image: url();
+	background-repeat: repeat;
+	padding: 0;
 	margin: 0;
 	}
 
-.footer {
+#header {
+	background: #1b1b1b;
+	margin: 0;
 	color: #fafafa;
-	background: #2e2e2e;
-	text-align: center;
-	padding: 10px;
-	margin-top: 10px;
-	font-size: 9pt;
 	}
 
 #container {
 	background: #fafafa;
-	padding: 10px 0;
-	margin: 0 auto;
-	-webkit-border-radius: 2px;
-	-moz-border-radius: 2px;
-	border-radius: 2px;
-}
+	}
+
+#sidebar {
+	background: #1b1b1b;
+	text-align: justify;
+	height: 100vh; /*full page height */
+	}
 
 #content {
-	border-width: 0 1px;
-	border-style: dashed;
-	border-color: #dcdcdc;
 	text-align: justify;
+	padding: 50px;
 	}
 
-.header_img {
-	background-image: url(../images/logo.png);
-	background-repeat: no-repeat;
- 	height: 0;
-	width: 0;
-	margin: 0 auto;
+#footer {
+	color: #fafafa;
+	background: #1b1b1b;
+	text-align: center;
+	padding: 10px;
+	margin-top: 10px;
+	font-size: 0.90em;
 	}
-
-@media handheld, only screen and (max-width: 825px) {
-	.header_img {
-	background-image: url(../images/logo.png);
-	background-repeat: no-repeat;
- 	height: 0;
-	width: 0;
-	margin: 0 auto;
-	}
-}
 
 img {
 	max-height: auto;
@@ -95,8 +77,8 @@ img {
 	list-style-type: none;
 	white-space: pre-wrap;
 	text-align: center;
-	font-family: 'Open Sans Condensed', sans-serif;
-	font-size: 16pt;
+	font-family: 'Open Sans', sans-serif;
+	font-size: 11pt;
 	background-color: #f4f4f4;
 	border: 1px solid #dcdcdc;
 	padding: 3px 4px;
@@ -110,7 +92,7 @@ img {
 	background-color: #dedede;
 	}
 .pagination current {
-	color: black;
+	color: #dcdcdc;
 }
 
 /*-----------------  SIDEBAR BOXES  -----------------*/

@@ -10,7 +10,6 @@ abstract class Base {
 	{
 		$this->config = \Config::getTree();
 		$this->f3 = \Base::instance();
-		$this->f3->JS = [ "head" => [], "body" => [] ];
 	}
 
 	public function javascript($location, $file=FALSE, $string)
@@ -38,6 +37,15 @@ abstract class Base {
 	public static function stub($text="")
 	{
 		return \Template::instance()->render('stub.html');
+	}
+
+	public function commentFormBase($structure,$data)
+	{
+		// 'structure' formating, clearing and naming in child function call
+		\Base::instance()->set('structure', $structure);
+		\Base::instance()->set('data', $data );
+
+		return $this->render('main/feedback_form.html');
 	}
 	
 }

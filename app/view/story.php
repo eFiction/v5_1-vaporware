@@ -104,21 +104,37 @@ class Story extends Base
 		return parent::render('story/reviews.inner.html');
 	}
 	*/
-
-	public static function commentForm($parentID,$chapter)
+	
+	
+	public function commentForm(array $in_structure)
 	{
-		\Base::instance()->set('childof', $parentID);
-		\Base::instance()->set('level', isset($_POST['level']) ? (int)$_POST['level'] : 1);
-		\Base::instance()->set('element', $chapter);
-		\Base::instance()->set('data', [ 
-											"cancel" 				=> TRUE,
-											"feedback_form_label"	=> "__Comment",
-											"postText"				=> \Base::instance()->get('POST.write.text'),
-											"postName"				=> \Base::instance()->get('POST.write.name'),
-										]
-							);
+		// renaming fields for use in base comment form
+		$out_structure = [ 
+					"level"			=> $in_structure['level'],
+					"element"		=> $in_structure['story'],
+					"subelement"	=> $in_structure['chapter'],
+					"childof"		=> $in_structure['childof'],
+				];
 		
-		return parent::render('main/feedback_form.html');
+		$data = [ 
+					"cancel" 				=> TRUE,
+					"feedback_form_label"	=> ($in_structure['level'] > 0) ? "__COMMENT" : "__REVIEW",
+					"postText"				=> \Base::instance()->get('POST.write.text'),
+					"postName"				=> \Base::instance()->get('POST.write.name'),
+				];
+		
+		// Label for the submit button
+		if ( $in_structure['level'] == 0 )
+		{
+			if ( $in_structure['chapter'] > 0 )
+				$data['submit_button_label'] = $this->f3->get("LN__Button_reviewChapter");
+			else
+				$data['submit_button_label'] = $this->f3->get("LN__Button_reviewStory");
+		}
+		else $data['submit_button_label'] = $this->f3->get("LN__Button_writeComment");
+
+		// defined in \View\Base
+		return parent::commentFormBase($out_structure,$data);
 	}
 
 	public function buildStory($storyData,$content,$dropdown,$view=1)
@@ -131,29 +147,45 @@ class Story extends Base
 		$storyData['modified'] = date( \Config::getPublic('date_format_short'), $storyData['modified']);
 
 		\Base::instance()->set('data', [
-												"story" 	=> $storyData,
-												"content" 	=> $content,
-												"dropdown" 	=> $dropdown,
-												"infoblock" => ( $storyData['chapters'] > 1 ) ? "" : $this->buildInfoblock($storyData),
-												"feedback_form_label" => "__Review",
-												"view"		=> $view,
-												"postName"	=> '',
-												"postText"	=> '',
-												]);
+											"story" 	=> $storyData,
+											"content" 	=> $content,
+											"dropdown" 	=> $dropdown,
+											"feedback_form_label" => "__Review",
+											"view"		=> $view,
+											"postName"	=> '',
+											"postText"	=> '',
+										]);
 		\Base::instance()->set('returnpath', \Base::instance()->get('PATH') );
 		
 		return parent::render('story/single.html');
+	}
+	
+	public function buildReviews($storyData, $reviewData, $chapter, $selected)
+	{
+		\Registry::get('VIEW')->javascript('body', TRUE, 'chapter.js?' );
+
+		Story::dataProcess($storyData);
+		\Base::instance()->set('story', $storyData);
+		\Base::instance()->set('data', [
+											"reviews" 	=> $reviewData,
+											"selected"	=> $selected,
+											"chapter"	=> $chapter,
+										]);
+		\Base::instance()->set('returnpath', \Base::instance()->get('PATH') );
+		
+		return parent::render('story/reviews.html');
 	}
 
 	public function dropdown($data,$chapter)
 	{
 		$i=1;
-		if(sizeof($data) > 1) $dropDown[] = array ( FALSE, "toc", FALSE, \Base::instance()->get("LN__TOC") );
+		//if(sizeof($data) > 1) 
+		$dropDown[] = array ( FALSE, "toc", FALSE, \Base::instance()->get("LN__TOC") );
 		foreach ( $data as $item )
 		{
 			$dropDown[] = array ( ($chapter==$item['chapter']), $item['chapter'], $i++, $item['title']);
 		}
-		$dropDown[] = array ( ($chapter==="reviews"), "reviews", FALSE, \Base::instance()->get("LN__Reviews") );
+		//$dropDown[] = array ( ($chapter==="reviews"), "reviews", FALSE, \Base::instance()->get("LN__Reviews") );
 		return $dropDown;
 	}
 	

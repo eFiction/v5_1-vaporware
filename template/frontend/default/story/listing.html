@@ -20,7 +20,7 @@
 			</a>&nbsp;
 		</check>
 		<check if="{{@story.reviews>0}}">
-			<a href="{{@BASE}}/story/read/{{@story.sid}},reviews" title="{{@LN__TitleReadReviews, @story.title | format}}">{ICON:comments} {{@story.reviews}}</a>
+			<a href="{{@BASE}}/story/reviews/{{@story.sid}}" title="{{@LN__TitleReadReviews, @story.title | format}}">{ICON:comments} {{@story.reviews}}</a>
 		</check>
 	</div>
 	<div class="story-info2"><span class="fa fa-folder-open"></span> <repeat group="{{@story.cache_categories}}" value="{{@category}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check>{{@category.1}}</repeat></div>

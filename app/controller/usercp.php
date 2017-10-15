@@ -315,6 +315,12 @@ class UserCP extends Base
 		
 		if(array_key_exists("edit",$params))
 			$this->feedbackReviewsEdit($f3, $params);
+		elseif(array_key_exists("delete",$params))
+		{
+			$this->feedbackReviewsDelete($f3, $params);
+			$f3->reroute($params['returnpath'], false);
+			exit;
+		}
 
 		if ( isset($params[2]) AND isset($counter[$params[2]]) )
 		{
@@ -343,12 +349,48 @@ class UserCP extends Base
 	
 	protected function feedbackReviewsEdit(\Base $f3, $params)
 	{
-		if ( FALSE !== $data = $this->model->loadReview($params) )
+		if ( FALSE === $data = $this->model->loadReview($params) )
 		{
-			$this->buffer ( \View\UserCP::libraryFeedbackEdit($data, $params) );
+			// test
+			$f3->reroute("/userCP/feedback/reviews", false);
+			exit;
 		}
+		$this->buffer ( \View\UserCP::libraryFeedbackEdit($data, $params) );
 	}
 
+	protected function feedbackReviewsDelete(\Base $f3, $params)
+	{
+		// check if user is allowed to delete the review
+		if ( FALSE )
+			return FALSE;
+
+		// check if review has child elements
+		if ( $this->model->reviewHasChildren($params['id'][1]) )
+		{
+			// can we delete a branch ?
+			if ( TRUE )
+			{
+				// do
+				if ( FALSE === $this->model->reviewDeleteTree($params['id'][1]) )
+				{
+					// Set a session note to show after reroute
+					
+					// drop out with an error
+					return FALSE;
+				}
+			}
+				// don't
+			else return FALSE;
+		}
+		// no child elements
+		elseif ( FALSE === $this->model->reviewDelete($params['id'][1]) )
+		{
+			// drop out with an error
+			return FALSE;
+		}
+		return TRUE;
+	}
+	
 	protected function feedbackHome(\Base $f3, $params)
 	{
 		$stats = $this->model->feedbackHomeStats($this->counter);
