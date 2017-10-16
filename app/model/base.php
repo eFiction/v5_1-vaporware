@@ -18,6 +18,11 @@ class Base extends \Prefab {
 	{
 		return $this->db->exec(str_replace("`tbl_", "`{$this->prefix}", $cmds), $args,$ttl,$log);
 	}
+	
+	public function log()
+	{
+		return $this->db->log(TRUE);
+	}
 
 	public function newPasswordQuality($password1, $password2)
 	{

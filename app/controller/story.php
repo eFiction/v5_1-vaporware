@@ -48,8 +48,10 @@ class Story extends Base
 	public function save(\Base $f3, $params)
 	{
 		list($requestpath, $returnpath) = array_pad(explode(";returnpath=",$params['*']), 2, '');
-		@list($story, $view, $selected) = explode(",",$requestpath);
+		//@list($story, $view, $selected) = explode(",",$requestpath);
 		$params['returnpath'] = $returnpath;
+
+		/* maybe deprecated? 
 
 		if ( $params['action']=="read" )
 		{
@@ -60,8 +62,10 @@ class Story extends Base
 				$data = $f3->get('POST');
 			
 			// write review or reply to a review
+
 			if( is_numeric($story) AND isset($data) AND ($_SESSION['userID']!=0 || \Config::getPublic('allow_guest_reviews')) )
 			{
+				echo "Panik, schon wieder?";
 				$errors = $this->validateReview($data['write']);
 				
 				if ( sizeof($errors)==0 )
@@ -86,10 +90,33 @@ class Story extends Base
 				// Error reporting
 				
 			}
+			
+
+		}
+		*/
+			
+		if ( $params['action']=="reviews" )
+		{
+			/*
+				this is a sort of stub, as it doesn't actually save any data
+				all it does is to process a return-string from the ajax form
+				and build a proper path ro relocate to
+			*/
+			if ( isset($_POST['s_data']) )
+			{
+				@list($feedback,$hash) = explode("-", $params['*']);
+				@list($story,$chapter,$review) = explode(",", $feedback);
+				
+				if ( $chapter[0] == "r" )
+				{
+					$chapter = $this->model->getChapterByReview( substr($chapter, 1) );
+				}
+				
+				$requestpath = "{$story},{$chapter},{$review}#{$hash}";
+			}
 		}
 		
 		//echo "<pre>".print_r($params,TRUE).print_r(@$data,TRUE).print_r(@$errors,TRUE)."</pre>";
-
 		// If nothing else has worked so far, return to where we came from and pretend this was intentional
 		$f3->reroute($requestpath, false);
 		exit;
@@ -112,71 +139,52 @@ class Story extends Base
 
 		elseif ( isset($params['segment']) AND $params['segment']=="review_comment_form" )
 		{
+			/*
+				receive a new review or comment via AJAX-form
+				
+				Input data is:
+				
+				array: POST.write
+							- name (only defined if guest)
+							- text
+				array: POST.structure
+			*/
 			$structure = 
 			[
-				"level"		=> (int)$f3->get('POST.structure.level'),
-				"story"		=> (int)$f3->get('POST.structure.story'),
-				"chapter"	=> (int)$f3->get('POST.structure.chapter'),
+				"story"		=> (int)$f3->get('POST.structure.element'),
+				"chapter"	=> (int)$f3->get('POST.structure.subelement'),
 				"childof"	=> (int)$f3->get('POST.structure.childof'),
+				"level"		=> (int)$f3->get('POST.structure.level'),
 			];
-			// This is a comment to an element
-			/*
-				params: Array
-				(
-					[segment] => review_comment_form
-					[0] => /story/ajax/review_comment_form
-				)
-				POST: Array
-				(
-					[structure] => Array
-						(
-							[childof] => 3553
-							[level] => 1
-							[story] => 1259
-							[chapter] => 4059
-						)
-
-				)
-			*/
 
 			$errors = [];
-			$saveData = "";
+			$relocate = FALSE;
 
-			//print_r($params);
-			//print_r($_POST);
 			
 			if($_SESSION['userID']!=0 || \Config::getPublic('allow_guest_reviews') )
 			{
 				if ( isset($_POST['write']) )
 				{
-					$data = $f3->get('POST.write');
-					print_r($data);
-					$errors = $this->validateReview($data);
+					// Validate input
+					$errors = $this->validateReview( $f3->get('POST.write') );
 
+					// Write errors (or lack thereof) to form feedback handler
 					$f3->set('formError', $errors);
-					//if ( empty($errors) ) 
+
+					// If data is acceptable, store and process
 					if ( sizeof($errors)==0 )
 					{
-						//$data['childof'] = (int)$f3->get('POST.childof');
-						/*
-							$data['childof']:
-								0 => new review
-								int => comment
-								
-							$data['write']['element']:
-								0 => story
-								int => chapter
-						*/
+						// $saveData = 1 will trigger an event in jQuery to reload page.
 						$saveData = 1;
 						// For now let's assume this always returns a proper result
-						@list($insert_id, $routine_type, $routine_id) = $this->model->saveReview($story, $data);
-						// Run notification routines
+						@list($relocate, $routine_type, $routine_id) = $this->model->saveReview( $structure, $f3->get('POST.write') );
+						// Run notification routines (send mails)
 						Routines::instance()->notification($routine_type, $routine_id);
 					}
 				}
 			}
 			if(empty($view)) $view = $this->template->commentForm($structure, $f3->get('POST.write'));
-			$this->buffer( [ "", $view, $saveData, ($_SESSION['userID']==0) ], "BODY", TRUE );
+			$this->buffer( [ "", $view, $relocate, ($_SESSION['userID']==0) ], "BODY", TRUE );
 		}
 	}
 	

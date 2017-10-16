@@ -391,125 +391,128 @@ class Story extends Base
 	public function loadReviews($storyID,$selectedReview,$chapter=NULL)
 	{
 		$limit=5;
-		$sql = "SELECT 
-						SQL_CALC_FOUND_ROWS F1.*, 
-						F2.fid as comment_id, 
-						F2.text as comment_text, 
-						F2.reference_sub as parent_item, 
-						IF(F2.writer_uid>0,U2.nickname,F2.writer_name) as comment_writer_name, 
-						F2.writer_uid as comment_writer_uid,
-						UNIX_TIMESTAMP(F2.datetime) as date_comment
-					FROM 
-					(
-						SELECT 
-							F.fid as review_id, 
-							Ch.inorder,
-							F.text as review_text, 
-							F.reference as review_story, 
-							F.reference_sub as review_chapter, 
-							IF(F.writer_uid>0,U.nickname,F.writer_name) as review_writer_name, 
-							F.writer_uid as review_writer_uid, 
-							UNIX_TIMESTAMP(F.datetime) as date_review
-						FROM `tbl_feedback`F 
-							JOIN `tbl_users`U ON ( F.writer_uid = U.uid )
-							LEFT JOIN `tbl_chapters`Ch ON ( Ch.chapid = F.reference_sub )
-						WHERE F.reference = :storyid @CHAPTER@ AND F.type='ST' 
-						ORDER BY F.datetime 
-						DESC LIMIT 0,".$limit."
-					) F1
-					LEFT JOIN `tbl_feedback`F2  ON (F1.review_id = F2.reference AND F2.type='C')
-						LEFT JOIN `tbl_users`U2 ON ( F2.writer_uid = U2.uid )
-				ORDER BY F1.date_review DESC, F2.datetime ASC";
-
-		if ( $chapter )
-			$flat = $this->exec( str_replace("@CHAPTER@", "AND F.reference_sub = :chapter", $sql), [':storyid' => $storyID, ':chapter' => $chapter] );
-
-		else $flat = $this->exec( str_replace("@CHAPTER@", "", $sql), [':storyid' => $storyID] );
-		//echo $this->exec("SELECT FOUND_ROWS() as found")[0]['found'];
-		
-		if ( sizeof($flat) == 0 ) return FALSE;
-
-		$current_id = NULL;
 		$tree = [];
 
-		foreach ( $flat as $item )
+		/*
+			get the amount of reviews defines by $limit (offset to come) and count the total amount for pagination setup
+		*/
+		$sql = "SELECT 
+					SQL_CALC_FOUND_ROWS F.fid as review_id, 
+					Ch.inorder,
+					F.text as review_text, 
+					F.reference as review_story, 
+					F.reference_sub as review_chapter, 
+					IF(F.writer_uid>0,U.nickname,F.writer_name) as review_writer_name, 
+					F.writer_uid as review_writer_uid, 
+					UNIX_TIMESTAMP(F.datetime) as date_review
+				FROM `tbl_feedback`F 
+					JOIN `tbl_users`U ON ( F.writer_uid = U.uid )
+					LEFT JOIN `tbl_chapters`Ch ON ( Ch.chapid = F.reference_sub )
+				WHERE F.reference = :storyid @CHAPTER@ AND F.type='ST' 
+				ORDER BY F.datetime DESC
+				LIMIT 0,".$limit."";
+
+		if ( $chapter )
+			$reviews = $this->exec( str_replace("@CHAPTER@", "AND F.reference_sub = :chapter", $sql), [':storyid' => $storyID, ':chapter' => $chapter] );
+
+		else $reviews = $this->exec( str_replace("@CHAPTER@", "", $sql), [':storyid' => $storyID] );
+
+		/*
+			initiate data array with root elements
+		*/
+		foreach ( $reviews as $item )
 		{
-			// new review root element
-			if ( $item['review_id']!=$current_id )
-			{
-				// remember current review ID
-				$current_id = $item['review_id'];
-				$data['r'.$current_id] =
-				[
-					"level"		=>	1,
-					"story"		=>	$item['review_story'],
-					"date"		=>	date( \Config::getPublic('date_format_short'), $item['date_review']),
-					"date_long"	=>	date( \Config::getPublic('date_format_long'), $item['date_review']),
-					"time"		=>	date( \Config::getPublic('time_format'), $item['date_review']),
+			// remember current review ID
+			$current_id = $item['review_id'];
+			$data['r'.$current_id] =
+			[
+				"level"		=>	1,
+				"story"		=>	$item['review_story'],
+				"date"		=>	date( \Config::getPublic('date_format_short'), $item['date_review']),
+				"date_long"	=>	date( \Config::getPublic('date_format_long'), $item['date_review']),
+				"time"		=>	date( \Config::getPublic('time_format'), $item['date_review']),
+				"chapter"	=>	$item['review_chapter'],
+				"chapternr"	=>	$item['inorder'],
+				"id"		=>	$item['review_id'],
+				"text"		=>	$item['review_text'],
+				"name"		=>	$item['review_writer_name'],
+				"uid"		=>	$item['review_writer_uid'],
+				"timestamp"	=>	$item['date_review'],
+				"elements"	=> 0,
+			];
+			$chapters[$item['review_id']] = 
+				[ 
 					"chapter"	=>	$item['review_chapter'],
-					"chapternr"	=>	$item['inorder'],
-					"id"		=>	$item['review_id'],
-					"text"		=>	$item['review_text'],
-					"name"		=>	$item['review_writer_name'],
-					"uid"		=>	$item['review_writer_uid'],
-					"timestamp"	=>	$item['date_review'],
-					"elements"	=> 0,
+					"chapternr"	=>	$item['inorder']
 				];
-				// When there is a review from the user, we don't want a new on - there's always the edit button
-				if ( $_SESSION['userID']>0 AND $_SESSION['userID']==$item['review_writer_uid'] )
-					\Base::instance()->set('nocomment',1);
-			}
+			// When there is a review from the user, we don't want a new on - there's always the edit button
+			if ( $_SESSION['userID']>0 AND $_SESSION['userID']==$item['review_writer_uid'] )
+				\Base::instance()->set('nocomment',1);
+			$parents[] = $item['review_id'];
 			
 			$tree += [ 'r'.$current_id => null ];
-			
-			// Add the comment to the data structure
-			if ( $item['comment_id'] != NULL )
+		}
+
+		$sql = "SELECT 
+					F2.fid as comment_id, 
+					F2.text as comment_text, 
+					F2.reference_sub as parent_item, 
+					IF(F2.writer_uid>0,U2.nickname,F2.writer_name) as comment_writer_name, 
+					F2.writer_uid as comment_writer_uid,
+					F2.reference as review_id, 
+					UNIX_TIMESTAMP(F2.datetime) as date_comment
+				FROM `tbl_feedback`F2
+					LEFT JOIN `tbl_users`U2 ON ( F2.writer_uid = U2.uid )
+				WHERE F2.type='C' AND F2.reference IN (".implode(",",$parents).")
+				ORDER BY F2.datetime ASC";
+		$comments = $this->exec($sql);
+
+		foreach ( $comments as $item )
+		{
+			if ( $item['review_id']==(int)$selectedReview OR $selectedReview=="all" )
 			{
-				if ( $item['review_id']==(int)$selectedReview OR $selectedReview=="all" )
-				{
-					// showing this branch, so make sure we don't offer a link to show it ... again
-					$data['r'.$current_id]['elements'] = NULL;
-					// Check parent level and remember this node's level
-					if ( isset($depth[$item['parent_item']]) )
-						$depth[$item['comment_id']] = $depth[$item['parent_item']] + 1;
-					else
-						$depth[$item['comment_id']] = 2;
-
-					// tell the tree where this item originates from
-					if ( $item['parent_item'] == "" )
-						$tree += [ 'c'.$item['comment_id'] => 'r'.$current_id ];
-					else
-						$tree += [ 'c'.$item['comment_id'] => 'c'.$item['parent_item'] ];
-					
-					$data['c'.$item['comment_id']] = 
-					[
-						"level"		=>	min ($depth[$item['comment_id']], 4),
-						"story"		=>	$item['review_story'],
-						"date"		=>	date( \Config::getPublic('date_format_short'), $item['date_review']),
-						"date_long"	=>	date( \Config::getPublic('date_format_long'), $item['date_review']),
-						"time"		=>	date( \Config::getPublic('time_format'), $item['date_review']),
-						"chapter"	=>	$item['review_chapter'],
-						"chapternr"	=>	$item['inorder'],
-						"id"		=>	$item['comment_id'],
-						"parent"	=>	$item['parent_item'],
-						"text"		=>	$item['comment_text'],
-						"name"		=>	$item['comment_writer_name'],
-						"uid"		=>	$item['comment_writer_uid'],
-						"timestamp"	=>	$item['date_comment'],
-					];
-				}
+				// showing this branch, so make sure we don't offer a link to show it ... again
+				$data['r'.$item['review_id']]['elements'] = NULL;
+				// Check parent level and remember this node's level
+				if ( isset($depth[$item['parent_item']]) )
+					$depth[$item['comment_id']] = $depth[$item['parent_item']] + 1;
 				else
+					$depth[$item['comment_id']] = 2;
 
-				$data['r'.$current_id]['elements']++;
-				// When there is a comment from the user, we don't want a new on - there's always the edit button
-				if ( $_SESSION['userID']>0 AND $_SESSION['userID']==$item['comment_writer_uid'] )
-				{
-					if ( $item['parent_item']=="" )
-						$data['r'.$current_id]['nocomment'] = 1;
-					else
-						$data['c'.$item['parent_item']]['nocomment'] = 1;
-				}
+				// tell the tree where this item originates from
+				if ( $item['parent_item'] == "" )
+					$tree += [ 'c'.$item['comment_id'] => 'r'.$item['review_id'] ];
+				else
+					$tree += [ 'c'.$item['comment_id'] => 'c'.$item['parent_item'] ];
+				
+				$data['c'.$item['comment_id']] = 
+				[
+					"level"		=>	min ($depth[$item['comment_id']], 4),
+					"story"		=>	(int)$storyID,
+					"date"		=>	date( \Config::getPublic('date_format_short'), $item['date_comment']),
+					"date_long"	=>	date( \Config::getPublic('date_format_long'), $item['date_comment']),
+					"time"		=>	date( \Config::getPublic('time_format'), $item['date_comment']),
+					"chapter"	=>	$chapters[$item['review_id']]['chapter'],
+					"chapternr"	=>	$chapters[$item['review_id']]['chapternr'],
+					"id"		=>	$item['comment_id'],
+					"parent"	=>	$item['parent_item'],
+					"text"		=>	$item['comment_text'],
+					"name"		=>	$item['comment_writer_name'],
+					"uid"		=>	$item['comment_writer_uid'],
+					"timestamp"	=>	$item['date_comment'],
+				];
 			}
+			else
+
+			$data['r'.$item['review_id']]['elements']++;
+			// When there is a comment from the user, we don't want a new on - there's always the edit button
+			if ( $_SESSION['userID']>0 AND $_SESSION['userID']==$item['comment_writer_uid'] )
+			{
+				if ( $item['parent_item']=="" )
+					$data['r'.$item['review_id']]['nocomment'] = 1;
+				else
+					$data['c'.$item['parent_item']]['nocomment'] = 1;
+			}		
 		}
 		
 		// build an index-tree of all elements on their proper location
@@ -521,58 +524,56 @@ class Story extends Base
 		{
 			if ( $item != "" ) $indexFlat[(int) $i++] = $data[$item]; 
 		});
-
+		
 		return $indexFlat;
 	}
 
-	public function saveReview($storyID, $data)
+	public function saveReview($structure, $data)
 	{
 		/*
-			$data['childof']:
-				0 => new review
-				int => comment
-				
-			$data['write']['element']:
-				0 => story
-				int => chapter
+			new review
 		*/
-		if ( $data['childof']==0 )
+		if ( $structure['childof']==0 )
 		{
-			// new review
-			$sql = "SELECT 1 FROM `tbl_chapters`Ch WHERE Ch.sid = :sid";
-			$bind[":sid"] = $storyID;
-			if ($data['write']['element']>0)
+			// select story
+			$sql = "SELECT chapid FROM `tbl_chapters`Ch WHERE Ch.sid = :sid";
+			$bind[":sid"] = $structure['story'];
+			// ... and chapter if provided
+			if ($structure['chapter']>0)
 			{
-				$sql .= " AND Ch.chapid = :chapid";
-				$bind[":chapid"] = $data['write']['element'];
+				$sql .= " AND Ch.inorder = :inorder";
+				$bind[":inorder"] = $structure['chapter'];
 			}
-			// drop out if chapter doesn't exist
-			if ( empty($this->exec($sql, $bind)) )
+			$check = $this->exec($sql, $bind);
+
+			// drop out if selection doesn't exist
+			if ( empty($check) )
 				return FALSE;
 
 			$bind =
 			[
-				":reference"		=> $storyID,
-				":reference_sub"	=> ( $data['write']['element']>0 ) ? $data['write']['element'] : NULL,
+				":reference"		=> $structure['story'],
+				":reference_sub"	=> ( $structure['chapter']>0 ) ? $check[0]['chapid'] : NULL,
 				":guest_name"		=> ( $_SESSION['userID']!=0 ) ? NULL : $data['name'],
 				":uid"				=> (int)$_SESSION['userID'],
-				":text"				=> $data['write']['text'],
+				":text"				=> $data['text'],
 				":type"				=> "ST",
 			];
 		}
 		else
 		{
 			// write a comment
-			if ( $parent = $this->exec("SELECT reference as parent_id FROM `tbl_feedback` WHERE fid = :fid AND type='C';", [":fid"=>$data['childof']]) )
+			if ( $parent = $this->exec("SELECT reference as parent_id FROM `tbl_feedback` WHERE fid = :fid AND type='C';", [":fid"=>$structure['childof']]) )
 			{
 				$reference = $parent[0]['parent_id'];
-				$reference_sub = $data['childof'];
+				$reference_sub = $structure['childof'];
 			}
 			else
 			{
-				$reference = $data['childof'];
+				$reference = $structure['childof'];
 				$reference_sub = NULL;
 			}
+			$structure['chapter'] = "r{$reference}";
 
 			$bind =
 			[
@@ -580,7 +581,7 @@ class Story extends Base
 				":reference_sub"	=> $reference_sub,
 				":guest_name"		=> ( $_SESSION['userID']!=0 ) ? NULL : $data['name'],
 				":uid"				=> (int)$_SESSION['userID'],
-				":text"				=> $data['write']['text'],
+				":text"				=> $data['text'],
 				":type"				=> "C",
 			];
 		}
@@ -591,20 +592,49 @@ class Story extends Base
 
 		if ( 1== $this->exec($sql, $bind) )
 		{
+			// cache insert_id, will get destroyed by routines
+			$insert_id = (int)$this->db->lastInsertId();
+
+			$relocate = "/mvc/story/reviews/{$structure['story']},{$structure['chapter']},";
+			if ( $structure['childof']==0 )
+				$relocate .= $insert_id;
+			else
+				$relocate .= $reference;
+			$relocate .= "-{$insert_id}";
+
+			// run maintenance routines
 			\Model\Routines::dropUserCache("feedback");
 			\Cache::instance()->clear('stats');
-			return [ (int)$this->db->lastInsertId(), $bind[':type'], ($bind[':type']=="ST")?$storyID:$data['childof'] ] ;
+			
+			return [ $relocate, $bind[':type'], ($bind[':type']=="ST")?$storyID:$structure['childof'] ] ;
 		}
 		else
 		{
-			//echo "Fehler";exit;
-			
+			/*
+			echo "Fehler";
+			print_r($bind);
+			echo $sql;
+			echo $this->log();
+			exit;
+			*/
 			return FALSE;
 		}
 		
 		//return FALSE;
 	}
 
+	public function getChapterByReview($reviewID)
+	{
+		// SELECT Ch.inorder FROM `new5d_feedback`F INNER JOIN `new5d_chapters`Ch ON ( F.reference_sub = Ch.chapid ) WHERE F.fid = 4098
+		$data = $this->exec( "SELECT Ch.inorder 
+					FROM `new5d_feedback`F 
+						INNER JOIN `new5d_chapters`Ch ON ( F.reference_sub = Ch.chapid )
+					WHERE F.fid = :review;", [ ":review" => $reviewID ] );
+		if ( sizeof ( $data ) )
+			return $data[0]['inorder'];
+		return FALSE;
+	}
+	
 	public function getTOC($story)
 	{
 		return $this->exec( "SELECT UNIX_TIMESTAMP(T.last_read) as tracker_last_read, T.last_chapter, IF(T.last_chapter=Ch.inorder,1,0) as last,

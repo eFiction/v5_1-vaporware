@@ -15,7 +15,7 @@ $('#story-container').on("click", ".openform", function(e)
 		//clear all old forms
 		$(review_container).find('.ajaxform').hide('slow').html('');
 		var ajaxurl = base + '/story/ajax/review_comment_form';
-		var data = { structure : { childof: $(this).attr('id'), level: $(this).data("level"), story: $(this).data("story"), chapter: $(this).data("chapter") } };
+		var data = { captcha: $(this).data("captcha"), structure : { childof: $(this).attr('id'), level: $(this).data("level"), element: $(this).data("story"), subelement: $(this).data("chapter") } };
 		review_data ( ajaxurl, data, form );
 	}
 });
@@ -31,9 +31,12 @@ function review_data ( ajax_url, ajax_data, ajax_form )
 			number = 0;
 			//create the new form and make it visible
 			ajax_form.nextAll('.ajaxform:first').hide().html(html[1]).show('slow');
-			if ( html[2] == 1 )
+			if ( html[2] )
 			{
-				var redirect = $(location).attr('href');
+				// will currently redirect to the currently showing review, even if a comment was written for a different one
+				var redirect = $(location).attr('protocol') + '//' + $(location).attr('hostname') + html[2];
+				// new call would fix this, but requires code change in story model
+				//var redirect = $(location).attr('href');
 				$.redirectPost(redirect, {s_data: ajax_data});
 			}
 			$('.reviewButton').click(function(review) {
@@ -48,5 +51,5 @@ function review_data ( ajax_url, ajax_data, ajax_form )
 
 		}		
     });
-	getCaptchaImage();
+	if ( ajax_data.captcha == 1 ) getCaptchaImage();
 }
