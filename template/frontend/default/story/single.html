@@ -2,11 +2,25 @@
 		<div class="story-date">{{@LN__Published}}: {{@data.story.published}} <check if="{{ @data.story.published != @data.story.modified}}"><br />{{@LN__Updated}}: {{@data.story.modified}}</check></div>
 		<div class="story-info1"><include href="story/icons.html" /></div>
 		<div class="story-titleauthor">
-			<h2>{{@data.story.title}}<br /> {{@LN__by}} <repeat group="{{@data.story.cache_authors}}" value="{{@author}}" counter="{{ @i }}">
-													<check if="{{ @i>1 }}">, </check>
-													<check if="{{ @_SESSION.userID == @author[0] }}"><set no_review="1" /></check>
-													<a href="{{@BASE}}/authors/{{@author[0]}}">{{@author[1]}}</a>
-												</repeat>
+			<h2>{{@data.story.title}}<br />
+			{* prepare for translation functionality *}
+			<check if="{{ @data.story.translation }}">
+				<true>
+				{{@LN__translatedBy}} <repeat group="{{@data.story.cache_authors}}" value="{{@author}}" counter="{{ @i }}">
+														<check if="{{ @i>1 }}">, </check>
+														<check if="{{ @_SESSION.userID == @author[0] }}"><set no_review="1" /></check>
+														<a href="{{@BASE}}/authors/{{@author[0]}}">{{@author[1]}}</a>
+													</repeat><br/>
+				__transFrom {{ locale_get_display_language(@data.story.trans_from, @_SESSION['preferences']['language']) }} __transTo {{ locale_get_display_language(@data.story.trans_to, @_SESSION['preferences']['language']) }}
+				</true>
+				<false>
+				{{@LN__by}} <repeat group="{{@data.story.cache_authors}}" value="{{@author}}" counter="{{ @i }}">
+														<check if="{{ @i>1 }}">, </check>
+														<check if="{{ @_SESSION.userID == @author[0] }}"><set no_review="1" /></check>
+														<a href="{{@BASE}}/authors/{{@author[0]}}">{{@author[1]}}</a>
+													</repeat>
+				</false>
+			</check>
 			</h2>
 		</div>
 		<check if="{{ @data.dropdown }}">

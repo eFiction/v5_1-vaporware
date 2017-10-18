@@ -303,7 +303,8 @@ class Story extends Base
 				".((isset($this->config['optional_modules']['contests']))?"GROUP_CONCAT(rSC.relid) as contests,":"")."
 				GROUP_CONCAT(Fav.bookmark,',',Fav.fid SEPARATOR '||') as is_favourite,
 				Ra.rating as rating_name, Edit.uid as can_edit,
-				S.cache_authors, S.cache_tags, S.cache_characters, S.cache_categories, S.cache_rating, S.chapters, S.reviews
+				S.cache_authors, S.cache_tags, S.cache_characters, S.cache_categories, S.cache_rating, S.chapters, S.reviews,
+				S.translation, S.trans_from, S.trans_to
 			FROM `tbl_stories`S
 				@JOIN@
 			".((isset($this->config['optional_modules']['contests']))?"LEFT JOIN `tbl_contest_relations`rSC ON ( rSC.relid = S.sid AND rSC.type = 'story' )":"")."
@@ -453,6 +454,9 @@ class Story extends Base
 			$tree += [ 'r'.$current_id => null ];
 		}
 
+		/*
+			for the above comments ( id in array $parent), get the associated comments
+		*/
 		$sql = "SELECT 
 					F2.fid as comment_id, 
 					F2.text as comment_text, 
@@ -467,6 +471,9 @@ class Story extends Base
 				ORDER BY F2.datetime ASC";
 		$comments = $this->exec($sql);
 
+		/*
+			insert the comments to the base structure created above
+		*/
 		foreach ( $comments as $item )
 		{
 			if ( $item['review_id']==(int)$selectedReview OR $selectedReview=="all" )

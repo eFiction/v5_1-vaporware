@@ -413,6 +413,7 @@ return array(
 'Summary' =>	'Klappentext',
 'Tags' =>	'Tags',
 'by' => 'von',
+'translatedBy'	=> 'übersetzt von',
 'Stories' => 'Geschichten',
 'NewStories' => 'Neue Geschichten',
 'RandomStory' => '{0, plural,'.
