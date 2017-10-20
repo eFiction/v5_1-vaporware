@@ -15,10 +15,12 @@ class Authors extends Base {
 		
 		// Build menu letters
 		$letters = $this->model->letters();
-		$menu = $this->model->menuLetters($letters);
+		// build letter list only if there are authors
+		if($letters) $menu = $this->model->menuLetters($letters);
+		else $menu = [];
 
 		// set header
-		$header[] = "__authors";
+		$header[] = $f3->get('LN__Authors');
 
 		if ( empty($params['id']) )
 		{

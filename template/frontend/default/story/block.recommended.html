@@ -1,18 +1,25 @@
 <div class="feature">
 <h3>{{@LN__RecommendedStory, sizeof(@renderData) | format}}</h3>
-<repeat group="{{@renderData}}"  value="{{ @story }}">
-	<div class='feature'>
-		<a href="{{@story.url}}" target="_blank">{{@story.title}}</a> {ICON:external-link} {{@LN__by}} {{@story.author}}<br />
-		{{@LN__RecommBy}} <a href="{{@BASE}}/member/profile/{{@story.uid}}">{{@story.nickname}}</a><br />
-		<check if="{{isset(@story.cache_categories.0.1)}}">
-			<repeat group='@story.cache_categories' value='@category' counter='{{ @ctr }}'><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/story/browse/catIn={{@category.0}}">{{@category.1}}</a></repeat><br />
-		</check>
-		{{@LN__Rating}}: {{@story.cache_rating.1}}<br />
-		{{@LN__Summary}}: <span class="toggle">
-			<span class="toggle_more"><span class="fa fa-caret-square-o-down"></span></span>
-			<span class="toggle_less" style="display:none"><span class="fa fa-caret-square-o-up"></span></span>
-		</span>
-		<div class="toggle_container" style="display:none">{{ @story.summary | raw }}</div>
-	</div>
-</repeat>
+<check if="{{sizeof(@renderData)>0}}">
+<true>
+	<repeat group="{{@renderData}}"  value="{{ @story }}">
+		<div class='feature'>
+			<a href="{{@story.url}}" target="_blank">{{@story.title}}</a> {ICON:external-link} {{@LN__by}} {{@story.author}}<br />
+			{{@LN__RecommBy}} <a href="{{@BASE}}/member/profile/{{@story.uid}}">{{@story.nickname}}</a><br />
+			<check if="{{isset(@story.cache_categories.0.1)}}">
+				<repeat group='@story.cache_categories' value='@category' counter='{{ @ctr }}'><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/story/browse/catIn={{@category.0}}">{{@category.1}}</a></repeat><br />
+			</check>
+			{{@LN__Rating}}: {{@story.cache_rating.1}}<br />
+			{{@LN__Summary}}: <span class="toggle">
+				<span class="toggle_more"><span class="fa fa-caret-square-o-down"></span></span>
+				<span class="toggle_less" style="display:none"><span class="fa fa-caret-square-o-up"></span></span>
+			</span>
+			<div class="toggle_container" style="display:none">{{ @story.summary | raw }}</div>
+		</div>
+	</repeat>
+</true>
+<false>
+	{{@LN__noRecommendedStory}}
+</false>
+</check>
 </div>

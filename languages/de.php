@@ -36,6 +36,7 @@ return array(
 // 'StorySummaryExplained'	=>
 // 'ChapterText'			=>
 // 'ChapterTextExplained' =>
+'MaintenanceMode'		=> 'Archiv befindet sich in der Wartung',
 
 // Login
 'Login'			=> 'Anmelden',
@@ -114,6 +115,7 @@ return array(
 
 'Author'	=> 'Autor',
 'Authors'	=> 'Autoren',
+'noAuthors'	=> 'Noch keine Autoren',
 'Recomm'	=> 'Empfehlung',
 'Recomms'	=> 'Empfehlungen',
 'RecommBy'	=> 'Empfohlen von',
@@ -416,15 +418,19 @@ return array(
 'translatedBy'	=> 'übersetzt von',
 'Stories' => 'Geschichten',
 'NewStories' => 'Neue Geschichten',
+//'noNewStory'			=> 'No new Stories',
 'RandomStory' => '{0, plural,'.
 	'one	{Zufällige Geschichte},'.
 	'other	{Zufällige Geschichten} }',
+//'noRandomStory'	=> 'No random stories yet',
 'FeaturedStory' => '{0, plural,'.
 	'one	{Empfohlene Geschichte},'.
 	'other	{Empfohlene Geschichten} }',
+//'noFeaturedStory'	=> 'No featured stories yet',
 'RecommendedStory'	=> '{0, plural,'.
 	'one	{Externe Empfehlung},'.
 	'other	{Externe Empfehlungen} }',
+//'noRecommendedStory'	=> 'No recommended stories yet',
 'TitleReadReviews' => '{0, plural, other {Read reviews for \'#\'} }',
 
 'BookmarkAdd'		=> '{0, plural, other {\'#\' hat kein Lesezeichen, hier klicken um eines zu setzen.} }',

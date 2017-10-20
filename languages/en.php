@@ -36,6 +36,7 @@ return array(
 'StorySummaryExplained'	=> 'Your story summary goes here',
 'ChapterText'			=> 'Chapter text',
 'ChapterTextExplained'	=> 'Your chapter\'s content goes here',
+'MaintenanceMode'		=> 'Archive is in maintenance mode',
 
 // Login related
 'Login'			=> 'Login',
@@ -114,6 +115,7 @@ return array(
 
 'Author'	=> 'Author',
 'Authors'	=> 'Authors',
+'noAuthors'	=> 'no Authors yet',
 'Recomm'	=> 'Recommendation',
 'Recomms'	=> 'Recommendations',
 'RecommBy'	=> 'Recommended by',
@@ -416,15 +418,19 @@ return array(
 'translatedBy'	=> 'translated by',
 'Stories'				=> 'Stories',
 'NewStories'			=> 'New Stories',
+'noNewStory'			=> 'No new Stories',
 'RandomStory' => '{0, plural,'.
 	'one	{Random Story},'.
 	'other	{Random Stories} }',
+'noRandomStory'	=> 'No random stories yet',
 'FeaturedStory' => '{0, plural,'.
 	'one	{Featured Story},'.
 	'other	{Featured Stories} }',
+'noFeaturedStory'	=> 'No featured stories yet',
 'RecommendedStory'	=> '{0, plural,'.
 	'one	{Recommended Story},'.
 	'other	{Recommended Stories} }',
+'noRecommendedStory'	=> 'No recommended stories yet',
 'TitleReadReviews' => '{0, plural, other {Read reviews for \'#\'} }',
 
 'BookmarkAdd'		=> '{0, plural, other {\'#\' has no bookmark, click to add.} }',

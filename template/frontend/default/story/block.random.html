@@ -1,16 +1,23 @@
 <div class="feature">
 <h3>{{@LN__RandomStory, sizeof(@renderData) | format}}</h3>
-<repeat group="{{@renderData}}"  value="{{ @story }}">
-	<div class='feature'>
-		<a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a> {{@LN__by}} <repeat group='@story.cache_authors' value='@author' counter='{{ @ctr }}'><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/member/profile/{{@author.0}}">{{@author.1}}</a></repeat><br />
-		{* remove below to hide categories *}
-		 <repeat group='@story.cache_categories' value='@category' counter='{{ @ctr }}'><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/story/browse/catIn={{@category.0}}">{{@category.1}}</a></repeat><br />
-		{{@LN__Rating}}: {{@story.cache_rating.1}}<br />
-		{{@LN__Summary}}: <span class="toggle">
-			<span class="toggle_more"><span class="fa fa-caret-square-o-down"></span></span>
-			<span class="toggle_less" style="display:none"><span class="fa fa-caret-square-o-up"></span></span>
-		</span>
-		<div class="toggle_container" style="display:none">{{ @story.summary | raw }}</div>
-	</div>
-</repeat>
+<check if="{{sizeof(@renderData)>0}}">
+<true>
+	<repeat group="{{@renderData}}"  value="{{ @story }}">
+		<div class='feature'>
+			<a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a> {{@LN__by}} <repeat group='@story.cache_authors' value='@author' counter='{{ @ctr }}'><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/member/profile/{{@author.0}}">{{@author.1}}</a></repeat><br />
+			{* remove below to hide categories *}
+			 <repeat group='@story.cache_categories' value='@category' counter='{{ @ctr }}'><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/story/browse/catIn={{@category.0}}">{{@category.1}}</a></repeat><br />
+			{{@LN__Rating}}: {{@story.cache_rating.1}}<br />
+			{{@LN__Summary}}: <span class="toggle">
+				<span class="toggle_more"><span class="fa fa-caret-square-o-down"></span></span>
+				<span class="toggle_less" style="display:none"><span class="fa fa-caret-square-o-up"></span></span>
+			</span>
+			<div class="toggle_container" style="display:none">{{ @story.summary | raw }}</div>
+		</div>
+	</repeat>
+</true>
+<false>
+	{{@LN__noRandomStory}}
+</false>
+</check>
 </div>

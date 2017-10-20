@@ -1,5 +1,7 @@
 <h1>{{@LN__NewStories}}</h1>
 <div class="index-box">
+<check if="{{sizeof(@renderData)>0}}">
+<true>
 	<repeat group="{{@renderData}}"  value="{{ @story }}" counter="{{ @ctr }}">
 		<check if="{{@extra=='large'}}">
 			<true>
@@ -23,4 +25,9 @@
 			</false>
 		</check>
 	</repeat>
+</true>
+<false>
+	{{@LN__noNewStory}}
+</false>
+</check>
 </div>

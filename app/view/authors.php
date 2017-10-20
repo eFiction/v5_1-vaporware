@@ -27,16 +27,20 @@ class Authors extends Base
 				$construct["#"][] = [ "name" => $author['authorname'], "id" => $author['aid'], "stories" => $author['counted'] ];
 		}
 		
-		\Registry::get('VIEW')->javascript('body', TRUE, 'jquery.columnizer.js' );
-		\Registry::get('VIEW')->javascript('body', FALSE, "$(function(){ $('.author-grid-wrapper').addClass(\"dontsplit\"); $('.columnize').columnize({ width: 200, lastNeverTallest: true }); });" );
+		if ( isset($construct) )
+		{
+			\Registry::get('VIEW')->javascript('body', TRUE, 'jquery.columnizer.js' );
+			\Registry::get('VIEW')->javascript('body', FALSE, "$(function(){ $('.author-grid-wrapper').addClass(\"dontsplit\"); $('.columnize').columnize({ width: 200, lastNeverTallest: true }); });" );
 
-		return \Template::instance()->render
+			return \Template::instance()->render
 														('authors/listing.html','text/html', 
 															[
 																"construct"	=> $construct,
 																"BASE"		=> \Base::instance()->get('BASE')
 															]
 														);
+		}
+		else return \Base::instance()->get('LN__noAuthors');
 	}
 
 	public static function letterList($letter, $authors)
@@ -54,7 +58,7 @@ class Authors extends Base
 														('authors/listing.html','text/html', 
 															[
 																"authors"	=> $list,
-																"letter"		=> $letter,
+																"letter"	=> $letter,
 																"BASE"		=> \Base::instance()->get('BASE')
 															]
 														);
