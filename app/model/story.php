@@ -666,7 +666,9 @@ class Story extends Base
 		
 		$statSQL = [
 			"SET @users = (SELECT COUNT(*) FROM `tbl_users`U WHERE U.groups > 0);",
-			"SET @authors = (SELECT COUNT(*) FROM `tbl_users`U WHERE ( U.groups & 4 ) );",
+			// more precise stats, only counting authors with actual stories
+			"SET @authors = ( SELECT COUNT(DISTINCT rSA.aid) FROM `tbl_stories_authors`rSA INNER JOIN `tbl_stories`S ON ( S.sid = rSA.sid AND S.validated >= 20 AND S.completed >= 0 ) );",
+			//"SET @authors = (SELECT COUNT(*) FROM `tbl_users`U WHERE ( U.groups & 4 ) );",
 			"SET @reviews = (SELECT COUNT(*) FROM `tbl_feedback`F WHERE F.type='ST');",
 			"SET @stories = (SELECT COUNT(DISTINCT sid) FROM `tbl_stories`S WHERE S.validated >= 30 );",
 			"SET @chapters = (SELECT COUNT(DISTINCT chapid) FROM `tbl_chapters`C INNER JOIN `tbl_stories`S ON ( C.sid=S.sid AND S.validated >= 30 AND C.validated >= 20 ) );",

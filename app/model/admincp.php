@@ -1231,6 +1231,7 @@ class AdminCP extends Base {
 	
 	public function logGetCount()
 	{
+		$count = [];
 		$countSQL = "SELECT L.type, COUNT(L.id) as items FROM `tbl_log`L @WHERE@ GROUP BY L.type;";
 		$data = $this->exec(str_replace("@WHERE@","",$countSQL));
 		if ( sizeof($data) )

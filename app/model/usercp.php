@@ -78,6 +78,9 @@ class UserCP extends Base
 		$menu = [];
 
 		$menuItems = $this->exec(str_replace("@WHERE@", ($selected?"= :selected;":"IS NULL;"), $sql) , [":selected"=> $selected]);
+		
+		print_r($menuItems);print_r($this->config);exit;
+		
 		foreach ( $menuItems as $item )
 		{
 			if ( $item['evaluate']=="" OR $this->config['optional_modules'][$item['evaluate']] )

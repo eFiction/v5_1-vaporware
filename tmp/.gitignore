@@ -1,6 +1,7 @@
 # Ignore everything in this directory
 *.php
 *.json
+.devnotes
 # Except this file
 !.gitignore
 # Directory must exists

@@ -469,6 +469,7 @@ Click to remove.} }',
 
 'Search' => 'Search',
 'Tagcloud' => 'Tagcloud',
+'noTagcloud' => 'No tag cloud',
 
 // Feedback
 'Feedback_Not_Logged_In' => 'You need to be logged in to write a review or comment',

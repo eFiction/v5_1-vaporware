@@ -469,6 +469,7 @@ Hier klicken um zu entfernen.',
 
 'Search' => 'Suche',
 'Tagcloud' => 'Tagcloud',
+'noTagcloud' => 'No tag cloud',
 
 // Feedback
 'Feedback_Not_Logged_In' => 'Du musst angemeldet sein, um eine Review oder einen Kommentar zu verfassen.',
