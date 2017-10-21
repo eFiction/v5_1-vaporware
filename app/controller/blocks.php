@@ -128,7 +128,10 @@ class Blocks extends Base
 	
 	public function categories()
 	{
-		$data = $this->model->categories();
-		return \View\Blocks::categories($data);
+		if ( NULL !== $data = $this->model->categories() )
+			return \View\Blocks::categories($data);
+		
+		// Return empty if no data retrieved
+		return "";
 	}
 }

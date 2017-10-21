@@ -32,11 +32,11 @@ class Blocks extends Base
 	function ajaxCalendar($params)
 	{
 		$firstEvent = $this->exec("SELECT UNIX_TIMESTAMP(S.date) AS date FROM `tbl_stories`S ORDER BY S.date ASC LIMIT 0,1");
-		if ( sizeof($firstEvent) )
+		if ( sizeof($firstEvent)>0 )
 		{
 			$start = [
-				"month"	=> date("n",$firstEvent['date']),
-				"year"	=> date("Y",$firstEvent['date'])
+				"month"	=> date("n",$firstEvent[0]['date']),
+				"year"	=> date("Y",$firstEvent[0]['date'])
 			];
 		}
 		else

@@ -10,7 +10,7 @@
 		</div>
 	</div><!-- end header -->
 
-	<check if="{{TRUE==\Config::getPublic('maintenance')}}"><div class="alert-box warning">__Maintenance</div></check>
+	<check if="{{TRUE==\Config::getPublic('maintenance')}}"><div class="alert-box warning">{{@LN__MaintenanceMode}}!</div></check>
 	<check if="{{ @@systempage }}">
 	<!-- layout for system pages (admin panel, error pages, ...) -->
 		<true>

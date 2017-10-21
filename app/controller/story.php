@@ -496,9 +496,19 @@ class Story extends Base
 		}
 		elseif ( $select[1] == "tagcloud" )
 		{
-			$items = (isset($select[2]) AND is_numeric($select[2])) ? $select[2] : 15;
+			// Get number of desired items from template call or set to maximum items from config
+			$items = (isset($select[2]) AND is_numeric($select[2])) ? $select[2] : \Config::getPublic('tagcloud_elements');
+			
+			// if there is a minimum amount of items requested, make sure the template call does not request less items
+			if ( 0 < \Config::getPublic('tagcloud_minimum_elements') )
+				$items = max(\Config::getPublic('tagcloud_minimum_elements'),$items);
+			
 			$data = $this->model->blockTagcloud($items);
 
+			// If size of data is below minimum element threshhold, don't bother building a tagcloud
+			if ( sizeof($data)<\Config::getPublic('tagcloud_minimum_elements') ) return "";
+
+			// Wow, we are really getting a tag cloud, all eyes to the sky
 			return \View\Story::blockTagcloud($data);
 		}
 		return "";

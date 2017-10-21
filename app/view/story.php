@@ -322,11 +322,6 @@ class Story extends Base
 	
 	public static function blockTagcloud($taglist)
 	{
-		// If size of taglist is below minimum element threshhold, don't bother building a tagcloud
-		if ( sizeof($taglist)<\Config::getPublic('tagcloud_basesize') )
-			return "";
-		//\Base::instance()->get('LN__noTagcloud');
-		
 		$max = current($taglist)['count'];
 		$min = end($taglist)['count'];
 		shuffle($taglist);
