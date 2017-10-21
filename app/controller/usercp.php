@@ -20,7 +20,7 @@ class UserCP extends Base
 	{
 		$modules = [ "library", "messaging", "author", "feedback", "settings" ];
 
-		if ( TRUE == $this->config->optional_modules['shoutbox'] )
+		if ( TRUE == @$this->config->optional_modules['shoutbox'] )
 			$modules[] = "shoutbox";
 
 		$p = array_pad(@explode("/",$params['*']),2,NULL); // 3.6
