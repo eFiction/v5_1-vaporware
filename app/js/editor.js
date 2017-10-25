@@ -3,7 +3,7 @@ tinymce.init({
 	plugins: "link table contextmenu",
 	entity_encoding : "raw",
   tools: "inserttable",
-	contextmenu: "link image inserttable | cell row column deletetable",
+	contextmenu: "link image inserttable | cell row column deletetable | copy cut paste",
  	menubar : false,
 	toolbar: [
 		"undo redo | copy cut paste | bold italic underline strikethrough removeformat | bullist numlist formatselect | link image | alignleft aligncenter alignright | table"

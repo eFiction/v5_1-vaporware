@@ -7,6 +7,7 @@ class UserCP extends Base
 	{
 		$this->model = \Model\UserCP::instance();
 		$this->config = \Config::instance();
+		$this->template = new \View\UserCP();
 		\Base::instance()->set('systempage', TRUE);
 	}
 	
@@ -264,15 +265,16 @@ class UserCP extends Base
 			{
 				if ( FALSE === $result = $this->model->saveFeedback($post, $params) )
 				{
-					$params['error'] = "saving";
+					//$params['error'] = "saving";
+					$_SESSION['lastAction'] = [ "modified" => "unknown" ];
 					//$this->libraryBookFavEdit($f3, $params);
 				}
 				else
 				{
-					$f3->reroute($params['returnpath'], false);
-					exit;
 				}
 			}
+			$f3->reroute($params['returnpath'], false);
+			exit;
 		}
 
 		$this->showMenu("feedback");
@@ -343,7 +345,7 @@ class UserCP extends Base
 
 			$extra = [ "sub" => [ $params[0], $params[1] ], "type" => $params[2] ];
 			
-			$this->buffer ( \View\UserCP::feedbackListReviews($data, $sort, $extra) );
+			$this->buffer ( $this->template->feedbackListReviews($data, $sort, $extra) );
 		}
 	}
 	
@@ -355,7 +357,7 @@ class UserCP extends Base
 			$f3->reroute("/userCP/feedback/reviews", false);
 			exit;
 		}
-		$this->buffer ( \View\UserCP::libraryFeedbackEdit($data, $params) );
+		$this->buffer ( $this->template->libraryFeedbackEdit($data, $params) );
 	}
 
 	protected function feedbackReviewsDelete(\Base $f3, $params)

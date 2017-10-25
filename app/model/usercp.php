@@ -615,6 +615,12 @@ class UserCP extends Base
 		return $stats;
 	}
 	
+	public function saveFeedback($post, $params)
+	{
+		
+		return FALSE;
+	}
+
 	public function reviewHasChildren($reference)
 	{
 		$children = $this->exec("SELECT COUNT(1) FROM `tbl_feedback` WHERE `reference` = :reference AND `type` = 'C' ", [ ":reference" => $reference ] )[0]["COUNT(1)"];

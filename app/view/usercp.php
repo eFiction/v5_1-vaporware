@@ -169,26 +169,32 @@ class UserCP extends Base
 		return \Template::instance()->render('usercp/feedback.home.html');
 	}
 
-	public static function feedbackListReviews(array $data, array $sort, array $extra)
+	public function feedbackListReviews(array $data, array $sort, array $extra)
 	{
-		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 
-		\Base::instance()->set('feedbackEntries', $data);
-		\Base::instance()->set('sort', $sort);
-		\Base::instance()->set('extra', $extra);
-		return \Template::instance()->render('usercp/feedback.html');
+		$this->f3->set('feedbackEntries', $data);
+		$this->f3->set('sort', $sort);
+		$this->f3->set('extra', $extra);
+
+		if( isset($_SESSION['lastAction']) )
+		{
+			$this->f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
+			unset($_SESSION['lastAction']);
+		}
+		return $this->render('usercp/feedback.html');
 	}
 
-	public static function libraryFeedbackEdit($data, $params)
+	public function libraryFeedbackEdit($data, $params)
 	{
-		\Registry::get('VIEW')->javascript( 'head', TRUE, "jquery.are-you-sure.js" );
-		\Base::instance()->set('data', $data);
-		\Base::instance()->set('block', $params[0]);
-		\Base::instance()->set('direction', $params[1]);
-		\Base::instance()->set('returnpath', $params['returnpath']);
-		\Base::instance()->set('saveError', @$params['error']);
+		$this->javascript( 'head', TRUE, "jquery.are-you-sure.js" );
+		$this->f3->set('data', $data);
+		$this->f3->set('block', $params[0]);
+		$this->f3->set('direction', $params[1]);
+		$this->f3->set('returnpath', $params['returnpath']);
+		$this->f3->set('saveError', @$params['error']);
 		
-		return \Template::instance()->render('usercp/feedback.edit.html');
+		return $this->render('usercp/feedback.edit.html');
 	}
 	
 	public static function settingsChangePW($feedback)

@@ -1,3 +1,22 @@
+<check if="{{isset(@modified)}}">
+	<switch expr="{{ @modified }}">
+		<case value="success" break="TRUE">
+			<div class="alert-box-half success">{{@LN__MSG_deletedSuccess}}</div>
+		</case>
+		<case value="msgread" break="TRUE">
+			<div class="alert-box-half warning">{{@LN__MSG_deleteRead}}</div>
+		</case>
+		<case value="notfound" break="TRUE">
+			<div class="alert-box-half warning">{{@LN__MSG_deleteNotFound}}</div>
+		</case>
+		<case value="noaccess" break="TRUE">
+			<div class="alert-box-half error">{{@LN__MSG_deleteNoAccess}}</div>
+		</case>
+		<case value="unknown" break="TRUE">
+			<div class="alert-box-half error">{{@LN__UnknowError}}</div>
+		</case>
+	</switch>
+</check>
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
 <table class="tbody">
 	<tr>
