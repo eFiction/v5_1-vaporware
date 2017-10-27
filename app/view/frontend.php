@@ -62,7 +62,11 @@ class Frontend extends Template
 					[2] => menu
 					[3] => .main
 			*/
-			if ( $match[1] == "BLOCK" AND isset( $this->modules[$match[2]] ) )
+			if ( $match[1] == "BLOCK" AND $match[2] == "HONEYPOT" )
+			{
+				$tpl = str_replace ( $match[0], $this->honeypot(), $tpl );
+			}
+			elseif ( $match[1] == "BLOCK" AND isset( $this->modules[$match[2]] ) )
 			{
 				$call = $this->modules[$match[2]][0];
 				// call or recall block module
@@ -128,4 +132,20 @@ class Frontend extends Template
 		return $buffer;
 	}
 	
+	private function honeypot()
+	{
+		$links = 
+		[
+			'<a href="http://efiction.org/credits.php"><!-- give_credits --></a>',
+			'<a href="http://efiction.org/credits.php"><img src="give_credits.gif" height="1" width="1" border="0"></a>',
+			'<a href="http://efiction.org/credits.php" style="display: none;">give_credits</a>',
+			'<div style="display: none;"><a href="http://efiction.org/credits.php">give_credits</a></div>',
+			'<a href="http://efiction.org/credits.php"></a>',
+			'<!-- <a href="http://efiction.org/credits.php">give_credits</a> -->',
+			'<div style="position: absolute; top: -250px; left: -250px;"><a href="http://efiction.org/credits.php">give_credits</a></div>',
+			'<a href="http://efiction.org/credits.php"><span style="display: none;">give_credits</span></a>',
+			'<a href="http://efiction.org/credits.php"><div style="height: 0px; width: 0px;"></div></a>'
+		];
+		return $links[array_rand($links)];
+	}
 }

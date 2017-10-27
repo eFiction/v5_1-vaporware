@@ -1,3 +1,4 @@
+.gitignore
 /data/*
 !/data/.htaccess
 !/data/config.ini

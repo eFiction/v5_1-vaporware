@@ -11,5 +11,4 @@ class Page extends Base
 		else return NULL;
 	}
 
-
 }
