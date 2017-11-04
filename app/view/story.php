@@ -38,8 +38,8 @@ class Story extends Base
 
 		if (isset($item['cache_authors']))
 		{
-												$item['authors'] 	= $item['cache_authors'] = json_decode($item['cache_authors'],TRUE);
-												array_walk($item['authors'], function (&$v, $k){ $v = $v[1];} );
+												if ( NULL !== $item['authors'] 	= $item['cache_authors'] = json_decode($item['cache_authors'],TRUE) )
+													array_walk($item['authors'], function (&$v, $k){ $v = $v[1];} );
 		}
 
 		if (isset($item['cache_categories'])) 	$item['cache_categories']	= json_decode($item['cache_categories'],TRUE);
