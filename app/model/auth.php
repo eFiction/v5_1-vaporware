@@ -395,7 +395,7 @@ class Auth extends Base {
 		{
 			if ( $deny == "connect" )
 			{
-				// SFS server yould not be queried, registration was not completed
+				// SFS server could not be queried, registration was not completed
 				return [ "status" => 2, "reason" => "technical" ];
 			}
 			elseif ( $deny == "red" )

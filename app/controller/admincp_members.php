@@ -4,6 +4,7 @@ namespace Controller;
 class AdminCP_Members extends AdminCP
 {
 	var $moduleBase = "members";
+	//var $submodules = [ "search", "edit", "pending", "groups", "profile", "team" ];
 	var $submodules = [ "search", "pending", "groups", "profile", "team" ];
 
 	public function index(\Base $f3, $params)
@@ -13,8 +14,11 @@ class AdminCP_Members extends AdminCP
 		switch( $this->moduleInit(@$params['module']) )
 		{
 			case "search":
-				$this->buffer( \View\Base::stub() );
+				$this->search($f3, $params);
 				break;
+		/*	case "edit":
+				$this->edit($f3, $params);
+				break;	*/
 			case "pending":
 				$this->buffer( \View\Base::stub() );
 				break;
@@ -33,6 +37,20 @@ class AdminCP_Members extends AdminCP
 			default:
 				$this->buffer(\Template::instance()->render('access.html'));
 		}
+	}
+
+	public function ajax(\Base $f3, $params)
+	{
+		$data = [];
+		if ( empty($params['module']) ) return NULL;
+
+		$post = $f3->get('POST');
+		
+		if ( $params['module']=="search" )
+			$data = $this->model->ajax("userSearch", $post);
+
+		echo json_encode($data);
+		exit;
 	}
 
 	protected function home(\Base $f3, $feedback = [ NULL, NULL ])
@@ -66,14 +84,43 @@ class AdminCP_Members extends AdminCP
 		foreach ( $fields as $field )
 			$data[$field['field_type']][] = $field;
 		
-		$this->buffer ( \View\AdminCP::listUserFields( $data ) );
+		$this->buffer ( $this->template->listUserFields( $data ) );
 	}
-
+/*
+	protected function edit(\Base $f3, $params)
+	{
+		$this->buffer( print_r($team,1) );
+	}
+*/
 	protected function team(\Base $f3)
 	{
 		$team = $this->model->listTeam();
-		print_r($team);
-		$this->buffer( \View\Base::stub() );
+		$this->buffer( $this->template->userListTeam($team) );
+	}
+	
+	protected function search(\Base $f3, $params)
+	{
+		if( isset($_POST) ) $post = $f3->get('POST');
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+
+		// search/browse
+		$allow_order = array (
+				"id"		=>	"uid",
+				"name"		=>	"nickname",
+				"date"		=>	"registered",
+		);
+
+		// page will always be an integer > 0
+		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
+
+		// sort order
+		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "id";
+		$sort["order"]		= $allow_order[$sort["link"]];
+		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
+		
+		$data = $this->model->listUsers();
+		
+		$this->buffer( $this->template->userSearchList($data, $sort) );
 	}
 
 	public function save(\Base $f3, $params)

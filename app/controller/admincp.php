@@ -9,6 +9,7 @@ class AdminCP extends Base
 	public function __construct()
 	{
 		$this->model = \Model\AdminCP::instance();
+		$this->template = new \View\AdminCP();
 		\Base::instance()->set('systempage', TRUE);
 	}
 

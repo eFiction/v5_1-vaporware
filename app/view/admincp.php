@@ -142,21 +142,21 @@ class AdminCP extends Base
 		return \Template::instance()->render('archive/edit_featured.html');
 	}
 
-	public static function searchStoryForm()
+	public function searchStoryForm()
 	{
-		return \Template::instance()->render('stories/search.html');
+		return $this->render('stories/search.html');
 	}
 	
-	public static function storyMetaEdit(array $storyData, array $chapterList, array $prePop)
+	public function storyMetaEdit(array $storyData, array $chapterList, array $prePop)
 	{
 		$storyData['storynotes'] = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $storyData['storynotes']);
 		$storyData['summary'] = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $storyData['summary']);
 
-		\Base::instance()->set('prePop', $prePop);
-		\Base::instance()->set('data', $storyData);
-		\Base::instance()->set('chapterList', $chapterList);
+		$this->f3->set('prePop', $prePop);
+		$this->f3->set('data', $storyData);
+		$this->f3->set('chapterList', $chapterList);
 		
-		return \Template::instance()->render('stories/edit_meta.html');
+		return $this->render('stories/edit_meta.html');
 	}
 
 	public static function storyChapterEdit(array $chapterData, array $chapterList, $plain = FALSE)
@@ -179,10 +179,30 @@ class AdminCP extends Base
 		return \Template::instance()->render('stories/edit_chapter.html');
 	}
 	
-	public static function listUserFields(array $fieldData)
+	public function listPendingStories(array $data, array $sort)
+	{
+		$this->f3->set('data', $data);
+		$this->f3->set('sort', $sort);
+		return $this->render('stories/pending.html');
+	}
+	
+	public function listUserFields(array $fieldData)
 	{
 		\Base::instance()->set('data', $fieldData);
-		return \Template::instance()->render('members/list_fields.html');
+		return $this->render('members/list_fields.html');
+	}
+	
+	public function userListTeam($teamData)
+	{
+		\Base::instance()->set('data', $teamData);
+		return $this->render('members/list_team.html');
+	}
+	
+	public function userSearchList(array $data, array $sort)
+	{
+		$this->f3->set('data', $data);
+		$this->f3->set('sort', $sort);
+		return $this->render('members/searchlist.html');
 	}
 
 	public static function listShoutbox(array $data, array $sort, array $changes)

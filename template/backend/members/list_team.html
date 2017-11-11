@@ -1,0 +1,19 @@
+<set groups="0" />
+<repeat group="{{ @data }}" value="{{ @mod }}">
+<check if="{{ @groups!=@mod.groups}}">
+	<check if="{{@groups>0}}">
+			</div>
+	</fieldset>
+	</check>
+	<fieldset>
+		<legend>{{ ${"LN__AdminMenu_Team_Group".floor(log(@mod.groups, 2))} }}</legend>
+			<div class="grid-wrapper">
+	<set groups="{{@mod.groups}}" />
+</check>
+				<div class="gb-10"><a href="{{@BASE}}/adminCP/members/profile/edit={{ @mod['uid'] }};returnpath=/adminCP/members/team">{ICON:edit}</a></div>
+				<div class="gb-10">{{ @mod['uid'] }}</div>
+				<div class="gb-20">{{ @mod['nickname'] }}</div>
+				<div class="gb-20">{{ @mod['realname'] }}</div>
+				<div class="gb-40">&nbsp;</div>
+</repeat>
+</fieldset>

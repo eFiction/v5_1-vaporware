@@ -13,7 +13,7 @@ class AdminCP_Stories extends AdminCP
 		switch( $this->moduleInit(@$params['module']) )
 		{
 			case "pending":
-				$this->buffer( \View\Base::stub() );
+				$this->pending($f3, $params);
 				break;
 			case "edit":
 				$this->edit($f3, $params);
@@ -56,15 +56,46 @@ class AdminCP_Stories extends AdminCP
 	{
 		$this->buffer( \View\Base::stub() );
 	}
+
+	protected function pending(\Base $f3, $params)
+	{
+		$this->response->addTitle( $f3->get('LN__AdminMenu_Pending') );
+		$f3->set('title_h3', $f3->get('LN__AdminMenu_Pending') );
+
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+
+		// search/browse
+		$allow_order = array (
+				"id"		=>	"sid",
+				"date"		=>	"timestamp",
+				"title"		=>	"title",
+		);
+
+		// page will always be an integer > 0
+		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
+
+		// sort order
+		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "id";
+		$sort["order"]		= $allow_order[$sort["link"]];
+		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
+
+		$data = $this->model->getPendingStories($page, $sort);
+		$this->buffer( $this->template->listPendingStories($data, $sort) );
+	}
 	
 	protected function edit(\Base $f3, $params)
 	{
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		if ( isset($params['*']) )
+		{
+			list($params, $returnpath) = array_pad(explode(";returnpath=",$params['*']), 2, '');
+			$params = $this->parametric($params);
+			$params['returnpath'] = $returnpath;
+		}
 		
 		if ( empty($params['story']) )
 		{
 			// Select story form
-			$this->buffer( \View\AdminCP::searchStoryForm() );
+			$this->buffer( $this->template->searchStoryForm() );
 			return TRUE;
 		}
 		else
@@ -72,13 +103,15 @@ class AdminCP_Stories extends AdminCP
 			$storyInfo = $this->model->loadStoryInfo((int)$params['story']);
 			if ( $storyInfo AND isset($params['chapter']) )
 			{
+				$storyInfo['returnpath'] = $returnpath;
 				$this->buffer ( $this->editChapter($params, $storyInfo) );
 			}
 			elseif ( $storyInfo )
 			{
+				$storyInfo['returnpath'] = $returnpath;
 				$chapterList = $this->model->loadChapterList($storyInfo['sid']);
 				$prePopulate = $this->model->storyEditPrePop($storyInfo);
-				$this->buffer( \View\AdminCP::storyMetaEdit($storyInfo,$chapterList,$prePopulate) );
+				$this->buffer( $this->template->storyMetaEdit($storyInfo,$chapterList,$prePopulate) );
 			}
 			else
 			{
@@ -117,8 +150,13 @@ class AdminCP_Stories extends AdminCP
 
 	public function save(\Base $f3, $params)
 	{
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
-		
+		if ( isset($params['*']) )
+		{
+			list($params, $returnpath) = array_pad(explode(";returnpath=",$params['*']), 2, '');
+			$params = $this->parametric($params);
+			$params['returnpath'] = $returnpath;
+		}
+
 		$current = $this->model->loadStoryMapper($params['story']);
 		
 		if ( $current['sid'] != NULL )

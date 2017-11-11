@@ -221,23 +221,25 @@ class Base extends \Prefab {
 		]);
 	}
 
-	protected function storyStates()
+	/*
+	protected function storyStates($completed,$validated)
 	{
+		$f3 = \Base::instance();
 		// Commented lines are for later versions, providing more options
 		$state['completed'] =
 		[
-			-2 => "deleted",
-			-1 => "draft",
-			 0 => "wip",
-			 1 => "completed",
+			0 => "deleted",
+			1 => "draft",
+			2 => "wip",
+			3 => "completed",
 		];
 		
 		$state['validated'] =
 		[
-		//	 0 => "closed",
-			 1 => "moderationStatic",
-			 2 => "moderationPending",
-			 3 => "validated",
+			0 => "closed",
+			1 => "moderationStatic",
+			2 => "moderationPending",
+			3 => "validated",
 		];
 		
 		$state['reason'] =
@@ -246,15 +248,22 @@ class Base extends \Prefab {
 			1 => "user",
 			2 => "moderator",
 			3 => "admin",
-		//	4 => "__forcedRework",
-		//	5 => "__minorWorking",
-		//	6 => "__majorWorking",
-		//	7 => "__minorDone",
-		//	8 => "__majorDone",
-		//	9 => "__locked",
+			4 => "forcedRework",
+			5 => "minorWorking",
+			6 => "majorWorking",
+			7 => "minorDone",
+			8 => "majorDone",
+			9 => "lockedOrphaned",
 		];
 		return $state;
+		return
+		[
+			"completed" => [ $completed, 	$state['completed'][$completed] ],
+			"validated" => [ $validated[1],	$state['validated'][$validated[1]] ],
+			"reason" 	=> [ $validated[2],	$state['validated'][$validated[2]] ],
+		];
 	}
+	*/
 	
 	public function getChapter( $story, $chapter, $counting = TRUE )
 	{

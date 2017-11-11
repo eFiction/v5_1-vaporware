@@ -16,7 +16,7 @@
 			<div class="gb-10">{{ @row['field_id'] }}</div>
 			<div class="gb-20">{{ @row['field_name'] }}</div>
 			<div class="gb-30">{{ @row['field_title'] }}</div>
-			<div class="gb-20"><check if="{{ @row.field_on == 1}}"><true>{ICON:plus}</true><false>{ICON:minus}</false></check></div>
+			<div class="gb-20"><check if="{{ @row.enabled == 1}}"><true>{ICON:plus}</true><false>{ICON:minus}</false></check></div>
 		</div>
 	</repeat>
 </fieldset>

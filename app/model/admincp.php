@@ -49,6 +49,14 @@ class AdminCP extends Base {
 				$bind = [ ":story" =>  "%{$data['storyID']}%", ":sid" =>  $data['storyID'] ];
 			}
 		}
+		elseif ( $key == "userSearch" )
+		{
+			if(isset($data['userID']))
+			{
+				$ajax_sql = "SELECT U.nickname as name,U.uid as id from `tbl_users`U WHERE ( U.nickname LIKE :user OR U.uid = :uid ) AND U.uid > 0 ORDER BY U.nickname ASC LIMIT 5";
+				$bind = [ ":user" =>  "%{$data['userID']}%", ":uid" =>  $data['userID'] ];
+			}
+		}
 		elseif ( $key == "chaptersort" )
 		{
 			$chapters = new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
@@ -95,13 +103,19 @@ class AdminCP extends Base {
 	
 	public function listTeam()
 	{
-		$sql = "SELECT `uid`, `nickname`, `realname`, `groups` FROM `tbl_users` WHERE `groups` > 16";
+		$sql = "SELECT `uid`, `nickname`, `realname`, `groups` FROM `tbl_users` WHERE `groups` > 16 ORDER BY groups,nickname ASC";
 		return $this->exec($sql);
 	}
 	
 	public function listUserFields()
 	{
-		$sql = "SELECT `field_id`, `field_type`, `field_name`, `field_title`, `field_on` FROM `tbl_user_fields` ORDER BY `field_type` ASC";
+		$sql = "SELECT `field_id`, `field_type`, `field_name`, `field_title`, `field_options`, `enabled` FROM `tbl_user_fields` ORDER BY `field_type` ASC";
+		return $this->exec($sql);
+	}
+	
+	public function listUsers()
+	{
+		$sql = "SELECT `uid`, `nickname` FROM `tbl_users`";
 		return $this->exec($sql);
 	}
 	
@@ -868,7 +882,7 @@ class AdminCP extends Base {
 		);
 		if (sizeof($data)==1)
 		{
-			$data[0]['states']  = $this->storyStates();
+			//$data[0]['states']  = $this->storyStates($data[0]['completed'],$data[0]['validated']);
 			$data[0]['ratings'] = $this->exec("SELECT rid, rating, ratingwarning FROM `tbl_ratings`");
 			return $data[0];
 		}
@@ -877,22 +891,22 @@ class AdminCP extends Base {
 	
 	public function storyEditPrePop(array $storyData)
 	{
-		$categories = json_decode($storyData['cache_categories']);
+		$categories = json_decode($storyData['cache_categories'],TRUE);
 		foreach ( $categories as $tmp ) $pre['cat'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
 		$pre['cat'] = json_encode($pre['cat']);
 
-		$tags = json_decode($storyData['cache_tags']);
-		foreach ( $tags as $tmp ) $pre['tag'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
+		$tags = json_decode($storyData['cache_tags'],TRUE);
+		foreach ( $tags['simple'] as $tmp ) $pre['tag'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
 		$pre['tag'] = json_encode($pre['tag']);
 
-		$characters = json_decode($storyData['cache_characters']);
+		$characters = json_decode($storyData['cache_characters'],TRUE);
 		foreach ( $characters as $tmp ) $pre['char'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
 		$pre['char'] = json_encode($pre['char']);
 		
-		$authors = $this->exec ( "SELECT U.uid as id, U.nickname as name FROM `tbl_users`U INNER JOIN `tbl_stories_authors`Rel ON ( U.uid = Rel.aid AND Rel.sid = :sid AND Rel.ca = 0 );", [ ":sid" => $storyData['sid'] ]);
+		$authors = $this->exec ( "SELECT U.uid as id, U.nickname as name FROM `tbl_users`U INNER JOIN `tbl_stories_authors`Rel ON ( U.uid = Rel.aid AND Rel.sid = :sid AND Rel.type = 'M' );", [ ":sid" => $storyData['sid'] ]);
 		$pre['auth'] = json_encode($authors);
 
-		$coauthors = $this->exec ( "SELECT U.uid as id, U.nickname as name FROM `tbl_users`U INNER JOIN `tbl_stories_authors`Rel ON ( U.uid = Rel.aid AND Rel.sid = :sid AND Rel.ca = 1 );", [ ":sid" => $storyData['sid'] ]);
+		$coauthors = $this->exec ( "SELECT U.uid as id, U.nickname as name FROM `tbl_users`U INNER JOIN `tbl_stories_authors`Rel ON ( U.uid = Rel.aid AND Rel.sid = :sid AND Rel.type = 'S' );", [ ":sid" => $storyData['sid'] ]);
 		$pre['coauth'] = json_encode($coauthors);
 
 		return $pre;
@@ -934,6 +948,7 @@ class AdminCP extends Base {
 		return $data;
 	}
 	
+	//public function saveChapterChanges( int $chapterID, array $post )
 	public function saveChapterChanges( $chapterID, array $post )
 	{
 		$chapter=new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
@@ -946,18 +961,11 @@ class AdminCP extends Base {
 		// plain and visual return different newline representations, this will bring things to standard.
 		$post['chapter_text'] = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $post['chapter_text']);
 		
-		//$this->saveChapter($chapterID, $post['chapter_text']);
 		parent::saveChapter($chapterID, $post['chapter_text']);
 	}
 	
-/*
-	public function saveChapter( $chapterID, $chapterText )
-	{
-		return parent::saveChapter( $chapterID, $chapterText );
-	}
-*/
-	
-	public function addChapter ( $storyID, $post )
+	//public function addChapter ( int $storyID, array $post )
+	public function addChapter ( $storyID, array $post )
 	{
 		$location = $this->config['chapter_data_location'];
 		
@@ -1014,7 +1022,7 @@ class AdminCP extends Base {
 		$current->storynotes	= str_replace("\n","<br />",$post['story_notes']);
 		$current->ratingid		= $post['ratingid'];
 		$current->completed		= $post['completed'];
-		$current->validated 	= $post['validated'];
+		$current->validated 	= $post['validated'].$post['valreason'];
 		$current->save();
 		
 		// Step two: check for changes in relation tables
@@ -1109,35 +1117,35 @@ class AdminCP extends Base {
 		unset($categories);
 		
 		// Author and co-Author preparation:
-		$post['author'] = explode(",",$post['author']);		
-		$post['coauthor'] = explode(",",$post['coauthor']);
+		$post['mainauthor'] = explode(",",$post['mainauthor']);		
+		$post['supauthor'] = explode(",",$post['supauthor']);
 		// remove co-authors, that are already in the author field
-		$post['coauthor'] = array_diff($post['coauthor'], $post['author']);
+		$post['supauthor'] = array_diff($post['supauthor'], $post['mainauthor']);
 
 		// Check Authors:
 		$author = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors');
 
-		foreach ( $author->find(array('`sid` = ? AND `ca` = ?',$current->sid,'M')) as $X )
+		foreach ( $author->find(array('`sid` = ? AND `type` = ?',$current->sid,'M')) as $X )
 		{
-			$temp=array_search($X['aid'], $post['author']);
+			$temp=array_search($X['aid'], $post['mainauthor']);
 			if ( $temp===FALSE )
 			{
 				// Excess relation, drop from table
 				$author->erase(['lid=?',$X['lid']]);
 			}
-			else unset($post['author'][$temp]);
+			else unset($post['mainauthor'][$temp]);
 		}
 
 		// Insert any character IDs not already present
-		if ( sizeof($post['author'])>0 )
+		if ( sizeof($post['mainauthor'])>0 )
 		{
-			foreach ( $post['author'] as $temp)
+			foreach ( $post['mainauthor'] as $temp)
 			{
 				// Add relation to table
 				$author->reset();
 				$author->sid = $current->sid;
 				$author->aid = $temp;
-				$author->ca = 0;
+				$author->type = 'M';
 				$author->save();
 			}
 		}
@@ -1146,27 +1154,27 @@ class AdminCP extends Base {
 		// Check co-Authors:
 		$coauthor = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors');
 
-		foreach ( $coauthor->find(array('`sid` = ? AND `ca` = ?',$current->sid,'S')) as $X )
+		foreach ( $coauthor->find(array('`sid` = ? AND `type` = ?',$current->sid,'S')) as $X )
 		{
-			$temp=array_search($X['aid'], $post['coauthor']);
+			$temp=array_search($X['aid'], $post['supauthor']);
 			if ( $temp===FALSE )
 			{
 				// Excess relation, drop from table
 				$coauthor->erase(['lid=?',$X['lid']]);
 			}
-			else unset($post['coauthor'][$temp]);
+			else unset($post['supauthor'][$temp]);
 		}
 
 		// Insert any character IDs not already present
-		if ( sizeof($post['coauthor'])>0 )
+		if ( sizeof($post['supauthor'])>0 )
 		{
-			foreach ( $post['coauthor'] as $temp)
+			foreach ( $post['supauthor'] as $temp)
 			{
 				// Add relation to table
 				$coauthor->reset();
 				$coauthor->sid = $current->sid;
 				$coauthor->aid = $temp;
-				$coauthor->ca = 1;
+				$coauthor->type = 'S';
 				$coauthor->save();
 			}
 		}
@@ -1177,6 +1185,40 @@ class AdminCP extends Base {
 		return TRUE;
 	}
 	
+	//public function getPendingStories(int $page, array $sort)
+	public function getPendingStories($page, array $sort)
+	{
+		$limit = 20;
+		$pos = $page - 1;
+		
+		$sql = "SELECT SQL_CALC_FOUND_ROWS * FROM
+				(					
+					SELECT S.sid, S.title, '1' as story_pending, UNIX_TIMESTAMP(S.updated) as timestamp, Ch.chapid
+						FROM `trek_stories`S
+							LEFT JOIN `trek_chapters`Ch
+						ON ( S.sid = Ch.sid AND Ch.validated >= 20 AND Ch.validated < 30 ) 
+						WHERE S.validated >= 20 AND S.validated < 30
+					UNION
+					SELECT S.sid, S.title, IF((S.validated >= 20 AND S.validated < 30),1,0) as story_pending, UNIX_TIMESTAMP(S.updated) as timestamp, Ch.chapid
+						FROM `trek_stories`S
+							INNER JOIN `trek_chapters`Ch
+						ON ( S.sid = Ch.sid AND Ch.validated >= 20 AND Ch.validated < 30)
+				) P
+				ORDER BY {$sort['order']} {$sort['direction']}
+				LIMIT ".(max(0,$pos*$limit)).",".$limit;
+		
+		$data = $this->exec($sql);
+
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/adminCP/stories/pending/order={$sort['link']},{$sort['direction']}",
+			$limit
+		);
+				
+		return $data;
+	}
+	
+	//public function listShoutbox(int $page, array $sort)
 	public function listShoutbox($page, array $sort)
 	{
 		$limit = 20;

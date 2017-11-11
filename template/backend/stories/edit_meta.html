@@ -1,67 +1,50 @@
 <div class="grid-wrapper">
 	<div class="gb-3qrt">
-		<form method="post" action="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}}">
+		<form method="post" action="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}}<check if="{{!empty(@data.returnpath)}}">;returnpath={{@data.returnpath}}</check>">
 			<div class="ym-grid">
-				<div class="gb-2thrd"><h6>__Title</h6><input placeholder="Your story title goes here" type="text" name="form[story_title]" value="{{@data.title}}"></div>
-				<div class="gb-1thrd"><h6>__Rating</h6>
+				<div class="gb-2thrd"><h6>{{@LN__Title}}</h6><input placeholder="Your story title goes here" type="text" name="form[story_title]" value="{{@data.title}}"></div>
+				<div class="gb-1thrd"><h6>{{@LN__Rating}}</h6>
 					<select id="ratingid" name="form[ratingid]">
 					<repeat group="{{ @data.ratings }}" value="{{ @rating }}"><option value="{{ @rating.rid }}"<check if="{{@rating.rid==@data.ratingid}}"> selected="selected"</check>>{{ @rating.rating }}</option></repeat>
 					</select>
 				</div>
-
-		<!-- The next fields will be filled by the javascript below -->
+{*		<!-- The next fields will be filled by the javascript below, do not change the id! --> *}
 				<div class="gb-1qrt"><h6>{{@LN__Categories}}</h6></div><div class="gb-3qrt"><input type="text" id="category-select" name="form[category]" /></div>
 				<div class="gb-1qrt"><h6>{{@LN__MainAuthor}} <a class="contextual-popup" href="#mainauthorinfo">{ICON:info} <span> <b>Info:</b><br />{{@UCP_ExplainMainAuthor}}.</span></a></h6></div><div class="gb-3qrt"><input type="text" id="mainauthor-select" name="form[mainauthor]" /></div>
 				<div class="gb-1qrt"><h6>{{@LN__SupAuthor}} <a class="contextual-popup" href="#supauthorinfo">{ICON:info} <span> <b>Info:</b><br />{{@UCP_ExplainSupAuthor}}.</span></a></h6></div><div class="gb-3qrt"><input type="text" id="supauthor-select" name="form[supauthor]" /></div>
 				<div class="gb-1qrt"><h6>{{@LN__Tags}} </h6></div><div class="gb-3qrt"><input type="text" id="tag-select" name="form[tags]" /></div>
 				<div class="gb-1qrt"><h6>{{@LN__Characters}} </h6></div><div class="gb-3qrt"><input type="text" id="character-select" name="form[characters]" /></div>
-		<!-- end of special fields -->
-
+{*		<!-- end of special fields -->	*}
 				<div class="gb-full"><h6>{{@LN__StoryNotes}}</h6><textarea placeholder="{{@LN__StoryNotesExplained}}" name="form[story_notes]">{{@data.storynotes}}</textarea></div>
 				<div class="gb-full"><h6>{{@LN__StorySummary}}</h6><textarea placeholder="{{@LN__StorySummaryExplained}}" name="form[story_summary]">{{@data.summary}}</textarea></div>
-
+{*		<!-- story status fields -->	*}
 				<div class="gb-1thrd">
-					<h6>{{@LN__UCP_statusValidated}}:<br />{{ ${"LN__UCP_statusValidated_".@data.states.validated[@data.validated.0]} }}</h6>
+					<h6>{{@LN__UCP_statusValidated}}: <strong>{{ ${"LN__UCP_statusValidated_".@data.validated.0} }}</strong></h6>
 					{{@LN__ChangeTo}}:<select id="validated" name="form[validated]">
-						<repeat group="{{ @data.states.validated }}" key="{{ @validated.key }}" value="{{ @validated.label }}">
-							<check if="{{ (@validated.key!=2 OR !(@_SESSION['groups']&8)) AND (@validated.key!=3 OR (@_SESSION['groups']&8)) }}"><option value="{{ @validated.key }}"<check if="{{@validated.key==@data.validated.0}}"> selected="selected"</check>>{{ ${"LN__UCP_statusValidated_".@validated.label} }}</option></check>
-						</repeat>
+						<loop from="{{ @i=0 }}" to="{{ @i < 4 }}" step="{{ @i++ }}">
+							<check if="{{ @i==@data.validated.0 OR (@i!=2 OR !(@_SESSION['groups']&8)) AND (@i!=3 OR (@_SESSION['groups']&8)) }}">
+							<option value="{{ @i }}"<check if="{{@i==@data.validated.0}}"> selected="selected"</check>>{{ ${"LN__UCP_statusValidated_".@i} }}</option>
+							</check>
+						</loop>
 					</select>
 				</div>
 				<div class="gb-1thrd">
-					<h6>{{@LN__UCP_statusValidatedReason}}:<br />{{ ${"LN__UCP_statusValidated_".@data.states.reason[@data.validated.1]} }}</h6>
-					{{@LN__ChangeTo}}:<select id="validated" name="form[validated]">
-						<repeat group="{{ @data.states.reason }}" key="{{ @validated.key }}" value="{{ @validated.label }}"><option value="{{ @validated.key }}"<check if="{{@validated.key==@data.validated.1}}"> selected="selected"</check>>{{ ${"LN__UCP_statusValidated_".@validated.label} }}</option></repeat>
+					<h6>{{@LN__UCP_statusValidatedReason}}: <strong>{{ ${"LN__UCP_statusValReason_".@data.validated.1} }}</strong></h6>
+					{{@LN__ChangeTo}}:<select id="validated" name="form[valreason]">
+					<loop from="{{ @i=0 }}" to="{{ @i < 10 }}" step="{{ @i++ }}">
+						<option value="{{ @i }}"<check if="{{@i==@data.validated.1}}"> selected="selected"</check>>{{ ${"LN__UCP_statusValReason_".@i} }}</option>
+					</loop>
 					</select>
 				</div>
 				<div class="gb-1thrd">
-					<h6>{{@LN__UCP_statusCompleted}}:<br />{{ @data.states.completed[@data.completed] }}</h6>
+					<h6>{{@LN__UCP_statusCompleted}}: <strong>{{ ${"LN__UCP_statusCompleted_".@data.completed} }}</strong></h6>
 					{{@LN__ChangeTo}}:<select id="completed" name="form[completed]">
-						<repeat group="{{ @data.states.completed }}" key="{{ @completed.key }}" value="{{ @completed.label }}"><option value="{{ @completed.key }}"<check if="{{@completed.key==@data.completed}}"> selected="selected"</check>>{{ ${"LN__UCP_statusCompleted_".@completed.label} }}</option></repeat>
+						<loop from="{{ @i=0 }}" to="{{ @i < 4 }}" step="{{ @i++ }}">
+							<option value="{{ @i }}"<check if="{{@i==@data.completed}}"> selected="selected"</check>>{{ ${"LN__UCP_statusCompleted_".@i} }}</option>
+						</loop>
 					</select>
 				</div>
-{*
-Testing
-				<div class="gb-half">
-					<h6>__StatusValidated: {{ @data.states.validated[@data.validated.0] }}</h6>
-					__ChangeTo:<select id="validated" name="form[validated]">
-						<repeat group="{{ @data.states.validated }}" key="{{ @validated.key }}" value="{{ @validated.label }}"><option value="{{ @validated.key }}"<check if="{{@validated.key==@data.validated.0}}"> selected="selected"</check>>{{ @validated.label }}</option></repeat>
-					</select>
-				</div>
-				<div class="gb-half">
-					<h6>__StatusValidatedReason: {{ @data.states.reason[@data.validated.1] }}</h6>
-					__ChangeTo:<select id="validated" name="form[validated]">
-						<repeat group="{{ @data.states.reason }}" key="{{ @validated.key }}" value="{{ @validated.label }}"><option value="{{ @validated.key }}"<check if="{{@validated.key==@data.validated.1}}"> selected="selected"</check>>{{ @validated.label }}</option></repeat>
-					</select>
-				</div>
-				<div class="gb-half">
-					<h6>__StatusCompleted: {{ @data.states.completed[@data.completed] }}</h6>
-					__ChangeTo:<select id="completed" name="form[completed]">
-						<repeat group="{{ @data.states.completed }}" key="{{ @completed.key }}" value="{{ @completed.label }}"><option value="{{ @completed.key }}"<check if="{{@completed.key==@data.completed}}"> selected="selected"</check>>{{ @completed.label }}</option></repeat>
-					</select>
-				</div>
-				<div class="gb-half">&nbsp;</div>
-*}
+{*		<!-- end: story status fields -->	*}
 				<div class="gb-full" align="right"><a class="delete" href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}}"><span class="fa fa-times"></span> __Delete</a>
 				<input class="button" type="reset"> <input class="button" type="submit"></div>
 			</div>
@@ -82,7 +65,7 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-    $("#author-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    $("#mainauthor-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
     	method: "post",
     	queryParam: "author",
     	preventDuplicates: true,
@@ -91,7 +74,7 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-    $("#coauthor-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    $("#supauthor-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
     	method: "post",
     	queryParam: "author",
     	preventDuplicates: true,

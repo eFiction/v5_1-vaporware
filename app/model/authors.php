@@ -12,7 +12,7 @@ class Authors extends Base
 					INNER JOIN `tbl_stories_authors`rSA ON ( rSA.aid = U.uid )
 						INNER JOIN `tbl_stories`S ON ( S.sid = rSA.sid
 					AND S.validated >= 20
-					AND S.completed >= 0
+					AND S.completed >= 2
  					)
 					{$where} GROUP BY U.uid
   			HAVING counted > 0

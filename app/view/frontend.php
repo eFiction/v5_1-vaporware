@@ -15,6 +15,7 @@ class Frontend extends Template
 		if($this->data)
             $f3->mset($this->data);
 
+		$this->f3->set('SITENAME', $this->config['page_title']);
 		/*
 			3-step processing of the inner page content:
 			- render page
@@ -46,7 +47,7 @@ class Frontend extends Template
 
 		$f3->set('BODY', $body);
 		
-		return \Template::instance()->render('layout.html');
+		return \Template::instance()->render('index.html');
     }
 
 	public function tagWork($tpl)
@@ -102,8 +103,8 @@ class Frontend extends Template
 			$this->f3->set('TITLE', implode($this->config['page_title_separator'], array_merge([$this->config['page_title']],$this->title) ) );
 		}
 
-		else $this->f3->set('TITLE', '');
-
+		else $this->f3->set('TITLE', $this->config['page_title']);
+		
 		switch($this->config['debug'])
 		{
 			case 5:

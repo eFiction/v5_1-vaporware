@@ -121,6 +121,7 @@ if ($_SESSION['groups'] & 1)
 			[ 'GET /adminCP/members', 'GET /adminCP/members/@module', 'GET /adminCP/members/@module/*' ],
 			'Controller\AdminCP_Members->index' );
 		$f3->route( 'POST /adminCP/members/@module', 'Controller\AdminCP_Members->save' );
+		$f3->route( [ 'POST /adminCP/ajax/members/@module [ajax]', 'POST /adminCP/ajax/members/@module/* [ajax]' ], 'Controller\AdminCP_Members->ajax' );
 
 		// Settings
 		$f3->route(

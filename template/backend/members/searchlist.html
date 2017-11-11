@@ -1,0 +1,25 @@
+<div class="form-wrapper">
+<form>
+	<fieldset><legend>__Search</legend>
+	Type <b>username</b> or user <b>id</b>
+	<input type="text" id="member-select" name="member" />
+		<input class="button" type="reset"> <input id="search" class="button" type="submit">
+	</fieldset>
+</form>
+</div>
+<script type="text/javascript">
+$(document).ready(function() {
+	$("#member-select").tokenInput("{{$BASE}}/adminCP/ajax/members/search",{
+		method: "post",
+		queryParam: "userID",
+		hintText: "__A_StartTyping ...",
+		noResultsText: "{{@LN__Token_NoMatches}}.",
+		tokenLimit: 1
+	});
+	$('#search').click(function(event) {
+		event.preventDefault();
+		uid = $("#member-select" ).val();
+		window.location = '{{@BASE}}/adminCP/members/edit/uid='+uid;
+	});
+});
+</script>

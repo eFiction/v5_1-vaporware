@@ -2,16 +2,16 @@
 	<div class="gb-3qrt">
 		<check if="{{@data.chapid=='new'}}">New chapter!</check>
 		<form method="post" action="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}};chapter={{@data.chapid}}">
-  			<div class="gb-full"><h6>__StoryTitle</h6><input class="readonly" readonly value="{{@data.storytitle}}""></div>
+  			<div class="gb-full"><h6>{{@LN__StoryTitle}}</h6><input class="readonly" readonly value="{{@data.storytitle}}"></div>
 
-  			<div class="gb-full"><h6>__ChapterTitle</h6><input placeholder="Your chapter title goes here" type="text" name="form[chapter_title]" value="{{@data.title}}"></div>
-			<div class="gb-full"><h6>__Foreword</h6><textarea placeholder="Notes and dedications go here" name="form[chapter_notes]">{{@data.notes}}</textarea></div>
+  			<div class="gb-full"><h6>{{@LN__ChapterTitle}}</h6><input placeholder="Your chapter title goes here" type="text" name="form[chapter_title]" value="{{@data.title}}"></div>
+			<div class="gb-full"><h6>{{@LN__Foreword}}</h6><textarea placeholder="Notes and dedications go here" name="form[chapter_notes]">{{@data.notes}}</textarea></div>
 			
-			<div class="gb-full"><h6>__Story</h6>
+			<div class="gb-full"><h6>{{@LN__ChapterText}}
 			<check if="{{@data.editmode=='visual'}}">
-				<true><a href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}};chapter={{@data.chapid}};style=plain">__SwitchPlainHTML</a></true>
-				<false><a href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}};chapter={{@data.chapid}}">__SwitchVisual</a></false>
-			</check>
+				<true> <a href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}};chapter={{@data.chapid}};style=plain">{{@LN__SwitchPlainHTML}}</a></true>
+				<false> <a href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}};chapter={{@data.chapid}}">{{@LN__SwitchVisual}}</a></false>
+			</check></h6>
 			<textarea placeholder="Your chapter's content goes here" name="form[chapter_text]" id="editor1">{{@data.chaptertext}}</textarea></div>
 			<check if="{{@data.editmode=='visual'}}"><script>
 				// Replace the <textarea id="editor1"> with a CKEditor

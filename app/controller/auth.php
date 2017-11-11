@@ -76,7 +76,7 @@ class Auth extends Base {
 	{
 		if ( isset($params['*']) ) $params = ($this->parametric($params['*']));  // 3.6
 		\Registry::get('VIEW')->addTitle( $f3->get('LN__Login') );
-		
+
 		if( $f3->exists('POST.login') && $f3->exists('POST.password') )
 		{
 			if ( $userID = $this->model->userLoad($f3->get('POST.login'), $f3->get('POST.password') ) )

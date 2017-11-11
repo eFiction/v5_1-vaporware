@@ -1,0 +1,60 @@
+<check if="{{sizeof(@data)}}">
+	<true>
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
+<table class="tbody">
+	<tr>
+		<th>&nbsp;</th>
+		<th>S</th>
+		<th>C</th>
+		<th><a href="{{@BASE}}/adminCP/stories/pending/order=id,
+			<check if="{{ @sort['link']!='id' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-numeric-desc}</true>
+						<false>desc">{ICON:sort-numeric-asc}</false>
+					</check>
+				</false>
+			</check></a> __StoryID
+		</th>
+		<th><a href="{{@BASE}}/adminCP/stories/pending/order=date,
+			<check if="{{ @sort['link']!='date' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-numeric-desc}</true>
+						<false>desc">{ICON:sort-numeric-asc}</false>
+					</check>
+				</false>
+			</check></a> __Date
+		</th>
+		<th><a href="{{@BASE}}/adminCP/stories/pending/order=title,
+			<check if="{{ @sort['link']!='title' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-alpha-desc}</true>
+						<false>desc">{ICON:sort-alpha-asc}</false>
+					</check>
+				</false>
+			</check></a> __Name/Title
+		</th>
+		</th>
+	</tr>
+	<repeat group="{{ @data }}" value="{{ @row }}">
+	<tr>
+		<td><a href="{{@BASE}}/adminCP/stories/edit/story={{ @row['sid'] }};returnpath=/adminCP/stories/pending/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
+		<td><check if="{{ @row['story_pending']==1 }}">X</check>&nbsp;</td>
+		<td><check if="{{ @row['chapid']!=NULL }}">X</check>&nbsp;</td>
+		<td>{{ @row['sid'] }}</td>
+		<td>{{ date( \Config::getPublic('date_format_short'), $row['timestamp']) }}</td>
+		<td>{{ @row['title'] }}</td>
+	</tr>
+	</repeat>
+</table>
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
+	</true>
+	<false>
+		__noPendingStories
+	</false>
+</check>

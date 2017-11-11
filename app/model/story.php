@@ -316,7 +316,7 @@ class Story extends Base
 				LEFT JOIN `tbl_users`Edit ON ( ".(int)$_SESSION['userID']." = rSAE.aid OR ( Edit.uid = rSAE.aid AND Edit.curator = ".(int)$_SESSION['userID']." ) )
 
 				LEFT JOIN `tbl_user_favourites`Fav ON ( Fav.item = S.sid AND Fav. TYPE = 'ST' AND Fav.uid = ".(int)$_SESSION['userID'].")
-			WHERE S.completed @COMPLETED@ 0 AND S.validated >= 30 @WHERE@
+			WHERE S.completed @COMPLETED@ 2 AND S.validated >= 30 @WHERE@
 			GROUP BY S.sid
 			@ORDER@
 			@LIMIT@";
@@ -667,7 +667,7 @@ class Story extends Base
 		$statSQL = [
 			"SET @users = (SELECT COUNT(*) FROM `tbl_users`U WHERE U.groups > 0);",
 			// more precise stats, only counting authors with actual stories
-			"SET @authors = ( SELECT COUNT(DISTINCT rSA.aid) FROM `tbl_stories_authors`rSA INNER JOIN `tbl_stories`S ON ( S.sid = rSA.sid AND S.validated >= 20 AND S.completed >= 0 ) );",
+			"SET @authors = ( SELECT COUNT(DISTINCT rSA.aid) FROM `tbl_stories_authors`rSA INNER JOIN `tbl_stories`S ON ( S.sid = rSA.sid AND S.validated >= 20 AND S.completed >= 2 ) );",
 			//"SET @authors = (SELECT COUNT(*) FROM `tbl_users`U WHERE ( U.groups & 4 ) );",
 			"SET @reviews = (SELECT COUNT(*) FROM `tbl_feedback`F WHERE F.type='ST');",
 			"SET @stories = (SELECT COUNT(DISTINCT sid) FROM `tbl_stories`S WHERE S.validated >= 30 );",
@@ -749,7 +749,7 @@ class Story extends Base
 			FROM `tbl_stories`S
 				INNER JOIN `tbl_stories_authors`rSA ON ( S.sid=rSA.sid ) 
 					INNER JOIN `tbl_users`U ON (rSA.aid=U.uid)
-			WHERE S.sid=:sid AND S.completed >= 0 AND S.validated >= 30
+			WHERE S.sid=:sid AND S.completed >= 2 AND S.validated >= 30
 			GROUP BY S.sid";
 
 		$epubData = $this->exec( $epubSQL, array(':sid' => $id) )[0];
