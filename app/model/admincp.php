@@ -882,7 +882,6 @@ class AdminCP extends Base {
 		);
 		if (sizeof($data)==1)
 		{
-			//$data[0]['states']  = $this->storyStates($data[0]['completed'],$data[0]['validated']);
 			$data[0]['ratings'] = $this->exec("SELECT rid, rating, ratingwarning FROM `tbl_ratings`");
 			return $data[0];
 		}
@@ -916,7 +915,7 @@ class AdminCP extends Base {
 	{
 		$data = $this->exec
 		(
-			"SELECT Ch.sid,Ch.chapid,Ch.title
+			"SELECT Ch.sid,Ch.chapid,Ch.title,Ch.validated
 				FROM `tbl_chapters`Ch
 			WHERE Ch.sid = :sid ORDER BY Ch.inorder ASC",
 			[":sid" => $sid ]
@@ -954,8 +953,9 @@ class AdminCP extends Base {
 		$chapter=new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
 		$chapter->load(array('chapid=?',$chapterID));
 		
-		$chapter->title = $post['chapter_title'];
-		$chapter->notes = $post['chapter_notes'];
+		$chapter->title 		= $post['chapter_title'];
+		$chapter->notes 		= $post['chapter_notes'];
+		$chapter->validated 	= $post['validated'].$post['valreason'];
 		$chapter->save();
 		
 		// plain and visual return different newline representations, this will bring things to standard.

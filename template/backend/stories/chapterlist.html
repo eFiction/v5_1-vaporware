@@ -3,7 +3,9 @@
 		<br /><br />
 		<ul id="chapter-sort">
 		<repeat group="{{ @chapterList }}" value="{{ @row }}">
-			<li id="{{ @row.chapid }}"><a href="{{@BASE}}/adminCP/stories/edit/story={{ @row.sid }};chapter={{ @row.chapid }}" class="fa fa-pencil-square-o"></a> {{ @row.title }}</li>
+			<li id="{{ @row.chapid }}">
+				<a href="{{@BASE}}/adminCP/stories/edit/story={{ @row.sid }};chapter={{ @row.chapid }}" class="fa fa-pencil-square-o"></a> {{ @row.title }} <check if="{{20 < @row.validated AND @row.validated < 30}}">{ICON:waiting}</check>
+			</li>
 		</repeat>
 		</ul>
 		

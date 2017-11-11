@@ -7,6 +7,28 @@
   			<div class="gb-full"><h6>{{@LN__ChapterTitle}}</h6><input placeholder="Your chapter title goes here" type="text" name="form[chapter_title]" value="{{@data.title}}"></div>
 			<div class="gb-full"><h6>{{@LN__Foreword}}</h6><textarea placeholder="Notes and dedications go here" name="form[chapter_notes]">{{@data.notes}}</textarea></div>
 			
+{*		<!-- story status fields -->	*}
+				<div class="gb-1thrd">
+					<h6>{{@LN__UCP_statusValidated}}: <strong>{{ ${"LN__UCP_statusValidated_".@data.validated.0} }}</strong></h6>
+					{{@LN__ChangeTo}}:<select id="validated" name="form[validated]">
+						<loop from="{{ @i=0 }}" to="{{ @i < 4 }}" step="{{ @i++ }}">
+							<check if="{{ @i==@data.validated.0 OR (@i!=2 OR !(@_SESSION['groups']&8)) AND (@i!=3 OR (@_SESSION['groups']&8)) }}">
+							<option value="{{ @i }}"<check if="{{@i==@data.validated.0}}"> selected="selected"</check>>{{ ${"LN__UCP_statusValidated_".@i} }}</option>
+							</check>
+						</loop>
+					</select>
+				</div>
+				<div class="gb-1thrd">
+					<h6>{{@LN__UCP_statusValidatedReason}}: <strong>{{ ${"LN__UCP_statusValReason_".@data.validated.1} }}</strong></h6>
+					{{@LN__ChangeTo}}:<select id="validated" name="form[valreason]">
+					<loop from="{{ @i=0 }}" to="{{ @i < 10 }}" step="{{ @i++ }}">
+						<option value="{{ @i }}"<check if="{{@i==@data.validated.1}}"> selected="selected"</check>>{{ ${"LN__UCP_statusValReason_".@i} }}</option>
+					</loop>
+					</select>
+				</div>
+				<div class="gb-1thrd">&nbsp;</div>
+{*		<!-- end: story status fields -->	*}
+
 			<div class="gb-full"><h6>{{@LN__ChapterText}}
 			<check if="{{@data.editmode=='visual'}}">
 				<true> <a href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}};chapter={{@data.chapid}};style=plain">{{@LN__SwitchPlainHTML}}</a></true>

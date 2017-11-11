@@ -88,7 +88,7 @@ class Iconset extends \DB\Jig\Mapper {
 		if ($text)
 			return str_replace("@T@", "title='{$text}'", self::instance()->{$label});
 		else
-			return str_replace("@T@", "", self::instance()->{$label});
+			return str_replace("@T@", "", @self::instance()->{$label});
 	}
 	
 	static protected function rebuild($icon)
