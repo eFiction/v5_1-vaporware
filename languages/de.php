@@ -478,8 +478,11 @@ Hier klicken um zu entfernen.',
 }',
 
 'Search' => 'Suche',
+//'SearchUsername'=> 'Search in usernames',
+//'SearchUserAll' => 'Search in all user fields',
 'Tagcloud' => 'Tagcloud',
 'noTagcloud' => 'No tag cloud',
+'Edit'		=> 'Bearbeiten',
 
 // Feedback
 'Feedback_Not_Logged_In' => 'Du musst angemeldet sein, um eine Review oder einen Kommentar zu verfassen.',

@@ -44,8 +44,8 @@
 	<repeat group="{{ @data }}" value="{{ @row }}">
 	<tr>
 		<td><a href="{{@BASE}}/adminCP/stories/edit/story={{ @row['sid'] }};returnpath=/adminCP/stories/pending/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
-		<td><check if="{{ @row['story_pending']==1 }}">X</check>&nbsp;</td>
-		<td><check if="{{ @row['chapid']!=NULL }}">X</check>&nbsp;</td>
+		<td><check if="{{ @row['story_pending']==1 }}">{ICON:waiting}</check>&nbsp;</td>
+		<td><check if="{{ @row['chapid']!=NULL }}">{ICON:waiting}</check>&nbsp;</td>
 		<td>{{ @row['sid'] }}</td>
 		<td>{{ date( \Config::getPublic('date_format_short'), $row['timestamp']) }}</td>
 		<td>{{ @row['title'] }}</td>

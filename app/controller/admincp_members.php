@@ -5,7 +5,7 @@ class AdminCP_Members extends AdminCP
 {
 	var $moduleBase = "members";
 	//var $submodules = [ "search", "edit", "pending", "groups", "profile", "team" ];
-	var $submodules = [ "search", "pending", "groups", "profile", "team" ];
+	var $submodules = [ "edit", "pending", "groups", "profile", "team" ];
 
 	public function index(\Base $f3, $params)
 	{
@@ -13,12 +13,9 @@ class AdminCP_Members extends AdminCP
 
 		switch( $this->moduleInit(@$params['module']) )
 		{
-			case "search":
-				$this->search($f3, $params);
-				break;
-		/*	case "edit":
+			case "edit":
 				$this->edit($f3, $params);
-				break;	*/
+				break;
 			case "pending":
 				$this->buffer( \View\Base::stub() );
 				break;
@@ -86,41 +83,62 @@ class AdminCP_Members extends AdminCP
 		
 		$this->buffer ( $this->template->listUserFields( $data ) );
 	}
-/*
-	protected function edit(\Base $f3, $params)
-	{
-		$this->buffer( print_r($team,1) );
-	}
-*/
+
 	protected function team(\Base $f3)
 	{
 		$team = $this->model->listTeam();
 		$this->buffer( $this->template->userListTeam($team) );
 	}
 	
-	protected function search(\Base $f3, $params)
+	protected function edit(\Base $f3, $params)
 	{
 		if( isset($_POST) ) $post = $f3->get('POST');
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
-
+		
+		if(!empty($params['term']))
+		{
+			$search['term'] = $params['term'];
+			$search['follow'][] = "term={$params['term']}";
+		}
+		else $search['term'] = NULL;
+		
+		if(isset($params['fromlevel']))
+		{
+			if(isset($params['tolevel']) AND $params['fromlevel']>$params['tolevel'] )
+				$search['fromlevel'] = (int)$params['tolevel'];
+			else
+				$search['fromlevel'] = (int)$params['fromlevel'];
+			$search['follow'][] = "fromlevel={$search['fromlevel']}";
+		}
+		else $search['fromlevel'] = NULL;
+		
+		if(isset($params['tolevel']))
+		{
+			$search['tolevel'] = (int)$params['tolevel'];
+			$search['follow'][] = "tolevel={$search['tolevel']}";
+		}
+		else $search['tolevel'] = NULL;
+		
+		$search['follow'] = (count($search['follow'])) ? implode("/",$search['follow'])."/" : "";
+		
 		// search/browse
 		$allow_order = array (
 				"id"		=>	"uid",
 				"name"		=>	"nickname",
 				"date"		=>	"registered",
+				"email"		=>	"email",
 		);
 
 		// page will always be an integer > 0
 		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
 
 		// sort order
-		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "id";
+		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "date";
 		$sort["order"]		= $allow_order[$sort["link"]];
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
 		
-		$data = $this->model->listUsers();
-		
-		$this->buffer( $this->template->userSearchList($data, $sort) );
+		$data = $this->model->listUsers($page, $sort, $search);
+		$this->buffer( $this->template->userSearchList($data, $sort, $search) );
 	}
 
 	public function save(\Base $f3, $params)

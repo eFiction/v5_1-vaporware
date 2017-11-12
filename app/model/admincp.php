@@ -103,7 +103,7 @@ class AdminCP extends Base {
 	
 	public function listTeam()
 	{
-		$sql = "SELECT `uid`, `nickname`, `realname`, `groups` FROM `tbl_users` WHERE `groups` > 16 ORDER BY groups,nickname ASC";
+		$sql = "SELECT SQL_CALC_FOUND_ROWS `uid`, `nickname`, `realname`, `groups` FROM `tbl_users` WHERE `groups` > 16 ORDER BY groups,nickname ASC";
 		return $this->exec($sql);
 	}
 	
@@ -113,10 +113,45 @@ class AdminCP extends Base {
 		return $this->exec($sql);
 	}
 	
-	public function listUsers()
+	public function listUsers($page, array $sort, $search=NULL)
 	{
-		$sql = "SELECT `uid`, `nickname` FROM `tbl_users`";
-		return $this->exec($sql);
+		$limit = 20;
+		$pos = $page - 1;
+		$bind = [];
+
+		$sql = "SELECT SQL_CALC_FOUND_ROWS `uid`, `nickname`, `login`, `email`, UNIX_TIMESTAMP(registered) as registered, `groups`
+					FROM `tbl_users`
+					WHERE `uid`>0";
+
+		if ( $search['fromlevel'] )
+			$sql .= " AND `groups` >= POW(2,{$search['fromlevel']})";
+		else 
+			$sql .= " AND `groups` >= 1";
+		
+		if ( $search['tolevel'] )
+			$sql .=	" AND groups < POW(2,".($search['tolevel']+1).") ";
+
+		if($search['term'])
+		{
+			$sql .="	AND (`login` LIKE :term1
+							or `nickname` LIKE :term2
+							or `realname` LIKE :term3
+							or `email` LIKE :term4
+							or `about` LIKE :term5) ";
+			$bind = [ ":term1" => "%{$search['term']}%", ":term2" => "%{$search['term']}%", ":term3" => "%{$search['term']}%", ":term4" => "%{$search['term']}%", ":term5" => "%{$search['term']}%" ];
+		}
+
+		$sql .= " ORDER BY {$sort['order']} {$sort['direction']}
+				LIMIT ".(max(0,$pos*$limit)).",".$limit;
+
+		$data = $this->exec($sql,$bind);
+
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/adminCP/members/edit/{$search['follow']}order={$sort['link']},{$sort['direction']}",
+			$limit
+		);
+		return $data;
 	}
 	
 	public function saveKeys($data)
@@ -1194,14 +1229,14 @@ class AdminCP extends Base {
 		$sql = "SELECT SQL_CALC_FOUND_ROWS * FROM
 				(					
 					SELECT S.sid, S.title, '1' as story_pending, UNIX_TIMESTAMP(S.updated) as timestamp, Ch.chapid
-						FROM `trek_stories`S
-							LEFT JOIN `trek_chapters`Ch
+						FROM `tbl_stories`S
+							LEFT JOIN `tbl_chapters`Ch
 						ON ( S.sid = Ch.sid AND Ch.validated >= 20 AND Ch.validated < 30 ) 
 						WHERE S.validated >= 20 AND S.validated < 30
 					UNION
 					SELECT S.sid, S.title, IF((S.validated >= 20 AND S.validated < 30),1,0) as story_pending, UNIX_TIMESTAMP(S.updated) as timestamp, Ch.chapid
-						FROM `trek_stories`S
-							INNER JOIN `trek_chapters`Ch
+						FROM `tbl_stories`S
+							INNER JOIN `tbl_chapters`Ch
 						ON ( S.sid = Ch.sid AND Ch.validated >= 20 AND Ch.validated < 30)
 				) P
 				ORDER BY {$sort['order']} {$sort['direction']}

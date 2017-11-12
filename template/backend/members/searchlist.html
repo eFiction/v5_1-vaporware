@@ -1,25 +1,128 @@
-<div class="form-wrapper">
-<form>
-	<fieldset><legend>__Search</legend>
-	Type <b>username</b> or user <b>id</b>
-	<input type="text" id="member-select" name="member" />
-		<input class="button" type="reset"> <input id="search" class="button" type="submit">
-	</fieldset>
-</form>
+<div class="grid-wapper">
+	<div class="gb-1thrd">
+		<div class="form-wrapper">
+		<form>
+			<fieldset>
+				<legend>{{@LN__SearchUsername}}</legend>
+				<input type="text" id="member-select" name="member" />
+				<button id="search" class="button" type="submit">{{@LN__Edit}}</button>
+			</fieldset>
+		</form>
+		</div>
+	</div>
+	<div class="gb-2thrd">
+		<form>
+			<fieldset>
+				<legend>{{@LN__SearchUserAll}}</legend>
+				<input type="text" id="fulltext" name="fulltext" <check if="{{!empty(@search.term)}}">value="{{@search.term}}" </check>/>
+				<div class="grid-wapper">
+					<div class="gb-half">From:
+						<select id="fromlevel" name="fromlevel">
+						<loop from="{{ @i=0 }}" to="{{ @i < 8 }}" step="{{ @i++ }}">
+							<option value="{{ @i }}"<check if="{{@i==@search.fromlevel}}"> selected="selected"</check>>{{@i}}</option>
+						</loop>
+						</select>
+					</div>
+					<div class="gb-half">To:
+						<select id="tolevel" name="tolevel">
+						<loop from="{{ @i=0 }}" to="{{ @i < 8 }}" step="{{ @i++ }}">
+							<option value="{{ @i }}"<check if="{{@i==@search.tolevel OR (@i==7 AND @search.tolevel==NULL)}}"> selected="selected"</check>>{{@i}}</option>
+						</loop>
+						</select>
+					</div>
+				</div>
+				<button id="fullsearch" class="button" type="submit">{{@LN__Search}}</button>
+			</fieldset>
+			</fieldset>
+		</form>
+	</div>
+<div class="gb-full">
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
+<table class="tbody">
+	<tr>
+		<th>&nbsp;</th>
+		<th>&nbsp;</th>
+		<th><a href="{{@BASE}}/adminCP/members/edit/{{@search.follow}}order=id,
+			<check if="{{ @sort['link']!='id' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-numeric-desc}</true>
+						<false>desc">{ICON:sort-numeric-asc}</false>
+					</check>
+				</false>
+			</check></a> __UserID
+		</th>
+		<th><a href="{{@BASE}}/adminCP/members/edit/{{@search.follow}}order=name,
+			<check if="{{ @sort['link']!='name' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-alpha-desc}</true>
+						<false>desc">{ICON:sort-alpha-asc}</false>
+					</check>
+				</false>
+			</check></a> __Name
+		</th>
+		<th><a href="{{@BASE}}/adminCP/members/edit/{{@search.follow}}order=email,
+			<check if="{{ @sort['link']!='email' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-alpha-desc}</true>
+						<false>desc">{ICON:sort-alpha-asc}</false>
+					</check>
+				</false>
+			</check></a> __Name
+		</th>
+		<th><a href="{{@BASE}}/adminCP/members/edit/{{@search.follow}}order=date,
+			<check if="{{ @sort['link']!='date' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-numeric-desc}</true>
+						<false>desc">{ICON:sort-numeric-asc}</false>
+					</check>
+				</false>
+			</check></a> __Date
+		</th>
+		</th>
+	</tr>
+	<repeat group="{{ @data }}" value="{{ @row }}">
+	<tr>
+		<td><a href="{{@BASE}}/adminCP/members/edit/uid={{ @row['uid'] }};returnpath=/adminCP/members/edit/{{@search.follow}}order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
+		<td>{{ floor(log(@row.groups, 2))  }}</td>
+		<td>{{ @row['uid'] }}</td>
+		<td>{{ @row['nickname'] }}</td>
+		<td>{{ @row['email'] }}</td>
+		<td>{{ date( \Config::getPublic('date_format_short'), $row['registered']) }}</td>
+	</tr>
+	</repeat>
+</table>
+<F3:check if="{{isset(@paginate.firstPage) AND sizeof(@data)>5}}"><include href="paginate.html" /></F3:check>
+</div>
 </div>
 <script type="text/javascript">
 $(document).ready(function() {
 	$("#member-select").tokenInput("{{$BASE}}/adminCP/ajax/members/search",{
 		method: "post",
 		queryParam: "userID",
-		hintText: "__A_StartTyping ...",
+		hintText: "__Type username or user id",
 		noResultsText: "{{@LN__Token_NoMatches}}.",
 		tokenLimit: 1
 	});
 	$('#search').click(function(event) {
 		event.preventDefault();
 		uid = $("#member-select" ).val();
-		window.location = '{{@BASE}}/adminCP/members/edit/uid='+uid;
+		if ( uid > 0 ) window.location = '{{@BASE}}/adminCP/members/edit/uid='+uid;
+	});
+	$('#fullsearch').click(function(event) {
+		event.preventDefault();
+		term = $("#fulltext" ).val();
+		fromlevel = $("#fromlevel" ).val();
+		tolevel = $("#tolevel" ).val();
+		if ( tolevel < fromlevel ) fromlevel = tolevel;
+		window.location = '{{@BASE}}/adminCP/members/edit/term='+term+'/fromlevel='+fromlevel+'/tolevel='+tolevel;
 	});
 });
 </script>

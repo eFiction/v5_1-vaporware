@@ -477,9 +477,12 @@ Click to remove.} }',
 	'other	{# reviews}
 }',
 
-'Search' => 'Search',
+'Search'		=> 'Search',
+'SearchUsername'=> 'Search in usernames',
+'SearchUserAll' => 'Search in all user fields',
 'Tagcloud' => 'Tagcloud',
 'noTagcloud' => 'No tag cloud',
+'Edit'		=> 'Edit',
 
 // Feedback
 'Feedback_Not_Logged_In' => 'You need to be logged in to write a review or comment',

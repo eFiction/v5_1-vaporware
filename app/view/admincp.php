@@ -198,10 +198,11 @@ class AdminCP extends Base
 		return $this->render('members/list_team.html');
 	}
 	
-	public function userSearchList(array $data, array $sort)
+	public function userSearchList(array $data, array $sort, $search)
 	{
 		$this->f3->set('data', $data);
 		$this->f3->set('sort', $sort);
+		$this->f3->set('search', $search);
 		return $this->render('members/searchlist.html');
 	}
 
