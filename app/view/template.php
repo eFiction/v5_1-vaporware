@@ -27,7 +27,7 @@ class Template extends Base
 			$tpl = $this->config["layout_default"];
 
 		if ( !file_exists( $UI_BASE.$tpl ) ) $tpl = "default";
-
+		
 		/*
 			This so needs to be reworked!
 		*/

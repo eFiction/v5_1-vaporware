@@ -467,13 +467,14 @@ class Story extends Base
 			
 			return $this->template->blockStory("random", $data);
 		}
+		/*
 		elseif ( $select[1] == "fame" )
 		{
 			// Check if there is data in the Cache hive
 			if ( "" == $data = \Cache::instance()->get('fameData') )
 			{
-				/* check if a TTL was provided */
-				if (isset($select[2])
+				// check if a TTL was provided
+				if ( isset($select[2]) )
 				{
 					if( is_numeric($select[2]) )
 						$time = 60 * $select[2];
@@ -485,7 +486,7 @@ class Story extends Base
 						$time = strtotime('tomorrow') - time();
 				}
 
-				/* apply default TTL values */
+				// apply default TTL values 
 				if ( empty($time) )
 				{
 					$time = "900"; // 15 minutes, that's the default amount of fame-time
@@ -501,12 +502,17 @@ class Story extends Base
 			/*
 				update the TTL of a change was made to the template
 				this will not work if the template does not provide a TTL
-			*/
-			if ( isset(select[2]) AND select[2] != \Cache::instance()->get('fameTime') )
-				\Cache::instance()->set('fameData', $data, \Cache::instance()->get('fameTime'));
+				
+				in this case, the TTL has to be calculated again, bloating this update
+				skipping for now until finding a better solution
+				
+			if ( isset($select[2]) AND $select[2] != \Cache::instance()->get('fameTime') )
+				\Cache::instance()->set('fameData', \Cache::instance()->get('fameTime') );
+			
 
 			return $this->template->blockStory("random", $data, $select[2]);
 		}
+		*/
 		elseif ( $select[1] == "featured" )
 		{
 			/*
