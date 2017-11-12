@@ -303,19 +303,19 @@ class Story extends Base
 		return parent::render('blocks/stats.html');
 	}
 	
-	public static function blockStory($type, $stories=[], $extra=NULL)
+	public function blockStory($type, $stories=[], $extra=NULL)
 	{
 		$blocks = [ "recommended", "featured", "random", "new" ];
 
 		if ( in_array($type, $blocks) )
 		{
 			while ( list($key, ) = each($stories) )
-				Story::dataProcess($stories[$key]);
+				$this->dataProcess($stories[$key]);
 
-			\Base::instance()->set('renderData', $stories);
-			\Base::instance()->set('extra', $extra);
+			$this->f3->set('renderData', $stories);
+			$this->f3->set('extra', $extra);
 
-			return parent::render("story/block.{$type}.html");
+			return $this->render("story/block.{$type}.html");
 		}
 		else return NULL;
 	}

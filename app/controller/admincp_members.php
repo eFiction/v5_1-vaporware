@@ -119,7 +119,7 @@ class AdminCP_Members extends AdminCP
 		}
 		else $search['tolevel'] = NULL;
 		
-		$search['follow'] = (count($search['follow'])) ? implode("/",$search['follow'])."/" : "";
+		$search['follow'] = (isset($search['follow'])) ? implode("/",$search['follow'])."/" : "";
 		
 		// search/browse
 		$allow_order = array (

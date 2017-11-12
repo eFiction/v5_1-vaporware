@@ -458,14 +458,54 @@ class Story extends Base
 			$data = $this->model->blockNewStories($items);
 			$size = isset($select[3]) ? $select[3] : 'large';
 			
-			return \View\Story::blockStory("new", $data, $size);
+			return $this->template->blockStory("new", $data, $size);
 		}
 		elseif ( $select[1] == "random" )
 		{
 			$items = (isset($select[2]) AND is_numeric($select[2])) ? $select[2] : 1;
 			$data = $this->model->blockRandomStory($items);
 			
-			return \View\Story::blockStory("random", $data);
+			return $this->template->blockStory("random", $data);
+		}
+		elseif ( $select[1] == "fame" )
+		{
+			// Check if there is data in the Cache hive
+			if ( "" == $data = \Cache::instance()->get('fameData') )
+			{
+				/* check if a TTL was provided */
+				if (isset($select[2])
+				{
+					if( is_numeric($select[2]) )
+						$time = 60 * $select[2];
+
+					elseif ( $select[2]=="hour" )
+						$time = 60 * ( 60 - (int)date("i") ) - (int)date("s");
+
+					elseif ( $select[2]=="day" )
+						$time = strtotime('tomorrow') - time();
+				}
+
+				/* apply default TTL values */
+				if ( empty($time) )
+				{
+					$time = "900"; // 15 minutes, that's the default amount of fame-time
+					$select[2] = 15;
+				}
+
+				// Get a random story and make the data last for $time seconds
+				$data = $this->model->blockRandomStory(1);
+				\Cache::instance()->set('fameData', $data, $time);
+				\Cache::instance()->set('fameTime', $data, $select[2]);
+			}
+			
+			/*
+				update the TTL of a change was made to the template
+				this will not work if the template does not provide a TTL
+			*/
+			if ( isset(select[2]) AND select[2] != \Cache::instance()->get('fameTime') )
+				\Cache::instance()->set('fameData', $data, \Cache::instance()->get('fameTime'));
+
+			return $this->template->blockStory("random", $data, $select[2]);
 		}
 		elseif ( $select[1] == "featured" )
 		{
@@ -477,7 +517,7 @@ class Story extends Base
 			$order = isset($select[3]) ? $select[3] : FALSE;
 			$data = $this->model->blockFeaturedStory($items,$order);
 			
-			return \View\Story::blockStory("featured", $data);
+			return $this->template->blockStory("featured", $data);
 		}
 		elseif ( $select[1] == "recommend" )
 		{
@@ -492,7 +532,7 @@ class Story extends Base
 			
 			$data = $this->model->blockRecommendedStory($items,$order);
 			
-			return \View\Story::blockStory("recommended", $data);
+			return $this->template->blockStory("recommended", $data);
 		}
 		elseif ( $select[1] == "tagcloud" )
 		{

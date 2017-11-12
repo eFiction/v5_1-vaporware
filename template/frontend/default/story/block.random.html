@@ -1,5 +1,20 @@
 <div class="feature">
-<h3>{{@LN__RandomStory, sizeof(@renderData) | format}}</h3>
+<check if="{{@extra==NULL}}">
+<true>
+	<h3>{{@LN__RandomStory, sizeof(@renderData) | format}}</h3>
+</true>
+<false>
+	<h3>{{@LN__RandomSpotlight}}</h3>
+	<check if="{{is_numeric(@extra)}}">
+		<true>
+			<h6>__New story every {{@extra}} minutes</h6>
+		</true>
+		<false>
+			<h6>__Story of the {{@extra}}</h6>
+		</false>
+	</check>
+</false>
+</check>
 <check if="{{sizeof(@renderData)>0}}">
 <true>
 	<repeat group="{{@renderData}}"  value="{{ @story }}">
@@ -12,7 +27,7 @@
 				<span class="toggle_more"><span class="fa fa-caret-square-o-down"></span></span>
 				<span class="toggle_less" style="display:none"><span class="fa fa-caret-square-o-up"></span></span>
 			</span>
-			<div class="toggle_container" style="display:none">{{ @story.summary | raw }}</div>
+			<div class="toggle_container" style="display:none">{{ @story.summary | raw }}<br/>{{@LN__Tags}}:<repeat group='@story.cache_tags.simple' value='@tag' counter='{{ @ctr }}'><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/story/browse/tagIn={{@tag.0}}">{{@tag.1}}</a></repeat><br /></div>
 		</div>
 	</repeat>
 </true>

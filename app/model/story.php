@@ -698,7 +698,7 @@ class Story extends Base
 	
 	public function blockRandomStory($items=1)
 	{
-		return $this->exec('SELECT S.title, S.sid, S.summary, S.cache_authors, S.cache_rating, S.cache_categories
+		return $this->exec('SELECT S.title, S.sid, S.summary, S.cache_authors, S.cache_rating, S.cache_categories, S.cache_tags
 				FROM `tbl_stories`S WHERE S.validated >= 30
 			ORDER BY RAND() 
 			LIMIT '.(int)$items);

@@ -433,6 +433,7 @@ return array(
 	'one	{Random Story},'.
 	'other	{Random Stories} }',
 'noRandomStory'	=> 'No random stories yet',
+'RandomSpotlight' => 'Random Spotlight',
 'FeaturedStory' => '{0, plural,'.
 	'one	{Featured Story},'.
 	'other	{Featured Stories} }',

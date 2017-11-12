@@ -433,6 +433,7 @@ return array(
 	'one	{Zufällige Geschichte},'.
 	'other	{Zufällige Geschichten} }',
 //'noRandomStory'	=> 'No random stories yet',
+//'RandomSpotlight' => 'Random Spotlight',
 'FeaturedStory' => '{0, plural,'.
 	'one	{Empfohlene Geschichte},'.
 	'other	{Empfohlene Geschichten} }',
