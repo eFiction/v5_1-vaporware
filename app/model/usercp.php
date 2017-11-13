@@ -39,7 +39,7 @@ class UserCP extends Base
 				if ( isset($data['uid']) AND isset($authors["AUTHORS"][$data['uid']]) )
 				{
 					// create an empty array
-					$status = [ 'id' => $data['uid'], -1 => 0, 0 => 0, 1 => 0 ];
+					$status = [ 'id' => $data['uid'], 1 => 0, 2 => 0, 3 => 0 ];
 
 					// get story count by completion status
 					$authorData = $this->exec("SELECT S.completed, COUNT(DISTINCT S.sid) as count 
@@ -204,7 +204,7 @@ class UserCP extends Base
 	{
 		$newStory = new \DB\SQL\Mapper($this->db, $this->prefix."stories");
 		$newStory->title		= $data['new_title'];
-		$newStory->completed	= -1;
+		$newStory->completed	= 1;
 		$newStory->validated	= 11;
 		$newStory->save();
 		
@@ -241,7 +241,6 @@ class UserCP extends Base
 		);
 		if (sizeof($data)==1 AND $data[0]['sid']!="")
 		{
-			$data[0]['states']  = $this->storyStates();
 			$data[0]['ratings'] = $this->exec("SELECT rid, rating, ratingwarning FROM `tbl_ratings`");
 			return $data[0];
 		}
@@ -324,13 +323,13 @@ class UserCP extends Base
 		switch ($select)
 		{
 			case "finished":
-				$sql .= "1";
+				$sql .= "'3'";
 				break;
 			case "unfinished":
-				$sql .= "0";
+				$sql .= "'2'";
 				break;
 			case "drafts":
-				$sql .= "-1";
+				$sql .= "'1'";
 				break;
 			default:
 				return FALSE;
