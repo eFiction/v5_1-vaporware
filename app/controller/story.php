@@ -419,9 +419,9 @@ class Story extends Base
 					{
 						$tidy->parseString($body, $tidyConfig, 'utf8');
 						$tidy->cleanRepair();
-						$body = $tidy->html();
+						$body = $tidy->body();
 					}
-
+					
 					$page = $this->template->epubPage(
 															$body,
 															$chapter['title'],

@@ -213,11 +213,15 @@ class Story extends Base
 
 	public function epubPage($body, $title, $language)
 	{
-		return $this->TPL->render('base.xhtml', 'text/html', [ 	"BODY" => $body, 
-																										"TITLE" => $title,
-																										"LANGUAGE" => $language
-																									]
-																);
+		return $this->TPL->render(
+			'base.xhtml',
+			'text/html',
+			[
+				"BODY"		=> $body, 
+				"TITLE"		=> $title,
+				"LANGUAGE"	=> $language
+			]
+		);
 	}
 
 	public function epubChapter($title, $content)
@@ -225,35 +229,42 @@ class Story extends Base
 		$ebook = $this->f3->get('EPUB');
 		if ( $ebook['version']==3 )
 		{
-			return $this->TPL->render('chapter_v3.xhtml',
-																	'text/html',
-																	[ 	"CONTENT" => $content, 
-																		"CHAPTER_TITLE" => $title,
-																		"LANGUAGE" => $ebook['language']
-																	]
-															);
-			
+			return $this->TPL->render(
+				'chapter_v3.xhtml',
+				'text/html',
+				[
+					"CONTENT" 		=> $content, 
+					"CHAPTER_TITLE" => $title,
+					"LANGUAGE" 		=> $ebook['language']
+				]
+			);
 		}
 		elseif ( $ebook['version']==2 )
 		{
-			return $this->TPL->render('chapter_v2.xhtml',
-																	'text/html',
-																	[ 	"CONTENT" => $content, 
-																		"CHAPTER_TITLE" => $title,
-																	]
-															);
+			return $this->TPL->render(
+				'chapter_v2.xhtml',
+				'text/html',
+				[
+					"CONTENT" 		=> $content, 
+					"CHAPTER_TITLE" => $title,
+				]
+			);
 		}
 	}
 
 	public function epubTitle()
 	{
 		$ebook = $this->f3->get('EPUB');
-		$file = "title".($ebook['version']==3 ?"_v3":"_v2").".xhtml";
-		return $this->TPL->render($file, 'application/xhtml+xml', [ "STORY_TITLE"	=>	$ebook['title'],
-																							"AUTHOR"			=>	$ebook['authors'],
-		    																				"NOTES"			=>	$ebook['storynotes']
-																							]
-																);
+
+		return $this->TPL->render(
+			"title".($ebook['version']==3 ?"_v3":"_v2").".xhtml",
+			'application/xhtml+xml',
+			[
+				"STORY_TITLE"	=>	$ebook['title'],
+				"AUTHOR"		=>	$ebook['authors'],
+		    	"NOTES"			=>	$ebook['storynotes']
+			]
+		);
 	}
 	
 	public function epubRoot( $chapterTOC )
@@ -265,12 +276,14 @@ class Story extends Base
 		}
 		elseif ( $ebook['version']==2 )
 		{
-			return $this->TPL->render('root_v2.opf', 'application/xhtml+xml',
-																		[
-																			"pages" => $chapterTOC,
-																			"ebook" => $ebook,
-																		]
-																	);
+			return $this->TPL->render(
+				'root_v2.opf',
+				'application/xhtml+xml',
+				[
+					"pages" => $chapterTOC,
+					"ebook" => $ebook,
+				]
+			);
 		}
 	}
 
@@ -279,21 +292,25 @@ class Story extends Base
 		$ebook = \Base::instance()->get('EPUB');
 		if ( $version==3 )
 		{
-			return $this->TPL->render('toc.xhtml', 'application/xhtml+xml',
-																		[
-																			"pages" => $chapterTOC,
-																			"ebook" => $ebook,
-																		]
-																	);
+			return $this->TPL->render(
+				'toc.xhtml',
+				'application/xhtml+xml',
+				[
+					"pages" => $chapterTOC,
+					"ebook" => $ebook,
+				]
+			);
 		}
 		else
 		{
-			return $this->TPL->render('toc.ncx', 'application/xhtml+xml',
-																		[
-																			"pages" => $chapterTOC,
-																			"ebook" => $ebook,
-																		]
-																	);
+			return $this->TPL->render(
+				'toc.ncx',
+				'application/xhtml+xml',
+				[
+					"pages" => $chapterTOC,
+					"ebook" => $ebook,
+				]
+			);
 		}
 	}
 

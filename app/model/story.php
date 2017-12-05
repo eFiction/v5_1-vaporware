@@ -737,7 +737,6 @@ class Story extends Base
 				WHERE S.validated >= 30
 			ORDER BY {$sort} {$limit}");
 		// 1 = aktuell, 2, ehemals
-		//return $this
 	}
 	
 	public function printEPub($id)
