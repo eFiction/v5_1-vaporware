@@ -1,4 +1,4 @@
-<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1" xml:lang="{LANG}">
+<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1" xml:lang="{{@ebook.language}}">
 	<head>
   	<!-- UUID must match OPF-file: -->
 		<meta name="dtb:uid" content="{{@ebook.uuid}}"/>
@@ -16,7 +16,7 @@
 			<navLabel>
 				<text>Title page</text>
 			</navLabel>
-			<content src="content/title.xhtml"/>
+			<content src="Text/title.xhtml"/>
 		</navPoint>
 	
 		<repeat group="{{ @pages }}" value="{{ @page }}">
@@ -24,7 +24,7 @@
 			<navLabel>
 				<text>{{ @page['title'] }}</text>
 			</navLabel>
-			<content src="content/chapter{{ @page['number'] }}.xhtml"/>
+			<content src="Text/chapter{{ @page['number'] }}.xhtml"/>
 		</navPoint>
 		</repeat>
 

@@ -16,7 +16,6 @@ class Base extends \Prefab {
 		$this->response = $view;
 	}
 */
-
 	/**
 	 * init the View
 	 */
@@ -29,6 +28,8 @@ class Base extends \Prefab {
 			$this->response = new \View\Frontend();
 
 		\Registry::set('VIEW',$this->response);
+
+		$this->config = \Base::instance()->get('CONFIG');
 	}
 	
 	protected function buffer($content, $section="BODY", $destroy = FALSE)

@@ -10,6 +10,7 @@ abstract class Base {
 	{
 		$this->config = \Config::getTree();
 		$this->f3 = \Base::instance();
+		$this->TPL = \Template::instance();
 	}
 
 	public function javascript($location, $file=FALSE, $string)
@@ -33,7 +34,7 @@ abstract class Base {
 	{
 		return "<!-- FILE: {$file} -->".\Template::instance()->render($file,$mime,$hive,$ttl)."<!-- END: {$file} -->";
 	}
-	
+
 	public static function stub($text="")
 	{
 		return \Template::instance()->render('stub.html');

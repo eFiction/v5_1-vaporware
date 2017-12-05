@@ -271,7 +271,13 @@ class Story extends Base
 		
 		if ( $printer == "epub" )
 		{
-			$epubData = $this->model->printEPub($id);
+			// Get the main story data, check if the story is public and an eBook is available.
+			// Gracefully fail if not
+			if ( NULL === $epubData = $this->model->printEPub($id) )
+			{
+				echo "";
+				exit;
+			}
 			
 			if($file = realpath("tmp/epub/s{$epubData['sid']}.zip"))
 			{
@@ -280,7 +286,7 @@ class Story extends Base
 			}
 			else
 			{
-				list($ebook, $filesize) = $this->model->createEPub($epubData['sid']);
+				list($ebook, $filesize) = $this->createEPub($epubData['sid']);
 			}
 			
 			if ( $ebook )
@@ -299,11 +305,152 @@ class Story extends Base
 					echo $buffer;
 				}
 				fclose ($ebook);
-
+//unlink($file);
 				exit;
 			}
 		}
 		
+	}
+	
+	private function createEPub($sid)
+	{
+		$epubData = $this->model->epubData($sid)[0];
+		
+		\Base::instance()->set('UI', "template/epub/");
+		$filename = realpath("tmp/epub")."/s{$epubData['sid']}.zip";
+
+		/*
+		This must be coming from admin panel at some point, right now we will fake it
+		*/
+		$epubData['version'] = 2;		// supported by most readers, v3 is still quite new
+		$epubData['language'] = "de";
+		$epubData['uuid']  = uuid_v5(
+										uuid_v5
+										(
+											"6ba7b810-9dad-11d1-80b4-00c04fd430c8",
+											(""==$this->config['epub_domain']) ? \Base::instance()->get('HOST').\Base::instance()->get('BASE') : $this->config['epub_domain']
+										),
+										$epubData['title']
+									);
+		
+		\Base::instance()->set('EPUB', $epubData);
+
+		$body = "";
+		$re_element = array (
+			"old"	=>	array ("<center>", "</center>"),
+			"new"	=>	array ("<span style=\"text-align: center;\">", "</span>"),
+		);
+		$elements_allowed = "<a><abbr><acronym><applet><b><bdo><big><br><cite><code><del><dfn><em><i><img><ins><kbd><map><ns:svg><q><samp><small><span><strong><sub><sup><tt><var>";
+
+		// The folder *should* exist, but creating it and ignoring the outcome is the quickest way of making sure it really is there
+		@mkdir("tmp/epub",0777,TRUE);
+		
+		// Auto-detect TidyHTML class
+		if ( TRUE === class_exists('tidy') )
+		{
+			$tidy = new \tidy();
+			$tidyConfig = [
+							//"doctype"		=> "omit",
+							'output-xml'		=> true,
+							'show-body-only'	=> true,
+						];
+		}
+
+		/*
+		Create the Archive
+		Since the mimetype file has to be at the beginning of the archive and uncompressed, we have to create the zip file from binary
+		*/
+		file_put_contents($filename, base64_decode("UEsDBAoAAAAAAOmRAT1vYassFAAAABQAAAAIAAAAbWltZXR5cGVhcHBsaWNhdGlvbi9lcHViK3ppcFBLAQIUAAoAAAAAAOmRAT1vYassFAAAABQAAAAIAAAAAAAAAAAAIAAAAAAAAABtaW1ldHlwZVBLBQYAAAAAAQABADYAAAA6AAAAAAA="));
+
+	  	$zip = new \ZipArchive;
+		$res = $zip->open($filename);
+		if ($res === TRUE)
+		{
+			// memorize the XML opening tag
+			$xml = $this->template->epubXMLtag();
+
+			// add folder for container file & META-INF/container.xml
+			$zip->addEmptyDir('META-INF');
+			$zip->addFromString('META-INF/container.xml', $xml.$this->template->epubContainer() );
+
+			// add folders for content
+			$zip->addEmptyDir('OEBPS');
+			//$zip->addEmptyDir('OEBPS/Images');
+			$zip->addEmptyDir('OEBPS/Styles');
+			$zip->addEmptyDir('OEBPS/Text');
+			
+			// add style sheet
+			$zip->addFromString('OEBPS/Styles/stylesheet.css', $this->template->epubCSS() );
+
+		    // title.xhtml
+	    	$zip->addFromString('OEBPS/Text/title.xhtml', 
+											$xml.$this->template->epubPage(
+															$this->template->epubTitle(),
+															$epubData['title'],
+															$epubData['language']
+														)
+											);
+
+			// page[n].xhtml							| epub_page
+
+			$chapters = $this->model->epubChapters( $epubData['sid'] );
+
+			if(sizeof($chapters)>0)
+			{
+				$n = 1;
+				foreach($chapters as $chapter)
+				{
+					$chapterText = $this->model->getChapter( $epubData['sid'], $chapter['inorder'], FALSE );
+					$chapterTOC[] = array ( "number" => $n, "title" => "{$chapter['title']}" );
+					
+					$body = $this->template->epubChapter(
+															$chapter['title'],
+															strip_tags(
+	    														str_replace(
+	    															$re_element['old'],
+	    															$re_element['new'],
+	    															$chapterText
+	    														),
+	    														$elements_allowed
+		    												)
+													);
+					
+					if ( isset($tidyConfig) )
+					{
+						$tidy->parseString($body, $tidyConfig, 'utf8');
+						$tidy->cleanRepair();
+						$body = $tidy->html();
+					}
+
+					$page = $this->template->epubPage(
+															$body,
+															$chapter['title'],
+															$epubData['language']
+														);
+
+					
+
+					$zip->addFromString('OEBPS/Text/chapter'.($n++).'.xhtml', 
+											$xml.$page
+											);
+
+				}
+			}
+			else return "__StoryError";
+
+			// root.opf
+		    $zip->addFromString('OEBPS/content.opf', $xml.$this->template->epubRoot( $chapterTOC ) );
+			
+			// TOC
+			$zip->addFromString('OEBPS/toc.ncx', $xml.$this->template->epubTOC( $chapterTOC ) );
+
+			if( $epubData['version']==3 )
+				$zip->addFromString('OEBPS/toc.xhtml', $xml.$this->template->epubTOC( $chapterTOC, 3 ) );
+
+			$zip->close();
+		}
+		return [ @fopen($filename,"rb"), filesize($filename) ];
+
 	}
 	
 	public function series($params)
@@ -561,4 +708,48 @@ class Story extends Base
 	}
 
 	
+}
+
+function uuid_v5($namespace, $name) {
+  if(!uuid_validate($namespace)) return false;
+
+  // Get hexadecimal components of namespace
+  $nhex = str_replace(array('-','{','}'), '', $namespace);
+
+  // Binary Value
+  $nstr = '';
+
+  // Convert Namespace UUID to bits
+  for($i = 0; $i < strlen($nhex); $i+=2) {
+    $nstr .= chr(hexdec($nhex[$i].$nhex[$i+1]));
+  }
+
+  // Calculate hash value
+  $hash = sha1($nstr . $name);
+
+  return sprintf('%08s-%04s-%04x-%04x-%12s',
+
+    // 32 bits for "time_low"
+    substr($hash, 0, 8),
+
+    // 16 bits for "time_mid"
+    substr($hash, 8, 4),
+
+    // 16 bits for "time_hi_and_version",
+    // four most significant bits holds version number 5
+    (hexdec(substr($hash, 12, 4)) & 0x0fff) | 0x5000,
+
+    // 16 bits, 8 bits for "clk_seq_hi_res",
+    // 8 bits for "clk_seq_low",
+    // two most significant bits holds zero and one for variant DCE1.1
+    (hexdec(substr($hash, 16, 4)) & 0x3fff) | 0x8000,
+
+    // 48 bits for "node"
+    substr($hash, 20, 12)
+  );
+}
+
+function uuid_validate($uuid) {
+  return preg_match('/^\{?[0-9a-f]{8}\-?[0-9a-f]{4}\-?[0-9a-f]{4}\-?'.
+                    '[0-9a-f]{4}\-?[0-9a-f]{12}\}?$/i', $uuid) === 1;
 }

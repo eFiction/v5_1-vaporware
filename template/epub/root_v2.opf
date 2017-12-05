@@ -28,12 +28,12 @@
 
 	<!-- Shipping manifest, must include all files that are part of the eBook -->
 	<manifest>
-		<!-- <item id="cover" 		href="cover.jpeg" media-type="image/jpeg" /> -->
-		<item id="page_css" href="Styles/styles.css" media-type="text/css" />
+		<!-- <item id="cover" 		href="Images/cover.jpeg" media-type="image/jpeg" /> -->
+		<item id="page_css" 	href="Styles/stylesheet.css" media-type="text/css" />
 		<item id="ncx"			href="toc.ncx" media-type="application/x-dtbncx+xml" />
-		<item id="title" 		href="content/title.xhtml" media-type="application/xhtml+xml" />
+		<item id="title" 		href="Text/title.xhtml" media-type="application/xhtml+xml" />
 		<repeat group="{{ @pages }}" value="{{ @page }}">
-			<item id="id{{ @page['number'] }}" 		href="content/chapter{{ @page['number'] }}.xhtml" media-type="application/xhtml+xml" />
+			<item id="chapter{{ @page['number'] }}" 		href="Text/chapter{{ @page['number'] }}.xhtml" media-type="application/xhtml+xml" />
 		</repeat>
 	</manifest>
 
@@ -41,15 +41,15 @@
 	<spine toc="ncx">
 		<itemref idref="title" />
 		<repeat group="{{ @pages }}" value="{{ @page }}">
-			<itemref idref="id{{ @page['number'] }}" />
+			<itemref idref="chapter{{ @page['number'] }}" />
 		</repeat>
 	</spine>
 
 	<!-- Guide to the content, "what is what"-type list -->
 	<guide>
-		<reference href="content/title.xhtml" type="title-page" title="Title page"/>
+		<reference href="Text/title.xhtml" type="title-page" title="Title page"/>
 		<repeat group="{{ @pages }}" value="{{ @page }}">
-			<reference href="content/chapter{{ @page['number'] }}.xhtml" type="text" title="[{{ @page['number'] }}]: {{ @page['title'] }}"/>
+			<reference href="Text/chapter{{ @page['number'] }}.xhtml" type="text" title="[{{ @page['number'] }}]: {{ @page['title'] }}"/>
 		</repeat>
 	</guide>
 
