@@ -41,10 +41,13 @@ return array(
 
 // Login related
 'Login'			=> 'Login',
+'LoginName'		=> 'Login',
+'VisibleName'	=> 'Visible name',
 'Logout'		=> 'Logout',
 'Username'		=> 'Username',
 'Password'		=> 'Password',
 'Email'			=> 'e-Mail',
+'Registered'	=> 'Registered',
 'Guest'			=> 'Guest',
 'ForgotPW'		=> 'Forgot you password',
 'ResetPW'		=> 'Reset my password',
@@ -260,8 +263,10 @@ return array(
 	'AdminMenu_Groups' => 'Groups',
 	'AdminMenu_Profile' => 'Profile',
 	'AdminMenu_Team' => 'Team',
-		'AdminMenu_Team_Group7' => 'Administrator',
+		'AdminMenu_Team_Group4' => 'Lector',
+		'AdminMenu_Team_Group5' => 'Moderator',
 		'AdminMenu_Team_Group6' => 'Super Moderator',
+		'AdminMenu_Team_Group7' => 'Administrator',
 
 'AdminMenu_Archive' => 'Archive',
 	'AdminMenu_Intro' => 'Intro',

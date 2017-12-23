@@ -154,6 +154,33 @@ class AdminCP extends Base {
 		return $data;
 	}
 	
+	//public function loadUser(int $uid)
+	public function loadUser($uid)
+	{
+		$sql = "SELECT uid, login, nickname, realname, email, UNIX_TIMESTAMP(registered) as registered, groups, curator, about
+					FROM `tbl_users`
+					WHERE uid = :uid;";
+		$data = $this->exec( $sql, [ ":uid" => $uid ] );
+		
+		if ( sizeof($data)==1 ) $user = $data[0];
+		else return FALSE;
+		
+		$sql = "SELECT F.field_id as id, F.field_title as title, F.field_type as type, F.field_options as options, I.info
+					FROM `tbl_user_fields`F
+					LEFT JOIN `tbl_user_info`I ON ( F.field_id = I.field AND I.uid = :uid )
+					WHERE F.enabled = 1
+					ORDER BY F.field_type, F.field_order";
+		$user['fields'] = $this->exec( $sql, [ ":uid" => $uid ] );
+		
+		foreach ( $user['fields'] as &$field )
+		{
+			if ( $field['type']==2 )
+				$field['options'] = json_decode($field['options'],TRUE);
+		}
+		
+		return $user;
+	}
+	
 	public function saveKeys($data)
 	{
 		$affected=0;

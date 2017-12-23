@@ -206,6 +206,13 @@ class AdminCP extends Base
 		return $this->render('members/searchlist.html');
 	}
 
+	public function userEdit(array $data, $returnpath)
+	{
+		$this->f3->set('data', $data);
+		$this->f3->set('returnpath', $returnpath);
+		return $this->render('members/edit_member.html');
+	}
+
 	public static function listShoutbox(array $data, array $sort, array $changes)
 	{
 		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );

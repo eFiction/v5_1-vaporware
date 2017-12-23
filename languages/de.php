@@ -41,10 +41,13 @@ return array(
 
 // Login
 'Login'			=> 'Anmelden',
+'LoginName'		=> 'Anmeldename',
+'VisibleName'	=> 'Sichtbarer Name',
 'Logout'		=> 'Abmelden',
 'Username'		=> 'Benutzername',
 'Password'		=> 'Passwort',
 'Email'			=> 'E-Mail',
+'Registered'	=> 'Registriert',
 'Guest'			=> 'Gast',
 'ForgotPW'		=> 'Passwort vergessen',
 'ResetPW'		=> 'Passwort zurücksetzen',
@@ -260,8 +263,10 @@ return array(
 	'AdminMenu_Groups' => 'Gruppen',
 	'AdminMenu_Profile' => 'Profil',
 	'AdminMenu_Team' => 'Team',
-		'AdminMenu_Team_Group7' => 'Administrator',
+		'AdminMenu_Team_Group4' => 'Lektor',
+		'AdminMenu_Team_Group5' => 'Moderator',
 		'AdminMenu_Team_Group6' => 'Super Moderator',
+		'AdminMenu_Team_Group7' => 'Administrator',
 
 'AdminMenu_Archive' => 'Archive',
 	'AdminMenu_Intro' => 'Intro',

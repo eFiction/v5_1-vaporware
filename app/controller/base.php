@@ -42,6 +42,8 @@ class Base extends \Prefab {
 	
 	protected function parametric($params=NULL)
 	{
+		list($params, $returnpath) = array_pad(explode(";returnpath=",$params), 2, '');
+		
 		$r = [];
 		if ( $pArray = explode(";", str_replace(["/","&"],";",$params) ) )
 		{
@@ -62,6 +64,8 @@ class Base extends \Prefab {
 		}
 
 		if(isset($r['page'])) \Base::instance()->set('paginate.page', max(1,$r['page']));
+		$r['returnpath'] = $returnpath;
+
 		return $r;
 	}
 

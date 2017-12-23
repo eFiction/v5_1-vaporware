@@ -1,0 +1,50 @@
+<fieldset>
+	<ul>
+		<li>
+			<label><input type="checkbox" name="group" value="banned"<check if="{{@data['groups']==-1}}"> checked="checked"</check>>&nbsp;Banned</label>
+		</li>
+		<li>
+			<label><input type="checkbox" name="group" value="banned"<check if="{{@data['groups']==0}}"> checked="checked"</check>>&nbsp;Guest</label>
+		</li>
+	</ul>
+</fieldset>
+<fieldset>
+	<ul>
+		<li>
+			<label><input type="checkbox" name="group" value="banned"<check if="{{@data['groups']&1}}"> checked="checked"</check>>&nbsp;Member</label>
+		</li>
+		<li>
+			<label><input type="checkbox" name="group" value="banned"<check if="{{@data['groups']&2}}"> checked="checked"</check>>&nbsp;Trusted Member</label>
+		</li>
+	</ul>
+</fieldset>
+<fieldset>
+	<ul>
+		<li>
+			<label><input type="checkbox" name="group" value="banned"<check if="{{@data['groups']&4}}"> checked="checked"</check>>&nbsp;Author</label>
+		</li>
+		<li>
+			<label><input type="checkbox" name="group" value="banned"<check if="{{@data['groups']&8}}"> checked="checked"</check>>&nbsp;Trusted Author</label>
+		</li>
+	</ul>
+</fieldset>
+<fieldset>
+	<ul>
+		<li>
+			<label><input type="checkbox" name="group" value="banned"<check if="{{@data['groups']&16}}"> checked="checked"</check>>&nbsp;{{ @LN__AdminMenu_Team_Group4 }}</label>
+		</li>
+		<li>
+			<label><input type="checkbox" name="group" value="banned"<check if="{{@data['groups']&32}}"> checked="checked"</check>>&nbsp;{{ @LN__AdminMenu_Team_Group5 }}</label>
+		</li>
+		<li>
+			<label><input type="checkbox" name="group" value="banned"<check if="{{@data['groups']&64}}"> checked="checked"</check>>&nbsp;{{ @LN__AdminMenu_Team_Group6 }}</label>
+		</li>
+	</ul>
+</fieldset>
+<fieldset>
+	<ul>
+		<li>
+			<label><input type="checkbox" name="group" value="banned"<check if="{{@data['groups']&128}}"> checked="checked"</check>>&nbsp;{{ @LN__AdminMenu_Team_Group7 }}</label>
+		</li>
+	</ul>
+</fieldset>

@@ -86,11 +86,7 @@ class AdminCP_Stories extends AdminCP
 	protected function edit(\Base $f3, $params)
 	{
 		if ( isset($params['*']) )
-		{
-			list($params, $returnpath) = array_pad(explode(";returnpath=",$params['*']), 2, '');
-			$params = $this->parametric($params);
-			$params['returnpath'] = $returnpath;
-		}
+			$params = $this->parametric($params['*']);
 		
 		if ( empty($params['story']) )
 		{
@@ -103,12 +99,12 @@ class AdminCP_Stories extends AdminCP
 			$storyInfo = $this->model->loadStoryInfo((int)$params['story']);
 			if ( $storyInfo AND isset($params['chapter']) )
 			{
-				$storyInfo['returnpath'] = $returnpath;
+				$storyInfo['returnpath'] = $params['returnpath'];
 				$this->buffer ( $this->editChapter($params, $storyInfo) );
 			}
 			elseif ( $storyInfo )
 			{
-				$storyInfo['returnpath'] = $returnpath;
+				$storyInfo['returnpath'] = $params['returnpath'];
 				$chapterList = $this->model->loadChapterList($storyInfo['sid']);
 				$prePopulate = $this->model->storyEditPrePop($storyInfo);
 				$this->buffer( $this->template->storyMetaEdit($storyInfo,$chapterList,$prePopulate) );
@@ -151,11 +147,7 @@ class AdminCP_Stories extends AdminCP
 	public function save(\Base $f3, $params)
 	{
 		if ( isset($params['*']) )
-		{
-			list($params, $returnpath) = array_pad(explode(";returnpath=",$params['*']), 2, '');
-			$params = $this->parametric($params);
-			$params['returnpath'] = $returnpath;
-		}
+			$params = $this->parametric($params['*']);
 
 		$current = $this->model->loadStoryMapper($params['story']);
 		

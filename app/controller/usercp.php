@@ -24,15 +24,13 @@ class UserCP extends Base
 		if ( TRUE == @$this->config->optional_modules['shoutbox'] )
 			$modules[] = "shoutbox";
 
+		// grab the first parameter
 		$p = array_pad(@explode("/",$params['*']),2,NULL); // 3.6
-
 		$mod = array_shift($p);
 
 		if ( in_array($mod, $modules) )
 		{
-			list($params, $returnpath) = array_pad(explode(";returnpath=",implode("/",$p)), 2, '');
-			$params = $this->parametric($params);
-			$params['returnpath'] = $returnpath;
+			$params = $this->parametric(implode("/",$p));
 			$this->{$mod}($f3, $params);
 		}
 		// Just show default menu

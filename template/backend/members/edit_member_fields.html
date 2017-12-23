@@ -1,0 +1,37 @@
+<fieldset>
+	<div class="gb-40">{{@LN__LoginName}}: *</div>
+	<div class="gb-60"><input type="text" value="{{@data.login}}" /></div>
+
+	<div class="gb-40">{{@LN__VisibleName}} *</div>
+	<div class="gb-60"><input type="text" value="{{@data.nickname}}" /></div>
+
+	<div class="gb-40">__realname</div>
+	<div class="gb-60"><input type="text" value="{{@data.realname}}" /></div>
+
+	<div class="gb-40">{{@LN__Email}}:</div>
+	<div class="gb-60"><input type="text" value="{{@data.email}}" /></div>
+
+	<div class="gb-40">{{@LN__Registered}}:</div>
+	<div class="gb-60">{{ date(@CONFIG.date_format_long, @data.registered) }}</div>
+</fieldset>
+
+<fieldset>
+<repeat group="{{@data.fields}}" value="{{@field}}">
+	<div class="gb-40">{{@field.title}} *</div>
+	<div class="gb-60">
+		<switch expr="{{@field.type}}">
+			<case value="2" break="TRUE">
+				<select name="field[{{@field.id}}]">
+					<repeat group="{{@field.options}}" value="{{@option}}">
+					<option>{{@option}}</option>
+					</repeat>
+				</select>
+			</case>
+			<default>
+				<input type="text" value="{{@field.info}}" />
+			</default>
+		</switch>
+	</div>
+</repeat>
+</fieldset>
+{* {{ print_r(@data,1) }} *}

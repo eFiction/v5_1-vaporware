@@ -14,7 +14,7 @@ class AdminCP_Members extends AdminCP
 		switch( $this->moduleInit(@$params['module']) )
 		{
 			case "edit":
-				$this->edit($f3, $params);
+				$this->buffer( $this->edit($f3, $params) );
 				break;
 			case "pending":
 				$this->buffer( \View\Base::stub() );
@@ -93,8 +93,21 @@ class AdminCP_Members extends AdminCP
 	protected function edit(\Base $f3, $params)
 	{
 		if( isset($_POST) ) $post = $f3->get('POST');
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		if( isset($params['*']) ) $params = $this->parametric($params['*']);
 		
+		if( empty($params['uid']) OR !is_numeric($params['uid']) )
+			return $this->editSearchForm($f3, $params);
+		
+		if( FALSE === $memberdata = $this->model->loadUser($params['uid']) )
+			return "__failed";
+		
+		return $this->template->userEdit($memberdata, $params['returnpath']);
+		//return print_r($memberdata,1);
+		
+	}
+			
+	protected function editSearchForm(\Base $f3, $params)
+	{
 		if(!empty($params['term']))
 		{
 			$search['term'] = $params['term'];
@@ -138,7 +151,7 @@ class AdminCP_Members extends AdminCP
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
 		
 		$data = $this->model->listUsers($page, $sort, $search);
-		$this->buffer( $this->template->userSearchList($data, $sort, $search) );
+		return $this->template->userSearchList($data, $sort, $search);
 	}
 
 	public function save(\Base $f3, $params)
