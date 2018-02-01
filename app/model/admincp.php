@@ -79,7 +79,7 @@ class AdminCP extends Base {
 	{
 		$f3 = \Base::instance();
 		
-		$sql = "SELECT `name`, `value`, `form_type`
+		$sql = "SELECT `name`, `value`, `form_type`, `can_edit`
 					FROM `tbl_config` 
 					WHERE 
 						`admin_module` LIKE :module 
@@ -184,7 +184,7 @@ class AdminCP extends Base {
 	public function saveKeys($data)
 	{
 		$affected=0;
-		$sqlUpdate = "UPDATE `tbl_config` SET `value` = :value WHERE `name` = :key and `admin_module` = :section;";
+		$sqlUpdate = "UPDATE `tbl_config` SET `value` = :value WHERE `can_edit` = 1 and `name` = :key and `admin_module` = :section;";
 		
 		foreach ( $data as $section => $fields )
 		{

@@ -29,7 +29,7 @@
 				<!-- SELECT -->
 				<case value="{{ 'select' }}" break="{{ TRUE }}">
 				<dd>
-					<select class="half" name="form_data[{{@elements.section}}][{{@element.name}}]" size="1">
+					<select class="half" name="form_data[{{@elements.section}}][{{@element.name}}]" size="1"<check if="{{ @element['can_edit']!=1 }}"> disabled="true"</check>>
 						<repeat group="{{ @element.form_type }}" value="{{ @option }}">
 							<option value="{{@option.1}}"<check if="{{ @element['value']==@option.1 }}"> selected="selected"</check>>{{ @option.0 }}</option>
 						</repeat>

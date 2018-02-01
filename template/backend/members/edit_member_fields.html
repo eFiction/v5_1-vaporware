@@ -1,9 +1,9 @@
 <fieldset>
-	<div class="gb-40">{{@LN__LoginName}}: *</div>
-	<div class="gb-60"><input type="text" value="{{@data.login}}" /></div>
+	<div class="gb-40">{{@LN__LoginName}}:</div>
+	<div class="gb-60"><input type="text" value="{{@data.login}}" readonly="readonly" /></div>
 
-	<div class="gb-40">{{@LN__VisibleName}} *</div>
-	<div class="gb-60"><input type="text" value="{{@data.nickname}}" /></div>
+	<div class="gb-40">{{@LN__VisibleName}}:</div>
+	<div class="gb-60"><input type="text" value="{{@data.nickname}}" readonly="readonly" /></div>
 
 	<div class="gb-40">__realname</div>
 	<div class="gb-60"><input type="text" value="{{@data.realname}}" /></div>
@@ -14,7 +14,16 @@
 	<div class="gb-40">{{@LN__Registered}}:</div>
 	<div class="gb-60">{{ date(@CONFIG.date_format_long, @data.registered) }}</div>
 </fieldset>
-
+{*
+	/*
+		1 = URL
+		2 = Options
+		3 = yes/no
+		4 = URL with ID
+		5 = code -> now tpl field
+		6 = text
+	*/
+*}
 <fieldset>
 <repeat group="{{@data.fields}}" value="{{@field}}">
 	<div class="gb-40">{{@field.title}} *</div>
@@ -23,12 +32,16 @@
 			<case value="2" break="TRUE">
 				<select name="field[{{@field.id}}]">
 					<repeat group="{{@field.options}}" value="{{@option}}">
-					<option>{{@option}}</option>
+					<option<check if="{{@field.info==@option}}"> selected="selected"</check>>{{@option}}</option>
 					</repeat>
 				</select>
 			</case>
+			<case value="3" break="TRUE">
+				<input type="radio" id="yes" name="field[{{@field.id}}]" value="1"<check if="{{@field.info==1}}"> checked="checked"</check>> <label for="yes"> {{@LN__yes}}</label> 				
+				<input type="radio" id="no"  name="field[{{@field.id}}]" value="0"<check if="{{@field.info==0}}"> checked="checked"</check>> <label for="no" > {{@LN__no}}</label> 				
+			</case>
 			<default>
-				<input type="text" value="{{@field.info}}" />
+				<input type="text" name="field[{{@field.id}}]" value="{{@field.info}}" />
 			</default>
 		</switch>
 	</div>

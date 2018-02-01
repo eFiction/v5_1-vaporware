@@ -49,8 +49,8 @@ class AdminCP_Settings extends AdminCP
 				$extra = $this->language($f3, $params);
 				break;
 			case "home":
-				$this->response->addTitle( $f3->get('LN__AdminMenu_Home') );
-				$f3->set('title_h3', $f3->get('LN__AdminMenu_Home') );
+				$this->response->addTitle( $f3->get('LN__AdminMenu_General') );
+				$f3->set('title_h3', $f3->get('LN__AdminMenu_General') );
 				$params['module'] = "home";
 				$data['General'] = $this->model->settingsFields('settings_general');
 				break;
@@ -79,6 +79,7 @@ class AdminCP_Settings extends AdminCP
 		$data['DateTime'] = $this->model->settingsFields('settings_datetime');
 		$data['Mail'] = $this->model->settingsFields('settings_mail');
 		$data['Maintenance'] = $this->model->settingsFields('settings_maintenance');
+		$data['Report'] = $this->model->settingsFields('settings_report');
 	}
 
 	public function save(\Base $f3, $params)

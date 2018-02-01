@@ -313,7 +313,7 @@ class UserCP extends Base
 		$limit = 20;
 		$pos = $page - 1;
 		
-		$sql = "SELECT SQL_CALC_FOUND_ROWS S.sid,S.title, S.validated as story_validated, S.completed, Ch.validated as chapter_validated
+		$sql = "SELECT SQL_CALC_FOUND_ROWS S.sid,S.title, S.validated as story_validated, S.completed, UNIX_TIMESTAMP(S.updated) as updated, Ch.validated as chapter_validated
 					FROM `tbl_stories`S 
 						LEFT JOIN `tbl_stories_authors`A ON ( S.sid = A.sid AND A.type='M' )
 							INNER JOIN `tbl_users`U ON ( A.aid = U.uid AND ( U.uid = {$_SESSION['userID']} OR U.curator = {$_SESSION['userID']} ) )

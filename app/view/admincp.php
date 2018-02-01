@@ -15,6 +15,7 @@ class AdminCP extends Base
 		\Base::instance()->set('form_target', $target);
 		\Base::instance()->set('form_elements', $data);
 		\Base::instance()->set('form_feedback', $feedback);
+		// resolve() eval's the language injections
 		$html = \Template::instance()->resolve(\Template::instance()->render('form_blocks.html'));
 		return $html;
 	}

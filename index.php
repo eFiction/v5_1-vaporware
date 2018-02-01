@@ -88,7 +88,7 @@ $f3->config('data/config.ini');
 //$cache = \Cache::instance();
 
 /* get database config */
-$cfg = new Config();
+$config = new Config();
 
 /** Establish database connection **/
 $f3->set('DB', storage::instance()->build() );
@@ -98,10 +98,10 @@ if ( FALSE === $f3->get('DB') )
 }
 
 /** Add the configuration to the framework **/
-$f3->set('CONFIG', $cfg->load());
+$f3->set('CONFIG', $config->load());
 
 /** We have DB and Config, let's check for bad ppl **/
-if ( TRUE == $cfg->bb2_enabled )
+if ( TRUE == $config->bb2_enabled )
 	require('app/bad-behaviour-efiction5.php');
 
 /** Load routes **/

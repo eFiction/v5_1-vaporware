@@ -38,13 +38,18 @@ return array(
 'ChapterTextExplained'	=> 'Your chapter\'s content goes here',
 'MaintenanceMode'		=> 'Archive is in maintenance mode',
 'Token_NoMatches'	=> 'No matches',
+'monthly'		=> 'monthly',
+'weekly'		=> 'weekly',
+'daily'			=> 'daily',
+'disabled'		=> 'disabled',
+'enabled'		=> 'enabled',
 
 // Login related
 'Login'			=> 'Login',
 'LoginName'		=> 'Login',
 'VisibleName'	=> 'Visible name',
 'Logout'		=> 'Logout',
-'Username'		=> 'Username',
+'Username'		=> 'User name',
 'Password'		=> 'Password',
 'Email'			=> 'e-Mail',
 'Registered'	=> 'Registered',
@@ -54,7 +59,7 @@ return array(
 'ResetPWMail'	=> 'If a user with this name or e-mail exists, a mail containing instructions on how to reset the password has been sent',
 'ChangePW'		=> 'Change password',
 'PWRecovery'	=> 'Password recovery',
-'Login_NoMatch'	=> 'Failed to log in, invalid username or password!',
+'Login_NoMatch'	=> 'Failed to log in, invalid user name or password!',
 'Login_NoData'	=> 'Failed to log in, data error!',
 
 // User registration
@@ -64,8 +69,8 @@ return array(
 'Registration_AcceptTOS_Error'	=> 'You have to accept the terms of use',
 'Registration_UsernameEmpty'	=> 'No login name provided!',
 'Registration_UsernameTaken'	=> 'Login name already in use.',
-'Registration_EmailEmpty'		=> 'No e-mail adress provided!',
-'Registration_EmailTaken'		=> 'Login name adress in use.',
+'Registration_EmailEmpty'		=> 'No e-mail address provided!',
+'Registration_EmailTaken'		=> 'Login name address in use.',
 'Registration_AlreadyMember'	=> 'A user with this data already exists.',
 'Registration_PasswordRepeat'	=> 'Repeat password',
 'Registration_PasswordTwice'	=> 'Enter your password twice',
@@ -195,6 +200,8 @@ return array(
 'DragdropSort'	=> 'Drag and drop to sort',
 'SwitchPlainHTML'	=> 'Switch to HTML mode',
 'SwitchVisual'		=> 'Switch to visual editor',
+'UCP_StoryStatus' => 'Story status',
+'UCP_ChapterStatus' => 'Chapter status',
 'UCP_statusValidated' => 'Validation status',
 	'UCP_statusValidated_0'	=> 'Closed',
 	'UCP_statusValidated_1'	=> 'Pending, author working',
@@ -245,6 +252,7 @@ return array(
 	'AdminMenu_DateTime'	=> 'Date and time',
 	'AdminMenu_Mail'		=> 'Mail and mail server',
 	'AdminMenu_Maintenance'	=> 'Maintenance',
+	'AdminMenu_Report'	=> 'Report',
 'AdminMenu_Registration' => 'Registration',
 	'AdminMenu_AntiSpam'	=> 'Spam protection',
 'AdminMenu_Security'	=> 'Security',
@@ -335,7 +343,7 @@ return array(
 	'CFG_allow_co_author' 		=> 'Allow addition of other authors to stories',
 	'CFG_stories_min_tags'		=> 'Minimum amount of tags required',
 	'CFG_allow_series'	 		=> 'Allow authors to create series@SMALL@Member series are now collections',
-	'CFG_allow_roundrobin'	 	=> 'Allow roundrobins',
+	'CFG_allow_roundrobin'	 	=> 'Allow round robins',
 // archive_tags_cloud
 	'CFG_tagcloud_basesize'		=> 'Base size in percent relative to normal font size.',
 	'CFG_tagcloud_elements'		=> 'Maximum number of elements in the tag cloud@SMALL@Elements are ordered by count.',
@@ -348,7 +356,7 @@ return array(
 	'CFG_bb2__strict'	 		=> 'Strict Mode@SMALL@(default <b>"{{@LN__no}}"</b>)',
 // bad_behaviour_ext
 	'CFG_bb2__verbose' 			=> 'Verbose Logging@SMALL@(default <b>"{{@LN__no}}"</b>)',
-	'CFG_bb2__offsite_forms' 	=> 'Allow Offsite Forms@SMALL@(default <b>"{{@LN__no}}"</b>)',
+	'CFG_bb2__offsite_forms' 	=> 'Allow off-site Forms@SMALL@(default <b>"{{@LN__no}}"</b>)',
 	'CFG_bb2__eu_cookie' 		=> 'EU Cookie@SMALL@(default <b>"{{@LN__no}}"</b>)',
 	'CFG_bb2__httpbl_key' 		=> 'http:BL API Key@SMALL@Screen requests through Project Honey Pot.<br/>Leave empty to disable.',
 	'CFG_bb2__httpbl_threat' 	=> 'http:BL Threat Level@SMALL@(default <b>"25"</b>)',
@@ -381,6 +389,10 @@ return array(
 	'CFG_shoutbox_guest'		=> 'Allow guest posts in shoutbox',
 	'CFG_allow_comment_news'	=> 'Allow news comments',
 	'CFG_allow_guest_comment_news'	=> 'Allow guest news comments',
+// settings_report
+	'CFG_server_report'				=> 'Server reports environment stats.@SMALL@Support development by keeping this enabled!',
+	'CFG_server_report_anon'		=> 'Anonymize stat report.@SMALL@Enable to anonymize the data.',
+	'CFG_server_report_publish'		=> 'List server (not available yet)@SMALL@Just a placeholder yet.',
 // settings_registration
 	'CFG_allow_registration'		=> 'Allow registration?',
 	'CFG_reg_require_email'			=> 'User must activate their account via eMail link.',
@@ -390,11 +402,11 @@ return array(
 	'CFG_reg_password_complexity'	=> 'Password complexity:@SMALL@see wiki',
 	'CFG_reg_use_captcha'			=> 'Select CAPTCHA to be used@SMALL@Configure under <a href="{{@BASE}}/adminCP/settings/security">Settings - Security</a>',
 // settings_registration_sfs
-	'CFG_reg_sfs_usage'				=> 'Use the "Stop Forumspam" Service.@SMALL@<a href="http://www.stopforumspam.com/faq" target="_blank">FAQ @ http://www.stopforumspam.com</a>',
+	'CFG_reg_sfs_usage'				=> 'Use the "Stop Forum Spam" Service.@SMALL@<a href="http://www.stopforumspam.com/faq" target="_blank">FAQ @ http://www.stopforumspam.com</a>',
 	'CFG_reg_sfs_check_ip'			=> 'Check IP',
 	'CFG_reg_sfs_check_mail'		=> 'Check mail address',
-	'CFG_reg_sfs_check_username'	=> 'Check username',
-	'CFG_reg_sfs_check_advice'		=> 'You may turn off username checking if you encounter false positives.<br>Turning off IP and mail check is not advised, however.',
+	'CFG_reg_sfs_check_username'	=> 'Check user name',
+	'CFG_reg_sfs_check_advice'		=> 'You may turn off user name checking if you encounter false positives.<br>Turning off IP and mail check is not advised, however.',
 	'CFG_reg_sfs_failsafe'			=> 'How to behave if the SFS Service cannot be reached upon registration@SMALL@Default is to hold.',
 	'CFG_reg_sfs_explain_api'		=> '__AdminRegExplainSFSApi',
 	'CFG_reg_sfs_api_key'			=> 'Your API key (optional)',
@@ -404,7 +416,7 @@ return array(
 	'CFG_smtp_server'				=> 'SMTP server@SMALL@See WIKI for GMail!',
 	'CFG_smtp_scheme' 				=> 'SMTP security scheme',
 	'CFG_smtp_port'					=> 'Port number (if not using default)',
-	'CFG_smtp_username'				=> 'SMTP username',
+	'CFG_smtp_username'				=> 'SMTP user name',
 	'CFG_smtp_password'				=> 'SMTP password',
 // settings_maintenance
 	'CFG_chapter_data_location' 	=> 'Chapter storage (Database Server or local file storage)@SMALL@Read-only - Local file is being handled by SQLite',
@@ -452,8 +464,7 @@ return array(
 'BookmarkAdd'		=> '{0, plural, other {\'#\' has no bookmark, click to add.} }',
 'BookmarkRemove'	=> '{0, plural, other {\'#\' has a bookmark, click to remove.} }',
 'FavouriteAdd'		=> '{0, plural, other {\'#\' is not a favourite, click to make it one.} }',
-'FavouriteRemove'	=> '{0, plural, other {\'#\' is a favourite.
-Click to remove.} }',
+'FavouriteRemove'	=> '{0, plural, other {\'#\' is a favourite. Click to remove.} }',
 
 'TOC'	=> 'Table of content',
 'NoTags' => 'No tags defined',
@@ -484,11 +495,15 @@ Click to remove.} }',
 }',
 
 'Search'		=> 'Search',
+'Reset'			=> 'Reset',
 'SearchUsername'=> 'Search in usernames',
 'SearchUserAll' => 'Search in all user fields',
 'Tagcloud' => 'Tagcloud',
 'noTagcloud' => 'No tag cloud',
 'Edit'		=> 'Edit',
+
+'ShowSearchForm'	=> 'Show search form',
+'HideSearchForm'	=> 'Hide search form',
 
 // Feedback
 'Feedback_Not_Logged_In' => 'You need to be logged in to write a review or comment',

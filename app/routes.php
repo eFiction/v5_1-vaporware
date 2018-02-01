@@ -8,7 +8,7 @@
 -------------------- */
 
 
-if ( FALSE == $cfg->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
+if ( FALSE == $config->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
 {
 	$f3->route( [ 'GET /', 'GET /page/*', 'GET /*' ], 'Controller\Page->getMain' );
 
@@ -63,7 +63,7 @@ if ($_SESSION['groups'] & 1)
 	[ 'GET /logout', 'GET /logout/*' ],
 	'Controller\Auth->logout' );
 
-	if ( FALSE == $cfg->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
+	if ( FALSE == $config->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
 	{
 		/* --------------------
 			Member routes
@@ -137,7 +137,7 @@ else
 		Guest routes
 	-------------------- */
 
-	if ( FALSE == $cfg->getPublic('maintenance') )
+	if ( FALSE == $config->getPublic('maintenance') )
 		$f3->route( [ 'GET|POST /register', 'GET|POST /register/@status' ], 'Controller\Auth->register' );
 	else
 		$f3->route( [ 'GET /', 'GET /*', 'GET /*' ], 'Controller\Auth->login' );

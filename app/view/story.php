@@ -13,17 +13,19 @@ class Story extends Base
 		return parent::render( 'story/listing.html' );
 	}
 	
-	public static function searchPage($terms=array(), $data=array())
+	public function searchHead($terms=array(), $return=NULL)
 	{
-		$form = \View\Story::searchForm($terms);
-		return $form;
+		$this->f3->set('searchForm', $terms);
+		$this->f3->set('searchLink', $return);
+
+		return $this->render('story/head.search.html');
 	}
-	
-	protected static function searchForm($terms)
+
+	public function browseHead($return=NULL)
 	{
-		\Base::instance()->set('searchForm', $terms);
-		
-		return parent::render('story/search.html');
+		$this->f3->set('searchLink', $return);
+
+		return $this->render('story/head.browse.html');
 	}
 	
 	protected static function dataProcess(&$item, $key=NULL)

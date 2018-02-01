@@ -38,6 +38,11 @@ return array(
 // 'ChapterTextExplained' =>
 'MaintenanceMode'		=> 'Archiv befindet sich in der Wartung',
 'Token_NoMatches'	=> 'Keine Treffer',
+'monthly'		=> 'monthly',
+'weekly'		=> 'weekly',
+'daily'			=> 'daily',
+'disabled'		=> 'disabled',
+'enabled'		=> 'enabled',
 
 // Login
 'Login'			=> 'Anmelden',
@@ -195,6 +200,8 @@ return array(
 'DragdropSort'	=> 'Ziehen um zu sortieren',
 'SwitchPlainHTML'	=> 'Zum einfachen Modus wechseln',
 'SwitchVisual'		=> 'Zum Editor wechseln',
+'UCP_StoryStatus' => 'Story status',
+'UCP_ChapterStatus' => 'Chapter status',
 'UCP_statusValidated' => 'Freigabe',
 	'UCP_statusValidated_0'	=> 'Geschlossen',
 	'UCP_statusValidated_1'	=> 'Offen, Autor arbeitet',
@@ -245,6 +252,7 @@ return array(
 	'AdminMenu_DateTime'	=> 'Datum und Uhrzeit',
 	'AdminMenu_Mail'		=> 'Mail und Mail-Server',
 	'AdminMenu_Maintenance'	=> 'Wartung',
+	'AdminMenu_Report'	=> 'Bericht',
 'AdminMenu_Registration' => 'Registrierung',
 	'AdminMenu_AntiSpam'	=> 'Spam-Schutz',
 'AdminMenu_Security'	=> 'Sicherheit',
@@ -381,6 +389,10 @@ return array(
 	'CFG_shoutbox_guest'		=> 'Erlaube Gästen die Shoutbox zu benutzen',
 	'CFG_allow_comment_news'	=> 'Erlaube News-Kommentare',
 	'CFG_allow_guest_comment_news'	=> 'Erlaube Gästen News-Kommentare',
+// settings_report
+	'CFG_server_report'				=> 'Server meldet monatlich statistische Werte.@SMALL@Bitte aktiv lassen, um die Entwicklung zu unterstützen!',
+	'CFG_server_report_anon'		=> 'Anonymize stat report.@SMALL@Enable to anonymize the data.',
+	'CFG_server_report_publish'		=> 'Server in Liste übernehmen (noch nicht verfügbar)@SMALL@Nur ein Platzhalter.',
 // settings_registration
 	'CFG_allow_registration'		=> 'Registrierung erlaubt?',
 	'CFG_reg_require_email'			=> 'Benutzer müssen ihren Account via E-Mail Link aktivieren.',
@@ -452,8 +464,7 @@ return array(
 'BookmarkAdd'		=> '{0, plural, other {\'#\' hat kein Lesezeichen, hier klicken um eines zu setzen.} }',
 'BookmarkRemove'		=> '{0, plural, other {\'#\' hat ein Lesezeichen, hier klicken um es zu entfernen.} }',
 'FavouriteAdd'		=> '{0, plural, other {\'#\' gehört nicht zu deinen Favoriten, hier klicken um sie hinzuzufügen.} }',
-'FavouriteRemove'	=> 'Diese Geschichte gehört zu den Favoriten.
-Hier klicken um zu entfernen.',
+'FavouriteRemove'	=> '{0, plural, other {\'#\' gehört zu den Favoriten. Hier klicken sie um zu entfernen.} }',
 
 'TOC'	=> 'Inhaltsverzeichnis',
 'NoTags' => 'Keine Tags gesetzt',
@@ -484,11 +495,15 @@ Hier klicken um zu entfernen.',
 }',
 
 'Search' => 'Suche',
+'Reset'			=> 'Zurücksetzen',
 //'SearchUsername'=> 'Search in usernames',
 //'SearchUserAll' => 'Search in all user fields',
 'Tagcloud' => 'Tagcloud',
 'noTagcloud' => 'No tag cloud',
 'Edit'		=> 'Bearbeiten',
+
+'ShowSearchForm'	=> 'Suchmaske anzeigen',
+'HideSearchForm'	=> 'Suchmaske verbergen',
 
 // Feedback
 'Feedback_Not_Logged_In' => 'Du musst angemeldet sein, um eine Review oder einen Kommentar zu verfassen.',

@@ -112,8 +112,8 @@ function bb2_insert($settings, $package, $key)
 
 // Return emergency contact email address.
 function bb2_email() {
-	global $cfg;
-	return $cfg->page_mail;
+	global $config;
+	return $config->page_mail;
 }
 
 // retrieve whitelist
@@ -123,9 +123,9 @@ function bb2_read_whitelist() {
 
 // retrieve settings from database
 function bb2_read_settings() {
-	global $cfg;
-	$bb_settings = $cfg->bb2;
-	$bb_settings['log_table'] = $cfg->prefix . 'bad_behavior';
+	global $config;
+	$bb_settings = $config->bb2;
+	$bb_settings['log_table'] = $config->prefix . 'bad_behavior';
 	return $bb_settings;
 }
 

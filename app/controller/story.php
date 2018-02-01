@@ -519,13 +519,16 @@ class Story extends Base
 			}
 			$return = implode(";",$return);
 			$data = $this->model->search( $searchData, $return, $searchForm );
-			if($searchForm) $this->buffer ( \View\Story::searchPage($searchData) );
+			if($searchForm)
+				$this->buffer ( $this->template->searchHead($searchData, $return) );
+			else
+				$this->buffer ( $this->template->browseHead($return) );
 
 			$this->buffer ( \View\Story::viewList($data) );
 		}
 
 		else
-			$this->buffer ( \View\Story::searchPage() );
+			$this->buffer ( $this->template->searchHead() );
 	}
 	
 	protected function searchCleanInput(&$arr=array())

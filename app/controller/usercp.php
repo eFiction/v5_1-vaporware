@@ -171,6 +171,7 @@ class UserCP extends Base
 				"title"			=>	"title",
 				"svalidated"	=>	"story_validated",
 				"chvalidated"	=>	"chapter_validated",
+				"updated"		=>  "updated",
 		);
 
 		// sort order
@@ -181,7 +182,7 @@ class UserCP extends Base
 		if ( FALSE === $data = $this->model->authorStoryList($params[1],$params['uid'],$sort,$page) )
 			return FALSE;
 		
-		return \View\UserCP::authorStoryList($data, $sort, $params);
+		return $this->template->authorStoryList($data, $sort, $params);
 	}
 
 	protected function authorStoryEdit(\Base $f3, array $params)

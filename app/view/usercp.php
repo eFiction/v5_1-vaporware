@@ -16,15 +16,15 @@ class UserCP extends Base
 		return \Template::instance()->render('usercp/author/home.html');
 	}
 
-	public static function authorStoryList(array $data, array $sort, array $params)
+	public function authorStoryList(array $data, array $sort, array $params)
 	{
 		//\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 
-		\Base::instance()->set('storyEntries', $data);
-		\Base::instance()->set('sort', $sort);
-		\Base::instance()->set('author', $params['uid']);
-		\Base::instance()->set('select', $params[1]);
-		return \Template::instance()->render('usercp/author/storyList.html');
+		$this->f3->set('storyEntries', $data);
+		$this->f3->set('sort', $sort);
+		$this->f3->set('author', $params['uid']);
+		$this->f3->set('select', $params[1]);
+		return $this->render('usercp/author/storyList.html');
 	}
 	
 	public static function authorStoryAdd(array $data)

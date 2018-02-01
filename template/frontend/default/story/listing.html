@@ -12,11 +12,14 @@
 					<false>{ICON:bookmark-off:{{@LN__BookmarkAdd, @story.title | format}}}</false>
 				</check>
 			</a>&nbsp;
-			<a href="{{@BASE}}/userCP/library/favourite/edit/id=ST,{{@story.sid}};returnpath={{@PATH}}">
-				<check if="{{@@story.is_favourite.0>0}}">
-					<true>{ICON:favourite:{{@LN__FavouriteRemove, @story.title | format}}}</true>
-					<false>{ICON:favourite-off:{{@LN__FavouriteAdd, @story.title | format}}}</false>
-				</check>
+			<check if="{{@@story.is_favourite.0>0}}">
+				<true>
+					<a href="{{@BASE}}/userCP/library/favourite/edit/id=ST,{{@story.sid}};returnpath={{@PATH}}" title="{{@LN__FavouriteRemove, @story.title | format}}">{ICON:favourite}
+				</true>
+				<false>
+					<a href="{{@BASE}}/userCP/library/favourite/edit/id=ST,{{@story.sid}};returnpath={{@PATH}}" title="{{@LN__FavouriteAdd, @story.title | format}}">{ICON:favourite-off}
+				</false>
+			</check>
 			</a>&nbsp;
 		</check>
 		<check if="{{@story.reviews>0}}">
