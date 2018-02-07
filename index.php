@@ -32,6 +32,9 @@
 
  **/
 
+// Turn off strict return type declaration for PHP 7
+declare(strict_types=0);
+
 /** initialize the framework **/
 $f3 = @require('lib/f3/base.php');
 
@@ -41,7 +44,7 @@ $f3->set('APP_VERSION', '5.0.0-dev.0');
 //new Session();
 /** define debugging and error reporting options **/
 
-ini_set('display_errors', 1);
+ini_set('display_errors', '1');
 error_reporting(1);
 error_reporting(E_ALL);// & ~E_NOTICE & ~E_DEPRECATED );
 
@@ -84,8 +87,6 @@ set_error_handler('exception_error_handler');
 
 /** load the framework core config file **/
 $f3->config('data/config.ini');
-
-//$cache = \Cache::instance();
 
 /* get database config */
 $config = new Config();

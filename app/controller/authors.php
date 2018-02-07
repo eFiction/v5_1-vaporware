@@ -51,9 +51,4 @@ class Authors extends Base {
 		$this->buffer ( \View\Authors::page($header , $menu, $content) );
 	}
 
-	protected function profile()
-	{
-		return "profile";
-	}
-	
 }

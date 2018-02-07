@@ -1,0 +1,28 @@
+<h1>{{@data.user.nickname}}</h1>
+<div class="grid-wrapper">
+	<div class="gb-half">{{ nl2br (@data.user.about) | raw }}</div>
+	<div class="gb-half">
+		<div class="grid-wrapper">
+			<div class="gb-1qrt">{{@LN__Nickname}}:</div><div class="gb-3qrt">{{ @data.user.nickname }}</div>
+			<check if="{{isset(@data.user.realname)}}"><div class="gb-1qrt">{{@LN__Realname}}:</div><div class="gb-3qrt">{{ @data.user.realname }}</div></check>
+			<div class="gb-1qrt">{{@LN__Registered}}:</div><div class="gb-3qrt">{{ date(@CONFIG.date_format_short, @data.user.registered) }}</div>
+			<div class="gb-1qrt">{{@LN__UserGroup}}:</div><div class="gb-3qrt">{{ floor(log(@data.user.groups, 2)) }}</div>
+		</div>
+		<br/>
+		__ Categories:
+		<ol>
+		<repeat group="{{ @data.cat.0 }}" value="{{ @category }}">
+			<li>{{@category.name}}</li>
+		</repeat>
+		</ol>
+		{{ @data.cat.1 }} __total
+		<br/>
+		__ Tags:
+		<ol>
+		<repeat group="{{ @data.tag.0 }}" value="{{ @tag }}">
+			<li>{{@tag.label}}</li>
+		</repeat>
+		</ol>
+		{{ @data.tag.1 }} __total
+	</div>
+</div>

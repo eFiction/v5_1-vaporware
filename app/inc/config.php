@@ -26,7 +26,7 @@ class Config extends \Prefab
 			// this will host the place where custom routes for plugins will be loaded when not in maintenance mode
 			
 		}
-		
+
 		if ( (FALSE === $report = \Cache::instance()->get('report')) OR ( $report!=self::$public['server_report']) )
 			self::report();
 
@@ -78,11 +78,12 @@ class Config extends \Prefab
 			$curl_handle=curl_init();
 			curl_setopt($curl_handle,CURLOPT_URL,'https://efiction.org/gatherer/collect5.0.php');
 			curl_setopt($curl_handle, CURLOPT_POST, 1);
+			curl_setopt($curl_handle, CURLOPT_RETURNTRANSFER , 1);
 			curl_setopt($curl_handle, CURLOPT_POSTFIELDS, http_build_query($server_data) );
 			$res = curl_exec($curl_handle);
 			curl_close($curl_handle);
 		}
-		
+
 		\Cache::instance()->set('report', self::$public['server_report'], $seconds );
 	}
 	public static function getPublic($key)

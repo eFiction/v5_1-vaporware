@@ -22,6 +22,11 @@ if ( FALSE == $config->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
 		'Controller\Story->index' );
 
 	$f3->route(
+	  [ 'GET /members', 'GET /members/@action', 'GET /members/@action/*', 
+		'GET /u/@membername' ],
+		'Controller\Members->index' );
+
+	$f3->route(
 	  [ 'POST /story/@action' , 'POST /story/@action/*' ],
 		'Controller\Story->save' );
 

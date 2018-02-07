@@ -13,12 +13,19 @@
 	</div>
 	<!-- misc -->	
 	<div class="grid-wrapper">
-	<div class="gb-full">
+	<div class="gb-half">
 		__SavedStories: <select class="search" name="saved">
 			<option value="">{{@LN__no}}</option>
 			<option value="both"<check if="{{isset(@searchForm.saved) AND @searchForm.saved=='both'}}"> selected="selected"</check>>Fav+BM</option>
 			<option value="fav"<check if="{{isset(@searchForm.saved) AND @searchForm.saved=='fav'}}"> selected="selected"</check>>Fav</option>
 			<option value="bm"<check if="{{isset(@searchForm.saved) AND @searchForm.saved=='bm'}}"> selected="selected"</check>>BM</option>
+		</select>
+	</div>
+	<div class="gb-half">
+		__StorySize: <select class="search" name="saved">
+			<option value="single"<check if="{{isset(@searchForm.saved) AND @searchForm.saved=='single'}}"> selected="selected"</check>>__SingleChapter</option>
+			<option value="multi"<check if="{{isset(@searchForm.saved) AND @searchForm.saved=='multi'}}"> selected="selected"</check>>__MultiChapter</option>
+			<option value="both"<check if="{{(empty(@searchForm.chapters) OR @searchForm.chapters=='both')}}"> selected="selected"</check>>__AllChapter</option>
 		</select>
 	</div>
 	<div class="gb-full">(*) {{@LN__Rating}} from <select class="search" name="rating[0]">
@@ -32,11 +39,6 @@
 </select>
 </div>
 <div class="gb-full"><input type="checkbox" name="exclude_wip" <check if="{{isset(@searchForm.exclude_wip)}}">checked="checked"</check> value="1">__SearchCompletedOnly</div>
-<div class="gb-full">
-	<input type="radio" name="chapters" <check if="{{(isset(@searchForm.chapters) AND @searchForm.chapters=='oneshot')}}">checked="checked" </check>value="oneshot"> __Oneshot 
-	<input type="radio" name="chapters" <check if="{{(isset(@searchForm.chapters) AND @searchForm.chapters=='multichapters')}}">checked="checked" </check>value="multichapters"> __MultiChapters 
-	<input type="radio" name="chapters" <check if="{{(empty(@searchForm.chapters) OR @searchForm.chapters=='both')}}">checked="checked" </check>value="both"> __Both
-</div>
 <div class="gb-1qrt"><button class="button" type="submit">{{@LN__Search}}</button></div>
 <div class="gb-1qrt"><button class="button" type="reset">{{@LN__Reset}}</button></div>
 <div class="gb-1qrt"><check if="{{!empty(@searchLink)}}"><a href="{{@BASE}}/story/browse/{{@searchLink}}<check if="{{isset(@paginate.page)}}">/page={{@paginate.page}}</check>">{{@LN__HideSearchForm}}</a></check>&nbsp;</div>

@@ -121,6 +121,9 @@ return array(
 'UserField_Type4'	=> 'ID with URL',	// _FIELDIDURL
 'UserField_Type5'	=> 'Custom Code',	// _FIELDCUSTOM
 'UserField_Type6'	=> 'Text',			// _TEXT
+'Nickname'			=> 'Nickname',
+'Realname'			=> 'Realname',
+'UserGroup'			=> 'User group',
 
 'Author'	=> 'Author',
 'Authors'	=> 'Authors',

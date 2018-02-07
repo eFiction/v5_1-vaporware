@@ -13,21 +13,17 @@ class Story extends Base
 		return parent::render( 'story/listing.html' );
 	}
 	
-	public function searchHead($terms=array(), $return=NULL)
+	public function searchHead($terms=array(), $return=NULL, $search=NULL)
 	{
 		$this->f3->set('searchForm', $terms);
 		$this->f3->set('searchLink', $return);
 
-		return $this->render('story/head.search.html');
+		if ( $search )
+			return $this->render('story/head.search.html');
+		else
+			return $this->render('story/head.browse.html');
 	}
 
-	public function browseHead($return=NULL)
-	{
-		$this->f3->set('searchLink', $return);
-
-		return $this->render('story/head.browse.html');
-	}
-	
 	protected static function dataProcess(&$item, $key=NULL)
 	{
 		if (isset($item['modified']))	$item['modified']	= ($item['modified'] > ($item['published'] + (24*60*60) ) ) ?

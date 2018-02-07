@@ -63,11 +63,5 @@ class Authors extends Base
 															]
 														);
 	}
-/*	
-	public static function menu($letters)
-	{
-		//$data = \Model\Authors::menuLetters();
-		return print_r($letters,TRUE);
-	}
-*/
+
 }

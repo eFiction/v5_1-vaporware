@@ -38,6 +38,12 @@ class Story extends Base
 			case 'series':
 				$data = $this->series($params);
 				break;
+			/*
+			case 'search':
+			case 'browse':
+				$data = $this->search($f3, $params);
+				break;
+				*/
 			case 'archive':
 			default:
 				$data = $this->intro($params);
@@ -519,16 +525,19 @@ class Story extends Base
 			}
 			$return = implode(";",$return);
 			$data = $this->model->search( $searchData, $return, $searchForm );
-			if($searchForm)
-				$this->buffer ( $this->template->searchHead($searchData, $return) );
-			else
-				$this->buffer ( $this->template->browseHead($return) );
+			
+			// Show a header, the view will select browse or search template
+			$this->buffer ( $this->template->searchHead($searchData, $return, $searchForm) );
+			//return $this->template->searchHead($searchData, $return, $searchForm)
 
+			// append the stories
 			$this->buffer ( \View\Story::viewList($data) );
+			//. \View\Story::viewList($data);
 		}
 
 		else
 			$this->buffer ( $this->template->searchHead() );
+			//return $this->template->searchHead();
 	}
 	
 	protected function searchCleanInput(&$arr=array())
