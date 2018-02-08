@@ -15,16 +15,16 @@
 	<div class="grid-wrapper">
 	<div class="gb-half">
 		__SavedStories: <select class="search" name="saved">
-			<option value="">{{@LN__no}}</option>
+			<option value="no">{{@LN__no}}</option>
 			<option value="both"<check if="{{isset(@searchForm.saved) AND @searchForm.saved=='both'}}"> selected="selected"</check>>Fav+BM</option>
 			<option value="fav"<check if="{{isset(@searchForm.saved) AND @searchForm.saved=='fav'}}"> selected="selected"</check>>Fav</option>
 			<option value="bm"<check if="{{isset(@searchForm.saved) AND @searchForm.saved=='bm'}}"> selected="selected"</check>>BM</option>
 		</select>
 	</div>
 	<div class="gb-half">
-		__StorySize: <select class="search" name="saved">
-			<option value="single"<check if="{{isset(@searchForm.saved) AND @searchForm.saved=='single'}}"> selected="selected"</check>>__SingleChapter</option>
-			<option value="multi"<check if="{{isset(@searchForm.saved) AND @searchForm.saved=='multi'}}"> selected="selected"</check>>__MultiChapter</option>
+		__StorySize: <select class="search" name="chapters">
+			<option value="single"<check if="{{isset(@searchForm.chapters) AND @searchForm.chapters=='single'}}"> selected="selected"</check>>__SingleChapter</option>
+			<option value="multi"<check if="{{isset(@searchForm.chapters) AND @searchForm.chapters=='multi'}}"> selected="selected"</check>>__MultiChapter</option>
 			<option value="both"<check if="{{(empty(@searchForm.chapters) OR @searchForm.chapters=='both')}}"> selected="selected"</check>>__AllChapter</option>
 		</select>
 	</div>
@@ -62,6 +62,16 @@ $(document).ready(function() {
     	queryParam: "tag",
     	preventDuplicates: true,
     	prePopulate: {{@prepopulateData.tagOut|raw}}
+    });
+});
+
+$(document).ready(function() {
+    $("#characters-select").tokenInput("{{@BASE}}/story/ajax/search",{
+    	method: "post",
+    	queryParam: "characters",
+		resultsLimit: 10,
+    	preventDuplicates: true,
+    	prePopulate: {{@prepopulateData.characters|raw}}
     });
 });
 

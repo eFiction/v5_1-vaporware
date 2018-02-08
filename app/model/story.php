@@ -110,26 +110,35 @@ class Story extends Base
 
 		if ( isset($terms['tagIn']) )
 		{
-			$join[] = "INNER JOIN (SELECT sid FROM `tbl_stories_tags` WHERE tid IN (".implode(",",$terms['tagIn']).") GROUP BY sid having count(lid)=".count($terms['tagIn']).") iT ON ( iT.sid = S.sid )";
-
+			// find story that match all tags listed
+			$join[] = "INNER JOIN (SELECT sid FROM `tbl_stories_tags` WHERE tid IN (".implode(",",$terms['tagIn']).") AND `character`=0 GROUP BY sid having count(lid)=".count($terms['tagIn']).") iT ON ( iT.sid = S.sid )";
 		}
 		if ( isset($terms['tagOut']) )
 		{
-			$join[] = "LEFT JOIN (SELECT sid FROM `tbl_stories_tags` WHERE tid IN (".implode(",",$terms['tagOut']).") GROUP BY sid having count(lid)=".count($terms['tagOut']).") iTo ON ( iTo.sid = S.sid )";
+			// find stories that match any tag listed
+			$join[] = "LEFT JOIN (SELECT sid FROM `tbl_stories_tags` WHERE tid IN (".implode(",",$terms['tagOut']).") AND `character`=0 GROUP BY sid ) iTo ON ( iTo.sid = S.sid )";
+			// and negate the results
 			$where[] = "AND iTo.sid IS NULL";
 
 		}
+
 		if ( isset($terms['category']) )
 		{
 			$join[] = "INNER JOIN (SELECT sid FROM `tbl_stories_categories` WHERE cid IN (".implode(",",$terms['category']).") GROUP BY sid having count(lid)=".count($terms['category']).") iC ON ( iC.sid = S.sid )";
-
 		}
+
+		if ( isset($terms['characters']) )
+		{
+			// find stories that match all character ids listed
+			$join[] = "INNER JOIN (SELECT sid FROM `tbl_stories_tags` WHERE tid IN (".implode(",",$terms['characters']).") AND `character`=1 GROUP BY sid having count(lid)=".count($terms['characters']).") iCh ON ( iCh.sid = S.sid )";
+		}
+
 		if ( isset($terms['author']) )
 		{
 			// sidebar stuff!
 			$join[] = "INNER JOIN (SELECT sid FROM `tbl_stories_authors` WHERE aid IN (".implode(",",$terms['author']).") GROUP BY sid having count(lid)=".count($terms['author']).") iA ON ( iA.sid = S.sid )";
 		}
-		if ( isset($terms['saved']) AND $_SESSION['userID']>0 )
+		if ( !empty($terms['saved']) AND $_SESSION['userID']>0 )
 		{
 			// bookmarks & favourites
 			$saved_sql = "INNER JOIN `tbl_user_favourites`FavS ON (FavS.uid=".(int)$_SESSION['userID']." AND FavS.item=S.sid AND FavS.type='ST'";
@@ -222,6 +231,9 @@ class Story extends Base
 		elseif ( $item == "tag")
 			$sql = "SELECT `label` as name, `tid` as id FROM `tbl_tags` WHERE `tid` IN ({$id})";
 
+		elseif ( $item == "characters")
+			$sql = "SELECT `charname` as name, `charid` as id FROM `tbl_characters` WHERE `charid` IN ({$id})";
+
 		if (empty($sql)) return "[]";
 		return json_encode( $this->exec($sql) );
 	}
@@ -230,7 +242,7 @@ class Story extends Base
 	{
 		if( $item=="tag" )
 		{
-			$ajax_sql = "SELECT label as name, tid as id from `tbl_tags`T WHERE T.label LIKE :tag ORDER BY T.label ASC LIMIT 5";
+			$ajax_sql = "SELECT label as name, tid as id from `tbl_tags`T WHERE T.label LIKE :tag ORDER BY T.label ASC LIMIT 10";
 			$bind = [ "tag" =>  "%{$bind}%" ];
 		}
 		elseif( $item=="author" )
@@ -240,8 +252,13 @@ class Story extends Base
 		}
 		elseif( $item=="category" )
 		{
-			$ajax_sql = "SELECT category as name, cid as id from `tbl_categories`C WHERE C.category LIKE :category ORDER BY C.category ASC LIMIT 5";
+			$ajax_sql = "SELECT category as name, cid as id from `tbl_categories`C WHERE C.category LIKE :category ORDER BY C.category ASC LIMIT 10";
 			$bind = [ "category" =>  "%{$bind}%" ];
+		}
+		elseif( $item=="characters" )
+		{
+			$ajax_sql = "SELECT charname as name, charid as id from `tbl_characters`Ch WHERE Ch.charname LIKE :characters ORDER BY Ch.charname ASC LIMIT 10";
+			$bind = [ "characters" =>  "%{$bind}%" ];
 		}
 
 		if ( isset($ajax_sql) ) return $this->exec($ajax_sql, $bind);

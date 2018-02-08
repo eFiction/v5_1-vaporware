@@ -18,6 +18,7 @@ class Members extends Base
 			[
 				"cat"	=> $this->profileCategories($uid),
 				"tag"	=> $this->profileTags($uid),
+				"char"	=> $this->profileCharacters($uid),
 				"user"	=> $user[0],
 			];
 		}
@@ -30,7 +31,7 @@ class Members extends Base
 	public function profileUser($uid)
 	{
 		$sql = "SELECT
-					U.nickname, U.realname, UNIX_TIMESTAMP(U.registered) as registered, U.groups, U.about,
+					U.nickname, U.realname, UNIX_TIMESTAMP(U.registered) as registered, U.groups, U.about, U.uid, 
 					GROUP_CONCAT(F.field_title, ',', F.field_type, ',', I.info, ',', F.field_options ORDER BY F.field_order ASC SEPARATOR '||' ) as fields
 					FROM `tbl_users`U
 						LEFT JOIN `tbl_user_info`I ON ( U.uid = I.uid )
@@ -61,13 +62,30 @@ class Members extends Base
 	public function profileTags($uid, $full=FALSE)
 	{
 		$sql = "SELECT SQL_CALC_FOUND_ROWS 
-				TG.description, T.label, T.tid, count(T.tid) as counted
+				T.label, T.tid, count(T.tid) as counted
 					FROM `tbl_stories_authors`rSA
-						INNER JOIN `tbl_stories_tags`rST ON (rSA.sid = rST.sid AND rSA.type='M' AND rSA.aid = :uid)
-					LEFT JOIN `tbl_tags`T ON ( rST.tid = T.tid )
-						INNER JOIN `tbl_tag_groups` TG ON ( T.tgid = TG.tgid )
+						INNER JOIN `tbl_stories_tags`rST ON (rSA.sid = rST.sid AND rST.character=0 AND rSA.type='M' AND rSA.aid = :uid)
+							INNER JOIN `tbl_tags`T ON ( rST.tid = T.tid AND T.tgid = 1 )
 				GROUP BY T.tid
-				ORDER BY TG.description,counted DESC";
+				ORDER BY counted DESC, T.label ASC";
+		if (!$full) $sql .= " LIMIT 0,5";
+		
+		$data = $this->exec( $sql, [ ":uid" => $uid ] );
+		
+		// return 'n' elements and the amount of total elements
+		return [ $data, $this->exec("SELECT FOUND_ROWS() as found")[0]['found'] ];
+	}
+	
+//	public function profileTags(int $uid, $full=FALSE) : array
+	public function profileCharacters($uid, $full=FALSE)
+	{
+		$sql = "SELECT SQL_CALC_FOUND_ROWS 
+				Ch.charname, Ch.charid, count(Ch.charid) as counted
+					FROM `tbl_stories_authors`rSA
+						INNER JOIN `tbl_stories_tags`rSC ON (rSA.sid = rSC.sid AND rSC.character=1 AND rSA.type='M' AND rSA.aid = :uid)
+							INNER JOIN `tbl_characters`Ch ON ( rSC.tid = Ch.charid )
+				GROUP BY Ch.charid
+				ORDER BY counted DESC, Ch.charname ASC";
 		if (!$full) $sql .= " LIMIT 0,5";
 		
 		$data = $this->exec( $sql, [ ":uid" => $uid ] );

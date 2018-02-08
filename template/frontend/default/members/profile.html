@@ -9,20 +9,28 @@
 			<div class="gb-1qrt">{{@LN__UserGroup}}:</div><div class="gb-3qrt">{{ floor(log(@data.user.groups, 2)) }}</div>
 		</div>
 		<br/>
-		__ Categories:
+		{{@LN__Categories}}:
 		<ol>
 		<repeat group="{{ @data.cat.0 }}" value="{{ @category }}">
-			<li>{{@category.name}}</li>
+			<li><a href="{{@BASE}}/story/browse/author={{ @data.user.uid }};category={{ @category.cid }}">{{@category.name}}</a> ({{ @category.counted }})</li>
 		</repeat>
 		</ol>
 		{{ @data.cat.1 }} __total
 		<br/>
-		__ Tags:
+		{{@LN__Tags}}:
 		<ol>
 		<repeat group="{{ @data.tag.0 }}" value="{{ @tag }}">
-			<li>{{@tag.label}}</li>
+			<li><a href="{{@BASE}}/story/browse/author={{ @data.user.uid }};tagIn={{ @tag.tid }}">{{@tag.label}}</a> ({{ @tag.counted }})</li>
 		</repeat>
 		</ol>
 		{{ @data.tag.1 }} __total
+		<br/>
+		{{@LN__Characters}}:
+		<ol>
+		<repeat group="{{ @data.char.0 }}" value="{{ @character }}">
+			<li><a href="{{@BASE}}/story/browse/author={{ @data.user.uid }};characters={{ @character.charid }}">{{@character.charname}}</a> ({{ @character.counted }})</li>
+		</repeat>
+		</ol>
+		{{ @data.char.1 }} __total
 	</div>
 </div>

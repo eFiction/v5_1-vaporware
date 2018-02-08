@@ -19,7 +19,7 @@
 <true>
 	<repeat group="{{@renderData}}"  value="{{ @story }}">
 		<div class='feature'>
-			<a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a> {{@LN__by}} <repeat group='@story.cache_authors' value='@author' counter='{{ @ctr }}'><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/member/profile/{{@author.0}}">{{@author.1}}</a></repeat><br />
+			<a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a> {{@LN__by}} <repeat group='@story.cache_authors' value='@author' counter='{{ @ctr }}'><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/members/id={{@author.0}}">{{@author.1}}</a></repeat><br />
 			{* remove below to hide categories *}
 			 <repeat group='@story.cache_categories' value='@category' counter='{{ @ctr }}'><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/story/browse/catIn={{@category.0}}">{{@category.1}}</a></repeat><br />
 			{{@LN__Rating}}: {{@story.cache_rating.1}}<br />

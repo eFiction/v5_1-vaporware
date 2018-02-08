@@ -2,7 +2,7 @@
 <repeat group="{{ @shoutboxLines }}" value="{{ @line }}">
 			<div class="sboxMSG">
 				<div class="sboxUser">
-					<check if="{{ @line['uid']==0 }}"><true>{{ @line['name'] }}</true><false><a href="{{ @BASE }}/member/profile/{{ @line['uid'] }}">{{ @line['name'] }}</a></false></check></div><div class="sboxDate"> @ {{ date( @CONFIG.date_format_long, @line['date']) }}</div>
+					<check if="{{ @line['uid']==0 }}"><true>{{ @line['name'] }}</true><false><a href="{{ @BASE }}/members/id={{ @line['uid'] }}">{{ @line['name'] }}</a></false></check></div><div class="sboxDate"> @ {{ date( @CONFIG.date_format_long, @line['date']) }}</div>
 					<div class="clearfix"></div><div class="sboxText">{{ @line['message'] |raw }}</div>
 			</div>
 </repeat>

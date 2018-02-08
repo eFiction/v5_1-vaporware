@@ -472,11 +472,14 @@ class Story extends Base
 		if ( isset($params['*']) ) $get = $this->parametric($params['*']); // 3.6
 		unset($get['page']);
 
+		// get search data from $_POST
 		$searchData = ($f3->get('POST'));
+		// merge with the $_GET scope (which is basically either or, but that should settle it
 		$searchData = array_filter(array_merge($get, $searchData));
+
+		// get the available ratings
 		$ratings = $this->model->ratings();
 		$f3->set('searchRatings', $ratings);
-
 		$ratingMaxID = end($ratings)['rid'];
 		// Add personal search preferences at some point
 		$searchData['rating'][0] = min( (@$searchData['rating'][0] ?: 0), $ratingMaxID);
@@ -512,6 +515,12 @@ class Story extends Base
 			$f3->set('prepopulateData.tagOut',"[]");
 		else
 			$f3->set('prepopulateData.tagOut', $this->model->searchPrepopulate( "tag", implode(",",$this->searchCleanInput($searchData['tagOut']) ) ) );
+
+		// characters
+		if ( empty($searchData['characters']) )
+			$f3->set('prepopulateData.characters',"[]");
+		else
+			$f3->set('prepopulateData.characters', $this->model->searchPrepopulate( "characters", implode(",",$this->searchCleanInput($searchData['characters']) ) ) );
 
 		// return string
 		if ( sizeof($searchData)>0 )

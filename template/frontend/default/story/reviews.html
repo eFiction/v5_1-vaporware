@@ -36,16 +36,16 @@
 		<div class="review-headline">
 			<check if="{{@item.level==1}}">
 				<true>
-					{{@LN__ReviewHeadline, "<a href='{@BASE}/member/profile/{@item.uid}'>{@item.name}</a>", @item.date, @item.time, @item.chapternr | format }}
+					{{@LN__ReviewHeadline, "<a href='{@BASE}/members/id={@item.uid}'>{@item.name}</a>", @item.date, @item.time, @item.chapternr | format }}
 				</true>
 				<false>
 					{* Is there a timestamp? eFiction 3 didn't save comment timestamp *}
 					<check if="{{@item.timestamp>0}}">
 						<true>
-						{{@LN__ReplyHeadline, "<a href='{@BASE}/member/profile/{@item.uid}'>{@item.name}</a>", @item.date, @item.time | format }}
+						{{@LN__ReplyHeadline, "<a href='{@BASE}/members/id={@item.uid}'>{@item.name}</a>", @item.date, @item.time | format }}
 						</true>
 						<false>
-						{{@LN__ReplyHeadline_noDate, "<a href='{@BASE}/member/profile/{@item.uid}'>{@item.name}</a>" | format }}
+						{{@LN__ReplyHeadline_noDate, "<a href='{@BASE}/members/id={@item.uid}'>{@item.name}</a>" | format }}
 						</false>
 					</check>
 				</false>

@@ -20,20 +20,19 @@ class Members extends Base {
 	{
 		// reroute /u/Membername type links to uid
 		if ( isset($params['membername']) AND ( 0 !== $uid = $this->model->uidByName($params['membername']) ) )
-			$params = [
-				"*"			=>	"id=".$uid,
-				"action"	=>	"profile",
-			];
+			$params['*'] = "id=".$uid;
 
-		switch(@$params['action'])
-		{
-			case 'profile':
-				$data = $this->profile($params['*']);
-				break;
-			case 'listing':
-			default:
-				$data = $this->listing($params);
-		}
+		if ( isset($params['*']) )
+			$params = $this->parametric($params['*']);
+		else
+			$params = [];
+
+		if ( isset($params['id']) AND is_numeric($params['id']) )
+			$data = $this->profile($params['id']);
+		
+		else
+			$data = $this->listing($params);
+
 		$this->buffer ($data);
 	}
 
@@ -42,13 +41,11 @@ class Members extends Base {
 		return "Listing";
 	}
 	
-//	protected function profile(string $params)
-	protected function profile($params)
+//	protected function profile(int $uid) : string
+	protected function profile($uid)
 	{
-		// prepare parameters
-		$params = $this->parametric($params);
 		// if the is no numeric id, fall back to listing
-		if ( FALSE === $data = $this->model->profileData(@$params['id']) )
+		if ( FALSE === $data = $this->model->profileData($uid) )
 			 return $this->listing();
 		 
 		return $this->template->profile($data);

@@ -22,7 +22,7 @@ if ( FALSE == $config->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
 		'Controller\Story->index' );
 
 	$f3->route(
-	  [ 'GET /members', 'GET /members/@action', 'GET /members/@action/*', 
+	  [ 'GET /members', 'GET /members/*', 
 		'GET /u/@membername' ],
 		'Controller\Members->index' );
 
