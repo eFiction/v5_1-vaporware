@@ -1,0 +1,20 @@
+{* provide a return link if a path exists *}
+<check if="{{!empty(@returnpath)}}"><a href="{{@BASE}}{{@returnpath}}">__return</a></check>
+<h1>{{@LN__ACP_Character}}:</h1>
+<form action="{{@BASE}}/adminCP/archive/characters/id={{ @data['id'] }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
+	<div class="grid-wrapper">
+		<check if="{{ @data['errors'] }}"><div class="gb-90 alert-box error">{{ @data['errors'] }}</div></check>
+		<check if="{{ @data['changes'] }}"><div class="gb-90 alert-box success">{{ @LN__Status_Changes, @data['changes'] |format }}</div></check>
+		<div class="gb-20">__A_CharacterName</div><div class="gb-80"><input type="text" size=80 name="form_data[charname]" value="{{ @data['charname'] }}" /></div>
+		<div class="gb-20">{{@LN__ACP_Category}}</div><div class="gb-80">
+			<select name="form_data[catid]" size="1">
+				<option value="-1"<check if="{{ @data['cid']==-1 }}"> selected="selected"</check>>__none</option>
+				<repeat group="{{ @data['categories'] }}" value="{{ @group }}">
+					<option value="{{@group['id'] }}"<check if="{{ @data['cid']==@group['id'] }}"> selected="selected"</check>>{{ @group['category'] }}</option>
+				</repeat>
+			</select>
+		</div>
+		<div class="gb-full">{{@LN__ACP_Biography}}:<br /><textarea name="form_data[biography]" rows="30" cols="80">{{ @data['biography'] }}</textarea><br /></div>
+		<div class="gb-40" align="right"><input type="submit"></div><div class="gb-60"><input type="reset"></div>
+	</div>
+</form>

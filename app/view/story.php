@@ -3,14 +3,14 @@ namespace View;
 
 class Story extends Base
 {
-	public static function viewList($data)
+	public function viewList($data)
 	{
 		while ( list($key, $value) = each($data) )
-			Story::dataProcess($data[$key], $key);
+			$this->dataProcess($data[$key], $key);
 
-		\Base::instance()->set('stories', $data);
+		$this->f3->set('stories', $data);
 		
-		return parent::render( 'story/listing.html' );
+		return $this->render( 'story/listing.html' );
 	}
 	
 	public function searchHead($terms=array(), $return=NULL, $search=NULL)
@@ -24,28 +24,6 @@ class Story extends Base
 			return $this->render('story/head.browse.html');
 	}
 
-	protected static function dataProcess(&$item, $key=NULL)
-	{
-		if (isset($item['modified']))	$item['modified']	= ($item['modified'] > ($item['published'] + (24*60*60) ) ) ?
-																	date(\Config::getPublic('date_format_short'),$item['modified']) :
-																	NULL;
-		if (isset($item['published']))	$item['published']	= date(\Config::getPublic('date_format_short'),$item['published']);
-										$item['number']		= isset($item['inorder']) ? "{$item['inorder']}&nbsp;" : "";
-		if (isset($item['wordcount'])) 	$item['wordcount']	= number_format($item['wordcount'], 0, '','.');
-		if (isset($item['count'])) 		$item['count']		= number_format($item['count'], 0, '','.');
-
-		if (isset($item['cache_authors']))
-		{
-												if ( NULL !== $item['authors'] 	= $item['cache_authors'] = json_decode($item['cache_authors'],TRUE) )
-													array_walk($item['authors'], function (&$v, $k){ $v = $v[1];} );
-		}
-
-		if (isset($item['cache_categories'])) 	$item['cache_categories']	= json_decode($item['cache_categories'],TRUE);
-		if (isset($item['cache_rating'])) 		$item['cache_rating']		= json_decode($item['cache_rating'],TRUE);
-		if (isset($item['cache_tags'])) 		$item['cache_tags']			= json_decode($item['cache_tags'],TRUE);
-		if (isset($item['cache_characters'])) 	$item['cache_characters']	= json_decode($item['cache_characters'],TRUE);
-	}
-	
 	public function vTest()
 	{
 		return "nichts";
@@ -162,7 +140,7 @@ class Story extends Base
 	{
 		\Registry::get('VIEW')->javascript('body', TRUE, 'chapter.js?' );
 
-		Story::dataProcess($storyData);
+		parent::dataProcess($storyData);
 		\Base::instance()->set('story', $storyData);
 		\Base::instance()->set('data', [
 											"reviews" 	=> $reviewData,

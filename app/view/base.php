@@ -40,6 +40,29 @@ abstract class Base {
 		return \Template::instance()->render('stub.html');
 	}
 
+	protected function dataProcess(&$item, $key=NULL)
+	{
+		if (isset($item['modified']))	$item['modified']	= ($item['modified'] > ($item['published'] + (24*60*60) ) ) ?
+																	date(\Config::getPublic('date_format_short'),$item['modified']) :
+																	NULL;
+		if (isset($item['published']))	$item['published']	= date(\Config::getPublic('date_format_short'),$item['published']);
+		//								$item['number']		= isset($item['inorder']) ? "{$item['inorder']}&nbsp;" : "";
+		if (isset($item['wordcount'])) 	$item['wordcount']	= number_format($item['wordcount'], 0, '','.');
+		if (isset($item['count'])) 		$item['count']		= number_format($item['count'], 0, '','.');
+
+		if (isset($item['cache_authors']))
+		{
+												if ( NULL !== $item['authors'] 	= $item['cache_authors'] = json_decode($item['cache_authors'],TRUE) )
+													array_walk($item['authors'], function (&$v, $k){ $v = $v[1];} );
+		}
+
+		if (isset($item['cache_categories'])) 	$item['cache_categories']	= json_decode($item['cache_categories'],TRUE);
+		if (isset($item['cache_rating'])) 		$item['cache_rating']		= json_decode($item['cache_rating'],TRUE);
+		if (isset($item['cache_tags'])) 		$item['cache_tags']			= json_decode($item['cache_tags'],TRUE);
+		if (isset($item['cache_characters'])) 	$item['cache_characters']	= json_decode($item['cache_characters'],TRUE);
+		if (isset($item['cache_stories']))		$item['cache_stories']		= json_decode($item['cache_stories'],TRUE);
+	}
+
 	public function commentFormBase($structure,$data)
 	{
 		// 'structure' formating, clearing and naming in child function call

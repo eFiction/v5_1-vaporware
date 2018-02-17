@@ -14,7 +14,7 @@ $('#datetimepicker').datetimepicker({
 	dayOfWeekStart : 1,
 	value:'{{ @data.datetime }}',
 	lang:'en',
-	step:10,
-	format:'{{ @data.date_format_short }} H:i',
+//	step:10,
+	format:'{{\Config::getPublic("date_format_long")}}',
 });
 </script>

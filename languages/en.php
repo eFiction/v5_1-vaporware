@@ -289,6 +289,7 @@ return array(
 	'AdminMenu_Future' => 'Future',
 	'AdminMenu_Current' => 'Current',
 	'AdminMenu_Past' => 'Past',
+'AdminMenu_Contests'	=> 'Contests',
 'AdminMenu_Characters' => 'Characters',
 'AdminMenu_Tags' => 'Tags',
 	'AdminMenu_Edit' => 'Edit',
@@ -301,6 +302,10 @@ return array(
 'ACP_Categories_Error_badID'		=> 'Could not delete category, ID not found in database!',
 
 'ACP_Tags'				=> 'Tags',
+'ACP_Character'			=> 'Character',
+'ACP_Biography'			=> 'Biography',
+'ACP_Contest'			=> 'Contest',
+'ACP_Category'			=> 'Category',
 'ACP_TagName'			=> 'Tag name',
 'ACP_TagLabel'			=> 'Tag label',
 'ACP_TagDescription'	=> 'Tag description',
@@ -314,6 +319,9 @@ return array(
 'AdminMenu_Edit' => 'Edit',
 'AdminMenu_Add' => 'Add',
 
+'CannotDeleteUsedElement'	=> 'Cannot delete an element that is currently being used.',
+'ElementDeleted'	=> 'Element deleted',
+'FailedDelete'		=> 'Failed to delete element',
 
 'Welcome' => 'Welcome',
 'Shoutbox' => 'Shoutbox',

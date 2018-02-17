@@ -2,7 +2,7 @@
 <repeat group="{{ @stories }}" value="{{ @story }}" counter="{{ @ctr }}">
 	<div class="story-box">
 	<!-- {RATING_IMG} -->
-	<h5>{{@story.number}}<a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a> {{@LN__by}} <repeat group="{{@story.cache_authors}}" value="{{@author}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check><a href="{{@BASE}}/members/uid={{@author.0}}">{{@author.1}}</a></repeat></h5>
+	<h5><check if="{{ isset(@story.inorder) }}">{{@item.inorder}}&nbsp;</check><a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a> {{@LN__by}} <repeat group="{{@story.cache_authors}}" value="{{@author}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check><a href="{{@BASE}}/members/uid={{@author.0}}">{{@author.1}}</a></repeat></h5>
 	<div class="story-info1">
 		&nbsp;
 		<check if="{{ @SESSION['userID']>0 }}">

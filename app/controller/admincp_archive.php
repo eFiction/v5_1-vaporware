@@ -5,7 +5,7 @@ namespace Controller;
 class AdminCP_Archive extends AdminCP
 {
 	var $moduleBase = "archive";
-	var $submodules = [ "submit", "featured", "characters", "tags", "categories" ];
+	var $submodules = [ "submit", "featured", "contests", "characters", "tags", "categories" ];
 
 	public function index(\Base $f3, $params, $feedback = [ NULL, NULL ] )
 	{
@@ -20,8 +20,11 @@ class AdminCP_Archive extends AdminCP
 			case "featured":
 				$this->featured($f3, $params, $feedback);
 				break;
+			case "contests":
+				$this->buffer( $this->contests($f3, $params, $feedback) );
+				break;
 			case "characters":
-				$this->characters($f3, $params, $feedback);
+				$this->buffer( $this->characters($f3, $params, $feedback) );
 				break;
 			case "tags":
 				$this->tagsIndex($f3, $params, $feedback);
@@ -44,10 +47,12 @@ class AdminCP_Archive extends AdminCP
 
 		$post = $f3->get('POST');
 		
-		if ( $params['module']=="tags" )
-		{
-			$data = $this->model->ajax("tags", $post);
-		}
+		if ( $params['module']=="search" )
+			$data = $this->model->ajax("search", $post);
+
+		elseif ( $params['module']=="editMeta" )
+			$data = $this->model->ajax("editMeta", $post);
+
 		elseif ( $params['module']=="featured" )
 		{
 			$data = $this->model->ajax("storySearch", $post);
@@ -134,10 +139,116 @@ class AdminCP_Archive extends AdminCP
 
 
 	}
+	
+	protected function contests(\Base $f3, $params, $feedback)
+	{
+		$this->response->addTitle( $f3->get('LN__AdminMenu_Contests') );
+		$f3->set('title_h3', $f3->get('LN__AdminMenu_Contests') );
+
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+
+		if ( isset($params['delete']) )
+		{
+			//$this->model->deleteCharacter( (int)$params['delete'] );
+			$f3->reroute('/adminCP/archive/contests', false);
+		}
+		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
+		{
+			if ( isset($_POST['form_data']) )
+			{
+				if ( FALSE === $changes = $this->model->contestSave($params['id'], $f3->get('POST.form_data') ) )
+					$errors = $f3->get('form_error');
+			}
+			elseif ( isset($_POST['newContest']) )
+			{
+				$newID = $this->model->contestAdd( $f3->get('POST.newContest') );
+				$f3->reroute('/adminCP/archive/contests/id='.$newID, false);
+			}
+			elseif ( isset($_POST['charid']) ) $params['id'] = $f3->get('POST.charid');
+		}
+
+		if( isset ($params['id']) )
+		{
+			$data = $this->model->contestLoad($params['id']);
+			//$data['categories'] = $this->model->getCategories();
+			//$data['tags']
+			$data['raw'] = @$params['raw'];
+			$data['errors'] = @$errors;
+			$data['changes'] = @$changes;
+			return $this->template->contestEdit($data, @$params['returnpath']);
+		}
+
+		// page will always be an integer > 0
+		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
+
+		// search/browse
+		$allow_order = array (
+			"id"		=>	"conid",
+			"name"		=>	"title",
+			"open"		=>	"date_open",
+			"close"		=>	"date_close",
+		);
+
+		// sort order
+		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "id";
+		$sort["order"]		= $allow_order[$sort["link"]];
+		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
+		
+		return $this->template->contestsList($this->model->contestsList($page, $sort), $sort);
+	}
 
 	protected function characters(\Base $f3, $params, $feedback)
 	{
-		$this->buffer( \View\Base::stub() );
+		$this->response->addTitle( $f3->get('LN__AdminMenu_Characters') );
+		$f3->set('title_h3', $f3->get('LN__AdminMenu_Characters') );
+
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+
+		if ( isset($params['delete']) )
+		{
+			$this->model->deleteCharacter( (int)$params['delete'] );
+			$f3->reroute('/adminCP/archive/characters', false);
+		}
+		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
+		{
+			if ( isset($_POST['form_data']) )
+			{
+				$changes = $this->model->saveCharacter($params['id'], $f3->get('POST.form_data') );
+			}
+			elseif ( isset($_POST['newCharacter']) )
+			{
+				$newID = $this->model->addCharacter( $f3->get('POST.newCharacter') );
+				$f3->reroute('/adminCP/archive/characters/id='.$newID, false);
+			}
+			elseif ( isset($_POST['charid']) ) $params['id'] = $f3->get('POST.charid');
+		}
+		
+		if( isset ($params['id']) )
+		{
+			$data = $this->model->loadCharacter($params['id']);
+			$data['categories'] = $this->model->getCategories();
+			$data['errors'] = @$errors;
+			$data['changes'] = @$changes;
+			return $this->template->editCharacter($data, @$params['returnpath']);
+		}
+
+		// page will always be an integer > 0
+		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
+
+		// search/browse
+		$allow_order = array (
+			"id"		=>	"charid",
+			"name"		=>	"charname",
+			"count"		=>	"count"
+		);
+
+		// sort order
+		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "name";
+		$sort["order"]		= $allow_order[$sort["link"]];
+		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="desc") ?	"desc" : "asc";
+		
+		$data = $this->model->charactersList($page, $sort);
+		return $this->template->listCharacters($data, $sort);
 	}
 	
 	protected function tagsIndex(\Base $f3, $params, $feedback)
@@ -215,7 +326,7 @@ class AdminCP_Archive extends AdminCP
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="desc") ?	"desc" : "asc";
 		
 		$data = $this->model->tagsList($page, $sort);
-		$this->buffer ( \View\AdminCP::listTags($data, $sort) );
+		$this->buffer ( $this->template->listTags($data, $sort) );
 	}
 	
 	protected function tagsGroups(\Base $f3, $params)
@@ -267,7 +378,7 @@ class AdminCP_Archive extends AdminCP
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="desc") ?	"desc" : "asc";
 		
 		$data = $this->model->tagGroupsList($page, $sort);
-		$this->buffer ( \View\AdminCP::listTagGroups($data, $sort) );
+		$this->buffer ( $this->template->listTagGroups($data, $sort) );
 	}
 	
 	protected function categories(\Base $f3, $params)

@@ -10,12 +10,22 @@ class AdminCP extends Base {
 	{
 		$bind = NULL;
 		
-		if ( $key == "tags" )
+		if ( $key == "search" )
 		{
 			if(isset($data['tagname']))
 			{
 				$ajax_sql = "SELECT T.label as name,T.tid as id FROM `tbl_tags`T WHERE T.label LIKE :label LIMIT 10";
 				$bind = [ ":label" =>  "%{$data['tagname']}%" ];
+			}
+			elseif(isset($data['charname']))
+			{
+				$ajax_sql = "SELECT Ch.charname as name,Ch.charid as id FROM `tbl_characters`Ch WHERE Ch.charname LIKE :label LIMIT 10";
+				$bind = [ ":label" =>  "%{$data['charname']}%" ];
+			}
+			elseif(isset($data['contestname']))
+			{
+				$ajax_sql = "SELECT C.title as name,C.conid as id FROM `tbl_contests`C WHERE C.title LIKE :label LIMIT 10";
+				$bind = [ ":label" =>  "%{$data['contestname']}%" ];
 			}
 		}
 		elseif ( $key == "editMeta" )
@@ -32,7 +42,7 @@ class AdminCP extends Base {
 			}
 			elseif(isset($data['tag']))
 			{
-				$ajax_sql = "SELECT label as name, tid as id from `tbl_tags`T WHERE T.label LIKE :tag ORDER BY T.label ASC LIMIT 5";
+				$ajax_sql = "SELECT label as name, tid as id from `tbl_tags`T WHERE T.label LIKE :tag ORDER BY T.label ASC LIMIT 10";
 				$bind = [ ":tag" =>  "%{$data['tag']}%" ];
 			}
 			elseif(isset($data['character']))
@@ -231,30 +241,33 @@ class AdminCP extends Base {
 		}
 
 		$data = $this->exec($sql, [":selected"=> $selected]);
-
+		
 		foreach ( $data as $item )
 		{
-			/*
-			if ( $item['link']==$selected."/".\Base::instance()->get('PARAMS.module') )
+			if( empty($item['evaluate']) OR 1 == eval("return \$this->config{$item['evaluate']};") )
 			{
-				if ( $item['link'] == "home/logs" )
+				/*
+				if ( $item['link']==$selected."/".\Base::instance()->get('PARAMS.module') )
 				{
-					$menuCount = $this->logGetCount();
-					foreach( $menuCount as $sub => $data )
-						$a["home/logs/".$sub] =  [ "label" => "Logs_{$sub}", "icon" => "", "requires" => $item["requires"] ];
+					if ( $item['link'] == "home/logs" )
+					{
+						$menuCount = $this->logGetCount();
+						foreach( $menuCount as $sub => $data )
+							$a["home/logs/".$sub] =  [ "label" => "Logs_{$sub}", "icon" => "", "requires" => $item["requires"] ];
+					}
+					//$item = "";
 				}
-				//$item = "";
+				else $a = NULL;
+				*/
+				
+				if ( isset($menu[$item['child_of']]) )
+	//			{
+					$menu[$item['child_of']]['sub'][$item["link"]] = [ "label" => $item["label"], "icon" => $item["icon"], "requires" => $item["requires"] ];
+	//				if ( $a ) $menu[$item['child_of']]['sub'] += $a ;
+	//			}
+				else $menu[$item["link"]] = [ "label" => $item["label"], "icon" => $item["icon"], "requires" => $item["requires"] ];
+				$this->access[$item['link']] = $item["requires"];
 			}
-			else $a = NULL;
-			*/
-			
-			if ( isset($menu[$item['child_of']]) )
-//			{
-				$menu[$item['child_of']]['sub'][$item["link"]] = [ "label" => $item["label"], "icon" => $item["icon"], "requires" => $item["requires"] ];
-//				if ( $a ) $menu[$item['child_of']]['sub'] += $a ;
-//			}
-			else $menu[$item["link"]] = [ "label" => $item["label"], "icon" => $item["icon"], "requires" => $item["requires"] ];
-			$this->access[$item['link']] = $item["requires"];
 		}
 
 		/**
@@ -366,6 +379,7 @@ class AdminCP extends Base {
 		return NULL;
 	}
 	
+//	public function addTag(string $name) : int
 	public function addTag($name)
 	{
 		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'tags');
@@ -417,7 +431,7 @@ class AdminCP extends Base {
 	{
 		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'tags');
 		$tag->load(array('tid=?',$tid));
-		$tag->erase();
+		$_SESSION['lastAction'] = [ "deleteResult" => $tag->erase() ];
 	}
 
 //	public function deleteTagGroup(int $tgid)
@@ -426,11 +440,12 @@ class AdminCP extends Base {
 		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'tags');
 		if($tag->count(array('tgid=?',$tgid)))
 		{
+			$_SESSION['lastAction'] = [ "deleteResult" => 0 ];
 			return FALSE;
 		}
 		$taggroup=new \DB\SQL\Mapper($this->db, $this->prefix.'tag_groups');
 		$taggroup->load(array('tgid=?',$tgid));
-		$taggroup->erase();
+		$_SESSION['lastAction'] = [ "deleteResult" => $taggroup->erase() ];
 		return TRUE;
 	}
 
@@ -440,6 +455,230 @@ class AdminCP extends Base {
 		return $this->exec($sql);
 	}
 	
+	public function charactersList($page, $sort)
+	{
+		/*
+		$tags = new \DB\SQL\Mapper($this->db, $this->prefix.'characters' );
+		$data = $tags->paginate($page, 10, NULL, [ 'order' => "{$sort['order']} {$sort['direction']}", ] );
+		*/
+		$limit = 20;
+		$pos = $page - 1;
+
+		$sql = "SELECT SQL_CALC_FOUND_ROWS Ch.charid, Ch.charname, Ch.count, Cat.category
+				FROM `tbl_characters`Ch 
+				LEFT JOIN `tbl_categories`Cat ON ( Ch.catid=Cat.cid )
+				ORDER BY {$sort['order']} {$sort['direction']}
+				LIMIT ".(max(0,$pos*$limit)).",".$limit;
+
+		$data = $this->exec($sql);
+				
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/adminCP/archive/characters/order={$sort['link']},{$sort['direction']}",
+			$limit
+		);
+				
+		return $data;
+	}
+	
+//	public function loadCharacter(int $tid)
+	public function loadCharacter($charid)
+	{
+		$sql = "SELECT Ch.charid as id, Ch.charname, Ch.biography, Ch.count, Cat.cid, Cat.category 
+					FROM `tbl_characters`Ch
+					LEFT JOIN `tbl_categories`Cat ON ( Ch.catid=Cat.cid )
+					WHERE Ch.charid = :charid";
+		$data = $this->exec($sql, [":charid" => $charid ]);
+		if (sizeof($data)==1) return $data[0];
+		return NULL;
+	}
+	
+	public function getCategories()
+	{
+		$sql = "SELECT Cat.cid as id, Cat.category FROM `tbl_categories`Cat ORDER BY Cat.category ASC;";
+		return $this->exec($sql);
+	}
+
+//	public function addTag(string $name) : int
+	public function addCharacter($name)
+	{
+		$character=new \DB\SQL\Mapper($this->db, $this->prefix.'characters');
+		$character->charname = $name;
+		$character->save();
+		return $character->get('_id');
+	}
+	
+//	public function saveCharacter(int $charid, array $data)
+	public function saveCharacter($charid, array $data)
+	{
+		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'characters');
+		$tag->load(array('charid=?',$charid));
+		$tag->copyfrom( [ "catid" => $data['catid'], "charname" => $data['charname'], "biography" => $data['biography'] ]);
+
+		//if ( TRUE === $i = $tag->changed("tgid") ) $this->tagGroupRecount();
+		$i = $tag->changed("catid");
+		$i += $tag->changed("charname");
+		$i += $tag->changed("biography");
+
+		$tag->save();
+		return $i;
+	}
+
+//	public function deleteCharacter(int $tid)
+	public function deleteCharacter($charid)
+	{
+		$character=new \DB\SQL\Mapper($this->db, $this->prefix.'characters');
+		$character->load(array('charid=? and count=0',$charid));
+		
+		$_SESSION['lastAction'] = [ "deleteResult" => $character->erase() ];
+	}
+	
+//	public function contestsList(int $page, array $sort) : array
+	public function contestsList($page, array $sort)
+	{
+		$limit = 20;
+		$pos = $page - 1;
+
+		$sql = "SELECT SQL_CALC_FOUND_ROWS
+					C.conid, C.title, 
+					UNIX_TIMESTAMP(C.date_open) as date_open, UNIX_TIMESTAMP(C.date_close) as date_close, UNIX_TIMESTAMP(C.vote_closed) as vote_closed, 
+					C.cache_tags, C.cache_characters, 
+					U.nickname, COUNT(R.lid) as count
+				FROM `tbl_contests`C
+					LEFT JOIN `tbl_users`U ON ( C.uid = U.uid )
+					LEFT JOIN `tbl_contest_relations`R ON ( C.conid = R.conid AND R.type='ST' )
+				GROUP BY C.conid
+				ORDER BY {$sort['order']} {$sort['direction']}
+				LIMIT ".(max(0,$pos*$limit)).",".$limit;
+
+		$data = $this->exec($sql);
+				
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/adminCP/archive/contests",
+			$limit
+		);
+
+		return $data;
+		
+	}
+
+//	public function contestLoad(int $tid)
+	public function contestLoad($conid)
+	{
+		$sql = "SELECT C.conid as id, C.title, C.summary, C.concealed, C.date_open, C.date_close,
+					GROUP_CONCAT(S.sid,',',S.title SEPARATOR '||') as story_list,
+					GROUP_CONCAT(T.tid,',',T.label SEPARATOR '||') as tag_list,
+					GROUP_CONCAT(Ch.charid,',',Ch.charname SEPARATOR '||') as character_list, 
+					GROUP_CONCAT(Cat.cid,',',Cat.category SEPARATOR '||') as category_list, 
+					U.uid, U.nickname
+					FROM `tbl_contests`C
+					LEFT JOIN `tbl_users`U ON ( C.uid=U.uid )
+					LEFT JOIN `tbl_contest_relations`RelC ON ( C.conid=RelC.conid )
+						LEFT JOIN `tbl_stories`S ON ( RelC.relid = S.sid AND RelC.type='ST' )
+						LEFT JOIN `tbl_tags`T ON ( RelC.relid = T.tid AND RelC.type='T' )
+						LEFT JOIN `tbl_characters`Ch ON ( RelC.relid = Ch.charid AND RelC.type='CH' )
+						LEFT JOIN `tbl_categories`Cat ON ( RelC.relid = Cat.cid AND RelC.type='CA' )
+					WHERE C.conid = :conid";
+		$data = $this->exec($sql, [":conid" => $conid ]);
+		if (sizeof($data)==1) 
+		{
+			$data[0]['date_open'] = ($data[0]['date_open']>0)
+				? $this->timeToUser($data[0]['date_open'],  $this->config['date_format_short'])
+				: "";
+			$data[0]['date_close'] = ($data[0]['date_close']>0)
+				? $this->timeToUser($data[0]['date_close'], $this->config['date_format_short'])
+				: "";
+
+			$data[0]['story_list']		 = parent::cleanResult($data[0]['story_list']);
+			$data[0]['pre']['tag']		 = $this->jsonPrepop($data[0]['tag_list']);
+			$data[0]['pre']['character'] = $this->jsonPrepop($data[0]['character_list']);
+			$data[0]['pre']['category']	 = $this->jsonPrepop($data[0]['category_list']);
+			return $data[0];
+		}
+		return NULL;
+	}
+	
+	public function contestSave($conid, array $data)
+	{
+		if( empty($data['title']) )
+		{
+			\Base::instance()->set('form_error', "__EmptyLabel");
+			return FALSE;
+		}
+		$contest=new \DB\SQL\Mapper($this->db, $this->prefix.'contests');
+		if ( $data['date_close'] < $data['date_open'] ) $data['date_close'] = $data['date_open'];
+
+		$contest->load(array('conid=?',$conid));
+		$contest->copyfrom( 
+			[
+				"title"			=> $data['title'],
+				"concealed"		=> isset($data['concealed']) ? 1 : 0,
+				"summary"		=> $data['summary'],
+				"date_open"		=> \DateTime::createFromFormat($this->config['date_format_short'], $data['date_open'])->format('Y-m-d')." 00:00:00",
+				"date_close"	=> \DateTime::createFromFormat($this->config['date_format_short'], $data['date_close'])->format('Y-m-d')." 00:00:00",
+			]
+		);
+
+		$i  = $contest->changed("title");
+		$i += $contest->changed("concealed");
+		$i += $contest->changed("summary");
+		$i += $contest->changed("date_open");
+		$i += $contest->changed("date_close");
+		
+		$contest->save();
+		
+		// update relation table
+		$this->contestRelation( $conid, $data['tag'], "T" );
+		$this->contestRelation( $conid, $data['character'], "CH" );
+		$this->contestRelation( $conid, $data['category'], "CA" );
+
+		$this->rebuildContestCache($contest->conid);
+
+		return $i;
+	}
+	
+	private function contestRelation( $conid, $data, $type )
+	{
+		// Check tags:
+		$data = explode(",",$data);
+		$relations = new \DB\SQL\Mapper($this->db, $this->prefix.'contest_relations');
+
+		foreach ( $relations->find(array('`conid` = ? AND `type` = ?',$conid,$type)) as $X )
+		{
+			$temp=array_search($X['relid'], $data);
+			if ( $temp===FALSE )
+			{
+				// Excess relation, drop from table
+				$relations->erase(['lid=?',$X['lid']]);
+			}
+			else unset($data[$temp]);
+		}
+		
+		// Insert any tag IDs not already present
+		if ( sizeof($data)>0 )
+		{
+			foreach ( $data as $temp)
+			{
+				// Add relation to table
+				$relations->reset();
+				$relations->conid = $conid;
+				$relations->relid = $temp;
+				$relations->type = $type;
+				$relations->save();
+			}
+		}
+		unset($relations);
+	}
+
+	public function jsonPrepop($rawData)
+	{
+		if ( $rawData == NULL ) return "[]";
+		foreach ( parent::cleanResult($rawData) as $tmp )
+			$data[] = [ "id" => $tmp[0], "name" => $tmp[1] ];
+		return json_encode( $data );	
+	}
+
 	public function categoriesListFlat()
 	{
 		$sql = "SELECT 
@@ -768,8 +1007,7 @@ class AdminCP extends Base {
 		if (sizeof($data)!=1) 
 			return NULL;
 
-		$data[0]['date_format_short'] = $this->config['date_format_short'];
-		$data[0]['datetime'] = $this->timeToUser($data[0]['datetime'], $data[0]['date_format_short']." H:i");
+		$data[0]['datetime'] = $this->timeToUser($data[0]['datetime'], $this->config['date_format_long']);
 
 		return $data[0];
 	}
@@ -952,17 +1190,9 @@ class AdminCP extends Base {
 	
 	public function storyEditPrePop(array $storyData)
 	{
-		$categories = json_decode($storyData['cache_categories'],TRUE);
-		foreach ( $categories as $tmp ) $pre['cat'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
-		$pre['cat'] = json_encode($pre['cat']);
-
-		$tags = json_decode($storyData['cache_tags'],TRUE);
-		foreach ( $tags['simple'] as $tmp ) $pre['tag'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
-		$pre['tag'] = json_encode($pre['tag']);
-
-		$characters = json_decode($storyData['cache_characters'],TRUE);
-		foreach ( $characters as $tmp ) $pre['char'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
-		$pre['char'] = json_encode($pre['char']);
+		$pre['cat']  = $this->storyJsonPrepare($storyData['cache_categories']);
+		$pre['tag']	 = $this->storyJsonPrepare($storyData['cache_tags']);
+		$pre['char'] = $this->storyJsonPrepare($storyData['cache_characters']);
 		
 		$authors = $this->exec ( "SELECT U.uid as id, U.nickname as name FROM `tbl_users`U INNER JOIN `tbl_stories_authors`Rel ON ( U.uid = Rel.aid AND Rel.sid = :sid AND Rel.type = 'M' );", [ ":sid" => $storyData['sid'] ]);
 		$pre['auth'] = json_encode($authors);
@@ -971,6 +1201,23 @@ class AdminCP extends Base {
 		$pre['coauth'] = json_encode($coauthors);
 
 		return $pre;
+	}
+	
+	protected function storyJsonPrepare( $data )
+	{
+		// if the array is empty, take the short way out.
+		if ( NULL === $data = json_decode($data,TRUE) )
+			return "[]";
+
+		// tags come in a more complex version, so we have to treat them a bit different
+		if ( isset($data['simple']) )
+			foreach ( $data['simple'] as $tmp ) $array[] = [ "id" => $tmp[0], "name" => $tmp[1] ];
+		// category or character
+		else
+			foreach ( $data as $tmp ) $array[] = [ "id" => $tmp[0], "name" => $tmp[1] ];
+		
+		// return a json encoded array for the prepopulation
+		return json_encode($array);
 	}
 	
 	public function loadChapterList($sid)
@@ -1090,67 +1337,12 @@ class AdminCP extends Base {
 		// Step two: check for changes in relation tables
 
 		// Check tags:
-		$post['tags'] = explode(",",$post['tags']);
-		$tags = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_tags');
-
-		foreach ( $tags->find(array('`sid` = ? AND `character` = ?',$current->sid,0)) as $X )
-		{
-			$temp=array_search($X['tid'], $post['tags']);
-			if ( $temp===FALSE )
-			{
-				// Excess relation, drop from table
-				$tags->erase(['lid=?',$X['lid']]);
-			}
-			else unset($post['tags'][$temp]);
-		}
-		
-		// Insert any tag IDs not already present
-		if ( sizeof($post['tags'])>0 )
-		{
-			foreach ( $post['tags'] as $temp)
-			{
-				// Add relation to table
-				$tags->reset();
-				$tags->sid = $current->sid;
-				$tags->tid = $temp;
-				$tags->character = 0;
-				$tags->save();
-			}
-		}
-		unset($tags);
-		
+		$this->storyRelationTag( $current->sid, $post['tags'] );
 		// Check Characters:
-		$post['characters'] = explode(",",$post['characters']);
-		$characters = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_tags');
-
-		foreach ( $characters->find(array('`sid` = ? AND `character` = ?',$current->sid,1)) as $X )
-		{
-			$temp=array_search($X['tid'], $post['characters']);
-			if ( $temp===FALSE )
-			{
-				// Excess relation, drop from table
-				$characters->erase(['lid=?',$X['lid']]);
-			}
-			else unset($post['characters'][$temp]);
-		}
-		
-		// Insert any character IDs not already present
-		if ( sizeof($post['characters'])>0 )
-		{
-			foreach ( $post['characters'] as $temp)
-			{
-				// Add relation to table
-				$characters->reset();
-				$characters->sid = $current->sid;
-				$characters->tid = $temp;
-				$characters->character = 1;
-				$characters->save();
-			}
-		}
-		unset($characters);
+		$this->storyRelationTag( $current->sid, $post['characters'], 1 );
 		
 		// Check Categories:
-		$post['category'] = explode(",",$post['category']);
+		$post['category'] = array_filter(explode(",",$post['category']));
 		$categories = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_categories');
 
 		foreach ( $categories->find(array('`sid` = ?',$current->sid)) as $X )
@@ -1179,74 +1371,85 @@ class AdminCP extends Base {
 		unset($categories);
 		
 		// Author and co-Author preparation:
-		$post['mainauthor'] = explode(",",$post['mainauthor']);		
-		$post['supauthor'] = explode(",",$post['supauthor']);
-		// remove co-authors, that are already in the author field
+		$post['mainauthor'] = array_filter(explode(",",$post['mainauthor']));
+		$post['supauthor'] = array_filter(explode(",",$post['supauthor']));
+		// remove co-authors that are already in the author field
 		$post['supauthor'] = array_diff($post['supauthor'], $post['mainauthor']);
 
 		// Check Authors:
-		$author = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors');
-
-		foreach ( $author->find(array('`sid` = ? AND `type` = ?',$current->sid,'M')) as $X )
-		{
-			$temp=array_search($X['aid'], $post['mainauthor']);
-			if ( $temp===FALSE )
-			{
-				// Excess relation, drop from table
-				$author->erase(['lid=?',$X['lid']]);
-			}
-			else unset($post['mainauthor'][$temp]);
-		}
-
-		// Insert any character IDs not already present
-		if ( sizeof($post['mainauthor'])>0 )
-		{
-			foreach ( $post['mainauthor'] as $temp)
-			{
-				// Add relation to table
-				$author->reset();
-				$author->sid = $current->sid;
-				$author->aid = $temp;
-				$author->type = 'M';
-				$author->save();
-			}
-		}
-		unset($author);
-		
+		$this->storyRelationAuthor( $current->sid, $post['mainauthor'] );
 		// Check co-Authors:
-		$coauthor = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors');
-
-		foreach ( $coauthor->find(array('`sid` = ? AND `type` = ?',$current->sid,'S')) as $X )
-		{
-			$temp=array_search($X['aid'], $post['supauthor']);
-			if ( $temp===FALSE )
-			{
-				// Excess relation, drop from table
-				$coauthor->erase(['lid=?',$X['lid']]);
-			}
-			else unset($post['supauthor'][$temp]);
-		}
-
-		// Insert any character IDs not already present
-		if ( sizeof($post['supauthor'])>0 )
-		{
-			foreach ( $post['supauthor'] as $temp)
-			{
-				// Add relation to table
-				$coauthor->reset();
-				$coauthor->sid = $current->sid;
-				$coauthor->aid = $temp;
-				$coauthor->type = 'S';
-				$coauthor->save();
-			}
-		}
-		unset($coauthor);
+		$this->storyRelationAuthor( $current->sid, $post['supauthor'], 'S' );
 		
 		$this->rebuildStoryCache($current->sid);
 		
 		return TRUE;
 	}
 	
+	protected function storyRelationTag( $sid, $data, $character = 0 )
+	{
+		// Check tags:
+		$data = explode(",",$data);
+		$relations = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_tags');
+
+		foreach ( $relations->find(array('`sid` = ? AND `character` = ?',$sid,$character)) as $X )
+		{
+			$temp=array_search($X['tid'], $data);
+			if ( $temp===FALSE )
+			{
+				// Excess relation, drop from table
+				$relations->erase(['lid=?',$X['lid']]);
+			}
+			else unset($data[$temp]);
+		}
+		
+		// Insert any tag IDs not already present
+		if ( sizeof($data)>0 )
+		{
+			foreach ( $data as $temp)
+			{
+				// Add relation to table
+				$relations->reset();
+				$relations->sid = $sid;
+				$relations->tid = $temp;
+				$relations->character = $character;
+				$relations->save();
+			}
+		}
+		unset($relations);
+	}
+	
+	protected function storyRelationAuthor( $sid, $data, $type = 'M' )
+	{
+		$author = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors');
+
+		foreach ( $author->find(array('`sid` = ? AND `type` = ?',$sid,$type)) as $X )
+		{
+			$temp=array_search($X['aid'], $data);
+			if ( $temp===FALSE )
+			{
+				// Excess relation, drop from table
+				$author->erase(['lid=?',$X['lid']]);
+			}
+			else unset($data[$temp]);
+		}
+
+		// Insert any character IDs not already present
+		if ( sizeof($data)>0 )
+		{
+			foreach ( $data as $temp)
+			{
+				// Add relation to table
+				$author->reset();
+				$author->sid = $sid;
+				$author->aid = $temp;
+				$author->type = $type;
+				$author->save();
+			}
+		}
+		unset($author);
+	}
+
 	//public function getPendingStories(int $page, array $sort)
 	public function getPendingStories($page, array $sort)
 	{

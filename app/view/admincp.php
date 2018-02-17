@@ -27,34 +27,98 @@ class AdminCP extends Base
 		return \Template::instance()->render('home/welcome.html');
 	}
 	
-	public static function listTags($data, $sort)
+	public function listTags($data, $sort)
 	{
 		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 
-		\Base::instance()->set('sort', $sort);
-		\Base::instance()->set('taglist', $data);
-		return \Template::instance()->render('archive/list_tags.html');
+		if( isset($_SESSION['deleteResult']) )
+		{
+			$this->f3->set('deleteResult',$_SESSION['deleteResult']);
+			unset($_SESSION['deleteResult']);
+		}
+
+		$this->f3->set('sort', $sort);
+		$this->f3->set('taglist', $data);
+		return $this->render('archive/list_tags.html');
 	}
 
-	public static function listTagGroups($data, $sort)
+	public function listTagGroups(array $data, array $sort)
 	{
 		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 
-		\Base::instance()->set('sort', $sort);
-		\Base::instance()->set('grouplist', $data);
-		return \Template::instance()->render('archive/list_tag_groups.html');
+		if( isset($_SESSION['lastAction']) )
+		{
+			$this->f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
+			unset($_SESSION['lastAction']);
+		}
+
+		$this->f3->set('sort', $sort);
+		$this->f3->set('grouplist', $data);
+		return $this->render('archive/list_tag_groups.html');
 	}
 	
-	public static function editTag($data)
+	public static function editTag(array $data)
 	{
 		\Base::instance()->set('data', $data);
 		return \Template::instance()->render('archive/edit_tag.html');
 	}
 
-	public static function editTagGroup($data)
+	public static function editTagGroup(array $data)
 	{
 		\Base::instance()->set('data', $data);
 		return \Template::instance()->render('archive/edit_tag_group.html');
+	}
+	
+	public function listCharacters(array $data, array $sort)
+	{
+		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+
+		if( isset($_SESSION['lastAction']) )
+		{
+			$this->f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
+			unset($_SESSION['lastAction']);
+		}
+
+		$this->f3->set('sort', $sort);
+		$this->f3->set('characterlist', $data);
+		return $this->render('archive/list_characters.html');
+	}
+
+//	public function editCharacter(array $data, str $returnpath)
+	public function editCharacter(array $data, $returnpath)
+	{
+		$this->f3->set('data', $data);
+		$this->f3->set('returnpath', $returnpath);
+
+		return $this->render('archive/edit_character.html');
+	}
+	
+	public function contestsList(array $data, array $sort)
+	{
+		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+
+		while ( list($key, $value) = each($data) )
+			$this->dataProcess($data[$key], $key);
+
+		$this->f3->set('sort', $sort);
+		$this->f3->set('contestlist', $data);
+
+		return \Template::instance()->render('archive/list_contests.html');
+	}
+	
+	public function contestEdit(array $data, $returnpath)
+	{
+		if(!isset($data['raw']))
+		{
+			\Registry::get('VIEW')->javascript( 'head', TRUE, "//cdn.tinymce.com/4/tinymce.min.js" );
+			\Registry::get('VIEW')->javascript( 'head', TRUE, "editor.js" );
+		}
+		\Registry::get('VIEW')->javascript( 'head', TRUE, "jquery.datetimepicker.js" );
+
+		$this->f3->set('data', $data);
+		$this->f3->set('returnpath', $returnpath);
+
+		return \Template::instance()->render('archive/edit_contest.html');
 	}
 
 	public static function listCategories($data, $feedback)

@@ -3,21 +3,21 @@
 	<check if="{{ @deleteResult===1 }}"><div class="gb-90 alert-box success">{{@LN__ElementDeleted}}</div></check>
 </check>
 
-<form method="post" action="{{@BASE}}/adminCP/archive/tags/edit">
+<form method="post" action="{{@BASE}}/adminCP/archive/characters">
 	<div class="grid-wrapper">
-		<div class="gb-30"><input class="text-input" type="text" name="newTag"></div>
-		<div class="gb-70"><input class="button" type="submit" value="__NewTag"></div>
+		<div class="gb-30"><input class="text-input" type="text" name="newCharacter"></div>
+		<div class="gb-70"><input class="button" type="submit" value="__NewCharacter"></div>
 	</div>
 </form>
-<form method="post" action="{{@BASE}}/adminCP/archive/tags/edit">
-	<fieldset><legend>__A_SearchTag:</legend>
+<form method="post" action="{{@BASE}}/adminCP/archive/characters">
+	<fieldset><legend>__A_SearchCharacter:</legend>
 	<table>
-	<tr><td><input type="text" id="tag-select" name="tid" />
+	<tr><td><input type="text" id="char-select" name="charid" />
         <script type="text/javascript">
         $(document).ready(function() {
-            $("#tag-select").tokenInput("{{$BASE}}/adminCP/ajax/archive/search",{
+            $("#char-select").tokenInput("{{$BASE}}/adminCP/ajax/archive/search",{
             	method: "post",
-            	queryParam: "tagname",
+            	queryParam: "charname",
             	hintText: "__A_StartTyping ...",
               noResultsText: "__A_NoMatches.",
             	tokenLimit: 1
@@ -35,7 +35,7 @@
 	<tr>
 		<th>&nbsp;</th>
 		<th>&nbsp;</th>
-		<th><a href="{{@BASE}}/adminCP/archive/tags/edit/order=id,
+		<th><a href="{{@BASE}}/adminCP/archive/characters/order=id,
 			<check if="{{ @sort['link']!='id' }}">
 				<true>desc">{ICON:sort}</true>
 				<false>
@@ -46,7 +46,7 @@
 				</false>
 			</check></a> __ID
 		</th>
-		<th><a href="{{@BASE}}/adminCP/archive/tags/edit/order=label,
+		<th><a href="{{@BASE}}/adminCP/archive/characters/order=name,
 			<check if="{{ @sort['link']!='label' }}">
 				<true>desc">{ICON:sort}</true>
 				<false>
@@ -57,7 +57,7 @@
 				</false>
 			</check></a> __Label
 		</th>
-		<th><a href="{{@BASE}}/adminCP/archive/tags/edit/order=group,
+		<th><a href="{{@BASE}}/adminCP/archive/characters/order=category,
 			<check if="{{ @sort['link']!='group' }}">
 				<true>desc">{ICON:sort}</true>
 				<false>
@@ -66,9 +66,9 @@
 						<false>asc">{ICON:sort-alpha-desc}</false>
 					</check>
 				</false>
-			</check></a> __TagGroup
+			</check></a> __Category
 		</th>
-		<th><a href="{{@BASE}}/adminCP/archive/tags/edit/order=count,
+		<th><a href="{{@BASE}}/adminCP/archive/characters/order=count,
 			<check if="{{ @sort['link']!='count' }}">
 				<true>desc">{ICON:sort}</true>
 				<false>
@@ -80,13 +80,22 @@
 			</check></a> __Count
 		</th>
 	</tr>
-	<repeat group="{{ @taglist }}" value="{{ @row }}">
+	<repeat group="{{ @characterlist }}" value="{{ @row }}">
 	<tr>
-		<td><a href="{{@BASE}}/adminCP/archive/tags/edit/id={{ @row['tid'] }}">{ICON:edit}</a></td>
-		<td><a href="{{@BASE}}/adminCP/archive/tags/edit/delete={{ @row['tid'] }}" class="deleteItem" title="#{{ @row['tid'] }}: {{ @row['label'] }}">{ICON:trash}</a></td>
-		<td>{{ @row['tid'] }}</td>
-		<td>{{ @row['label'] }}</td>
-		<td>{{ @row['group'] }}</td>
+		<td><a href="{{@BASE}}/adminCP/archive/characters/id={{ @row['charid'] }};returnpath=/adminCP/archive/characters/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
+		<td>
+			<check if="{{ @row['count']==0 }}">
+				<true>
+					<a href="{{@BASE}}/adminCP/archive/characters/delete={{ @row['charid'] }}" class="deleteItem" title="#{{ @row['charid'] }}: {{ @row['charname'] }}">{ICON:trash}</a>
+				</true>
+				<false>
+					{ICON:trash:{{@LN__CannotDeleteUsedElement}}}
+				</false>
+			</check>
+		</td>
+		<td>{{ @row['charid'] }}</td>
+		<td>{{ @row['charname'] }}</td>
+		<td>{{ @row['category'] }}</td>
 		<td>{{ @row['count'] }}</td>
 	</tr>
 	</repeat>

@@ -1,3 +1,8 @@
+<check if="{{ isset(@deleteResult) }}">
+	<check if="{{ @deleteResult===0 }}"><div class="gb-90 alert-box error">{{@LN__FailedDelete}}</div></check>
+	<check if="{{ @deleteResult===1 }}"><div class="gb-90 alert-box success">{{@LN__ElementDeleted}}</div></check>
+</check>
+
 <form method="post" action="{{@BASE}}/adminCP/archive/tags/groups">
 	<div class="grid-wrapper">
 		<div class="gb-30"><input class="text-input" type="text" name="newTagGroup"></div>
@@ -46,14 +51,16 @@
 	<repeat group="{{ @grouplist }}" value="{{ @row }}">
 	<tr>
 		<td><a href="{{@BASE}}/adminCP/archive/tags/groups/id={{ @row['tgid'] }}">{ICON:edit}</a></td>
+		<td>
 		<check if="{{ @row['count'] == 0 }}">
 			<true>
-				<td><a href="{{@BASE}}/adminCP/archive/tags/groups/delete={{ @row['tgid'] }}" class="deleteItem" title="#{{ @row['tgid'] }}: {{ @row['description'] }}">{ICON:trash}</a></td>
+				<a href="{{@BASE}}/adminCP/archive/tags/groups/delete={{ @row['tgid'] }}" class="deleteItem" title="#{{ @row['tgid'] }}: {{ @row['description'] }}">{ICON:trash}</a>
 			</true>
 			<false>
-				<td>{ICON:trash}</td>
+				{ICON:trash:{{@LN__CannotDeleteUsedElement}}}
 			</false>
 		</check>
+		</td>
 		<td>{{ @row['tgid'] }}</td>
 		<td>{{ @row['description'] }}</td>
 		<td>{{ @row['count'] }}</td>

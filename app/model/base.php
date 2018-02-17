@@ -442,7 +442,54 @@ class Base extends \Prefab {
 			],
 			['sid=?',$sid]
 		);
+	}
+	
+	public function rebuildContestCache($conid)
+	{
+		$sql = "SELECT SELECT_OUTER.conid,
+					GROUP_CONCAT(DISTINCT tid,',',tag,',',description,',',tgid ORDER BY `order`,tgid,tag ASC SEPARATOR '||') AS tagblock,
+					GROUP_CONCAT(DISTINCT charid,',',charname ORDER BY charname ASC SEPARATOR '||') AS characterblock,
+					GROUP_CONCAT(DISTINCT cid,',',category ORDER BY category ASC SEPARATOR '||' ) as categoryblock,
+					GROUP_CONCAT(DISTINCT sid,',',title ORDER BY title ASC SEPARATOR '||' ) as storyblock
+					FROM
+					(
+						SELECT C.conid, 
+								TG.description,TG.order,TG.tgid,T.label as tag,T.tid,
+								Cat.cid, Cat.category,
+								S.sid, S.title,
+								Ch.charid, Ch.charname
+							FROM `tbl_contests`C
+								LEFT JOIN `tbl_contest_relations`rC ON ( rC.conid = C.conid )
+									LEFT JOIN `tbl_tags`T ON ( T.tid = rC.relid AND rC.type = 'T' )
+										LEFT JOIN `tbl_tag_groups`TG ON ( TG.tgid = T.tgid )
+									LEFT JOIN `tbl_characters`Ch ON ( Ch.charid = rC.relid AND rC.type = 'CH' )
+									LEFT JOIN `tbl_categories`Cat ON ( rC.relid = Cat.cid AND rC.type = 'CA' )
+									LEFT JOIN `tbl_stories`S ON ( rC.relid = S.sid AND rC.type = 'ST' )
+							WHERE C.conid = :conid
+					)AS SELECT_OUTER
+				GROUP BY conid ORDER BY conid ASC";
+		
+		$item = $this->exec($sql, ['conid' => $conid] );
+		
+		if ( empty($item) ) return FALSE;
+		
+		$item = $item[0];
 
+		$tagblock['simple'] = $this->cleanResult($item['tagblock']);
+		if($tagblock['simple']!==NULL) foreach($tagblock['simple'] as $t)
+			$tagblock['structured'][$t[2]][] = [ $t[0], $t[1], $t[2], $t[3] ];
+
+		$this->update
+		(
+			'tbl_contests',
+			[
+				'cache_tags'		=> json_encode($tagblock),
+				'cache_characters'	=> json_encode($this->cleanResult($item['characterblock'])),
+				'cache_categories'	=> json_encode($this->cleanResult($item['categoryblock'])),
+				'cache_stories'		=> json_encode($this->cleanResult($item['storyblock'])),
+			],
+			['conid=?',$conid]
+		);
 	}
 
 	protected static function cleanResult($messy)

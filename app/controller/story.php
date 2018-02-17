@@ -226,14 +226,14 @@ class Story extends Base
 
 		$data = $this->model->intro();
 		
-		return \View\Story::viewList($data);
+		return $this->template->viewList($data);
 	}
 	
 	public function author($id)
 	{
 		list($info, $data) = $this->model->author($id);
 
-		$stories = \View\Story::viewList($data);
+		$stories = $this->template->viewList($data);
 		return [ $info[0], $stories];
 	}
 	
@@ -248,7 +248,7 @@ class Story extends Base
 			$day = isset($selection[2]) ? min($selection[2],date("t", mktime(0, 0, 0, $month, 1, $year))) : FALSE;
 			
 			$data = $this->model->updates($year, $month, $day);
-			return \View\Story::viewList($data);
+			return $this->template->viewList($data);
 		}
 		else return $this->intro($params);
 	}
@@ -540,8 +540,8 @@ class Story extends Base
 			//return $this->template->searchHead($searchData, $return, $searchForm)
 
 			// append the stories
-			$this->buffer ( \View\Story::viewList($data) );
-			//. \View\Story::viewList($data);
+			$this->buffer ( $this->template->viewList($data) );
+			//. $this->template->viewList($data);
 		}
 
 		else

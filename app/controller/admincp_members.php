@@ -102,8 +102,6 @@ class AdminCP_Members extends AdminCP
 			return "__failed";
 		
 		return $this->template->userEdit($memberdata, $params['returnpath']);
-		//return print_r($memberdata,1);
-		
 	}
 			
 	protected function editSearchForm(\Base $f3, $params)

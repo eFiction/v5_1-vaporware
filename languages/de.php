@@ -289,6 +289,7 @@ return array(
 	'AdminMenu_Future' => 'Zukünftige',
 	'AdminMenu_Current' => 'Aktuell',
 	'AdminMenu_Past' => 'Vergangenheit',
+//'AdminMenu_Contests'	=> 'Contests',
 'AdminMenu_Characters' => 'Charaktere',
 'AdminMenu_Tags' => 'Tags',
 	'AdminMenu_Edit' => 'Editieren',
@@ -301,6 +302,10 @@ return array(
 'ACP_Categories_Error_badID' => 'Kann die Kategorien nicht löschen, keine gültige ID gefunden!',
 
 // 'ACP_Tags'				=> 'Tags',
+'ACP_Character'			=> 'Charakter',
+//'ACP_Biography'			=> 'Biography',
+//'ACP_Contest'			=> 'Contest',
+'ACP_Category'			=> 'Kategorie',
 // 'ACP_TagName'			=> 'Tag name',
 // 'ACP_TagLabel'			=> 'Tag label',
 // 'ACP_TagDescription'	=> 'Tag description',
@@ -314,6 +319,9 @@ return array(
 'AdminMenu_Edit' => 'Editieren',
 'AdminMenu_Add' => 'Hinzufügen',
 
+'CannotDeleteUsedElement'	=> 'Kann ein Element, dass zur Zeit verwendet wird, nicht löschen.',
+'ElementDeleted'	=> 'Element gelöscht',
+'FailedDelete'		=> 'Element konnte nicht gelöscht werden',
 
 'Welcome' => 'Willkommen',
 'Shoutbox' => 'Shoutbox',
