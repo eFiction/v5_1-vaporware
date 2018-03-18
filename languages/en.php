@@ -285,11 +285,6 @@ return array(
 	'AdminMenu_Stories' => 'Stories',
 	'AdminMenu_Images' => 'Cover art',
 	'AdminMenu_Reviews' => 'Reviews',
-'AdminMenu_Featured' => 'Featured',
-	'AdminMenu_Future' => 'Future',
-	'AdminMenu_Current' => 'Current',
-	'AdminMenu_Past' => 'Past',
-'AdminMenu_Contests'	=> 'Contests',
 'AdminMenu_Characters' => 'Characters',
 'AdminMenu_Tags' => 'Tags',
 	'AdminMenu_Edit' => 'Edit',
@@ -313,6 +308,21 @@ return array(
 'ACP_TagGroupLabel'		=> 'Tag group label',
 'ACP_TagGroup'			=> 'Tag group',
 'ACP_TagGroups'			=> 'Tag groups',
+
+// Admin - Archive - Featured
+'AdminMenu_Featured' => 'Featured',
+	'AdminMenu_Future' => 'Future',
+	'AdminMenu_Current' => 'Current',
+	'AdminMenu_Past' => 'Past',
+'Feat_Current'			=> 'Currently featured',
+'Feat_Past'				=> 'Past feature',
+'Feat_Future'			=> 'Future feature (not active yet, merely a note)',
+'SelectedBy'			=> 'Selected by',
+
+// Admin - Archive - Contest
+'AdminMenu_Contests'	=> 'Contests',
+'ContestDescription'	=> 'Contest description',
+
 
 'AdminMenu_Stories' => 'Stories',
 'AdminMenu_Pending' => 'Pending',

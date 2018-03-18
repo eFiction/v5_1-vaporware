@@ -47,7 +47,7 @@
 			</check></a> __ID
 		</th>
 		<th><a href="{{@BASE}}/adminCP/archive/contests/order=name,
-			<check if="{{ @sort['link']!='label' }}">
+			<check if="{{ @sort['link']!='name' }}">
 				<true>desc">{ICON:sort}</true>
 				<false>
 					<check if="{{ @sort['direction']=='asc' }}">
@@ -58,7 +58,7 @@
 			</check></a> __Label
 		</th>
 		<th><a href="{{@BASE}}/adminCP/archive/contests/order=open,
-			<check if="{{ @sort['link']!='group' }}">
+			<check if="{{ @sort['link']!='open' }}">
 				<true>desc">{ICON:sort}</true>
 				<false>
 					<check if="{{ @sort['direction']=='asc' }}">
@@ -69,7 +69,7 @@
 			</check></a> __Open
 		</th>
 		<th><a href="{{@BASE}}/adminCP/archive/contests/order=close,
-			<check if="{{ @sort['link']!='count' }}">
+			<check if="{{ @sort['link']!='close' }}">
 				<true>desc">{ICON:sort}</true>
 				<false>
 					<check if="{{ @sort['direction']=='asc' }}">

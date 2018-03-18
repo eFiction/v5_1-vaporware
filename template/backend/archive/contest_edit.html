@@ -12,7 +12,8 @@
 		<div class="gb-20">{{@LN__Characters}}</div><div class="gb-80"><input type="text" id="character-select" name="form_data[character]" /></div>
 		<div class="gb-20">{{@LN__Tags}}</div><div class="gb-80"><input type="text" id="tag-select" name="form_data[tag]" /></div>
 		<div class="gb-20">{{@LN__Categories}}</div><div class="gb-80"><input type="text" id="category-select" name="form_data[category]" /></div>
-		<div class="gb-90">__ContestDescription:</div><div class="gb-10" align="right"><a href="{{@BASE}}/adminCP/archive/contests/id={{@data.id}}<check if="{{ !@data.raw }}">/raw=1</check>"><check if="{{ @data.raw }}"><true>__SwitchEditor</true><false>__SwitchRaw</false></check></a></div>
+		<div class="gb-20">__Entries</div><div class="gb-80"><a href="{{@BASE}}/adminCP/archive/contests/id={{ @data['id'] }}/entries;returnpath={{@returnpath}}">__edit</a></div>
+		<div class="gb-90">{{@LN__ContestDescription}}:</div><div class="gb-10" align="right"><a href="{{@BASE}}/adminCP/archive/contests/id={{@data.id}}<check if="{{ !@data.raw }}">/raw=1</check>"><check if="{{ @data.raw }}"><true>__SwitchEditor</true><false>__SwitchRaw</false></check></a></div>
 		<div class="gb-full"><textarea name="form_data[summary]" id="tinymce" rows="20" cols="80">{{ @data.summary }}</textarea><br /></div>
 		<div class="gb-40" align="right"><input type="submit"></div><div class="gb-60"><input type="reset"></div>
 	</div>

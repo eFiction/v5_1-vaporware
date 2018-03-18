@@ -100,10 +100,16 @@ class AdminCP extends Base
 		while ( list($key, $value) = each($data) )
 			$this->dataProcess($data[$key], $key);
 
+		if( isset($_SESSION['lastAction']) )
+		{
+			$this->f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
+			unset($_SESSION['lastAction']);
+		}
+
 		$this->f3->set('sort', $sort);
 		$this->f3->set('contestlist', $data);
 
-		return \Template::instance()->render('archive/list_contests.html');
+		return \Template::instance()->render('archive/contest_list.html');
 	}
 	
 	public function contestEdit(array $data, $returnpath)
@@ -118,7 +124,15 @@ class AdminCP extends Base
 		$this->f3->set('data', $data);
 		$this->f3->set('returnpath', $returnpath);
 
-		return \Template::instance()->render('archive/edit_contest.html');
+		return \Template::instance()->render('archive/contest_edit.html');
+	}
+
+	public function contestEntries(array $data, $returnpath)
+	{
+		$this->f3->set('data', $data);
+		$this->f3->set('returnpath', $returnpath);
+		
+		return \Template::instance()->render('archive/contest_entries.html');
 	}
 
 	public static function listCategories($data, $feedback)

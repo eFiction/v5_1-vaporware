@@ -567,7 +567,6 @@ class AdminCP extends Base {
 	public function contestLoad($conid)
 	{
 		$sql = "SELECT C.conid as id, C.title, C.summary, C.concealed, C.date_open, C.date_close,
-					GROUP_CONCAT(S.sid,',',S.title SEPARATOR '||') as story_list,
 					GROUP_CONCAT(T.tid,',',T.label SEPARATOR '||') as tag_list,
 					GROUP_CONCAT(Ch.charid,',',Ch.charname SEPARATOR '||') as character_list, 
 					GROUP_CONCAT(Cat.cid,',',Cat.category SEPARATOR '||') as category_list, 
@@ -575,11 +574,15 @@ class AdminCP extends Base {
 					FROM `tbl_contests`C
 					LEFT JOIN `tbl_users`U ON ( C.uid=U.uid )
 					LEFT JOIN `tbl_contest_relations`RelC ON ( C.conid=RelC.conid )
-						LEFT JOIN `tbl_stories`S ON ( RelC.relid = S.sid AND RelC.type='ST' )
 						LEFT JOIN `tbl_tags`T ON ( RelC.relid = T.tid AND RelC.type='T' )
 						LEFT JOIN `tbl_characters`Ch ON ( RelC.relid = Ch.charid AND RelC.type='CH' )
 						LEFT JOIN `tbl_categories`Cat ON ( RelC.relid = Cat.cid AND RelC.type='CA' )
 					WHERE C.conid = :conid";
+					/*
+					--GROUP_CONCAT(S.sid,',',S.title SEPARATOR '||') as story_list,
+					--LEFT JOIN `tbl_stories`S ON ( RelC.relid = S.sid AND RelC.type='ST' )
+					*/
+
 		$data = $this->exec($sql, [":conid" => $conid ]);
 		if (sizeof($data)==1) 
 		{
@@ -590,13 +593,37 @@ class AdminCP extends Base {
 				? $this->timeToUser($data[0]['date_close'], $this->config['date_format_short'])
 				: "";
 
-			$data[0]['story_list']		 = parent::cleanResult($data[0]['story_list']);
+			//$data[0]['story_list']		 = parent::cleanResult($data[0]['story_list']);
 			$data[0]['pre']['tag']		 = $this->jsonPrepop($data[0]['tag_list']);
 			$data[0]['pre']['character'] = $this->jsonPrepop($data[0]['character_list']);
 			$data[0]['pre']['category']	 = $this->jsonPrepop($data[0]['category_list']);
 			return $data[0];
 		}
 		return NULL;
+	}
+
+//	public function contestLoad(int $tid)
+	public function contestLoadEntries($conid)
+	{
+		$sql = "SELECT S.sid, S.title
+					FROM `tbl_contests`C
+						LEFT JOIN `tbl_contest_relations`RelC ON ( C.conid = RelC.conid )
+						INNER JOIN `tbl_stories`S ON ( S.sid = RelC.relid AND RelC.type='ST' )
+					WHERE C.conid = :conid";
+
+		$data = $this->exec($sql, [":conid" => $conid ]);
+		
+		return $data;
+	}
+	
+	public function contestAdd($name)
+	{
+		$contest=new \DB\SQL\Mapper($this->db, $this->prefix.'contests');
+		$contest->uid = $_SESSION['userID'];	// create under current user
+		$contest->title = $name;
+		$contest->concealed = 1;				// create hidden
+		$contest->save();
+		return $contest->get('_id');			// return new ID for edit form
 	}
 	
 	public function contestSave($conid, array $data)
@@ -615,8 +642,12 @@ class AdminCP extends Base {
 				"title"			=> $data['title'],
 				"concealed"		=> isset($data['concealed']) ? 1 : 0,
 				"summary"		=> $data['summary'],
-				"date_open"		=> \DateTime::createFromFormat($this->config['date_format_short'], $data['date_open'])->format('Y-m-d')." 00:00:00",
-				"date_close"	=> \DateTime::createFromFormat($this->config['date_format_short'], $data['date_close'])->format('Y-m-d')." 00:00:00",
+				"date_open"		=> empty($data['date_open']) ?
+										NULL :
+										\DateTime::createFromFormat($this->config['date_format_short'], $data['date_open'])->format('Y-m-d')." 00:00:00",
+				"date_close"	=> empty($data['date_close']) ?
+										NULL :
+										\DateTime::createFromFormat($this->config['date_format_short'], $data['date_close'])->format('Y-m-d')." 00:00:00",
 			]
 		);
 
@@ -646,8 +677,7 @@ class AdminCP extends Base {
 
 		foreach ( $relations->find(array('`conid` = ? AND `type` = ?',$conid,$type)) as $X )
 		{
-			$temp=array_search($X['relid'], $data);
-			if ( $temp===FALSE )
+			if ( FALSE === $temp = array_search($X['relid'], $data) )
 			{
 				// Excess relation, drop from table
 				$relations->erase(['lid=?',$X['lid']]);
@@ -658,17 +688,28 @@ class AdminCP extends Base {
 		// Insert any tag IDs not already present
 		if ( sizeof($data)>0 )
 		{
-			foreach ( $data as $temp)
+			foreach ( $data as $temp )
 			{
-				// Add relation to table
-				$relations->reset();
-				$relations->conid = $conid;
-				$relations->relid = $temp;
-				$relations->type = $type;
-				$relations->save();
+				if ( !empty($temp) )		// Fix adding empty entries
+				{
+					// Add relation to table
+					$relations->reset();
+					$relations->conid = $conid;
+					$relations->relid = $temp;
+					$relations->type = $type;
+					$relations->save();
+				}
 			}
 		}
 		unset($relations);
+	}
+
+//	public function contestDelete(int $conid)
+	public function contestDelete($conid)
+	{
+		$contest=new \DB\SQL\Mapper($this->db, $this->prefix.'contests');
+		$contest->load(array('conid=?',$conid));
+		$_SESSION['lastAction'] = [ "deleteResult" => $contest->erase() ];
 	}
 
 	public function jsonPrepop($rawData)
@@ -1076,15 +1117,15 @@ class AdminCP extends Base {
 
 		/*
 		active:
-		SELECT * FROM `tbl_stories_featured` WHERE status=1 OR ( start < NOW() AND end > NOW() )
+		SELECT * FROM `tbl_featured` WHERE status=1 OR ( start < NOW() AND end > NOW() )
 		*/
 		/*
 		past:
-		SELECT * FROM `tbl_stories_featured` WHERE status=2 OR end < NOW()
+		SELECT * FROM `tbl_featured` WHERE status=2 OR end < NOW()
 		*/
 		/*
 		future:
-		SELECT * FROM `tbl_stories_featured` WHERE start > NOW()
+		SELECT * FROM `tbl_featured` WHERE start > NOW()
 		*/
 
 		$limit = 20;
@@ -1146,7 +1187,7 @@ class AdminCP extends Base {
 	public function saveFeatured($sid, array $data)
 	{
 		$i = NULL;
-		$feature=new \DB\SQL\Mapper($this->db, $this->prefix.'stories_featured');
+		$feature=new \DB\SQL\Mapper($this->db, $this->prefix.'featured');
 		$feature->load(array('sid=?',$sid));
 		$feature->copyfrom( 
 			[ 

@@ -25,7 +25,7 @@
 	<tr>
 		<th>&nbsp;</th>
 		<th>&nbsp;</th>
-		<th><a href="{{@BASE}}/adminCP/archive/featured/{{@select}}/order=id,
+		<th><a href="{{@BASE}}/adminCP/archive/featured/select={{@select}}/order=id,
 			<check if="{{ @sort['link']!='id' }}">
 				<true>desc">{ICON:sort}</true>
 				<false>
@@ -34,10 +34,10 @@
 						<false>asc">{ICON:sort-numeric-desc}</false>
 					</check>
 				</false>
-			</check></a> __ID
+			</check></a> ID
 		</th>
-		<th><a href="{{@BASE}}/adminCP/archive/featured/{{@select}}/order=label,
-			<check if="{{ @sort['link']!='label' }}">
+		<th><a href="{{@BASE}}/adminCP/archive/featured/select={{@select}}/order=title,
+			<check if="{{ @sort['link']!='title' }}">
 				<true>desc">{ICON:sort}</true>
 				<false>
 					<check if="{{ @sort['direction']=='asc' }}">
@@ -45,9 +45,10 @@
 						<false>asc">{ICON:sort-alpha-desc}</false>
 					</check>
 				</false>
-			</check></a> __Label
+			</check></a> {{@LN__Title}}
 		</th>
-		<th><a href="{{@BASE}}/adminCP/archive/featured/{{@select}}/order=group,
+		{*
+		<th><a href="{{@BASE}}/adminCP/archive/featured/select={{@select}}/order=group,
 			<check if="{{ @sort['link']!='group' }}">
 				<true>desc">{ICON:sort}</true>
 				<false>
@@ -58,7 +59,7 @@
 				</false>
 			</check></a> __TagGroup
 		</th>
-		<th><a href="{{@BASE}}/adminCP/archive/featured/{{@select}}/order=count,
+		<th><a href="{{@BASE}}/adminCP/archive/featured/select={{@select}}/order=count,
 			<check if="{{ @sort['link']!='count' }}">
 				<true>desc">{ICON:sort}</true>
 				<false>
@@ -69,15 +70,18 @@
 				</false>
 			</check></a> __Count
 		</th>
+		*}
 	</tr>
 	<repeat group="{{ @featured }}" value="{{ @row }}">
 	<tr>
-		<td><a href="{{@BASE}}/adminCP/archive/featured/sid={{ @row['sid'] }}">{ICON:edit}</a></td>
+		<td><a href="{{@BASE}}/adminCP/archive/featured/sid={{ @row['sid'] }};returnpath=/adminCP/archive/contests/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
 		<td><a href="{{@BASE}}/adminCP/archive/featured/delete={{ @row['sid'] }}" class="deleteItem" title="#{{ @row['sid'] }}: {{ @row['title'] }}">{ICON:trash}</a></td>
 		<td>{{ @row['sid'] }}</td>
 		<td>{{ @row['title'] }}</td>
+		{*
 		<td>*</td>
 		<td>*</td>
+		*}
 	</tr>
 	</repeat>
 </table>

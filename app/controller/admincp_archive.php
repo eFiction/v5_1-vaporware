@@ -149,7 +149,7 @@ class AdminCP_Archive extends AdminCP
 
 		if ( isset($params['delete']) )
 		{
-			//$this->model->deleteCharacter( (int)$params['delete'] );
+			$this->model->contestDelete( (int)$params['delete'] );
 			$f3->reroute('/adminCP/archive/contests', false);
 		}
 		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
@@ -159,23 +159,41 @@ class AdminCP_Archive extends AdminCP
 				if ( FALSE === $changes = $this->model->contestSave($params['id'], $f3->get('POST.form_data') ) )
 					$errors = $f3->get('form_error');
 			}
+			elseif ( isset($_POST['entries_data']) )
+			{
+				//if ( FALSE === $changes = $this->model->contestSave($params['id'], $f3->get('POST.form_data') ) )
+				//	$errors = $f3->get('form_error');
+			}
 			elseif ( isset($_POST['newContest']) )
 			{
-				$newID = $this->model->contestAdd( $f3->get('POST.newContest') );
-				$f3->reroute('/adminCP/archive/contests/id='.$newID, false);
+				if ( NULL !== $newID = $this->model->contestAdd( $f3->get('POST.newContest') ) )
+					$f3->reroute('/adminCP/archive/contests/id='.$newID, false);
+				// Error handling
 			}
 			elseif ( isset($_POST['charid']) ) $params['id'] = $f3->get('POST.charid');
 		}
 
 		if( isset ($params['id']) )
 		{
+			// Load contest data
 			$data = $this->model->contestLoad($params['id']);
-			//$data['categories'] = $this->model->getCategories();
-			//$data['tags']
-			$data['raw'] = @$params['raw'];
-			$data['errors'] = @$errors;
-			$data['changes'] = @$changes;
-			return $this->template->contestEdit($data, @$params['returnpath']);
+
+			// Edit or add contest entries
+			if( isset($params['entries']) )
+			{
+				$data['stories'] = $this->model->contestLoadEntries($params['id']);
+				return $this->template->contestEntries($data, @$params['returnpath']);
+			}
+			// Edit contest data
+			else
+			{
+				//$data['categories'] = $this->model->getCategories();
+				//$data['tags']
+				$data['raw'] = @$params['raw'];
+				$data['errors'] = @$errors;
+				$data['changes'] = @$changes;
+				return $this->template->contestEdit($data, @$params['returnpath']);
+			}
 		}
 
 		// page will always be an integer > 0
@@ -187,6 +205,7 @@ class AdminCP_Archive extends AdminCP
 			"name"		=>	"title",
 			"open"		=>	"date_open",
 			"close"		=>	"date_close",
+			"count"		=>	"count",
 		);
 
 		// sort order
