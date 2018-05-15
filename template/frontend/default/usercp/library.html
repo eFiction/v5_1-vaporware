@@ -12,7 +12,7 @@
 						<false>desc">{ICON:sort-numeric-asc}</false>
 					</check>
 				</false>
-			</check></a> __StoryID
+			</check></a> {{@LN__Sort_ID}}
 		</th>
 		<th><a href="{{@BASE}}/userCP/library/{{@extra.sub}}/{{@extra.type}}/order=visibility,
 			<check if="{{ @sort['link']!='visibility' }}">
@@ -23,7 +23,7 @@
 						<false>desc">{ICON:sort-alpha-asc}</false>
 					</check>
 				</false>
-			</check></a> __Visibility
+			</check></a> {{@LN__Sort_Visibility}}
 		</th>
 		<th><a href="{{@BASE}}/userCP/library/{{@extra.sub}}/{{@extra.type}}/order=name,
 			<check if="{{ @sort['link']!='name' }}">
@@ -34,7 +34,7 @@
 						<false>desc">{ICON:sort-alpha-asc}</false>
 					</check>
 				</false>
-			</check></a> __Name/Title
+			</check></a> {{@LN__Sort_Name}}/{{@LN__Sort_Title}}
 		</th>
 		<th><a href="{{@BASE}}/userCP/library/{{@extra.sub}}/{{@extra.type}}/order=comments,
 			<check if="{{ @sort['link']!='comments' }}">
@@ -45,7 +45,7 @@
 						<false>desc">{ICON:sort-alpha-asc}</false>
 					</check>
 				</false>
-			</check></a> __Comment
+			</check></a> {{@LN__Sort_Comment}}
 		</th>
 	</tr>
 	<repeat group="{{ @libraryEntries }}" value="{{ @row }}">

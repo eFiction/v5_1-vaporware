@@ -12,8 +12,8 @@ $(document).ready(function() {
 	$("#story-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/search",{
 		method: "post",
 		queryParam: "storyID",
-		hintText: "__A_StartTyping ...",
-		noResultsText: "__A_NoMatches.",
+		hintText: "{{@LN__Token_StartTyping}}.",
+		noResultsText: "{{@LN__Token_NoMatches}}.",
 		tokenLimit: 1
 	});
 	$('#search').click(function(event) {

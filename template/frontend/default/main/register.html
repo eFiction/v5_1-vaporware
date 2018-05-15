@@ -14,8 +14,8 @@
 <h3>Moderation!</h3>
 		</case>
 		<case value="failed" break="TRUE">
-<h3>Registration failed!</h3>
-Sorry, can't complete registration at this point.
+<h3>{{ @LN__Reg_Failed }}</h3>
+{{ @LN__Reg_FailedSorry }}
 		</case>
 	</switch>
 </true>
@@ -26,30 +26,30 @@ Sorry, can't complete registration at this point.
 		<div class="grid-wrapper">
 				<div class="gb-full">{PAGE:tos}</div>
 				<check if="{{ isset(@error.accept) }}">
-					<div class="grid-wrapper"><div class="note alert-box error">{{ @LN__Registration_AcceptTOS_Error }}</div></div>
+					<div class="grid-wrapper"><div class="note alert-box error">{{ @LN__Reg_AcceptTOS_Error }}</div></div>
 				</check>
-				<div class="gb-full"><input class="field input" type="checkbox" name="form[accept]" <check if="{{ isset(@_POST.form.accept) }}">checked="checked" </check>/>  {{ @LN__Registration_AcceptTOS }}</div>
+				<div class="gb-full"><input class="field input" type="checkbox" name="form[accept]" <check if="{{ isset(@_POST.form.accept) }}">checked="checked" </check>/>  {{ @LN__Reg_AcceptTOS }}</div>
 			<check if="{{ isset(@error.login) }}">
 				<div class="grid-wrapper"><div class="note alert-box
-					<check if="{{ @error.login == 'missing' }}"> error">{{ @LN__Registration_UsernameEmpty }}</check>
-					<check if="{{ @error.login == 'taken' }}"> warning">{{ @LN__Registration_UsernameTaken }}</check>
-					<check if="{{ @error.login == 'member' }}"> info">{{ @LN__Registration_AlreadyMember }}</check>
+					<check if="{{ @error.login == 'missing' }}"> error">{{ @LN__Reg_UsernameEmpty }}</check>
+					<check if="{{ @error.login == 'taken' }}"> warning">{{ @LN__Reg_UsernameTaken }}</check>
+					<check if="{{ @error.login == 'member' }}"> info">{{ @LN__Reg_AlreadyMember }}</check>
 				</div></div>
 			</check>
 			<div class="gb-1qrt">{{@LN__Username}}</div><div class="gb-3qrt"><input class="half" type="text" name="form[login]" value="{{ @@data['login'] }}"></div>
 			<check if="{{ isset(@error.email) }}">
 				<div class="grid-wrapper"><div class="note alert-box
-					<check if="{{ @error.email == 'missing' }}"> error">{{ @LN__Registration_EmailEmpty }}</check>
-					<check if="{{ @error.email == 'taken' }}"> warning">{{ @LN__Registration_EmailTaken }}</check>
+					<check if="{{ @error.email == 'missing' }}"> error">{{ @LN__Reg_EmailEmpty }}</check>
+					<check if="{{ @error.email == 'taken' }}"> warning">{{ @LN__Reg_EmailTaken }}</check>
 				</div></div>
 			</check>
 			<div class="gb-1qrt">{{@LN__Email}}</div><div class="gb-3qrt"><input class="half" type="text" name="form[email]" value="{{ @@data['email'] }}"></div>
 			<check if="{{ isset(@error.password) }}">
 				<div class="grid-wrapper"><div class="note alert-box error">
-					<check if="{{ @error.password == 'missing' }}">{{ @LN__Registration_PasswordTwice }}!</check>
-					<check if="{{ @error.password == 'mismatch' }}">{{ @LN__Registration_PasswordMismatch }}</check>
+					<check if="{{ @error.password == 'missing' }}">{{ @LN__Reg_PasswordTwice }}!</check>
+					<check if="{{ @error.password == 'mismatch' }}">{{ @LN__Reg_PasswordMismatch }}</check>
 					<check if="{{ @error.password == 'criteria' }}">
-						{{ @LN__Registration_PasswordCriteria }}:<br/>
+						{{ @LN__Reg_PasswordCriteria }}:<br/>
 						- {{ \CONFIG::getPublic('reg_min_password') }} _characters<br/>
 						<check if="{{ 1 < \CONFIG::getPublic('reg_password_complexity') }}">
 							- {{ \CONFIG::getPublic('reg_password_complexity') }} _complex
@@ -58,7 +58,7 @@ Sorry, can't complete registration at this point.
 				</div></div>
 			</check>
 			<div class="gb-1qrt">{{@LN__Password}}</div><div class="gb-3qrt"><input class="half" type="password" name="form[password1]" value=""></div>
-			<div class="gb-1qrt">{{@LN__Registration_PasswordRepeat}}</div><div class="gb-3qrt"><input class="half" type="password" name="form[password2]" value=""></div>
+			<div class="gb-1qrt">{{@LN__Reg_PasswordRepeat}}</div><div class="gb-3qrt"><input class="half" type="password" name="form[password2]" value=""></div>
 			<div class="gb-1qrt"><div class="captchaBox">&nbsp;**cap**</div></div><div class="gb-3qrt"><input type="text" name="write[captcha]" class="half" placeholder="captcha" value=""></div>
 			<div class="gb-full"><input class="button" type="submit" value="__Register"></div>
 		</div>

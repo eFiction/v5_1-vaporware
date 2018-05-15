@@ -29,7 +29,7 @@ $(document).ready(function() {
     	queryParam: "namestring",
     	prePopulate: [{{@curator.self|raw}}],
 		hintText: "__A_StartTyping ...",
-		noResultsText: "__A_NoMatches.",
+		noResultsText: "{{@LN__Token_NoMatches}}.",
 		tokenLimit: 1
     });
 });

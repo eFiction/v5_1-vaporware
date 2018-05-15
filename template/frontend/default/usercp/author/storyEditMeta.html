@@ -81,7 +81,7 @@ $(document).ready(function() {
     $("#tag-select").tokenInput("{{$BASE}}/userCP/ajax/stories",{
     	method: "post",
     	queryParam: "tag",
-		hintText: "{{@LN__TokenInputHint}}",
+		hintText: "{{@LN__Token_InputHint}}",
     	preventDuplicates: true,
     	prePopulate: {{@prePop.tag | raw}}
     });

@@ -31,7 +31,7 @@
 						<false>desc">{ICON:sort-size-asc}</false>
 					</check>
 				</false>
-			</check></a> __Date
+			</check></a> {{@LN__Sort_Date}}
 		</th>
 		<th><a href="{{@BASE}}/userCP/feedback/{{@extra.sub.0}}/{{@extra.sub.1}}/{{@extra.type}}/order=title,
 			<check if="{{ @sort['link']!='title' }}">
@@ -42,7 +42,7 @@
 						<false>desc">{ICON:sort-alpha-asc}</false>
 					</check>
 				</false>
-			</check></a> __Title
+			</check></a> {{@LN__Sort_Title}}
 		</th>
 		<th><a href="{{@BASE}}/userCP/feedback/{{@extra.sub.0}}/{{@extra.sub.1}}/{{@extra.type}}/order=name,
 			<check if="{{ @sort['link']!='name' }}">
@@ -53,7 +53,7 @@
 						<false>desc">{ICON:sort-alpha-asc}</false>
 					</check>
 				</false>
-			</check></a> __Name
+			</check></a> {{@LN__Sort_Name}}
 		</th>
 		<th><a href="{{@BASE}}/userCP/feedback/{{@extra.sub.0}}/{{@extra.sub.1}}/{{@extra.type}}/order=text,
 			<check if="{{ @sort['link']!='text' }}">
@@ -64,7 +64,7 @@
 						<false>desc">{ICON:sort-alpha-asc}</false>
 					</check>
 				</false>
-			</check></a> __Text
+			</check></a> {{@LN__Sort_Text}}
 		</th>
 	</tr>
 	<repeat group="{{ @feedbackEntries }}" value="{{ @row }}">

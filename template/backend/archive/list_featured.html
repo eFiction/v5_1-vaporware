@@ -1,5 +1,5 @@
 <form method="post" action="{{@BASE}}/adminCP/archive/featured/add">
-	<fieldset><legend>__A_SearchStory:</legend>
+	<fieldset><legend>{{@LN__SearchStory}}:</legend>
 	<table>
 	<tr><td><input type="text" id="add-featured" name="sid" />
         <script type="text/javascript">
@@ -7,8 +7,8 @@
             $("#add-featured").tokenInput("{{$BASE}}/adminCP/ajax/archive/featured",{
             	method: "post",
             	queryParam: "storyID",
-				hintText: "__A_StartTyping ...",
-				noResultsText: "__A_NoMatches.",
+            	hintText: "{{@LN__Token_StartTyping}} ...",
+				noResultsText: "{{@LN__Token_NoMatches}}.",
 				tokenLimit: 1
             });
         });
@@ -34,7 +34,7 @@
 						<false>asc">{ICON:sort-numeric-desc}</false>
 					</check>
 				</false>
-			</check></a> ID
+			</check></a> {{@LN__Sort_ID}}
 		</th>
 		<th><a href="{{@BASE}}/adminCP/archive/featured/select={{@select}}/order=title,
 			<check if="{{ @sort['link']!='title' }}">
@@ -45,7 +45,7 @@
 						<false>asc">{ICON:sort-alpha-desc}</false>
 					</check>
 				</false>
-			</check></a> {{@LN__Title}}
+			</check></a> {{@LN__Sort_Title}}
 		</th>
 		{*
 		<th><a href="{{@BASE}}/adminCP/archive/featured/select={{@select}}/order=group,
@@ -57,7 +57,7 @@
 						<false>asc">{ICON:sort-alpha-desc}</false>
 					</check>
 				</false>
-			</check></a> __TagGroup
+			</check></a> {{@LN__Sort_TagGroup}}
 		</th>
 		<th><a href="{{@BASE}}/adminCP/archive/featured/select={{@select}}/order=count,
 			<check if="{{ @sort['link']!='count' }}">
@@ -68,7 +68,7 @@
 						<false>asc">{ICON:sort-numeric-desc}</false>
 					</check>
 				</false>
-			</check></a> __Count
+			</check></a> {{@LN__Sort_Count}}
 		</th>
 		*}
 	</tr>
@@ -87,5 +87,5 @@
 </table>
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
 </true><false>
-__NoEntries
+{{@LN__NoEntries}}
 </false></check>

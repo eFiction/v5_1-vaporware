@@ -10,7 +10,7 @@
 	</div>
 </form>
 <form method="post" action="{{@BASE}}/adminCP/archive/characters">
-	<fieldset><legend>__A_SearchCharacter:</legend>
+	<fieldset><legend>{{@LN__SearchCharacter}}:</legend>
 	<table>
 	<tr><td><input type="text" id="char-select" name="charid" />
         <script type="text/javascript">
@@ -18,8 +18,8 @@
             $("#char-select").tokenInput("{{$BASE}}/adminCP/ajax/archive/search",{
             	method: "post",
             	queryParam: "charname",
-            	hintText: "__A_StartTyping ...",
-              noResultsText: "__A_NoMatches.",
+            	hintText: "{{@LN__Token_StartTyping}} ...",
+				noResultsText: "{{@LN__Token_NoMatches}}.",
             	tokenLimit: 1
             });
         });
@@ -30,6 +30,7 @@
 	</table>
 	</fieldset>
 </form>
+<check if="{{ sizeof(@characterlist)>0 }}"><true>
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
 <table class="tbody" id="textblockForm">
 	<tr>
@@ -44,7 +45,7 @@
 						<false>asc">{ICON:sort-numeric-desc}</false>
 					</check>
 				</false>
-			</check></a> __ID
+			</check></a> {{@LN__Sort_ID}}
 		</th>
 		<th><a href="{{@BASE}}/adminCP/archive/characters/order=name,
 			<check if="{{ @sort['link']!='label' }}">
@@ -55,7 +56,7 @@
 						<false>asc">{ICON:sort-alpha-desc}</false>
 					</check>
 				</false>
-			</check></a> __Label
+			</check></a> {{@LN__Sort_Label}}
 		</th>
 		<th><a href="{{@BASE}}/adminCP/archive/characters/order=category,
 			<check if="{{ @sort['link']!='group' }}">
@@ -66,7 +67,7 @@
 						<false>asc">{ICON:sort-alpha-desc}</false>
 					</check>
 				</false>
-			</check></a> __Category
+			</check></a> {{@LN__Sort_Category}}
 		</th>
 		<th><a href="{{@BASE}}/adminCP/archive/characters/order=count,
 			<check if="{{ @sort['link']!='count' }}">
@@ -77,7 +78,7 @@
 						<false>asc">{ICON:sort-numeric-desc}</false>
 					</check>
 				</false>
-			</check></a> __Count
+			</check></a> {{@LN__Sort_Count}}
 		</th>
 	</tr>
 	<repeat group="{{ @characterlist }}" value="{{ @row }}">
@@ -100,3 +101,6 @@
 	</tr>
 	</repeat>
 </table>
+</true><false>
+{{@LN__NoEntries}}
+</false></check>

@@ -2,7 +2,7 @@
 <div class="alert-box info">
 {{@LN__ResetPWMail}}.<br/>
 <br/>
-<a href="{{ @BASE }}{{ @returnpath}}">__Click</a>
+<a href="{{ @BASE }}{{ @returnpath}}">{{@LN__ClickCont}}</a>
 	</div>
 </check>
 <check if ="{{ isset(@tokenform)}}">
@@ -23,17 +23,16 @@
 <check if ="{{ isset(@success)}}">
 	<div class="centermessage">
 Good!
-<a href="{{ @BASE }}{{ @returnpath}}">__Click</a>
+<a href="{{ @BASE }}{{ @returnpath}}">{{@LN__ClickCont}}</a>
 	</div>
 </check>
 <check if ="{{ isset(@changed)}}">
 <div class="centermessage">
-	Password has been changed!
-	<a href="{{ @BASE }}">__Click</a>
+	{{@LN__PWChanged}}!
+	<a href="{{ @BASE }}">{{@LN__ClickCont}}</a>
 </div>
 </check>
 <check if ="{{ isset(@loginform)}}">
-
 	<check if="{{ isset(@error) }}"><div class="gb-full"><div class="alert-box error">{{ ${'LN__'.@error} }}</div></div></check>
 	<check if="{{ isset(@login.info) }}"><div class="gb-full"><div class="alert-box info">{{@login.info}}</div></div></check>
 <div class="grid-wrapper">

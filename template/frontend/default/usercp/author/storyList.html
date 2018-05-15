@@ -25,7 +25,7 @@ __Nothing
 						<false>desc">{ICON:sort-numeric-asc}</false>
 					</check>
 				</false>
-			</check></a> __StoryID
+			</check></a> {{@LN__Sort_ID}}
 		</th>
 		<th><a href="{{@BASE}}/userCP/author/uid={{@author}}/{{@select}}/order=updated,
 			<check if="{{ @sort['link']!='updated' }}">
@@ -36,7 +36,7 @@ __Nothing
 						<false>desc">{ICON:sort-size-asc}</false>
 					</check>
 				</false>
-			</check></a> __Updated
+			</check></a> {{@LN__Sort_Updated}}
 		</th>
 		<th><a href="{{@BASE}}/userCP/author/uid={{@author}}/{{@select}}/order=svalidated,
 			<check if="{{ @sort['link']!='svalidated' }}">
@@ -69,7 +69,7 @@ __Nothing
 						<false>desc">{ICON:sort-alpha-asc}</false>
 					</check>
 				</false>
-			</check></a> {{@LN__Title}}
+			</check></a> {{@LN__Sort_Title}}
 		</th>
 	</tr>
 	<repeat group="{{ @storyEntries }}" value="{{ @row }}">

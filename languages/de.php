@@ -2,7 +2,7 @@
 @define('__transLocale', 'de_DE');
 
 return array(
-// Allgemeines
+// [1] Global -- General 20
 'UserCP'	=> 'User Panel',
 'AdminCP'	=> 'Admin Panel',
 'yes'		=>	'ja',
@@ -10,41 +10,26 @@ return array(
 'no'		=>	'nein',
 'No'		=>	'Nein',
 'Cancel'	=>	'Abbrechen',
-'Submit'	=>	'Absenden',
 'Return'	=>	'Zurück',
 'Date'		=>	'Datum',
 'Message'	=>	'Nachricht',
-'CaptchaMismatch'	=>	'Captcha stimmt nicht überein',
-'GuestURL'		=>	'Gäste dürfen keine URLs posten',
-'GuestNameEmpty' => 'Gäste müssen einen Namen angeben',
-'MessageEmpty'	=>	'Keine Nachricht eingegeben',
-'CommentEmpty'	=>	'Kein Kommentar eingegeben',
-'CannotSave'	=>	'Daten konnten nicht gespeichert werden, bitte erneut versuchen',
-'FormErrors'	=> '{0, plural,'.
-							'zero	{Keine Fehler},'.
-							'one	{Beim Verarbeiten des Formulars ist ein Fehler aufgetreten},'.
-							'other	{Beim Verarbeiten des Formulars sind Fehler aufgetreten} }',
-'UnknowError'	=> 'There was an unknown error',
-'MainAuthor'	=> 'Autor',
-'MainAuthors'	=> 'Autoren',
-'SupAuthor'		=> 'Nebenautor',
-'SupAuthors'	=> 'Nebenautoren',
-'TokenInputHint' => 'Suchwort eingeben',
-// 'StoryNotes'			=>
-'StoryNotesExplained'	=>	'Platz für Widmungen und Anmerkungen',
-// 'StorySummary'			=>
-// 'StorySummaryExplained'	=>
-// 'ChapterText'			=>
-// 'ChapterTextExplained' =>
+'UnknowError'	=> 'Ein unbekannter Fehler ist aufgetreten',
 'MaintenanceMode'		=> 'Archiv befindet sich in der Wartung',
-'Token_NoMatches'	=> 'Keine Treffer',
 'monthly'		=> 'monthly',
 'weekly'		=> 'weekly',
 'daily'			=> 'daily',
 'disabled'		=> 'disabled',
 'enabled'		=> 'enabled',
+'ClickCont'		=> 'Anklicken um fortzufahren',
+'Error'			=> 'Fehler',
+'Success'		=> 'Erfolg',
+'Search' 		=> 'Suche',
+'Reset'			=> 'Zurücksetzen',
+'Edit'			=> 'Bearbeiten',
+'Title' 		=>	'Titel',
+'Author' 		=>	'Autor',
 
-// Login
+// [2] Global -- Login related 20
 'Login'			=> 'Anmelden',
 'LoginName'		=> 'Anmeldename',
 'VisibleName'	=> 'Sichtbarer Name',
@@ -59,33 +44,113 @@ return array(
 'ResetPWMail'	=> 'Falls ein Benutzer mit diesem Namen oder dieser E-Mail Adresse existiert, wurde eine E-Mail mit weiteren Anweisungen verschickt.',
 'ChangePW'		=> 'Passwort ändern',
 'PWRecovery'	=> 'Passwort Wiederherstellung',
+'PWChanged'		=> 'Passwort wurde geändert',
 'Login_NoMatch'	=> 'Anmeldung nicht möglich, Benutzername oder Passwort ungültig!',
 'Login_NoData'	=> 'Anmeldung nicht möglich, keine Daten!',
+'oldPW'			=> 'altes Passwort',
+'newPW'			=> 'neues Passwort',
+'newPWrepeat'	=> 'neues Passwort wiederholen',
 
-// Registrierung
-'Registration'					=> 'Registrierung',
-'RegisterNow'					=> 'Jetzt registrieren',
-'Registration_AcceptTOS'		=> 'Ich akzeptiere die Nutzungsbedingungen!',
-'Registration_AcceptTOS_Error'	=> 'Du musst den Nutzungsbedingungen zustimmen.',
-'Registration_UsernameEmpty'	=> 'Benutzername fehlt!',
-'Registration_UsernameTaken'	=> 'Benutzername wird bereits verwendet.',
-'Registration_EmailEmpty'		=> 'E-Mail Adresse fehlt!',
-'Registration_EmailTaken'		=> 'E-Mail wird bereits verwendet.',
-'Registration_AlreadyMember'	=> 'Ein Benutzer mit diesen Daten existiert bereits.',
-'Registration_PasswordRepeat'	=> 'Passwort wiederholen',
-'Registration_PasswordTwice'	=> 'Passwort bitte zwei mal eingeben',
-'Registration_PasswordMismatch'	=> 'Die eingegebenen Passwörter stimmen nicht miteinander überein.',
-'Registration_PasswordCriteria'	=> 'Dein gewünschtes Passwort erfüllt nicht die Voraussetzungen.',
+// [3] Global -- Sort
+'Sort_Date'		=> 'Datum',
+'Sort_ID'		=> 'ID',
+'Sort_Title'	=> 'Titel',
+'Sort_Name'		=> 'Name',
+'Sort_Text'		=> 'Text',
+'Sort_Updated'	=> 'Aktualisiert',
+'Sort_Count'	=> 'Anzahl',
+'Sort_COpen'	=> 'Öffnet',
+'Sort_CClose'	=> 'Schließt',
+'Sort_Category' => 'Kategorie',
+//'Sort_TagGroup'	=> 'Tag group',
+'Sort_Visibility' => 'Visibility',
+'Sort_Comment'	=> 'Kommentar',
 
+// [4] Registrierung 15
+'Registration'			=> 'Registrierung',
+'RegisterNow'			=> 'Jetzt registrieren',
+'Reg_AcceptTOS'			=> 'Ich akzeptiere die Nutzungsbedingungen!',
+'Reg_AcceptTOS_Error'	=> 'Du musst den Nutzungsbedingungen zustimmen.',
+'Reg_UsernameEmpty'		=> 'Benutzername fehlt!',
+'Reg_UsernameTaken'		=> 'Benutzername wird bereits verwendet.',
+'Reg_EmailEmpty'		=> 'E-Mail Adresse fehlt!',
+'Reg_EmailTaken'		=> 'E-Mail wird bereits verwendet.',
+'Reg_AlreadyMember'		=> 'Ein Benutzer mit diesen Daten existiert bereits.',
+'Reg_PasswordRepeat'	=> 'Passwort wiederholen',
+'Reg_PasswordTwice'		=> 'Passwort bitte zwei mal eingeben',
+'Reg_PasswordMismatch'	=> 'Die eingegebenen Passwörter stimmen nicht miteinander überein.',
+'Reg_PasswordCriteria'	=> 'Dein gewünschtes Passwort erfüllt nicht die Voraussetzungen.',
+'Reg_Failed'			=> 'Registrierung fehlgeschlagen!',
+'Reg_FailedSorry'		=> 'Leider kann die Registrierung zu diesem Zeitpunkt nicht abgeschlossen werden',
 
-'Sort_Date'	=> 'Datum',
-'Sort_ID'	=> 'ID',
-
-
+// [5] Global -- System 5
 'CookieText'	=> 'Diese Website benutzt Cookies, um das Krümelmonster zu füttern.',
 'CookieInfo'	=> 'Mehr über die echten Gründe.',
 'CookieAccept'	=> 'Akzeptiert!',
+'Month_Calendar' => '{0,date,custom,%B %Y}',	// using php strftime
+'Weekday' => '{0,date,custom,%A}',
 
+// [6] Global -- Forms 8
+'CaptchaMismatch'	=>	'Captcha stimmt nicht überein',
+'GuestURL'		=>	'Gäste dürfen keine URLs posten',
+'GuestNameEmpty' => 'Gäste müssen einen Namen angeben',
+'MessageEmpty'	=>	'Keine Nachricht eingegeben',
+'CommentEmpty'	=>	'Kein Kommentar eingegeben',
+'CannotSave'	=>	'Daten konnten nicht gespeichert werden, bitte erneut versuchen',
+'FormErrors'	=> '{0, plural, zero {Keine Fehler}, one {Beim Verarbeiten des Formulars ist ein Fehler aufgetreten}, other	{Beim Verarbeiten des Formulars sind Fehler aufgetreten} }',
+'Submit'	=>	'Absenden',
+
+// [7] Global -- Search 1
+'NoEntries'			=> 'Keine Einträge',
+
+// [8] Global -- Archiv Stats'
+'Stats_Archive' => 'Archiv Statistiken',
+'Stats_Members' => 'Mitglieder',
+'Stats_Authors' => 'Autoren',
+'Stats_Stories' => 'Stories',
+'Stats_Chapters' => 'Kapitel',
+'Stats_Reviews' => 'Reviews',
+'Stats_Online' => 'Wer online ist',
+'Stats_Guests' => 'Gäste',
+'Stats_Users' => 'Mitglieder',
+'Stats_LatestMember' => 'Neuestes Mitglied',
+
+// [9] Story -- Search 19
+'AdvancedSearch'	=> 'Detaillierte Suche',
+'Token_InputHint'	=> 'Suchwort eingeben',
+'Token_NoMatches'	=> 'Keine Treffer',
+//'Token_StartTyping' => '',
+'SearchContest'		=> 'Contest suchen',
+'SearchCharacter'	=> 'Charakter suchen',
+'SearchStory'		=> 'Geschichte suchen',
+'SearchTag'			=> 'Tag suchen',
+'LibraryStories'	=> 'Nur Geschichten aus meiner Bibliothek anzeigen',
+'Search_FavBM'		=> 'Favoriten & Lesezeichen',
+'Search_Fav'		=> 'Favoriten',
+'Search_BM'			=> 'Lesezeichen',
+'StoryExtent'		=> 'Umfang der Geschichte',
+'Size_SingleChapter'=> 'Einzelnes Kapitel',
+'Size_MultiChapter'	=> 'Mehrere Kapitel',
+'Search_ShowAll'	=> 'Alle anzeigen',
+'SearchCompletedOnly'	=> 'Nur abgeschlossenen Geschichten anzeigen',
+'ShowSearchForm'	=> 'Suchmaske anzeigen',
+'HideSearchForm'	=> 'Suchmaske verbergen',
+
+// [10] Story -- Fields 10
+'MainAuthor'	=> 'Autor',
+'MainAuthors'	=> 'Autoren',
+'SupAuthor'		=> 'Nebenautor',
+'SupAuthors'	=> 'Nebenautoren',
+// 'StoryNotes'			=>
+'StoryNotesExplained'	=>	'Platz für Widmungen und Anmerkungen',
+// 'StorySummary'			=>
+// 'StorySummaryExplained'	=>
+// 'ChapterText'			=>
+// 'ChapterTextExplained' =>
+///DB
+
+
+// User panel - PM
 'PM_Inbox'				=> 'Posteingang',
 'PM_Outbox'				=> 'Postausgang',
 'PM_Write'				=> 'Verfassen',
@@ -109,10 +174,6 @@ return array(
 'PM_ReplyMessageHeader'	=> 'Am {0} schrieb {1}:',
 'PM_WritePM'			=> 'Nachricht verfassen',
 'PM_ReadPM'				=> 'Nachricht lesen',
-
-// using php strftime
-'Month_Calendar' => '{0,date,custom,%B %Y}',
-'Weekday' => '{0,date,custom,%A}',
 
 // User elements
 'UserField_Type1'	=> 'URL',			// _FIELDURL
@@ -148,33 +209,25 @@ return array(
 	'MSG_deleteRead'	=> 'Löschen nicht möglich, Nachricht wurde bereits gelesen.',
 	'MSG_deleteNotFound' => 'Löschen nicht möglich, Nachricht wurde nicht gefunden.',
 	'MSG_deleteNoAccess' => 'Du kannst auf diese Nachricht nicht zugreifen.',
-'UserMenu_Shoutbox'			=> '{0, plural,'. 'other {Shoutbox (#)} }', 
+'UserMenu_Shoutbox'			=> 'Shoutbox ({0})', 
 
 'UserMenu_Authoring' => 'Authoring',
-	'Authoring_Finished' => '{0, plural,'.
-		'other	{Abgeschlossen (#)}}',
-	'Authoring_Unfinished' => '{0, plural,'.
-		'other	{In Arbeit (#)}}',
-	'Authoring_Drafts' => '{0, plural,'.
-		'other	{Entwürfe (#)}}',
-'UserMenu_MyLibrary' => 'My Library',
-	'Library_Favourites' => '{0, plural,'.
-		'other	{Favoriten (#)}
-	}',
-	'AddFavourite'	=>	'Add favourite',
-	'Library_Bookmarks' => '{0, plural,'.
-		'other	{Lesezeichen (#)}
-	}',
-	'AddBookmark'	=> 'Add bookmark',
-	'Library_Recommendations' => '{0, plural,'.
-		'other	{Empfehlungen (#)}
-	}',
+	'Authoring_Finished'	=> 'Abgeschlossen ({0})',
+	'Authoring_Unfinished'	=> 'In Arbeit ({0})',
+	'Authoring_Drafts'		=> 'Entwürfe ({0})',
+'UserMenu_MyLibrary' => 'Beine Bibliothek',
+	'Library_Favourites'	=> 'Favoriten ({0})',
+	'AddFavourite'			=> 'Favorit hinzufügen',
+	'Library_Bookmarks'		=> 'Lesezeichen ({0})',
+	'AddBookmark'			=> 'Lesezeichen hinzufügen',
+	'Library_Recommendations' => 'Empfehlungen ({0})',
+
 'UserMenu_Feedback' => 'Feedback',
 'UserMenu_Reviews' => 'Bewertungen',
-	'UserMenu_ReviewsWritten'	=> '{0, plural,'. 'other {Bewertungen geschrieben (#)} }',
-	'UserMenu_ReviewsReceived'	=> '{0, plural,'. 'other {Bewertungen erhalten (#)} }', 
-	'UserMenu_CommentsWritten'	=> '{0, plural,'. 'other {Kommentare geschrieben (#)} }',
-	'UserMenu_CommentsReceived'	=> '{0, plural,'. 'other {Kommentare erhalten (#)} }', 
+	'UserMenu_ReviewsWritten'	=> 'Bewertungen geschrieben ({0})',
+	'UserMenu_ReviewsReceived'	=> 'Bewertungen erhalten ({0})',
+	'UserMenu_CommentsWritten'	=> 'Kommentare geschrieben ({0})',
+	'UserMenu_CommentsReceived'	=> 'Kommentare erhalten ({0})',
 'UserMenu_Settings' => 'Einstellungen',
 //	'UserMenu_Preferences' => 'Preferences',
 
@@ -194,7 +247,7 @@ return array(
 //	'UCP_Pref_Age'		=> '***Age consent***',
 //	'UCP_Pref_hideTags'	=> '***Hide Tags***',
 
-'UserMenu_AddStory' => 'Hinzufügen',
+'UserMenu_AddStory' => 'Geschichte hinzufügen',
 'StoryTitle'	=>	'Titel der Geschichte',
 'ChapterTitle'	=>	'Titel des Kapitels',
 'ChapterText'	=>	'Text des Kapitels',
@@ -229,6 +282,21 @@ return array(
 'UserMenu_Curator' => 'Betreuer',
 'UCP_ExplainMainAuthor'	=> 'Alle (Haupt)Autoren können die Geschichte bearbeiten',
 'UCP_ExplainSupAuthor'	=> 'Nebenautoren werden in der Geschichte aufgeführt, können sie aber nicht bearbeiten',
+
+'FB_Stats'					=> 'Feedback Statistik',
+'FB_ReviewRatio'			=> 'Review-Quote',
+'FB_ReviewsPerStory' => '{0, plural,'.
+					'one	{Das ist eine Reviews je Geschichte},'.
+					'other	{Das sind # Reviews je Geschichte}
+					}',
+'FB_orReviewsPerChapter' => '{0, plural,'.
+					'one	{oder eine Review je Kapitel},'.
+					'other	{oder # Reviews je Kapitel}
+					}',
+'FB_ReviewsPerChapter' => '{0, plural,'.
+					'one	{Das ist eine Reviews je Kapitel},'.
+					'other	{Das sind # Reviews je Kapitel}
+					}',
 
 // AdminCP Home elements
 'AdminMenu_General' => 'Allgemeine Einstellungen',
@@ -285,11 +353,6 @@ return array(
 	'AdminMenu_Stories' => 'Geschichten',
 	'AdminMenu_Images' => 'Cover Grafik',
 	'AdminMenu_Reviews' => 'Reviews',
-'AdminMenu_Featured' => 'Featured',
-	'AdminMenu_Future' => 'Zukünftige',
-	'AdminMenu_Current' => 'Aktuell',
-	'AdminMenu_Past' => 'Vergangenheit',
-//'AdminMenu_Contests'	=> 'Contests',
 'AdminMenu_Characters' => 'Charaktere',
 'AdminMenu_Tags' => 'Tags',
 	'AdminMenu_Edit' => 'Editieren',
@@ -313,6 +376,20 @@ return array(
 // 'ACP_TagGroupLabel'		=> 'Tag group label',
 // 'ACP_TagGroup'			=> 'Tag group',
 // 'ACP_TagGroups'			=> 'Tag groups',
+
+// Admin - Archive - Featured
+'AdminMenu_Featured' => 'Featured',
+	'AdminMenu_Future' => 'Zukünftige',
+	'AdminMenu_Current' => 'Aktuell',
+	'AdminMenu_Past' => 'Vergangenheit',
+//'Feat_Current'			=> 'Currently featured',
+//'Feat_Past'				=> 'Past feature',
+//'Feat_Future'			=> 'Future feature (not active yet, merely a note)',
+//'SelectedBy'			=> 'Selected by',
+
+// Admin - Archive - Contest
+//'AdminMenu_Contests'	=> 'Contests',
+//'ContestDescription'	=> 'Contest description',
 
 'AdminMenu_Stories' => 'Stories',
 'AdminMenu_Pending' => 'Pending',
@@ -436,8 +513,6 @@ return array(
 	// 'CFG_logging'					=> 'Log actions',
 
 // Story view'
-'Title' =>	'Titel',
-'Author' =>	'Autor',
 'AuthorCounted' => '{0, plural,'.
 	'one	{Author},'.
 	'other	{Authors}
@@ -470,12 +545,14 @@ return array(
 	'one	{Externe Empfehlung},'.
 	'other	{Externe Empfehlungen} }',
 //'noRecommendedStory'	=> 'No recommended stories yet',
-'TitleReadReviews' => '{0, plural, other {Read reviews for \'#\'} }',
+'TitleReadReviews' => 'Reviews zu \'{0}\' lesen',
 
-'BookmarkAdd'		=> '{0, plural, other {\'#\' hat kein Lesezeichen, hier klicken um eines zu setzen.} }',
-'BookmarkRemove'		=> '{0, plural, other {\'#\' hat ein Lesezeichen, hier klicken um es zu entfernen.} }',
-'FavouriteAdd'		=> '{0, plural, other {\'#\' gehört nicht zu deinen Favoriten, hier klicken um sie hinzuzufügen.} }',
-'FavouriteRemove'	=> '{0, plural, other {\'#\' gehört zu den Favoriten. Hier klicken sie um zu entfernen.} }',
+'BookmarkAdd'		=> '\'{0}\' hat kein Lesezeichen, hier klicken um eines zu setzen.',
+'BookmarkRemove'	=> '\'{0}\' hat ein Lesezeichen, zum bearbeiten oder entfernen hier klicken.',
+'FavouriteAdd'		=> '\'{0}\' gehört nicht zu deinen Favoriten, hier klicken um sie hinzuzufügen.',
+'FavouriteRemove'	=> '\'{0}\' gehört zu den Favoriten. Zum bearbeiten oder entfernen hier klicken.',
+'Notification'	=> 'Benachrichtigung',
+'Visibility'	=> 'Sichtbarkeit',
 
 'TOC'	=> 'Inhaltsverzeichnis',
 'NoTags' => 'Keine Tags gesetzt',
@@ -489,9 +566,9 @@ return array(
 'Characters' => 'Charaktere',
 'Clicks' => 'Klicks',
 'Author_Notes' => 'Anmerkungen des Autors',
-'BrowseStories' => '{0, plural,'.
-	'one	{Eine Geschichte anzeigen},'.
-	'other	{# Geschichten durschstöbern}
+'BrowseStories' => '{0, plural,
+one	{Eine Geschichte anzeigen},
+other	{# Geschichten durschstöbern}
 }',
 
 'Review_Link' => '{0, plural,'.
@@ -505,16 +582,11 @@ return array(
 	'other	{# Reviews}
 }',
 
-'Search' => 'Suche',
-'Reset'			=> 'Zurücksetzen',
 //'SearchUsername'=> 'Search in usernames',
 //'SearchUserAll' => 'Search in all user fields',
 'Tagcloud' => 'Tagcloud',
 'noTagcloud' => 'No tag cloud',
-'Edit'		=> 'Bearbeiten',
 
-'ShowSearchForm'	=> 'Suchmaske anzeigen',
-'HideSearchForm'	=> 'Suchmaske verbergen',
 
 // Feedback
 'Feedback_Not_Logged_In' => 'Du musst angemeldet sein, um eine Review oder einen Kommentar zu verfassen.',
@@ -531,19 +603,8 @@ return array(
 'CommentsC' => '{0, plural,'.
 	'zero	{Noch keine Kommentare},'.
 	'one	{Ein Kommentar},'.
-'other	{# Kommentare} }',
+	'other	{# Kommentare} }',
 
-// Archiv Stats'
-'AS_ArchiveStats' => 'Archiv Statistiken',
-'AS_Members' => 'Mitglieder',
-'AS_Authors' => 'Autoren',
-'AS_Stories' => 'Stories',
-'AS_Chapters' => 'Kapitel',
-'AS_Reviews' => 'Reviews',
-'AS_Online' => 'Wer online ist',
-'AS_Guests' => 'Gäste',
-'AS_Users' => 'Mitglieder',
-'AS_LatestMember' => 'Neuestes Mitglied',
 
 'Status_Changes' => '{0, plural,'.
 	'zero	{Keine Änderungen.},'.

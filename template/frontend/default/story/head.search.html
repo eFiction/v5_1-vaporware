@@ -1,5 +1,5 @@
 <form method="post" action="{{@BASE}}/story/search/">
-	<fieldset><legend>Advanced Search</legend>
+	<fieldset><legend>{{@LN__AdvancedSearch}}</legend>
 	<div class="grid-wrapper">
 	<!-- row #1 -->
 		<div class="gb-half">{{@LN__Title}}<br /><input placeholder="" type="text" name="story_title" value="<check if="{{isset(@searchForm.story_title)}}">{{@searchForm.story_title}}</check>"></div>
@@ -14,21 +14,21 @@
 	<!-- misc -->	
 	<div class="grid-wrapper">
 	<div class="gb-half">
-		__SavedStories: <select class="search" name="saved">
+		{{@LN__LibraryStories}}: <select class="search" name="saved">
 			<option value="no">{{@LN__no}}</option>
-			<option value="both"<check if="{{isset(@searchForm.saved) AND @searchForm.saved=='both'}}"> selected="selected"</check>>Fav+BM</option>
-			<option value="fav"<check if="{{isset(@searchForm.saved) AND @searchForm.saved=='fav'}}"> selected="selected"</check>>Fav</option>
-			<option value="bm"<check if="{{isset(@searchForm.saved) AND @searchForm.saved=='bm'}}"> selected="selected"</check>>BM</option>
+			<option value="both"<check if="{{isset(@searchForm.saved) AND @searchForm.saved=='both'}}"> selected="selected"</check>>{{@LN__Search_FavBM}}</option>
+			<option value="fav"<check if="{{isset(@searchForm.saved) AND @searchForm.saved=='fav'}}"> selected="selected"</check>>{{@LN__Search_Fav}}</option>
+			<option value="bm"<check if="{{isset(@searchForm.saved) AND @searchForm.saved=='bm'}}"> selected="selected"</check>>{{@LN__Search_BM}}</option>
 		</select>
 	</div>
 	<div class="gb-half">
-		__StorySize: <select class="search" name="chapters">
-			<option value="single"<check if="{{isset(@searchForm.chapters) AND @searchForm.chapters=='single'}}"> selected="selected"</check>>__SingleChapter</option>
-			<option value="multi"<check if="{{isset(@searchForm.chapters) AND @searchForm.chapters=='multi'}}"> selected="selected"</check>>__MultiChapter</option>
-			<option value="both"<check if="{{(empty(@searchForm.chapters) OR @searchForm.chapters=='both')}}"> selected="selected"</check>>__AllChapter</option>
+		{{@LN__StoryExtent}}: <select class="search" name="chapters">
+			<option value="single"<check if="{{isset(@searchForm.chapters) AND @searchForm.chapters=='single'}}"> selected="selected"</check>>{{@LN__Size_SingleChapter}}</option>
+			<option value="multi"<check if="{{isset(@searchForm.chapters) AND @searchForm.chapters=='multi'}}"> selected="selected"</check>>{{@LN__Size_MultiChapter}}</option>
+			<option value="both"<check if="{{(empty(@searchForm.chapters) OR @searchForm.chapters=='both')}}"> selected="selected"</check>>{{@LN__Size_All}}</option>
 		</select>
 	</div>
-	<div class="gb-full">(*) {{@LN__Rating}} from <select class="search" name="rating[0]">
+	<div class="gb-full">{{@LN__Rating}} from <select class="search" name="rating[0]">
 		<repeat group="{{ @searchRatings }}" value="{{ @rating }}">
 			<option value="{{ @rating.rid }}" <check if="{{@rating.rid==@searchForm.rating.0}}">selected="selected" </check> >{{ @rating.rating }}</option>
 		</repeat>
@@ -38,7 +38,7 @@
 	</repeat>
 </select>
 </div>
-<div class="gb-full"><input type="checkbox" name="exclude_wip" <check if="{{isset(@searchForm.exclude_wip)}}">checked="checked"</check> value="1">__SearchCompletedOnly</div>
+<div class="gb-full"><input type="checkbox" name="exclude_wip" <check if="{{isset(@searchForm.exclude_wip)}}">checked="checked"</check> value="1">{{@LN__SearchCompletedOnly}}</div>
 <div class="gb-1qrt"><button class="button" type="submit">{{@LN__Search}}</button></div>
 <div class="gb-1qrt"><button class="button" type="reset">{{@LN__Reset}}</button></div>
 <div class="gb-1qrt"><check if="{{!empty(@searchLink)}}"><a href="{{@BASE}}/story/browse/{{@searchLink}}<check if="{{isset(@paginate.page)}}">/page={{@paginate.page}}</check>">{{@LN__HideSearchForm}}</a></check>&nbsp;</div>
@@ -52,6 +52,8 @@ $(document).ready(function() {
     	method: "post",
     	queryParam: "tag",
     	preventDuplicates: true,
+       	hintText: "{{@LN__Token_StartTyping}} ...",
+		noResultsText: "{{@LN__Token_NoMatches}}.",
     	prePopulate: {{@prepopulateData.tagIn|raw}}
     });
 });
@@ -60,6 +62,8 @@ $(document).ready(function() {
     $("#tagOut-select").tokenInput("{{@BASE}}/story/ajax/search",{
     	method: "post",
     	queryParam: "tag",
+       	hintText: "{{@LN__Token_StartTyping}} ...",
+		noResultsText: "{{@LN__Token_NoMatches}}.",
     	preventDuplicates: true,
     	prePopulate: {{@prepopulateData.tagOut|raw}}
     });
@@ -69,6 +73,8 @@ $(document).ready(function() {
     $("#characters-select").tokenInput("{{@BASE}}/story/ajax/search",{
     	method: "post",
     	queryParam: "characters",
+       	hintText: "{{@LN__Token_StartTyping}} ...",
+		noResultsText: "{{@LN__Token_NoMatches}}.",
 		resultsLimit: 10,
     	preventDuplicates: true,
     	prePopulate: {{@prepopulateData.characters|raw}}
@@ -79,6 +85,8 @@ $(document).ready(function() {
     $("#author-select").tokenInput("{{@BASE}}/story/ajax/search/",{
     	method: "post",
     	queryParam: "author",
+       	hintText: "{{@LN__Token_StartTyping}} ...",
+		noResultsText: "{{@LN__Token_NoMatches}}.",
     	tokenLimit: 1,
     	prePopulate: {{@prepopulateData.author|raw}}
     });
@@ -88,6 +96,8 @@ $(document).ready(function() {
     $("#category-select").tokenInput("{{@BASE}}/story/ajax/search/",{
     	method: "post",
     	queryParam: "category",
+       	hintText: "{{@LN__Token_StartTyping}} ...",
+		noResultsText: "{{@LN__Token_NoMatches}}.",
     	preventDuplicates: true,
     	prePopulate: {{@prepopulateData.category|raw}}
     });

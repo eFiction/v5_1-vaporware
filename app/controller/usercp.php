@@ -536,7 +536,7 @@ class UserCP extends Base
 	
 	private function libraryBookFav(\Base $f3, $params)
 	{
-		print_r($this->counter);
+		//print_r($this->counter);
 		// Build upper micro-menu
 		$counter = $this->counter[$params[0]]['details'];
 

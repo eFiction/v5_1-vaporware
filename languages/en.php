@@ -2,7 +2,7 @@
 @define('__transLocale', 'en_GB');
 
 return array(
-// General stuff
+// [1] Global -- General 20
 'UserCP'	=> 'User Panel',
 'AdminCP'	=> 'Admin Panel',
 'yes'		=>	'yes',
@@ -10,41 +10,26 @@ return array(
 'no'		=>	'no',
 'No'		=>	'No',
 'Cancel'	=>	'Cancel',
-'Submit'	=>	'Submit',
 'Return'	=>	'Return',
 'Date'		=>	'Date',
 'Message'	=>	'Message',
-'CaptchaMismatch'	=>	'Captcha did not match',
-'GuestURL'		=>	'Guests are not allowed to post URLs',
-'GuestNameEmpty' => 'Name field cannot be empty',
-'MessageEmpty'	=>	'No message entered',
-'CommentEmpty'	=>	'No comment entered',
-'CannotSave'	=>	'Could not save the data, please try again',
-'FormErrors'	=> '{0, plural,'.
-							'zero	{No errors},'.
-							'one	{There was an error while processing this form},'.
-							'other	{There were errors while processing this form} }',
 'UnknowError'	=> 'There was an unknown error',
-'MainAuthor'	=> 'Main author',
-'MainAuthors'	=> 'Main authors',
-'SupAuthor'		=> 'Supporting author',
-'SupAuthors'	=> 'Supporting authors',
-'TokenInputHint' => 'Enter search term',
-'StoryNotes'			=> 'Notes',
-'StoryNotesExplained'	=> 'Notes and dedications go here',
-'StorySummary'			=> 'Summary',
-'StorySummaryExplained'	=> 'Your story summary goes here',
-'ChapterText'			=> 'Chapter text',
-'ChapterTextExplained'	=> 'Your chapter\'s content goes here',
 'MaintenanceMode'		=> 'Archive is in maintenance mode',
-'Token_NoMatches'	=> 'No matches',
 'monthly'		=> 'monthly',
 'weekly'		=> 'weekly',
 'daily'			=> 'daily',
 'disabled'		=> 'disabled',
 'enabled'		=> 'enabled',
+'ClickCont'		=> 'Click to continue',
+'Error'			=> 'Error',
+'Success'		=> 'Success',
+'Search'		=> 'Search',
+'Reset'			=> 'Reset',
+'Edit'			=> 'Edit',
+'Title' 		=>	'Title',
+'Author' 		=>	'Author',
 
-// Login related
+// [2] Global -- Login related 20
 'Login'			=> 'Login',
 'LoginName'		=> 'Login',
 'VisibleName'	=> 'Visible name',
@@ -59,33 +44,113 @@ return array(
 'ResetPWMail'	=> 'If a user with this name or e-mail exists, a mail containing instructions on how to reset the password has been sent',
 'ChangePW'		=> 'Change password',
 'PWRecovery'	=> 'Password recovery',
+'PWChanged'		=> 'Password has been changed',
 'Login_NoMatch'	=> 'Failed to log in, invalid user name or password!',
 'Login_NoData'	=> 'Failed to log in, data error!',
+'oldPW'			=> 'old password',
+'newPW'			=> 'new password',
+'newPWrepeat'	=> 'repeat new password',
 
-// User registration
-'Registration'					=> 'Registration',
-'RegisterNow'					=> 'Register now',
-'Registration_AcceptTOS'		=> 'I accept these terms!',
-'Registration_AcceptTOS_Error'	=> 'You have to accept the terms of use',
-'Registration_UsernameEmpty'	=> 'No login name provided!',
-'Registration_UsernameTaken'	=> 'Login name already in use.',
-'Registration_EmailEmpty'		=> 'No e-mail address provided!',
-'Registration_EmailTaken'		=> 'Login name address in use.',
-'Registration_AlreadyMember'	=> 'A user with this data already exists.',
-'Registration_PasswordRepeat'	=> 'Repeat password',
-'Registration_PasswordTwice'	=> 'Enter your password twice',
-'Registration_PasswordMismatch'	=> 'Your passwords do not match',
-'Registration_PasswordCriteria'	=> 'Your desired password does not match the requirements',
+// [3] Global -- Sort 13
+'Sort_Date'			=> 'Date',
+'Sort_ID'			=> 'ID',
+'Sort_Title'		=> 'Title',
+'Sort_Name'			=> 'Name',
+'Sort_Text'			=> 'Text',
+'Sort_Updated'		=> 'Updated',
+'Sort_Count'		=> 'Count',
+'Sort_COpen'		=> 'Opens',
+'Sort_CClose'		=> 'Closes',
+'Sort_Category' 	=> 'Category',
+'Sort_TagGroup'		=> 'Tag group',
+'Sort_Visibility' 	=> 'Visibility',
+'Sort_Comment'		=> 'Comment',
 
+// [4] Global -- User registration 15
+'Registration'			=> 'Registration',
+'RegisterNow'			=> 'Register now',
+'Reg_AcceptTOS'			=> 'I accept these terms!',
+'Reg_AcceptTOS_Error'	=> 'You have to accept the terms of use',
+'Reg_UsernameEmpty'		=> 'No login name provided!',
+'Reg_UsernameTaken'		=> 'Login name already in use.',
+'Reg_EmailEmpty'		=> 'No e-mail address provided!',
+'Reg_EmailTaken'		=> 'E-mail address already in use.',
+'Reg_AlreadyMember'		=> 'A user with this data already exists.',
+'Reg_PasswordRepeat'	=> 'Repeat password',
+'Reg_PasswordTwice'		=> 'Enter your password twice',
+'Reg_PasswordMismatch'	=> 'Your passwords do not match',
+'Reg_PasswordCriteria'	=> 'Your desired password does not match the requirements',
+'Reg_Failed'			=> 'Registration failed!',
+'Reg_FailedSorry'		=> 'Sorry, can\'t complete registration at this point.',
 
-'Sort_Date'	=> 'Date',
-'Sort_ID'	=> 'ID',
-
-
+// [5] Global -- System 5
 'CookieText'	=> 'This website uses cookies to ensure you get the best experience on our website.',
 'CookieInfo'	=> 'More info on cookies',
 'CookieAccept'	=> 'Accept cookies',
+'Month_Calendar' => '{0,date,custom,%B %Y}',	// using php strftime
+'Weekday' => '{0,date,custom,%A}',
 
+// [6] Global -- Forms 8
+'CaptchaMismatch'	=> 'Captcha did not match',
+'GuestURL'			=> 'Guests are not allowed to post URLs',
+'GuestNameEmpty'	=> 'Name field cannot be empty',
+'MessageEmpty'		=> 'No message entered',
+'CommentEmpty'		=> 'No comment entered',
+'CannotSave'		=> 'Could not save the data, please try again',
+'FormErrors'		=> '{0, plural,zero	{No errors},one	{There was an error while processing this form},other {There were errors while processing this form} }',
+'Submit'			=> 'Submit',
+
+// [7] Global -- Search 1
+'NoEntries'			=> 'No entries',
+
+// [8] Global -- Archiv Stats 10
+'Stats_Archive' => 'Archive stats',
+'Stats_Members' => 'Members',
+'Stats_Authors' => 'Authors',
+'Stats_Stories' => 'Stories',
+'Stats_Chapters' => 'Chapters',
+'Stats_Reviews' => 'Reviews',
+'Stats_Online' => 'Who\'s online',
+'Stats_Guests' => 'Guests',
+'Stats_Users' => 'Users',
+'Stats_LatestMember' => 'Latest Member',
+
+// [9] Story -- Search 19
+'AdvancedSearch'	=> 'Advanced Search',
+'Token_InputHint'	=> 'Enter search term',
+'Token_NoMatches'	=> 'No matches',
+'Token_StartTyping' => 'Start typing to search',
+'SearchContest'		=> 'Search contest',
+'SearchCharacter'	=> 'Search character',
+'SearchStory'		=> 'Search story',
+'SearchTag'			=> 'Search tag',
+'LibraryStories'	=> 'Limit to stories from my library',
+'Search_FavBM'		=> 'Favourites & bookmarks',
+'Search_Fav'		=> 'Favourites',
+'Search_BM'			=> 'Bookmarks',
+'StorySizetype'		=> 'Extent of story',
+'Size_SingleChapter'=> 'Single chapter',
+'Size_MultiChapter'	=> 'Multiple chapters',
+'Search_ShowAll'	=> 'Show all',
+'SearchCompletedOnly'	=> 'Only show completed stories',
+'ShowSearchForm'	=> 'Show search form',
+'HideSearchForm'	=> 'Hide search form',
+
+// [10] Story -- Fields 10
+'MainAuthor'	=> 'Main author',
+'MainAuthors'	=> 'Main authors',
+'SupAuthor'		=> 'Supporting author',
+'SupAuthors'	=> 'Supporting authors',
+'StoryNotes'			=> 'Notes',
+'StoryNotesExplained'	=> 'Notes and dedications go here',
+'StorySummary'			=> 'Summary',
+'StorySummaryExplained'	=> 'Your story summary goes here',
+'ChapterText'			=> 'Chapter text',
+'ChapterTextExplained'	=> 'Your chapter\'s content goes here',
+///DB
+
+
+// User panel - PM
 'PM_Inbox'				=> 'Inbox',
 'PM_Outbox'				=> 'Outbox',
 'PM_Write'				=> 'Write',
@@ -109,10 +174,6 @@ return array(
 'PM_ReplyMessageHeader'	=> 'On {0}, {1} wrote:',
 'PM_WritePM'			=> 'Writing message',
 'PM_ReadPM'				=> 'Reading message',
-
-// using php strftime
-'Month_Calendar' => '{0,date,custom,%B %Y}',
-'Weekday' => '{0,date,custom,%A}',
 
 // User elements
 'UserField_Type1'	=> 'URL',			// _FIELDURL
@@ -148,33 +209,25 @@ return array(
 	'MSG_deleteRead'	=> 'Unable to delete, this message has been read',
 	'MSG_deleteNotFound' => 'Unable to delete, Message not found',
 	'MSG_deleteNoAccess' => 'You have no access to this message',
-'UserMenu_Shoutbox'			=> '{0, plural,'. 'other {Shoutbox (#)} }', 
+'UserMenu_Shoutbox'			=> 'Shoutbox ({0})', 
 	
 'UserMenu_Authoring' => 'Authoring',
-	'Authoring_Finished' => '{0, plural,'.
-		'other	{Finished (#)}}',
-	'Authoring_Unfinished' => '{0, plural,'.
-		'other	{Unfinished (#)}}',
-	'Authoring_Drafts' => '{0, plural,'.
-		'other	{Drafts (#)}}',
+	'Authoring_Finished'	=> 'Finished ({0})',
+	'Authoring_Unfinished'	=> 'Unfinished ({0})',
+	'Authoring_Drafts'		=> 'Drafts ({0})',
 'UserMenu_MyLibrary' => 'My Library',
-	'Library_Favourites' => '{0, plural,'.
-		'other	{Favourites (#)}
-	}',
-	'AddFavourite'	=>	'Add favourite',
-	'Library_Bookmarks' => '{0, plural,'.
-		'other	{Bookmarks (#)}
-	}',
-	'AddBookmark'	=> 'Add bookmark',
-	'Library_Recommendations' => '{0, plural,'.
-		'other	{Recommendations (#)}
-	}',
+	'Library_Favourites'	=> 'Favourites ({0})',
+	'AddFavourite'			=> 'Add favourite',
+	'Library_Bookmarks'		=> 'Bookmarks ({0})',
+	'AddBookmark'			=> 'Add bookmark',
+	'Library_Recommendations' => 'Recommendations ({0})',
+
 'UserMenu_Feedback' => 'Feedback',
 'UserMenu_Reviews' => 'Reviews',
-	'UserMenu_ReviewsWritten'	=> '{0, plural,'. 'other {Reviews written (#)} }',
-	'UserMenu_ReviewsReceived'	=> '{0, plural,'. 'other {Reviews received (#)} }', 
-	'UserMenu_CommentsWritten'	=> '{0, plural,'. 'other {Comments written (#)} }',
-	'UserMenu_CommentsReceived'	=> '{0, plural,'. 'other {Comments received (#)} }', 
+	'UserMenu_ReviewsWritten'	=> 'Reviews written ({0})',
+	'UserMenu_ReviewsReceived'	=> 'Reviews received ({0})',
+	'UserMenu_CommentsWritten'	=> 'Comments written ({0})',
+	'UserMenu_CommentsReceived'	=> 'Comments received ({0})',
 'UserMenu_Settings' => 'Settings',
 	'UserMenu_Preferences' => 'Preferences',
 	
@@ -229,6 +282,21 @@ return array(
 'UserMenu_Curator' => 'Curator',
 'UCP_ExplainMainAuthor'	=> 'All main authors can edit the story, unlike supporting authors',
 'UCP_ExplainSupAuthor'	=> 'Supporting authors are mentioned along the other authors, but cannot edit the story',
+
+'FB_Stats'					=> 'Feedback statistics',
+'FB_ReviewRatio'			=> 'Review ratio',
+'FB_ReviewsPerStory' => '{0, plural,'.
+					'one	{This is one review per story},'.
+					'other	{These are # reviews per story}
+					}',
+'FB_orReviewsPerChapter' => '{0, plural,'.
+					'one	{or one review per chapter},'.
+					'other	{or # reviews per chapter}
+					}',
+'FB_ReviewsPerChapter' => '{0, plural,'.
+					'one	{This is one review per chapter},'.
+					'other	{These are # reviews per chapter}
+					}',
 
 // AdminCP Home elements
 'AdminMenu_General' => 'General settings',
@@ -322,7 +390,6 @@ return array(
 // Admin - Archive - Contest
 'AdminMenu_Contests'	=> 'Contests',
 'ContestDescription'	=> 'Contest description',
-
 
 'AdminMenu_Stories' => 'Stories',
 'AdminMenu_Pending' => 'Pending',
@@ -446,8 +513,6 @@ return array(
 	'CFG_logging'					=> 'Log actions',
 
 // Story view'
-'Title' =>	'Title',
-'Author' =>	'Author',
 'AuthorCounted' => '{0, plural,'.
 	'one	{Author},'.
 	'other	{Authors}
@@ -480,12 +545,14 @@ return array(
 	'one	{Recommended Story},'.
 	'other	{Recommended Stories} }',
 'noRecommendedStory'	=> 'No recommended stories yet',
-'TitleReadReviews' => '{0, plural, other {Read reviews for \'#\'} }',
+'TitleReadReviews' => 'Read reviews for \'{0}\'',
 
-'BookmarkAdd'		=> '{0, plural, other {\'#\' has no bookmark, click to add.} }',
-'BookmarkRemove'	=> '{0, plural, other {\'#\' has a bookmark, click to remove.} }',
-'FavouriteAdd'		=> '{0, plural, other {\'#\' is not a favourite, click to make it one.} }',
-'FavouriteRemove'	=> '{0, plural, other {\'#\' is a favourite. Click to remove.} }',
+'BookmarkAdd'		=> '\'{0}\' has no bookmark, click to add.',
+'BookmarkRemove'	=> '\'{0}\' has a bookmark, click to edit or remove.',
+'FavouriteAdd'		=> '\'{0}\' is not a favourite, click to make it one.',
+'FavouriteRemove'	=> '\'{0}\' is a favourite. Click to edit or remove.',
+'Notification'	=> 'Notification',
+'Visibility'	=> 'Visibility',
 
 'TOC'	=> 'Table of content',
 'NoTags' => 'No tags defined',
@@ -499,9 +566,9 @@ return array(
 'Characters' => 'Characters',
 'Clicks' => 'Clicks',
 'Author_Notes' => 'Author notes',
-'BrowseStories' => '{0, plural,'.
-	'one	{Browse # story},'.
-	'other	{Browse # stories}
+'BrowseStories' => '{0, plural,
+one	{Browse # story},
+other	{Browse # stories}
 }',
 
 'Review_Link' => '{0, plural,'.
@@ -515,16 +582,11 @@ return array(
 	'other	{# reviews}
 }',
 
-'Search'		=> 'Search',
-'Reset'			=> 'Reset',
 'SearchUsername'=> 'Search in usernames',
 'SearchUserAll' => 'Search in all user fields',
 'Tagcloud' => 'Tagcloud',
 'noTagcloud' => 'No tag cloud',
-'Edit'		=> 'Edit',
 
-'ShowSearchForm'	=> 'Show search form',
-'HideSearchForm'	=> 'Hide search form',
 
 // Feedback
 'Feedback_Not_Logged_In' => 'You need to be logged in to write a review or comment',
@@ -543,17 +605,6 @@ return array(
 	'one	{One comment},'.
 'other	{# comments} }',
 
-// Archiv Stats
-'AS_ArchiveStats' => 'Archive Stats',
-'AS_Members' => 'Members',
-'AS_Authors' => 'Authors',
-'AS_Stories' => 'Stories',
-'AS_Chapters' => 'Chapters',
-'AS_Reviews' => 'Reviews',
-'AS_Online' => 'Who\'s online',
-'AS_Guests' => 'Guests',
-'AS_Users' => 'Users',
-'AS_LatestMember' => 'Latest Member',
 
 'Status_Changes' => '{0, plural,'.
 	'zero	{No changes.},'.

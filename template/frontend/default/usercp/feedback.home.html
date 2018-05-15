@@ -2,19 +2,20 @@
 <div class="grid-wrapper">
 	<div class="gb-full">
 		{{@LN__Welcome}} {{@_SESSION['username']}}<br />
-		__Feedback stats:
+		{{@LN__FB_Stats}}:
 	</div>
 </div>
 <div class="grid-wrapper">
 	<div class="gb-half">
-		<h3>__ReviewRatio</h3>
+		<h3>{{@LN__FB_ReviewRatio}}</h3>
 		<canvas id="chart1" width="200" height="200" style="float: left;">
 			This would have shown a pie chart of the ratio of reviewed stories.
 		</canvas>
-		<span id="b1">{ICON:plus} stories reviewed</span><br />
-		<span id="b1_not">{ICON:minus} stories without review</span>
-		<div valign="bottom">{{@stats.storiesReviewedQ}}%<br />
-		This is {{@stats.reviewsPerStoryTotal}} __reviewsPerStory (or {{@stats.reviewsPerChapter}} __reviewsPerChapter)</div>
+		<span id="b1">{ICON:plus} stories reviewed {{@stats.storiesReviewedQ}}%</span><br />
+		<span id="b1_not">{ICON:minus} stories without review {{(100-@stats.storiesReviewedQ)}}%</span>
+		<div valign="bottom"><br />
+		{{ @LN__FB_ReviewsPerStory, @stats.reviewsPerStoryTotal | format }}<br/>
+		({{ @LN__FB_orReviewsPerChapter, @stats.reviewsPerChapter | format }})</div>
 	</div>
 	<div class="gb-half">
 	<h3>"more"</h3>
