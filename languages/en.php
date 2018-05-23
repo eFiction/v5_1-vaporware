@@ -2,7 +2,9 @@
 @define('__transLocale', 'en_GB');
 
 return array(
-// [1] Global -- General 20
+// [1] Global -- General 27
+'Welcome' => 'Welcome',
+'Shoutbox' => 'Shoutbox',
 'UserCP'	=> 'User Panel',
 'AdminCP'	=> 'Admin Panel',
 'yes'		=>	'yes',
@@ -82,6 +84,10 @@ return array(
 'Reg_PasswordCriteria'	=> 'Your desired password does not match the requirements',
 'Reg_Failed'			=> 'Registration failed!',
 'Reg_FailedSorry'		=> 'Sorry, can\'t complete registration at this point.',
+	'Reg_Moderation'		=> 'Registration completed, however it requires moderation',
+	'Reg_Done'				=> 'Registration completed',
+	'Reg_Mail'				=> 'A mail has been sent to you, ',
+	'Reg_MailFail'			=> 'The server tried to send you a mail but encountered a problem, you registration cannot be completed at this point',
 
 // [5] Global -- System 5
 'CookieText'	=> 'This website uses cookies to ensure you get the best experience on our website.',
@@ -115,7 +121,7 @@ return array(
 'Stats_Users' => 'Users',
 'Stats_LatestMember' => 'Latest Member',
 
-// [9] Story -- Search 19
+// [9] Story -- Search 21
 'AdvancedSearch'	=> 'Advanced Search',
 'Token_InputHint'	=> 'Enter search term',
 'Token_NoMatches'	=> 'No matches',
@@ -135,8 +141,32 @@ return array(
 'SearchCompletedOnly'	=> 'Only show completed stories',
 'ShowSearchForm'	=> 'Show search form',
 'HideSearchForm'	=> 'Hide search form',
+'TagsInclude'	=>	'Tags included',
+'TagsExclude'	=>	'Tags excluded',
 
-// [10] Story -- Fields 10
+// [10] Story -- Fields 8
+'Categories' =>	'Categories',
+'Characters' =>	'Characters',
+'Rating' =>	'Rating',
+'Status' =>	'Status',
+'Reviews' =>	'Reviews',
+'Foreword' =>	'Foreword',
+'Summary' =>	'Summary',
+'Tags' =>	'Tags',
+
+// [11] Story -- Info
+
+// [12] Story -- Links 8
+'TitleReadReviews'	=> 'Read reviews for \'{0}\'',
+'BookmarkAdd'		=> '\'{0}\' has no bookmark, click to add.',
+'BookmarkRemove'	=> '\'{0}\' has a bookmark, click to edit or remove.',
+'FavouriteAdd'		=> '\'{0}\' is not a favourite, click to make it one.',
+'FavouriteRemove'	=> '\'{0}\' is a favourite. Click to edit or remove.',
+'BrowseStories'		=> '{0, plural, one	{Browse # story}, other	{Browse # stories} }',
+'Review_Link' 		=> '{0, plural, zero {None yet! Be the first to write one ...}, one	{One review}, other	{# reviews} }',
+'Review_Link_TOC'	=> '{0, plural, zero {No reviews}, one {One review}, other {# reviews} }',
+
+// [13] Story -- Edit 10
 'MainAuthor'	=> 'Main author',
 'MainAuthors'	=> 'Main authors',
 'SupAuthor'		=> 'Supporting author',
@@ -148,7 +178,18 @@ return array(
 'ChapterText'			=> 'Chapter text',
 'ChapterTextExplained'	=> 'Your chapter\'s content goes here',
 ///DB
+'StoryTitle'	=>	'Story title',
+'ChapterTitle'	=>	'Chapter title',
+'ChapterText'	=>	'Chapter text',
+'AddChapter'	=> 'Add chapter',
+'EditHeader'	=> 'Edit header',
+'DragdropSort'	=> 'Drag and drop to sort',
+'SwitchPlainHTML'	=> 'Switch to HTML mode',
+'SwitchVisual'		=> 'Switch to visual editor',
 
+// [14] Authors
+'NoAuthorsListed'	=> 'Currently, there are no authors to be listed',
+'Overview'			=> 'Overview',
 
 // User panel - PM
 'PM_Inbox'				=> 'Inbox',
@@ -212,6 +253,7 @@ return array(
 'UserMenu_Shoutbox'			=> 'Shoutbox ({0})', 
 	
 'UserMenu_Authoring' => 'Authoring',
+'UserMenu_AddStory' => 'Add Story',
 	'Authoring_Finished'	=> 'Finished ({0})',
 	'Authoring_Unfinished'	=> 'Unfinished ({0})',
 	'Authoring_Drafts'		=> 'Drafts ({0})',
@@ -247,15 +289,6 @@ return array(
 	'UCP_Pref_Age'		=> '***Age consent***',
 	'UCP_Pref_hideTags'	=> '***Hide Tags***',
 
-'UserMenu_AddStory' => 'Add Story',
-'StoryTitle'	=>	'Story title',
-'ChapterTitle'	=>	'Chapter title',
-'ChapterText'	=>	'Chapter text',
-'AddChapter'	=> 'Add chapter',
-'EditHeader'	=> 'Edit header',
-'DragdropSort'	=> 'Drag and drop to sort',
-'SwitchPlainHTML'	=> 'Switch to HTML mode',
-'SwitchVisual'		=> 'Switch to visual editor',
 'UCP_StoryStatus' => 'Story status',
 'UCP_ChapterStatus' => 'Chapter status',
 'UCP_statusValidated' => 'Validation status',
@@ -400,8 +433,6 @@ return array(
 'ElementDeleted'	=> 'Element deleted',
 'FailedDelete'		=> 'Failed to delete element',
 
-'Welcome' => 'Welcome',
-'Shoutbox' => 'Shoutbox',
 
 // Config explain
 // archive_general
@@ -517,16 +548,6 @@ return array(
 	'one	{Author},'.
 	'other	{Authors}
 }',
-'Categories' =>	'Categories',
-'Characters' =>	'Characters',
-'Rating' =>	'Rating',
-'TagsInclude'	=>	'Tags included',
-'TagsExclude'	=>	'Tags excluded',
-'Status' =>	'Status',
-'Reviews' =>	'Reviews',
-'Foreword' =>	'Foreword',
-'Summary' =>	'Summary',
-'Tags' =>	'Tags',
 'by' => 'by',
 'translatedBy'	=> 'translated by',
 'Stories'				=> 'Stories',
@@ -545,12 +566,6 @@ return array(
 	'one	{Recommended Story},'.
 	'other	{Recommended Stories} }',
 'noRecommendedStory'	=> 'No recommended stories yet',
-'TitleReadReviews' => 'Read reviews for \'{0}\'',
-
-'BookmarkAdd'		=> '\'{0}\' has no bookmark, click to add.',
-'BookmarkRemove'	=> '\'{0}\' has a bookmark, click to edit or remove.',
-'FavouriteAdd'		=> '\'{0}\' is not a favourite, click to make it one.',
-'FavouriteRemove'	=> '\'{0}\' is a favourite. Click to edit or remove.',
 'Notification'	=> 'Notification',
 'Visibility'	=> 'Visibility',
 
@@ -566,21 +581,6 @@ return array(
 'Characters' => 'Characters',
 'Clicks' => 'Clicks',
 'Author_Notes' => 'Author notes',
-'BrowseStories' => '{0, plural,
-one	{Browse # story},
-other	{Browse # stories}
-}',
-
-'Review_Link' => '{0, plural,'.
-	'zero	{None yet! Be the first to write one ...},'.
-	'one	{One review},'.
-	'other	{# reviews}
-}',
-'Review_Link_TOC' => '{0, plural,'.
-	'zero	{No reviews},'.
-	'one	{One review},'.
-	'other	{# reviews}
-}',
 
 'SearchUsername'=> 'Search in usernames',
 'SearchUserAll' => 'Search in all user fields',

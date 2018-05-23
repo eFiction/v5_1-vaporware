@@ -4,64 +4,39 @@ namespace View;
 class Authors extends Base
 {
 
-	public static function page($header, $menu, $content)
+	public function page($header, $menu, $content)
 	{
-		return \Template::instance()->render
-														('authors/main.html','text/html', 
-															[
-																"header"	=> $header,
-																"letters"	=> $menu,
-																"content"	=> $content,
-																"BASE"		=> \Base::instance()->get('BASE')
-															]
-														);
+		$this->f3->set('header',  $header);
+		$this->f3->set('letters', $menu);
+		$this->f3->set('content', $content);
+		
+		return $this->render('authors/main.html');
 	}
 	
-	public static function fullList($authors)
+	public function list($list, $letter=NULL)
 	{
-		foreach ( $authors as $author )
-		{
-			if ( preg_match("/[A-Z]/is", $author['letter']) )
-				$construct[$author['letter']][] = [ "name" => $author['authorname'], "id" => $author['aid'], "stories" => $author['counted'] ];
-			else
-				$construct["#"][] = [ "name" => $author['authorname'], "id" => $author['aid'], "stories" => $author['counted'] ];
-		}
+		// common definitions
+		$this->javascript('body', TRUE, 'jquery.columnizer.js' );
+		$this->f3->set('listing',  $list);
 		
-		if ( isset($construct) )
+		// List authors for a specific letter
+		if ( $letter )
 		{
-			\Registry::get('VIEW')->javascript('body', TRUE, 'jquery.columnizer.js' );
-			\Registry::get('VIEW')->javascript('body', FALSE, "$(function(){ $('.author-grid-wrapper').addClass(\"dontsplit\"); $('.columnize').columnize({ width: 200, lastNeverTallest: true }); });" );
+			$columns = min ( 3, ceil (sizeof($list)/5) );
+			$this->javascript('body', FALSE, "$(function(){ $('.author-grid-wrapper').addClass(\"dontsplit\"); $('.columnize').columnize({ columns: {$columns}, lastNeverTallest: true }); });" );
 
-			return \Template::instance()->render
-														('authors/listing.html','text/html', 
-															[
-																"construct"	=> $construct,
-																"BASE"		=> \Base::instance()->get('BASE')
-															]
-														);
+			$this->f3->set('letter',   $letter);
+			$this->f3->set('viewtype', 'small');
 		}
-		else return \Base::instance()->get('LN__noAuthors');
-	}
-
-	public static function letterList($letter, $authors)
-	{
-		foreach ( $authors as $author )
+		// List all authors
+		else
 		{
-			$list[] = [ "name" => $author['authorname'], "id" => $author['aid'], "stories" => $author['counted'] ];
-		}
-		
-		$columns = min ( 3, ceil (sizeof($list)/5) );
-		\Registry::get('VIEW')->javascript('body', TRUE, 'jquery.columnizer.js' );
-		\Registry::get('VIEW')->javascript('body', FALSE, "$(function(){ $('.author-grid-wrapper').addClass(\"dontsplit\"); $('.columnize').columnize({ columns: {$columns}, lastNeverTallest: true }); });" );
+			$this->javascript('body', FALSE, "$(function(){ $('.author-grid-wrapper').addClass(\"dontsplit\"); $('.columnize').columnize({ width: 200, lastNeverTallest: true }); });" );
 
-		return \Template::instance()->render
-														('authors/listing.html','text/html', 
-															[
-																"authors"	=> $list,
-																"letter"	=> $letter,
-																"BASE"		=> \Base::instance()->get('BASE')
-															]
-														);
+			$this->f3->set('viewtype', 'full');
+		}
+
+		return $this->render('authors/listing.html');
 	}
 
 }

@@ -1,8 +1,8 @@
-<check if="{{ isset(@construct)}}">
+<check if="{{ @viewtype=='full' }}">
 <true>
 <div class="columnize">
 	<!-- BLOCK:CELL -->
-	<repeat group="{{ @construct }}" key="{{@letter}}" value="{{ @authors }}">
+	<repeat group="{{ @listing }}" key="{{@letter}}" value="{{ @authors }}">
 	<div class="author-grid-wrapper">
 		<div class="author-grid-letter"><a href="{{@BASE}}/authors/{{@letter}}">{{@letter}}</a></div>
 		<ul class="author-grid">
@@ -22,7 +22,7 @@
 <div class="gb-full screen-micro">
 	<div class="columnize">
 		<ul class="alphabetical">
-		<repeat group="{{ @authors }}" value="{{ @author }}">
+		<repeat group="{{ @listing }}" value="{{ @author }}">
 			<li><i class="fa fa-user"></i> <a href="{{@BASE}}/authors/{{ @author.id }}">{{ @author.name }}</a> ({{ @author.stories }})</li>
 		</repeat>
 		</ul>

@@ -17,7 +17,29 @@ class Authors extends Base
 					{$where} GROUP BY U.uid
   			HAVING counted > 0
 				ORDER BY U.nickname ASC";
-		return $this->exec($sql,[ ":letter" => $letter."%"]);
+		$authors = $this->exec($sql,[ ":letter" => $letter."%"]);
+		if(sizeof($authors)==0) return FALSE;
+		
+		// Initialize empty list
+		$list = [];
+		
+		if ( $letter )
+		{
+			foreach ( $authors as $author )
+				$list[] = [ "name" => $author['authorname'], "id" => $author['aid'], "stories" => $author['counted'] ];
+		}
+		else
+		{
+			foreach ( $authors as $author )
+			{
+				if ( preg_match("/[A-Z]/is", $author['letter']) )
+					$list[$author['letter']][] = [ "name" => $author['authorname'], "id" => $author['aid'], "stories" => $author['counted'] ];
+				else
+					$list["#"][] = [ "name" => $author['authorname'], "id" => $author['aid'], "stories" => $author['counted'] ];
+			}
+		}
+
+		return $list;
 	}
 	
 	public function letters()
@@ -41,10 +63,10 @@ class Authors extends Base
 		
 	public function menuLetters($letters)
 	{
-		$links[] =	[
+/*		$links[] =	[
 							"label"	=> "__overview",
 							"href"	=> [ "", "__overiew" ],
-						];
+						];	*/
 
 		// http://php.net/manual/en/control-structures.for.php#107427 <- smart guy
 		$i=0;

@@ -2,7 +2,9 @@
 @define('__transLocale', 'de_DE');
 
 return array(
-// [1] Global -- General 20
+// [1] Global -- General
+'Welcome' => 'Willkommen',
+'Shoutbox' => 'Shoutbox',
 'UserCP'	=> 'User Panel',
 'AdminCP'	=> 'Admin Panel',
 'yes'		=>	'ja',
@@ -29,7 +31,7 @@ return array(
 'Title' 		=>	'Titel',
 'Author' 		=>	'Autor',
 
-// [2] Global -- Login related 20
+// [2] Global -- Login related
 'Login'			=> 'Anmelden',
 'LoginName'		=> 'Anmeldename',
 'VisibleName'	=> 'Sichtbarer Name',
@@ -66,7 +68,7 @@ return array(
 'Sort_Visibility' => 'Visibility',
 'Sort_Comment'	=> 'Kommentar',
 
-// [4] Registrierung 15
+// [4] Registrierung
 'Registration'			=> 'Registrierung',
 'RegisterNow'			=> 'Jetzt registrieren',
 'Reg_AcceptTOS'			=> 'Ich akzeptiere die Nutzungsbedingungen!',
@@ -82,15 +84,19 @@ return array(
 'Reg_PasswordCriteria'	=> 'Dein gewünschtes Passwort erfüllt nicht die Voraussetzungen.',
 'Reg_Failed'			=> 'Registrierung fehlgeschlagen!',
 'Reg_FailedSorry'		=> 'Leider kann die Registrierung zu diesem Zeitpunkt nicht abgeschlossen werden',
-
-// [5] Global -- System 5
+	'Reg_Moderation'		=> 'Die Registrierung war erfolgreich, muss aber noch moderiert werden',
+	'Reg_Done'				=> 'Die Registrierung war erfolgreich',
+//	'Reg_Mail'				=> '',
+	'Reg_MailFail'			=> 'Der Server hat versucht, dir eine Mail zu schicken, konnte diesen Vorgang aber nicht abschließen',
+	
+// [5] Global -- System
 'CookieText'	=> 'Diese Website benutzt Cookies, um das Krümelmonster zu füttern.',
 'CookieInfo'	=> 'Mehr über die echten Gründe.',
 'CookieAccept'	=> 'Akzeptiert!',
 'Month_Calendar' => '{0,date,custom,%B %Y}',	// using php strftime
 'Weekday' => '{0,date,custom,%A}',
 
-// [6] Global -- Forms 8
+// [6] Global -- Forms
 'CaptchaMismatch'	=>	'Captcha stimmt nicht überein',
 'GuestURL'		=>	'Gäste dürfen keine URLs posten',
 'GuestNameEmpty' => 'Gäste müssen einen Namen angeben',
@@ -100,7 +106,7 @@ return array(
 'FormErrors'	=> '{0, plural, zero {Keine Fehler}, one {Beim Verarbeiten des Formulars ist ein Fehler aufgetreten}, other	{Beim Verarbeiten des Formulars sind Fehler aufgetreten} }',
 'Submit'	=>	'Absenden',
 
-// [7] Global -- Search 1
+// [7] Global -- Search
 'NoEntries'			=> 'Keine Einträge',
 
 // [8] Global -- Archiv Stats'
@@ -115,7 +121,7 @@ return array(
 'Stats_Users' => 'Mitglieder',
 'Stats_LatestMember' => 'Neuestes Mitglied',
 
-// [9] Story -- Search 19
+// [9] Story -- Search
 'AdvancedSearch'	=> 'Detaillierte Suche',
 'Token_InputHint'	=> 'Suchwort eingeben',
 'Token_NoMatches'	=> 'Keine Treffer',
@@ -135,8 +141,32 @@ return array(
 'SearchCompletedOnly'	=> 'Nur abgeschlossenen Geschichten anzeigen',
 'ShowSearchForm'	=> 'Suchmaske anzeigen',
 'HideSearchForm'	=> 'Suchmaske verbergen',
+'TagsInclude'	=>	'Tags miteinbeziehen',
+'TagsExclude'	=>	'Tags nicht miteinbeziehen',
 
-// [10] Story -- Fields 10
+// [10] Story -- Fields
+'Categories' =>	'Kategorien',
+'Characters' =>	'Charaktere',
+'Rating' =>	'Einstufung',
+'Status' =>	'Status',
+'Reviews' =>	'Reviews',
+'Foreword' =>	'Vorwort',
+'Summary' =>	'Klappentext',
+'Tags' =>	'Tags',
+
+// [11] Story -- Info
+
+// [12] Story -- Links
+'TitleReadReviews'	=> 'Reviews zu \'{0}\' lesen',
+'BookmarkAdd'		=> '\'{0}\' hat kein Lesezeichen, hier klicken um eines zu setzen.',
+'BookmarkRemove'	=> '\'{0}\' hat ein Lesezeichen, zum bearbeiten oder entfernen hier klicken.',
+'FavouriteAdd'		=> '\'{0}\' gehört nicht zu deinen Favoriten, hier klicken um sie hinzuzufügen.',
+'FavouriteRemove'	=> '\'{0}\' gehört zu den Favoriten. Zum bearbeiten oder entfernen hier klicken.',
+'BrowseStories'		=> '{0, plural, one	{Eine Geschichte anzeigen}, other {# Geschichten durschstöbern} }',
+'Review_Link'		=> '{0, plural, zero {Noch keine ... schreibe die erste!}, one {Eine Review}, other {# Reviews} }',
+'Review_Link_TOC'	=> '{0, plural, zero {Keine Reviews}, one {Eine Review}, other {# Reviews} }',
+
+// [13] Story -- Edit
 'MainAuthor'	=> 'Autor',
 'MainAuthors'	=> 'Autoren',
 'SupAuthor'		=> 'Nebenautor',
@@ -148,7 +178,18 @@ return array(
 // 'ChapterText'			=>
 // 'ChapterTextExplained' =>
 ///DB
+'StoryTitle'	=>	'Titel der Geschichte',
+'ChapterTitle'	=>	'Titel des Kapitels',
+'ChapterText'	=>	'Text des Kapitels',
+'AddChapter'	=> 'Kapitel hinzufügen',
+'EditHeader'	=> 'Kopfdaten bearbeiten',
+'DragdropSort'	=> 'Ziehen um zu sortieren',
+'SwitchPlainHTML'	=> 'Zum einfachen Modus wechseln',
+'SwitchVisual'		=> 'Zum Editor wechseln',
 
+// [14] Authors
+'NoAuthorsListed'	=> 'Momentan gibt es keine Autor, die angezeigt werden könnten',
+'Overview'			=> 'Übersicht',
 
 // User panel - PM
 'PM_Inbox'				=> 'Posteingang',
@@ -212,6 +253,7 @@ return array(
 'UserMenu_Shoutbox'			=> 'Shoutbox ({0})', 
 
 'UserMenu_Authoring' => 'Authoring',
+'UserMenu_AddStory' => 'Geschichte hinzufügen',
 	'Authoring_Finished'	=> 'Abgeschlossen ({0})',
 	'Authoring_Unfinished'	=> 'In Arbeit ({0})',
 	'Authoring_Drafts'		=> 'Entwürfe ({0})',
@@ -247,15 +289,6 @@ return array(
 //	'UCP_Pref_Age'		=> '***Age consent***',
 //	'UCP_Pref_hideTags'	=> '***Hide Tags***',
 
-'UserMenu_AddStory' => 'Geschichte hinzufügen',
-'StoryTitle'	=>	'Titel der Geschichte',
-'ChapterTitle'	=>	'Titel des Kapitels',
-'ChapterText'	=>	'Text des Kapitels',
-'AddChapter'	=> 'Kapitel hinzufügen',
-'EditHeader'	=> 'Kopfdaten bearbeiten',
-'DragdropSort'	=> 'Ziehen um zu sortieren',
-'SwitchPlainHTML'	=> 'Zum einfachen Modus wechseln',
-'SwitchVisual'		=> 'Zum Editor wechseln',
 'UCP_StoryStatus' => 'Story status',
 'UCP_ChapterStatus' => 'Chapter status',
 'UCP_statusValidated' => 'Freigabe',
@@ -400,8 +433,6 @@ return array(
 'ElementDeleted'	=> 'Element gelöscht',
 'FailedDelete'		=> 'Element konnte nicht gelöscht werden',
 
-'Welcome' => 'Willkommen',
-'Shoutbox' => 'Shoutbox',
 
 // Config explain
 // archive_general
@@ -517,16 +548,6 @@ return array(
 	'one	{Author},'.
 	'other	{Authors}
 }',
-'Categories' =>	'Kategorien',
-'Characters' =>	'Charaktere',
-'Rating' =>	'Einstufung',
-'TagsInclude'	=>	'Tags miteinbeziehen',
-'TagsExclude'	=>	'Tags nicht miteinbeziehen',
-'Status' =>	'Status',
-'Reviews' =>	'Reviews',
-'Foreword' =>	'Vorwort',
-'Summary' =>	'Klappentext',
-'Tags' =>	'Tags',
 'by' => 'von',
 'translatedBy'	=> 'übersetzt von',
 'Stories' => 'Geschichten',
@@ -545,12 +566,6 @@ return array(
 	'one	{Externe Empfehlung},'.
 	'other	{Externe Empfehlungen} }',
 //'noRecommendedStory'	=> 'No recommended stories yet',
-'TitleReadReviews' => 'Reviews zu \'{0}\' lesen',
-
-'BookmarkAdd'		=> '\'{0}\' hat kein Lesezeichen, hier klicken um eines zu setzen.',
-'BookmarkRemove'	=> '\'{0}\' hat ein Lesezeichen, zum bearbeiten oder entfernen hier klicken.',
-'FavouriteAdd'		=> '\'{0}\' gehört nicht zu deinen Favoriten, hier klicken um sie hinzuzufügen.',
-'FavouriteRemove'	=> '\'{0}\' gehört zu den Favoriten. Zum bearbeiten oder entfernen hier klicken.',
 'Notification'	=> 'Benachrichtigung',
 'Visibility'	=> 'Sichtbarkeit',
 
@@ -566,21 +581,6 @@ return array(
 'Characters' => 'Charaktere',
 'Clicks' => 'Klicks',
 'Author_Notes' => 'Anmerkungen des Autors',
-'BrowseStories' => '{0, plural,
-one	{Eine Geschichte anzeigen},
-other	{# Geschichten durschstöbern}
-}',
-
-'Review_Link' => '{0, plural,'.
-	'zero	{Noch keine ... schreibe die erste!},'.
-	'one	{Eine Review},'.
-	'other	{# Reviews}
-}',
-'Review_Link_TOC' => '{0, plural,'.
-	'zero	{Keine Reviews},'.
-	'one	{Eine Review},'.
-	'other	{# Reviews}
-}',
 
 //'SearchUsername'=> 'Search in usernames',
 //'SearchUserAll' => 'Search in all user fields',

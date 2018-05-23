@@ -2,16 +2,16 @@
 <true>
 	<switch expr="{{ @registered }}">
 		<case value="done" break="TRUE">
-<h3>Done!</h3>
+<h3>{{ @LN__Reg_Done }}</h3>
 		</case>
 		<case value="mail" break="TRUE">
-<h3>Mail!</h3>
+<h3>{{ @LN__Reg_Mail }}</h3>
 		</case>
 		<case value="mailfail" break="TRUE">
-<h3>Mail! (failed)</h3>
+<h3>{{ @LN__Reg_Mail }}</h3>
 		</case>
 		<case value="moderation" break="TRUE">
-<h3>Moderation!</h3>
+<h3>{{ @LN__Reg_Moderation }}</h3>
 		</case>
 		<case value="failed" break="TRUE">
 <h3>{{ @LN__Reg_Failed }}</h3>

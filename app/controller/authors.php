@@ -7,37 +7,41 @@ class Authors extends Base {
 	public function __construct()
 	{
 		$this->model = \Model\Authors::instance();
+		$this->template = new \View\Authors();
 	}
 
 	public function index(\Base $f3, $params)
 	{
 		if ( isset($params['*']) ) $this->parametric($params['*']);
 		
-		// Build menu letters
-		$letters = $this->model->letters();
-		// build letter list only if there are authors
-		if($letters) $menu = $this->model->menuLetters($letters);
-		else $menu = [];
-
 		// set header
 		$header[] = $f3->get('LN__Authors');
 
 		if ( empty($params['id']) )
 		{
+			// Build menu letters
+			$letters = $this->model->letters();
+
 			// Load list of authors
-			$data = $this->model->getAuthors();
-			// build view
-			$content = \View\Authors::fullList($data);
-			// switch off right sidebar
-			\Base::instance()->set('bigscreen', TRUE);
+			if ( FALSE !== $data = $this->model->getAuthors() )
+			{
+				// build view
+				$content = $this->template->list($data);
+				// switch off right sidebar
+				\Base::instance()->set('bigscreen', TRUE);
+			}
+			else $content = NULL;
 		}
 		elseif ( preg_match("/[a-zA-Z#].*/", $params['id']) )
 		{
+			// Build menu letters
+			$letters = $this->model->letters();
+
 			// load list of authors starting with letter
 			$letter = $params['id'][0];
 			$data = $this->model->getAuthors($letter);
 			// build view
-			$content = \View\Authors::letterList($letter, $data);
+			$content = $this->template->list($data, $letter);
 		}
 		elseif ( is_numeric($params['id']) )
 		{
@@ -47,8 +51,12 @@ class Authors extends Base {
 			$header[] = $authorInfo;
 		}
 
+		// build letter list only if there are authors
+		if(!empty($letters)) $menu = $this->model->menuLetters($letters);
+		else $menu = NULL;
+		
 		// output
-		$this->buffer ( \View\Authors::page($header , $menu, $content) );
+		$this->buffer ( $this->template->page($header , $menu, $content) );
 	}
 
 }
