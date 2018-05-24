@@ -14,11 +14,11 @@
 	<!-- misc -->	
 	<div class="grid-wrapper">
 	<div class="gb-half">
-		{{@LN__LibraryStories}}: <select class="search" name="saved">
+		{{@LN__LibraryStories}}: <select class="search" name="library">
 			<option value="no">{{@LN__no}}</option>
-			<option value="both"<check if="{{isset(@searchForm.saved) AND @searchForm.saved=='both'}}"> selected="selected"</check>>{{@LN__Search_FavBM}}</option>
-			<option value="fav"<check if="{{isset(@searchForm.saved) AND @searchForm.saved=='fav'}}"> selected="selected"</check>>{{@LN__Search_Fav}}</option>
-			<option value="bm"<check if="{{isset(@searchForm.saved) AND @searchForm.saved=='bm'}}"> selected="selected"</check>>{{@LN__Search_BM}}</option>
+			<option value="both"<check if="{{isset(@searchForm.library) AND @searchForm.library=='both'}}"> selected="selected"</check>>{{@LN__Search_FavBM}}</option>
+			<option value="fav"<check if="{{isset(@searchForm.library) AND @searchForm.library=='fav'}}"> selected="selected"</check>>{{@LN__Search_Fav}}</option>
+			<option value="bm"<check if="{{isset(@searchForm.library) AND @searchForm.library=='bm'}}"> selected="selected"</check>>{{@LN__Search_BM}}</option>
 		</select>
 	</div>
 	<div class="gb-half">

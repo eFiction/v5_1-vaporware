@@ -138,15 +138,15 @@ class Story extends Base
 			// sidebar stuff!
 			$join[] = "INNER JOIN (SELECT sid FROM `tbl_stories_authors` WHERE aid IN (".implode(",",$terms['author']).") GROUP BY sid having count(lid)=".count($terms['author']).") iA ON ( iA.sid = S.sid )";
 		}
-		if ( !empty($terms['saved']) AND $_SESSION['userID']>0 )
+		if ( !empty($terms['library']) AND $_SESSION['userID']>0 )
 		{
 			// bookmarks & favourites
 			$saved_sql = "INNER JOIN `tbl_user_favourites`FavS ON (FavS.uid=".(int)$_SESSION['userID']." AND FavS.item=S.sid AND FavS.type='ST'";
-			if ($terms['saved']=="both")
+			if ($terms['library']=="both")
 				$join[] = $saved_sql.")";
-			elseif ($terms['saved']=="fav")
+			elseif ($terms['library']=="fav")
 				$join[] = $saved_sql." AND FavS.bookmark=0)";
-			elseif ($terms['saved']=="bm")
+			elseif ($terms['library']=="bm")
 				$join[] = $saved_sql." AND FavS.bookmark=1)";
 		}
 		

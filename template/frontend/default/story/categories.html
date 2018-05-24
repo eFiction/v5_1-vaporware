@@ -14,7 +14,7 @@
 		<div class="category-description">{{@element.description | raw}}</div><br />
 		<check if="{{@element.stats.count}}"><div class="button"><a href="{{@BASE}}/story/browse/category={{@element.cid}}">{{ @LN__BrowseStories, @element.stats.count | format }}</a></div><br /></check>
 		<check if="{{ sizeof(@element.stats.sub)}}">
-			<repeat group="{{ array_splice(@element['stats']['sub'],0,4) }}" key="{{@name}}" value="{{ @count }}" counter="{{@line}}">
+			<repeat group="{{ array_splice(@element['stats']['sub'],0,5) }}" key="{{@name}}" value="{{ @count }}" counter="{{@line}}">
 				{ICON:folder} {{@name}} [{{ @count }}]<br />
 			</repeat>
 			<check if="{{ sizeof(@element.stats.sub) }}">and {{ sizeof(@element.stats.sub) }} more subs</check>

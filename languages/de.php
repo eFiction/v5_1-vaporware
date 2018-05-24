@@ -137,6 +137,7 @@ return array(
 'StoryExtent'		=> 'Umfang der Geschichte',
 'Size_SingleChapter'=> 'Einzelnes Kapitel',
 'Size_MultiChapter'	=> 'Mehrere Kapitel',
+'Size_All'			=> 'Show all',
 'Search_ShowAll'	=> 'Alle anzeigen',
 'SearchCompletedOnly'	=> 'Nur abgeschlossenen Geschichten anzeigen',
 'ShowSearchForm'	=> 'Suchmaske anzeigen',
