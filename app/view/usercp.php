@@ -151,14 +151,14 @@ class UserCP extends Base
 		return \Template::instance()->render('usercp/library.html');
 	}
 	
-	public static function upperMenu(array $menu, array $counter, $path, $sub)
+	public function upperMenu(array $menu, $counter, $path, $sub)
 	{
-		\Base::instance()->set('menu_upper', $menu);
-		\Base::instance()->set('counter', $counter);
-		\Base::instance()->set('sub', $sub);
-		\Base::instance()->set('path', $path);
+		$this->f3->set('menu_upper', $menu);
+		$this->f3->set('counter', $counter);
+		$this->f3->set('sub', $sub);
+		$this->f3->set('path', $path);
 
-		return \Template::instance()->render('usercp/menu.upper.html');
+		return $this->render('usercp/menu.upper.html');
 	}
 	
 	public static function feedbackHome(array $data)

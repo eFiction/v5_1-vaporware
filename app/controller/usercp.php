@@ -309,7 +309,7 @@ class UserCP extends Base
 				[ "link" => "SE", "label" => "Series" ],
 				[ "link" => "RC", "label" => "Recomm" ],
 			];
-			$this->buffer ( \View\UserCP::upperMenu($menu_upper, $counter, "feedback/reviews/".$params[1], "comments") );
+			$this->buffer ( $this->template->upperMenu($menu_upper, $counter, "feedback/reviews/".$params[1], "comments") );
 		}
 		
 		// End of menu
@@ -536,10 +536,10 @@ class UserCP extends Base
 	
 	private function libraryBookFav(\Base $f3, $params)
 	{
-		//print_r($this->counter);
 		// Build upper micro-menu
 		$counter = $this->counter[$params[0]]['details'];
-
+		$menu_upper = [];
+		
 		if ( is_array($counter) )
 		{
 			$menu_upper =
@@ -549,12 +549,8 @@ class UserCP extends Base
 				[ "link" => "SE", "label" => "Series" ],
 				[ "link" => "ST", "label" => "Stories" ],
 			];
-			$this->buffer ( \View\UserCP::upperMenu($menu_upper, $counter, "library/{$params[0]}", $params[0]) );
 		}
-		else
-		{
-			$this->buffer ( "__empty" );
-		}
+		$this->buffer ( $this->template->upperMenu($menu_upper, $counter, "library/{$params[0]}", $params[0]) );
 		// End of menu
 
 		if(array_key_exists("edit",$params))

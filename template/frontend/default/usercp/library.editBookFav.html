@@ -2,7 +2,7 @@
 <div class="form-wrapper">
 <form method="post" action="{{@BASE}}/userCP/library/{{@block}}/save/id={{@data.type}},{{@data.id}};returnpath={{@returnpath}}">
 <check if="{{@data.fid}}">
-	<span class="alert-box error">__Check to delete: <input type="checkbox" name="delete" value="yes" /></span>
+	<span class="alert-box error">{{@LN__CheckToDelete}}: <input type="checkbox" name="delete" value="yes" /></span>
 	<br /><br />
 </check>
 <fieldset>
@@ -13,21 +13,25 @@
 	<table>
 		<tr><td colspan="2"><h6>{{@data.name}}:</h6></td></tr>
 		<tr><td colspan="2"><textarea class="textarea" name="comments">{{@data.comments}}</textarea></td></tr>
-		<tr><td>__Notification</td><td><input type="checkbox" name="notify" value="yes" <check if="{{@data.notify}}">checked="checked"</check> />
+		<tr><td>{{@LN__Notification}}</td><td><input type="checkbox" name="notify" value="yes" <check if="{{@data.notify}}">checked="checked"</check> />
 		<tr>
-			<td rowspan=3>__Visibility</td>
+			<td rowspan=4>{{@LN__Visibility}}</td>
 			<td>
-				<input type="radio" name="visibility" id="v0" value=0 <check if="{{@data.visibility==0}}">checked="checked" </check>/>
-				<label for="v0">friends</label>
+				<input type="radio" name="visibility" id="v0" value='0' <check if="{{@data.visibility==0 OR @data.visibility==''}}">checked="checked" </check>/>
+				<label for="v0">{{@LN__VisPrivate}}</label>
 			</td>
 		</tr>
 		<tr><td>
-			<input type="radio" name="visibility" id="v1" value=1 <check if="{{@data.visibility==1}}">checked="checked" </check>/>
-			<label for="v1">members</label>
+			<input type="radio" name="visibility" id="v1" value='1' <check if="{{@data.visibility==1}}">checked="checked" </check>/>
+			<label for="v1">{{@LN__VisFriends}}</label>
 		</td></tr>
 		<tr><td>
-			<input type="radio" name="visibility" id="v2" value=2 <check if="{{@data.visibility==2 OR @data.visibility==''}}">checked="checked" </check>/>
-			<label for="v2">everybody</label>
+			<input type="radio" name="visibility" id="v2" value='2' <check if="{{@data.visibility==2}}">checked="checked" </check>/>
+			<label for="v2">{{@LN__VisMembers}}</label>
+		</td></tr>
+		<tr><td>
+			<input type="radio" name="visibility" id="v3" value='3' <check if="{{@data.visibility==3}}">checked="checked" </check>/>
+			<label for="v3">{{@LN__VisEverybody}}</label>
 		</td></tr>
 		<tr><td colspan="2"><input class="button" type="submit"></td></tr>
 	</table>

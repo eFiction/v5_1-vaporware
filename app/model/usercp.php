@@ -966,6 +966,7 @@ class UserCP extends Base
 		else return FALSE;
 
 		$data = $this->exec($sql,[":bookmark" => (($params[0]=="bookmark")?1:0), ":id"=>$params['id'][1]]);
+
 		if ( sizeof($data)==1 )
 		{
 			if ( isset($data[0]['authorblock']) )
@@ -1114,7 +1115,7 @@ class UserCP extends Base
 				"type"			=>	$params['id'][0],
 				"bookmark"		=>	(($params[0]=="bookmark") ? 1 : 0),
 				"notify"		=>	(int)@isset($post['notify']),
-				"visibility"	=>	(isset($post['visibility'])) ? (int)$post['visibility'] : 0,
+				"visibility"	=>	(isset($post['visibility'])) ? $post['visibility'] : '',
 				"comments"		=>	$post['comments'],
 			];
 			return $this->insertArray('tbl_user_favourites', $insert, TRUE);

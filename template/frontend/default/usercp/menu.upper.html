@@ -1,7 +1,12 @@
-<check if="{{ isset(@menu_upper) }}">
+<check if="{{ !empty(@menu_upper) }}">
+<true>
 	<repeat group="{{ @menu_upper }}" value="{{ @menu_item }}">
 		<check if="{{ isset(@counter[@menu_item['link']]) }}"><span>{ICON:{{@sub}}} <a href="{{@BASE}}/userCP/{{@path}}/{{ @menu_item['link'] }}">{{ ${'LN__'.@menu_item['label']} }}</a> ({{@counter[@menu_item['link']]}})</span>&nbsp;&nbsp;</check>
 	</repeat>
+<br />
+<br />
+</true>
+<false>
+{* {{@LN__NoElements}} *}
+</false>
 </check>
-<br />
-<br />

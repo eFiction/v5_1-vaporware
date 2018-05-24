@@ -126,7 +126,7 @@ class Base extends \Prefab {
 		if(sizeof($keys)>0)
 		{
 			$sql_query = (($replace===TRUE)?"REPLACE":"INSERT")." INTO `{$table}` (".implode(", ", $keys).") VALUES ( ".implode(", ", $values).")";
-			//echo $sql_query;exit;
+
 			$this->prepare("insertArray", $sql_query);
 
 			foreach($kvpair as $key => $value)

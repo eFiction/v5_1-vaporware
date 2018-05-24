@@ -569,6 +569,14 @@ return array(
 //'noRecommendedStory'	=> 'No recommended stories yet',
 'Notification'	=> 'Benachrichtigung',
 'Visibility'	=> 'Sichtbarkeit',
+'VisPrivate'	=> 'Private',
+'VisFriends'	=> 'Friends',
+'VisMembers'	=> 'Members',
+'VisEverybody'	=> 'Everybody',
+
+'NoElements'	=> 'Für diese Ansicht gibt es keine Elemente',
+
+'CheckToDelete'	=> 'Markieren, um zu löschen',
 
 'TOC'	=> 'Inhaltsverzeichnis',
 'NoTags' => 'Keine Tags gesetzt',
