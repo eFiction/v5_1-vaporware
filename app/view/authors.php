@@ -13,7 +13,7 @@ class Authors extends Base
 		return $this->render('authors/main.html');
 	}
 	
-	public function list($list, $letter=NULL)
+	public function listing($list, $letter=NULL)
 	{
 		// common definitions
 		$this->javascript('body', TRUE, 'jquery.columnizer.js' );

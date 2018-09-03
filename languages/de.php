@@ -30,6 +30,7 @@ return array(
 'Edit'			=> 'Bearbeiten',
 'Title' 		=>	'Titel',
 'Author' 		=>	'Autor',
+'Privacy'		=> 	'Datenschutz',
 
 // [2] Global -- Login related
 'Login'			=> 'Anmelden',

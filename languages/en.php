@@ -30,6 +30,7 @@ return array(
 'Edit'			=> 'Edit',
 'Title' 		=>	'Title',
 'Author' 		=>	'Author',
+'Privacy'		=> 	'Privacy',
 
 // [2] Global -- Login related 20
 'Login'			=> 'Login',

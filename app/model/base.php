@@ -300,7 +300,7 @@ class Base extends \Prefab {
 							FROM `tbl_stories`S
 								LEFT JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid )
 								INNER JOIN `tbl_stories_authors`SA ON ( SA.sid = S.sid AND SA.type='M' )
-									INNER JOIN `new5_users`U ON ( ( U.uid=SA.aid ) AND ( U.uid={$userID} OR U.curator={$userID} ) )
+									INNER JOIN `tbl_users`U ON ( ( U.uid=SA.aid ) AND ( U.uid={$userID} OR U.curator={$userID} ) )
 						WHERE S.sid = :sid ";
 			$countBind = [ ":sid" => $storyID ];
 			

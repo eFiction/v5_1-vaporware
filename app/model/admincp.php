@@ -244,28 +244,14 @@ class AdminCP extends Base {
 		
 		foreach ( $data as $item )
 		{
-			if( empty($item['evaluate']) OR 1 == eval("return \$this->config{$item['evaluate']};") )
+			// fixed to return 0 if module disabled or not present
+			if( empty($item['evaluate']) OR 1 == eval("return (isset(\$this->config{$item['evaluate']})) ? \$this->config{$item['evaluate']} : 0;") )
 			{
-				/*
-				if ( $item['link']==$selected."/".\Base::instance()->get('PARAMS.module') )
-				{
-					if ( $item['link'] == "home/logs" )
-					{
-						$menuCount = $this->logGetCount();
-						foreach( $menuCount as $sub => $data )
-							$a["home/logs/".$sub] =  [ "label" => "Logs_{$sub}", "icon" => "", "requires" => $item["requires"] ];
-					}
-					//$item = "";
-				}
-				else $a = NULL;
-				*/
-				
 				if ( isset($menu[$item['child_of']]) )
-	//			{
 					$menu[$item['child_of']]['sub'][$item["link"]] = [ "label" => $item["label"], "icon" => $item["icon"], "requires" => $item["requires"] ];
-	//				if ( $a ) $menu[$item['child_of']]['sub'] += $a ;
-	//			}
+
 				else $menu[$item["link"]] = [ "label" => $item["label"], "icon" => $item["icon"], "requires" => $item["requires"] ];
+
 				$this->access[$item['link']] = $item["requires"];
 			}
 		}
@@ -1271,7 +1257,7 @@ class AdminCP extends Base {
 			[":sid" => $sid ]
 		);
 		if (sizeof($data)>0) return $data;
-		return FALSE;
+		return [];
 	}
 	
 	public function loadStoryMapper($sid)

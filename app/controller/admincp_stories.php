@@ -173,11 +173,12 @@ class AdminCP_Stories extends AdminCP
 				exit;
 			}
 		}
-		
+		/*		
 		var_dump ( $current['sid'] );
 		
 		print_r($params);
 		
 		print_r($post);
+		*/
 	}
 }

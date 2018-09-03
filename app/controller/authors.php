@@ -26,7 +26,7 @@ class Authors extends Base {
 			if ( FALSE !== $data = $this->model->getAuthors() )
 			{
 				// build view
-				$content = $this->template->list($data);
+				$content = $this->template->listing($data);
 				// switch off right sidebar
 				\Base::instance()->set('bigscreen', TRUE);
 			}
@@ -41,7 +41,7 @@ class Authors extends Base {
 			$letter = $params['id'][0];
 			$data = $this->model->getAuthors($letter);
 			// build view
-			$content = $this->template->list($data, $letter);
+			$content = $this->template->listing($data, $letter);
 		}
 		elseif ( is_numeric($params['id']) )
 		{

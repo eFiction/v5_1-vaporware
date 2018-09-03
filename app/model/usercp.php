@@ -988,7 +988,6 @@ class UserCP extends Base
 					( $params[1]=="written" ? "GROUP BY F.reference_sub " : "") .
 					"ORDER BY {$sort['order']} {$sort['direction']}
 					LIMIT ".(max(0,$pos*$limit)).",".$limit;
-					//echo $sql;exit;
 		}
 		else return FALSE;
 

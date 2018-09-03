@@ -39,7 +39,7 @@
 $f3 = @require('lib/f3/base.php');
 
 /** define the current version of eFiction **/
-$f3->set('APP_VERSION', '5.0.0-dev.0');
+$f3->set('APP_VERSION', '5.0.0-dev.1');
 
 //new Session();
 /** define debugging and error reporting options **/
@@ -78,7 +78,7 @@ function exception_error_handler($errno, $errstr, $errfile, $errline ) {
             if($f3->get('DEBUG')>0)
             {
                 //echo $errstr."<br>";
-            }   
+            } 
         }
     }
 	

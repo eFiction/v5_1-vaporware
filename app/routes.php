@@ -60,6 +60,9 @@ if ( FALSE == $config->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
 else
 	$f3->route( [ 'GET /', 'GET /page/*', 'GET /*' ], 'Controller\Page->maintenance' );
 
+// privacy needs to be available at all times
+$f3->route( [ 'GET /privacy', 'GET /privacy/*' ], 'Controller\Privacy->index' );
+
 
 if ($_SESSION['groups'] & 1)
 {

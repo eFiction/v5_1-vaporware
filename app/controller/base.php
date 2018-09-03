@@ -21,7 +21,9 @@ class Base extends \Prefab {
 	 */
 	public function beforeroute()
 	{
-		if(\Base::instance()->get('AJAX')===TRUE)
+		$f3 = \Base::instance();
+		
+		if($f3->get('AJAX')===TRUE)
 			$this->response = new \View\JSON();
 
 		else
@@ -29,7 +31,30 @@ class Base extends \Prefab {
 
 		\Registry::set('VIEW',$this->response);
 
-		$this->config = \Base::instance()->get('CONFIG');
+		$this->config = $f3->get('CONFIG');
+		
+		$this->config['maintenance'] = 0; /* debug */
+		
+		// check if a reroute to the privacy page is required
+		/*
+		if
+		(
+			// not in maintenance mode (user can still access privacy page)
+			FALSE == $this->config['maintenance']
+			AND 
+			(
+				// no privacy consent cookie set at all
+				empty($f3->get('COOKIE')['privacy_consent'])
+				OR
+				// from EU and no GDPR consent
+				( 1 == \Web\Geo::instance()->location()['in_e_u'] AND empty($f3->get('COOKIE')['gdpr_consent']) )
+			)
+			AND 
+			// not already on privacy page
+			!( strpos( ($f3->get('PARAMS')[0]), "/privacy" ) === 0 )
+		)
+		$f3->reroute("/privacy/consent;returnpath=".$f3->get('PARAMS')[0], false);
+		*/
 	}
 	
 	protected function buffer($content, $section="BODY", $destroy = FALSE)
@@ -43,7 +68,7 @@ class Base extends \Prefab {
 	protected function parametric($params=NULL)
 	{
 		list($params, $returnpath) = array_pad(explode(";returnpath=",$params), 2, '');
-		
+
 		$r = [];
 		if ( $pArray = explode(";", str_replace(["/","&"],";",$params) ) )
 		{

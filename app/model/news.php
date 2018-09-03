@@ -11,10 +11,11 @@ class News extends Base
 		
 		$sql = "SELECT SQL_CALC_FOUND_ROWS N.nid, N.headline, N.newstext, N.comments, UNIX_TIMESTAMP(N.datetime) as timestamp, 
 			U.uid,U.nickname,
-			COUNT(F.fid) as comments
+			COUNT(DISTINCT F.fid) as comments
 			FROM `tbl_news`N
 				LEFT JOIN `tbl_users`U ON ( U.uid = N.uid )
 				LEFT JOIN `tbl_feedback`F ON ( N.nid = F.reference )
+			WHERE N.datetime <= NOW()
 			GROUP BY N.nid
 			ORDER BY N.datetime DESC
 			LIMIT ".(max(0,$pos*$items)).",".(int)$items;
