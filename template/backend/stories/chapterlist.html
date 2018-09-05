@@ -1,15 +1,34 @@
+		<check if="{{isset(@data.chapid)}}"><a class="button" href="{{@BASE}}/adminCP/stories/edit/story={{ @data.sid }}">{{@LN__EditHeader}}</a> <br /><br /></check>
 		<h6>{{@LN__Chapters}}</h6>
 		<small>{{@LN__DragdropSort}}</small>
 		<br /><br />
 		<ul id="chapter-sort">
-		<repeat group="{{ @chapterList }}" value="{{ @row }}">
+		<repeat group="{{ @chapterList }}" value="{{ @row }}" counter="{{ @ctr }}">
 			<li id="{{ @row.chapid }}">
-				<a href="{{@BASE}}/adminCP/stories/edit/story={{ @row.sid }};chapter={{ @row.chapid }}" class="fa fa-pencil-square-o"></a> {{ @row.title }} <check if="{{20 < @row.validated AND @row.validated < 30}}">{ICON:waiting}</check>
+				<span class="ui-icon ui-icon-arrowthick-2-n-s"></span>{{ @ctr }}: <a href="{{@BASE}}/adminCP/stories/edit/story={{ @row.sid }}/chapter={{ @row.chapid }}" class="fa fa-pencil-square-o"></a> {{ @row.title }} <check if="{{20 < @row.validated AND @row.validated < 30}}">{ICON:waiting}</check>
 			</li>
 		</repeat>
 		</ul>
 		
 		<br /><br />
 		
-		<a class="button" href="{{@BASE}}/adminCP/stories/edit/story={{ @data.sid }}">{{@LN__EditHeader}}</a> <br /><br />
-		<a class="button" href="{{@BASE}}/adminCP/stories/edit/story={{ @data.sid }};chapter=new">{{@LN__AddChapter}}</a>
+		<a class="button" href="{{@BASE}}/adminCP/stories/edit/story={{ @data.sid }}/chapter=new">{{@LN__AddChapter}}</a>
+		
+<script type="text/javascript">
+$(function () {
+	$("#chapter-sort").sortable({
+		cursor: "move",
+		placeholder: "ui-state-highlight",
+		update: function () {
+			var neworder = $('#chapter-sort').sortable('toArray');
+			$.ajax({
+				type: "post",
+				url: "{{@BASE}}/adminCP/ajax/stories/chaptersort",
+				//data: { chaptersort: {{@data.sid}}, neworder: neworder },
+				data: { story: {{@data.sid}}, neworder: neworder },
+				dataType: "html"
+			});
+		}
+	});
+});
+</script>

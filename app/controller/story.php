@@ -122,7 +122,6 @@ class Story extends Base
 			}
 		}
 		
-		//echo "<pre>".print_r($params,TRUE).print_r(@$data,TRUE).print_r(@$errors,TRUE)."</pre>";
 		// If nothing else has worked so far, return to where we came from and pretend this was intentional
 		$f3->reroute($requestpath, false);
 		exit;
@@ -260,7 +259,7 @@ class Story extends Base
 		{
 			$data = $this->model->categories( (int)$id );
 
-			return \View\Story::categories($data);
+			return $this->template->categories($data);
 		}
 		else
 		{
@@ -406,7 +405,7 @@ class Story extends Base
 				$n = 1;
 				foreach($chapters as $chapter)
 				{
-					$chapterText = $this->model->getChapter( $epubData['sid'], $chapter['inorder'], FALSE );
+					$chapterText = $this->model->getChapterText( $epubData['sid'], $chapter['inorder'], FALSE );
 					$chapterTOC[] = array ( "number" => $n, "title" => "{$chapter['title']}" );
 					
 					$body = $this->template->epubChapter(
@@ -578,7 +577,7 @@ class Story extends Base
 				if( empty($view) OR !is_numeric($view) ) $view = 1;
 				$chapter = $view = max ( 1, min ( $view, $storyData['chapters']) );
 				\Base::instance()->set('bigscreen',TRUE);
-				$content = ($content = $this->model->getChapter( $story, $chapter )) ? : "Error";
+				$content = ($content = $this->model->getChapterText( $story, $chapter )) ? : "Error";
 
 				$storyData['chapternr'] = $chapter;
 			}

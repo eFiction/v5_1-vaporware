@@ -1,7 +1,7 @@
 <?php
 namespace Model;
 
-class AdminCP extends Base {
+class AdminCP extends Controlpanel {
 
 	protected $menu = [];
 	protected $access = [];
@@ -194,7 +194,7 @@ class AdminCP extends Base {
 	public function saveKeys($data)
 	{
 		$affected=0;
-		$sqlUpdate = "UPDATE `tbl_config` SET `value` = :value WHERE `can_edit` = 1 and `name` = :key and `admin_module` = :section;";
+		$sqlUpdate = "UPDATE `tbl_config` SET `value` = :value WHERE `name` = :key and `admin_module` = :section;";
 		
 		foreach ( $data as $section => $fields )
 		{
@@ -1034,7 +1034,8 @@ class AdminCP extends Base {
 		if (sizeof($data)!=1) 
 			return NULL;
 
-		$data[0]['datetime'] = $this->timeToUser($data[0]['datetime'], $this->config['date_format_long']);
+		// going with the preset date/time versions to make sure the datetimepicker is happy
+		$data[0]['datetime'] = $this->timeToUser($data[0]['datetime'], $this->config['date_format']." ".$this->config['time_format']);
 
 		return $data[0];
 	}
@@ -1065,11 +1066,12 @@ class AdminCP extends Base {
 			return FALSE;
 		}
 		$news->load(array('nid=?',$id));
+
 		$news->copyfrom( 
 			[ 
 				"headline"	=> $data['headline'], 
 				"newstext"	=> $data['newstext'],
-				"datetime"	=> \DateTime::createFromFormat($this->config['date_format_short']." H:i", $data['datetime'])->format('Y-m-d H:i'),
+				"datetime"	=> \DateTime::createFromFormat($this->config['date_format'], $data['datetime'])->format('Y-m-d H:i'),
 			]
 		);
 
@@ -1214,39 +1216,7 @@ class AdminCP extends Base {
 		}
 		return FALSE;
 	}
-	
-	public function storyEditPrePop(array $storyData)
-	{
-		$pre['cat']  = $this->storyJsonPrepare($storyData['cache_categories']);
-		$pre['tag']	 = $this->storyJsonPrepare($storyData['cache_tags']);
-		$pre['char'] = $this->storyJsonPrepare($storyData['cache_characters']);
-		
-		$authors = $this->exec ( "SELECT U.uid as id, U.nickname as name FROM `tbl_users`U INNER JOIN `tbl_stories_authors`Rel ON ( U.uid = Rel.aid AND Rel.sid = :sid AND Rel.type = 'M' );", [ ":sid" => $storyData['sid'] ]);
-		$pre['auth'] = json_encode($authors);
 
-		$coauthors = $this->exec ( "SELECT U.uid as id, U.nickname as name FROM `tbl_users`U INNER JOIN `tbl_stories_authors`Rel ON ( U.uid = Rel.aid AND Rel.sid = :sid AND Rel.type = 'S' );", [ ":sid" => $storyData['sid'] ]);
-		$pre['coauth'] = json_encode($coauthors);
-
-		return $pre;
-	}
-	
-	protected function storyJsonPrepare( $data )
-	{
-		// if the array is empty, take the short way out.
-		if ( NULL === $data = json_decode($data,TRUE) )
-			return "[]";
-
-		// tags come in a more complex version, so we have to treat them a bit different
-		if ( isset($data['simple']) )
-			foreach ( $data['simple'] as $tmp ) $array[] = [ "id" => $tmp[0], "name" => $tmp[1] ];
-		// category or character
-		else
-			foreach ( $data as $tmp ) $array[] = [ "id" => $tmp[0], "name" => $tmp[1] ];
-		
-		// return a json encoded array for the prepopulation
-		return json_encode($array);
-	}
-	
 	public function loadChapterList($sid)
 	{
 		$data = $this->exec
@@ -1259,28 +1229,12 @@ class AdminCP extends Base {
 		if (sizeof($data)>0) return $data;
 		return [];
 	}
-	
+
 	public function loadStoryMapper($sid)
 	{
 		$story=new \DB\SQL\Mapper($this->db, $this->prefix.'stories');
 		$story->load(array('sid=?',$sid));
 		return $story;
-	}
-	
-	public function getChapter( $story, $chapter, $counting = FALSE )
-	{
-		$data = $this->exec
-		(
-			"SELECT Ch.sid,Ch.chapid,Ch.inorder,Ch.title,Ch.notes,Ch.validated,Ch.rating
-				FROM `tbl_chapters`Ch
-			WHERE Ch.sid = :sid AND Ch.chapid = :chapter",
-			[":sid" => $story, ":chapter" => $chapter ]
-		);
-		if (empty($data)) return FALSE;
-		$data = $data[0];
-		$data['chaptertext'] = parent::getChapter( $story, $data['inorder'], $counting );
-		
-		return $data;
 	}
 	
 	//public function saveChapterChanges( int $chapterID, array $post )
@@ -1296,37 +1250,30 @@ class AdminCP extends Base {
 		
 		// plain and visual return different newline representations, this will bring things to standard.
 		$post['chapter_text'] = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $post['chapter_text']);
-		
 		parent::saveChapter($chapterID, $post['chapter_text']);
 	}
 	
-	//public function addChapter ( int $storyID, array $post )
-	public function addChapter ( $storyID, array $post )
+	//public function addChapter ( int $storyID )
+	public function addChapter ( $storyID )
 	{
 		$location = $this->config['chapter_data_location'];
 		
 		// Get current chapter count and raise
-		if ( FALSE == $chapterCount = @$this->exec("SELECT COUNT(chapid) as chapters FROM `tbl_chapters` WHERE `sid` = :sid ", [ ":sid" => $storyID ])[0]['chapters'] )
+		if ( FALSE === $chapterCount = @$this->exec("SELECT COUNT(chapid) as chapters FROM `tbl_chapters` WHERE `sid` = :sid ", [ ":sid" => $storyID ])[0]['chapters'] )
 			return FALSE;
 		$chapterCount++;
 		
 		$kv = [
-			'title'			=> $post['chapter_title'],
+			'title'			=> \Base::instance()->get('LN__Chapter')." #{$chapterCount}",
 			'inorder'		=> $chapterCount,
-			'notes'			=> $post['chapter_notes'],
-			//'workingtext'
-			//'workingdate'
-			//'endnotes'
 			'validated'		=> "1".($_SESSION['groups']&128)?"3":"2",
-			'wordcount'		=> $this->str_word_count_utf8($post['chapter_text']),
+			'wordcount'		=> 0,
 			'rating'		=> "0", // allow rating later
 			'sid'			=> $storyID,
 		];
-		if ( $location != "local" )
-			$kv['chaptertext'] = $post['chapter_text'];
 
 		$chapterID = $this->insertArray($this->prefix.'chapters', $kv );
-		
+
 		if ( $location == "local" )
 		{
 			$db = \storage::instance()->localChapterDB();
@@ -1335,7 +1282,7 @@ class AdminCP extends Base {
 									':chapid' 		=> $chapterID,
 									':sid' 			=> $storyID,
 									':inorder' 		=> $chapterCount,
-									':chaptertext'	=> $post['chapter_text'],
+									':chaptertext'	=> '',
 								]
 			);
 		}
@@ -1349,8 +1296,60 @@ class AdminCP extends Base {
 	{
 		return parent::addChapterText( $chapterData );
 	}
+	
+	public function storyAdd(array $data)
+	{
+		$newStory = new \DB\SQL\Mapper($this->db, $this->prefix."stories");
+		$newStory->title		= $data['new_title'];
+		$newStory->completed	= 1;
+		$newStory->validated	= 11;
+		$newStory->date			= date('Y-m-d H:i:s');
+		$newStory->save();
+		
+		$newID = $newStory->_id;
+		
+		$new_authors = explode(",",$data['new_author']);
+		foreach ( $new_authors as $new_author )
+		{
+			// add the story-author relation
+			$newRelation = new \DB\SQL\Mapper($this->db, $this->prefix."stories_authors");
+			$newRelation->sid	= $newID;
+			$newRelation->aid	= $new_author;
+			$newRelation->type	= 'M';
+			$newRelation->save();
+			
+			// already counting as author? mainly for stats ...
+			$editUser = new \DB\SQL\Mapper($this->db, $this->prefix."users");
+			$editUser->load(array("uid=?",$new_author));
+			if ( $editUser->groups < 4 )
+				$editUser->groups += 4;
+			$editUser->save();
+		}
+		
+		$this->rebuildStoryCache($newID);
 
-	public function saveStoryChanges(\DB\SQL\Mapper $current, array $post)
+		return $newID;
+	}
+
+	public function storyAddCheck(array $formData)
+	{
+		$sql = "SELECT S.sid, S.title 
+					FROM `tbl_stories`S 
+						INNER JOIN `tbl_stories_authors`A ON ( S.sid = A.sid ) 
+					WHERE S.title LIKE :title and A.aid IN(:aid)";
+		$similarExists = $this->exec($sql,  [ ':title' => $formData['new_title'], ':aid' => $formData['new_author'] ] );
+		
+		// no hits, seems to be a new story
+		if ( sizeof($similarExists) == 0 ) return NULL;
+		
+		// might be an existing title up for dual entry, let's notify the mod/admin
+		$sqlAuthors = "SELECT U.uid as id, U.nickname as name FROM `tbl_users`U WHERE FIND_IN_SET(U.uid,:uid);";
+		$authors = $this->exec($sqlAuthors,  [ ':uid' => $formData['new_author'] ] );
+		
+		return [ "storyInfo" => $similarExists[0], "preAuthor" => json_encode($authors) ];
+	}
+
+	public function storySaveChanges(\DB\SQL\Mapper $current, array $post)
 	{
 		// Step one: save the plain data
 		$current->title			= $post['story_title'];
@@ -1367,114 +1366,15 @@ class AdminCP extends Base {
 		$this->storyRelationTag( $current->sid, $post['tags'] );
 		// Check Characters:
 		$this->storyRelationTag( $current->sid, $post['characters'], 1 );
-		
 		// Check Categories:
-		$post['category'] = array_filter(explode(",",$post['category']));
-		$categories = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_categories');
-
-		foreach ( $categories->find(array('`sid` = ?',$current->sid)) as $X )
-		{
-			$temp=array_search($X['cid'], $post['category']);
-			if ( $temp===FALSE )
-			{
-				// Excess relation, drop from table
-				$categories->erase(['lid=?',$X['lid']]);
-			}
-			else unset($post['category'][$temp]);
-		}
-		
-		// Insert any character IDs not already present
-		if ( sizeof($post['category'])>0 )
-		{
-			foreach ( $post['category'] as $temp)
-			{
-				// Add relation to table
-				$categories->reset();
-				$categories->sid = $current->sid;
-				$categories->cid = $temp;
-				$categories->save();
-			}
-		}
-		unset($categories);
-		
-		// Author and co-Author preparation:
-		$post['mainauthor'] = array_filter(explode(",",$post['mainauthor']));
-		$post['supauthor'] = array_filter(explode(",",$post['supauthor']));
-		// remove co-authors that are already in the author field
-		$post['supauthor'] = array_diff($post['supauthor'], $post['mainauthor']);
-
+		$this->storyRelationCategories( $current->sid, $post['category'] );
 		// Check Authors:
-		$this->storyRelationAuthor( $current->sid, $post['mainauthor'] );
-		// Check co-Authors:
-		$this->storyRelationAuthor( $current->sid, $post['supauthor'], 'S' );
-		
+		$this->storyRelationAuthor( $current->sid, $post['mainauthor'], $post['supauthor'] );
+
+		// Rebuild story cache based on new data
 		$this->rebuildStoryCache($current->sid);
 		
 		return TRUE;
-	}
-	
-	protected function storyRelationTag( $sid, $data, $character = 0 )
-	{
-		// Check tags:
-		$data = explode(",",$data);
-		$relations = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_tags');
-
-		foreach ( $relations->find(array('`sid` = ? AND `character` = ?',$sid,$character)) as $X )
-		{
-			$temp=array_search($X['tid'], $data);
-			if ( $temp===FALSE )
-			{
-				// Excess relation, drop from table
-				$relations->erase(['lid=?',$X['lid']]);
-			}
-			else unset($data[$temp]);
-		}
-		
-		// Insert any tag IDs not already present
-		if ( sizeof($data)>0 )
-		{
-			foreach ( $data as $temp)
-			{
-				// Add relation to table
-				$relations->reset();
-				$relations->sid = $sid;
-				$relations->tid = $temp;
-				$relations->character = $character;
-				$relations->save();
-			}
-		}
-		unset($relations);
-	}
-	
-	protected function storyRelationAuthor( $sid, $data, $type = 'M' )
-	{
-		$author = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors');
-
-		foreach ( $author->find(array('`sid` = ? AND `type` = ?',$sid,$type)) as $X )
-		{
-			$temp=array_search($X['aid'], $data);
-			if ( $temp===FALSE )
-			{
-				// Excess relation, drop from table
-				$author->erase(['lid=?',$X['lid']]);
-			}
-			else unset($data[$temp]);
-		}
-
-		// Insert any character IDs not already present
-		if ( sizeof($data)>0 )
-		{
-			foreach ( $data as $temp)
-			{
-				// Add relation to table
-				$author->reset();
-				$author->sid = $sid;
-				$author->aid = $temp;
-				$author->type = $type;
-				$author->save();
-			}
-		}
-		unset($author);
 	}
 
 	//public function getPendingStories(int $page, array $sort)
@@ -1674,7 +1574,6 @@ class AdminCP extends Base {
 				"language_available" 	=> json_encode($available),
 				"language_default"		=> $default,
 			];
-			
 		return $this->saveKeys($post);
 	}
 

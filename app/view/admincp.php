@@ -37,6 +37,12 @@ class AdminCP extends Base
 			unset($_SESSION['deleteResult']);
 		}
 
+		if( isset($_SESSION['lastAction']) )
+		{
+			$this->f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
+			unset($_SESSION['lastAction']);
+		}
+
 		$this->f3->set('sort', $sort);
 		$this->f3->set('taglist', $data);
 		return $this->render('archive/list_tags.html');
@@ -116,10 +122,10 @@ class AdminCP extends Base
 	{
 		if(!isset($data['raw']))
 		{
-			\Registry::get('VIEW')->javascript( 'head', TRUE, "//cdn.tinymce.com/4/tinymce.min.js" );
-			\Registry::get('VIEW')->javascript( 'head', TRUE, "editor.js" );
+			$this->javascriptjavascript( 'head', TRUE, "//cdn.tinymce.com/4/tinymce.min.js" );
+			$this->javascriptjavascript( 'head', TRUE, "editor.js" );
 		}
-		\Registry::get('VIEW')->javascript( 'head', TRUE, "jquery.datetimepicker.js" );
+		$this->javascript( 'head', TRUE, "jquery.datetimepicker.js" );
 
 		$this->f3->set('data', $data);
 		$this->f3->set('returnpath', $returnpath);
@@ -182,26 +188,29 @@ class AdminCP extends Base
 		return \Template::instance()->render('home/edit_custompage.html');
 	}
 
-	public static function listNews(array $data, array $sort)
+	public function listNews(array $data, array $sort)
 	{
-		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 
-		\Base::instance()->set('newsEntries', $data);
-		\Base::instance()->set('sort', $sort);
-		return \Template::instance()->render('home/list_news.html');
+		$this->f3->set('newsEntries', $data);
+		$this->f3->set('sort', $sort);
+		return $this->render('home/list_news.html');
 	}
 
-	public static function editNews(array $data)
+	public function editNews(array $data, $returnpath)
 	{
 		if(!isset($data['raw']))
 		{
-			\Registry::get('VIEW')->javascript( 'head', TRUE, "//cdn.tinymce.com/4/tinymce.min.js" );
-			\Registry::get('VIEW')->javascript( 'head', TRUE, "editor.js" );
+			$this->javascript( 'head', TRUE, "//cdn.tinymce.com/4/tinymce.min.js" );
+			$this->javascript( 'head', TRUE, "editor.js" );
 		}
-		\Registry::get('VIEW')->javascript( 'head', TRUE, "jquery.datetimepicker.js" );
+		$this->javascript( 'head', TRUE, "jquery.datetimepicker.js" );
 
-		\Base::instance()->set('data', $data);
-		return \Template::instance()->render('home/edit_news.html');
+		$this->f3->set('data', $data);
+		$this->f3->set('format', $this->config['date_format']." ".$this->config['time_format']);
+		$this->f3->set('returnpath', $returnpath);
+
+		return $this->render('home/edit_news.html');
 	}
 	
 //	public static function listFeatured(array $data, array $sort, string $select)
@@ -226,6 +235,22 @@ class AdminCP extends Base
 		return $this->render('stories/search.html');
 	}
 	
+	public function storyAddForm( array $data = [] )
+	{
+		if ( sizeof($data)>0 )
+		{
+			$this->f3->set('storyInfo', $data['storyInfo']);
+			$this->f3->set('preAuthor', $data['preAuthor']);
+			$this->f3->set('storyLink', $this->f3->format($this->f3->get('LN__StoryAddSimilar'), $this->f3->get('BASE')."/adminCP/stories/edit/story=".$data['storyInfo']['sid']));
+		}
+		else
+		{
+			$this->f3->set('storyTitle', '');
+			$this->f3->set('preAuthor', '[]');
+		}
+		return $this->render('stories/add_story.html');
+	}
+	
 	public function storyMetaEdit(array $storyData, array $chapterList, array $prePop)
 	{
 		$storyData['storynotes'] = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $storyData['storynotes']);
@@ -238,9 +263,9 @@ class AdminCP extends Base
 		return $this->render('stories/edit_meta.html');
 	}
 
-	public static function storyChapterEdit(array $chapterData, array $chapterList, $plain = FALSE)
+	public static function storyChapterEdit(array $chapterData, array $chapterList, $editor = "plain")
 	{
-		if ($plain)
+		if ($editor == "plain")
 		{
 			$chapterData['notes']		= preg_replace("/<br\\s*\\/>\\s*/i", "\n", $chapterData['notes']);
 			$chapterData['chaptertext']	= html_entity_decode(preg_replace("/<br\\s*\\/>\\s*/i", "\n", $chapterData['chaptertext']));

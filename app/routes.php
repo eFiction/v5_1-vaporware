@@ -99,17 +99,11 @@ if ($_SESSION['groups'] & 1)
 				'Controller\AdminCP->fallback' );
 
 			// Home
-			$f3->route(
-				[ 'GET /adminCP/home', 'GET|POST /adminCP/home/@module', 'GET|POST /adminCP/home/@module/*' ],
-				'Controller\AdminCP_Home->index' );
+			$f3->route( [ 'GET /adminCP/home', 'GET|POST /adminCP/home/@module', 'GET|POST /adminCP/home/@module/*' ], 'Controller\AdminCP->__home' );
 
 			// Stories
-			$f3->route(
-				[ 'GET /adminCP/stories', 'GET /adminCP/stories/@module', 'GET /adminCP/stories/@module/*' ],
-				'Controller\AdminCP_Stories->index' );
-			$f3->route( 'POST /adminCP/stories/@module/*', 'Controller\AdminCP_Stories->save' );
-			$f3->route( [ 'POST /adminCP/ajax/stories/@module [ajax]', 'POST /adminCP/ajax/stories/@module/* [ajax]' ], 'Controller\AdminCP_Stories->ajax' );
-			
+			$f3->route( [ 'GET /adminCP/stories', 'GET|POST /adminCP/stories/@module', 'GET|POST /adminCP/stories/@module/*' ], 'Controller\AdminCP->__stories' );
+			$f3->route( [ 'POST /adminCP/ajax/stories/@module [ajax]', 'POST /adminCP/ajax/stories/@module/* [ajax]' ], 'Controller\AdminCP->storiesAjax' );
 		}
 	}
 
@@ -125,17 +119,12 @@ if ($_SESSION['groups'] & 1)
 		$f3->route( 'POST /adminCP/ajax/archive/@module [ajax]', 'Controller\AdminCP_Archive->ajax' );
 
 		// Members
-		$f3->route(
-			[ 'GET /adminCP/members', 'GET /adminCP/members/@module', 'GET /adminCP/members/@module/*' ],
-			'Controller\AdminCP_Members->index' );
-		$f3->route( 'POST /adminCP/members/@module', 'Controller\AdminCP_Members->save' );
-		$f3->route( [ 'POST /adminCP/ajax/members/@module [ajax]', 'POST /adminCP/ajax/members/@module/* [ajax]' ], 'Controller\AdminCP_Members->ajax' );
+		$f3->route( [ 'GET /adminCP/members', 'GET|POST /adminCP/members/@module', 'GET|POST /adminCP/members/@module/*' ],	'Controller\AdminCP->__members' );
+		$f3->route( [ 'POST /adminCP/ajax/members/@module [ajax]', 'POST /adminCP/ajax/members/@module/* [ajax]' ], 'Controller\AdminCP->membersAjax' );
 
 		// Settings
-		$f3->route(
-			[ 'GET /adminCP/settings', 'GET|POST /adminCP/settings/@module' ],
-			'Controller\AdminCP_Settings->index' );
-		$f3->route( 'POST /adminCP/settings/@module', 'Controller\AdminCP_Settings->save' );
+		$f3->route( [ 'GET /adminCP/settings', 'GET /adminCP/settings/@module' ], 'Controller\AdminCP->__settings' );
+		$f3->route( 'POST /adminCP/settings/@module', 'Controller\AdminCP->__settingsSave' );
 
 	}
 }

@@ -10,27 +10,25 @@
 		<th>&nbsp;</th>
 		<th>&nbsp;</th>
 		<th>&nbsp;</th>
-		<th><a href="{{@BASE}}/adminCP/home/news/order=id,
-			<check if="{{ @sort['link']!='id' }}">
-				<true>asc">{ICON:sort}</true>
-				<false>
-					<check if="{{ @sort['direction']=='desc' }}">
-						<true>asc">{ICON:sort-numeric-desc}</true>
-						<false>desc">{ICON:sort-numeric-asc}</false>
-					</check>
-				</false>
-			</check></a> __ID
+		<th><a href="{{@BASE}}/adminCP/home/news/order=id,<check if="{{ @sort['link']!='id' }}">
+															<true>asc">{ICON:sort}</true>
+															<false>
+																<check if="{{ @sort['direction']=='desc' }}">
+																	<true>asc">{ICON:sort-numeric-desc}</true>
+																	<false>desc">{ICON:sort-numeric-asc}</false>
+																</check>
+															</false>
+														</check></a> {{@LN__Sort_ID}}
 		</th>
-		<th><a href="{{@BASE}}/adminCP/home/news/order=date,
-			<check if="{{ @sort['link']!='date' }}">
-				<true>asc">{ICON:sort}</true>
-				<false>
-					<check if="{{ @sort['direction']=='desc' }}">
-						<true>asc">{ICON:sort-alpha-desc}</true>
-						<false>desc">{ICON:sort-alpha-asc}</false>
-					</check>
-				</false>
-			</check></a> __Date
+		<th><a href="{{@BASE}}/adminCP/home/news/order=date,<check if="{{ @sort['link']!='date' }}">
+															<true>asc">{ICON:sort}</true>
+															<false>
+																<check if="{{ @sort['direction']=='desc' }}">
+																	<true>asc">{ICON:sort-alpha-desc}</true>
+																	<false>desc">{ICON:sort-alpha-asc}</false>
+																</check>
+															</false>
+														</check></a> {{@LN__Sort_Date}}
 		</th>
 		<th><a href="{{@BASE}}/adminCP/home/news/order=title,
 			<check if="{{ @sort['link']!='title' }}">
@@ -41,7 +39,7 @@
 						<false>desc">{ICON:sort-alpha-asc}</false>
 					</check>
 				</false>
-			</check></a> __Headline
+			</check></a> {{@LN__Sort_Headline}}
 		</th>
 		<th><a href="{{@BASE}}/adminCP/home/news/order=author,
 			<check if="{{ @sort['link']!='author' }}">
@@ -52,12 +50,12 @@
 						<false>desc">{ICON:sort-alpha-asc}</false>
 					</check>
 				</false>
-			</check></a> __Author
+			</check></a> {{@LN__Sort_Name}}
 		</th>
 	</tr>
 	<repeat group="{{ @newsEntries }}" value="{{ @row }}">
 	<tr>
-		<td><a href="{{@BASE}}/adminCP/home/news/id={{ @row['nid'] }}">{ICON:edit}</a></td>
+		<td><a href="{{@BASE}}/adminCP/home/news/id={{ @row['nid'] }};returnpath=/adminCP/home/news/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
 		<td><a href="{{@BASE}}/adminCP/home/news/delete={{ @row['nid'] }}" class="deleteItem" title="#{{ @row['nid'] }}: {{ @row['headline'] }}">{ICON:trash}</a></td>
 		<td>
 			<check if="{{ @row['timestamp'] == NULL }}">
@@ -71,7 +69,7 @@
 			</check>
 		</td>
 		<td>{{ @row['nid'] }}</td>
-		<td>{{ @row['date'] }}</td>
+		<td>{{ date(\Config::getPublic("date_format_long"), @row['timestamp']) }}</td>
 		<td>{{ @row['headline'] }}</td>
 		<td>{{ @row['author'] }}</td>
 	</tr>

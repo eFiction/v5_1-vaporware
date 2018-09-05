@@ -2,7 +2,7 @@
 
 namespace Controller;
 
-class AdminCP_Archive extends AdminCP
+class AdminCP_Archive extends AdminCP_Old
 {
 	var $moduleBase = "archive";
 	var $submodules = [ "submit", "featured", "contests", "characters", "tags", "categories" ];

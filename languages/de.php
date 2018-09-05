@@ -58,7 +58,8 @@ return array(
 'Sort_Date'		=> 'Datum',
 'Sort_ID'		=> 'ID',
 'Sort_Title'	=> 'Titel',
-'Sort_Label'		=> 'Bezeichnung',
+'Sort_Label'	=> 'Bezeichnung',
+'Sort_Headline'	=> 'Schlagzeile',
 'Sort_Name'		=> 'Name',
 'Sort_Text'		=> 'Text',
 'Sort_Updated'	=> 'Aktualisiert',
@@ -172,6 +173,7 @@ return array(
 // [13] Story -- Edit
 'MainAuthor'	=> 'Autor',
 'MainAuthors'	=> 'Autoren',
+'MainAuthorNotEmpty' => 'Die Liste der Autoren kann nicht leer sein',
 'SupAuthor'		=> 'Nebenautor',
 'SupAuthors'	=> 'Nebenautoren',
 // 'StoryNotes'			=>
@@ -181,6 +183,9 @@ return array(
 // 'ChapterText'			=>
 // 'ChapterTextExplained' =>
 ///DB
+'ReturnToOverview'		=> 'Zurück zur Übersicht',
+'StoryAddSimilar'		=> 'Eine ähnliche Story scheint bereits zu existieren, <a href="{0}">diese stattdessen bearbeiten</a>',
+'StoryConfirmSimilar'	=> 'Trotzdem anlegen',
 'StoryTitle'	=>	'Titel der Geschichte',
 'ChapterTitle'	=>	'Titel des Kapitels',
 'ChapterText'	=>	'Text des Kapitels',
@@ -492,7 +497,8 @@ return array(
 // settings_datetime
 	// 'CFG_date_format_short'		=> 'Default short date.@SMALL@(See <a href="http://php.net/manual/en/function.date.php" target="_blank">php.net documentation</a> for syntax)',
 	// 'CFG_date_format_long'		=> 'Default long date.@SMALL@(See <a href="http://php.net/manual/en/function.date.php" target="_blank">php.net documentation</a> for syntax)',
-	// 'CFG_time_format'			=> 'Default time format.',
+	//'CFG_time_format'			=> 'Time format presets.',
+	//'CFG_date_format'			=> 'Date format presets.',
 	'CFG_monday_first_day'		=> 'Erster Wochentag im Kalender',
 // settings_language
 	'CFG_language_forced'		=> 'Deaktiviere persönliche Sprachwahl: @SMALL@Standard ist <b>nein</b>',
@@ -607,6 +613,9 @@ return array(
 'Button_writeComment'	=> 'Kommentar schreiben',
 
 // Archiv News'
+'News_Headline'	=> 'Schlagzeile',
+'News_DateTimeExplain' => 'Artikel werden zur oben angegeben Zeit sichtbar',
+'News_Article'	=> 'Artikel',
 'News_Box' => 'Archiv News',
 'News_Archive' => 'Alle News lesen',
 'News_writtenby' => 'geschrieben von',

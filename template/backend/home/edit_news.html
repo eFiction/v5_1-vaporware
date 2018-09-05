@@ -1,11 +1,12 @@
+<check if="{{!empty(@returnpath)}}"><a href="{{@BASE}}{{@returnpath}}">{ICON:arrow-left} {{@LN__ReturnToOverview}}</a></check>
 <form action="{{@BASE}}/adminCP/home/news/id={{@data.id}}<check if="{{ @data.raw }}">/raw=1</check>" method="post">
 	<div class="grid-wrapper">
 		<check if="{{ isset(@form_error) }}"><div class="gb-90 alert-box error">{{ @form_error }}</div></check>
 		<check if="{{ @data['changes'] }}"><div class="gb-90 alert-box success">{{ @LN__Status_Changes, @data['changes'] | format }}</div></check>
-		<div class="gb-20">__NewsHeadline</div><div class="gb-70"><input type="text" name="form_data[headline]" value="{{ @data.headline }}" /></div><div class="gb-10" align="right"><a href="{{@BASE}}/adminCP/home/news/id={{@data.id}}<check if="{{ !@data.raw }}">/raw=1</check>"><check if="{{ @data.raw }}"><true>__SwitchEditor</true><false>__SwitchRaw</false></check></a></div>
-		<div class="gb-20">__NewsDateTime</div><div class="gb-80"><input type="text" name="form_data[datetime]" value="{{ preg_replace('!\s+!', ' ', @data.datetime) }}" id="datetime"/></div>
-		<div class="gb-full">__NewsDateTimeExplain</div>
-		<div class="gb-full">__NewsEntry:<br /><textarea name="form_data[newstext]" id="tinymce" rows="20" cols="80">{{ @data.newstext }}</textarea><br /></div>
+		<div class="gb-20">{{@LN__News_Headline}}</div><div class="gb-70"><input type="text" name="form_data[headline]" value="{{ @data.headline }}" /></div><div class="gb-10" align="right"><a href="{{@BASE}}/adminCP/home/news/id={{@data.id}}<check if="{{ !@data.raw }}">/raw=1</check>"><check if="{{ @data.raw }}"><true>__SwitchEditor</true><false>__SwitchRaw</false></check></a></div>
+		<div class="gb-20">{{@LN__Date}}</div><div class="gb-80"><input type="text" name="form_data[datetime]" value="{{ @data.datetime }}" id="datetime"/></div>
+		<div class="gb-full">{{@LN__News_DateTimeExplain}}</div>
+		<div class="gb-full">{{@LN__News_Article}}:<br /><textarea name="form_data[newstext]" id="tinymce" rows="20" cols="80">{{ @data.newstext }}</textarea><br /></div>
 		<div class="gb-40" align="right"><input type="submit"></div><div class="gb-60"><input type="reset"></div>
 	</div>
 </form>
@@ -13,6 +14,6 @@
 jQuery.datetimepicker.setLocale('{{ $_SESSION['preferences']['language'] }}');
 $('#datetime').datetimepicker({
 	dayOfWeekStart : <check if="{{ \Config::getPublic('monday_first_day')==1 }}"><true>1</true><false>7</false></check>,
-	format:'{{ preg_replace('!\s+!', ' ', \Config::getPublic("date_format_long")) }}',
+	format:'{{ @format }}',
 });
 </script>

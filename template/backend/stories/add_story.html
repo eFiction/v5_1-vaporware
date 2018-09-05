@@ -1,0 +1,28 @@
+<div class="grid-wrapper">
+	<check if="{{ isset(@storyInfo) }}"><div class="gb-90 alert-box warning">{{@storyLink | raw }}?</div></check>
+	<div class="gb-3qrt">
+		<form method="post" action="{{@BASE}}/adminCP/stories/add">
+			<div class="ym-grid">
+				<div class="gb-1qrt"><h6>{{@LN__Title}}</h6></div>
+				<div class="gb-3qrt"><input placeholder="Your story title goes here" type="text" name="form[new_title]" value="{{@storyInfo.title}}"></div>
+{*		<!-- The next fields will be filled by the javascript below, do not change the id! --> *}
+				<div class="gb-1qrt"><h6>{{@LN__MainAuthor}} <a class="contextual-popup" href="#mainauthorinfo">{ICON:info} <span> <b>Info:</b><br />{{@UCP_ExplainMainAuthor}}.</span></a></h6></div>
+				<div class="gb-3qrt"><input type="text" id="mainauthor-select" name="form[new_author]" /></div>
+				<check if="{{ isset(@storyInfo) }}">
+				<div class="full"><div class="gb-90 alert-box warning"><input type="checkbox" name="form[confirmInsert]"/>{{@LN__StoryConfirmSimilar}}</div></div>
+				</check>
+				<div class="gb-full"><input class="button" type="reset"> <input class="button" type="submit"></div>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#mainauthor-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "author",
+    	preventDuplicates: true,
+    	prePopulate: {{@preAuthor | raw}}
+    });
+});
+</script>

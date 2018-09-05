@@ -165,11 +165,11 @@ class Story extends Base
 		return $dropDown;
 	}
 	
-	public static function categories($data)
+	public function categories($data)
 	{
-		\Base::instance()->set('categoriesData', $data);
+		$this->f3->set('categoriesData', $data);
 		
-		return parent::render('story/categories.html');
+		return $this->render('story/categories.html');
 	}
 	
 	public function epubXMLtag()

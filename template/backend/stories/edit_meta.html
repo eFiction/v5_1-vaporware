@@ -1,4 +1,5 @@
 <div class="grid-wrapper">
+	<check if="{{ isset(@form_warning) }}"><div class="gb-90 alert-box warning">{{ @form_warning }}</div></check>
 	<div class="gb-3qrt">
 		<form method="post" action="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}}<check if="{{!empty(@data.returnpath)}}">;returnpath={{@data.returnpath}}</check>">
 			<div class="ym-grid">
@@ -69,7 +70,7 @@ $(document).ready(function() {
     	method: "post",
     	queryParam: "author",
     	preventDuplicates: true,
-    	prePopulate: {{@prePop.auth | raw}}
+    	prePopulate: {{@prePop.mainauth | raw}}
     });
 });
 
@@ -78,7 +79,7 @@ $(document).ready(function() {
     	method: "post",
     	queryParam: "author",
     	preventDuplicates: true,
-    	prePopulate: {{@prePop.coauth | raw}}
+    	prePopulate: {{@prePop.supauth | raw}}
     });
 });
 
@@ -100,19 +101,4 @@ $(document).ready(function() {
     });
 });
 
-$(function () {
-	$("#chapter-sort").sortable({
-		cursor: "move",
-		containment: "parent",
-		update: function () {
-			var neworder = $('#chapter-sort').sortable('toArray');
-			$.ajax({
-				type: "post",
-				url: "{{@BASE}}/adminCP/ajax/stories/chaptersort",
-				data: { story: {{@data.sid}}, neworder: neworder },
-				dataType: "html"
-			});
-		}
-	});
-});
 </script>

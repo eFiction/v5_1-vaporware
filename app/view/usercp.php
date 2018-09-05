@@ -34,16 +34,22 @@ class UserCP extends Base
 		return \Template::instance()->render('usercp/author/storyAdd.html');
 	}
 
-	public static function authorStoryMetaEdit(array $storyData, array $chapterList, array $prePop)
+	public function authorStoryMetaEdit(array $storyData, array $chapterList, array $prePop)
 	{
 		$storyData['storynotes'] = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $storyData['storynotes']);
 		$storyData['summary'] = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $storyData['summary']);
 
-		\Base::instance()->set('prePop', $prePop);
-		\Base::instance()->set('data', $storyData);
-		\Base::instance()->set('chapterList', $chapterList);
+		if( isset($_SESSION['lastAction']) )
+		{
+			$this->f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
+			unset($_SESSION['lastAction']);
+		}
+
+		$this->f3->set('prePop', $prePop);
+		$this->f3->set('data', $storyData);
+		$this->f3->set('chapterList', $chapterList);
 		
-		return \Template::instance()->render('usercp/author/storyEditMeta.html');
+		return $this->render('usercp/author/storyEditMeta.html');
 	}
 
 	public static function authorStoryChapterEdit(array $chapterData, array $chapterList, $editor="plain")

@@ -287,11 +287,6 @@ class Story extends Base
 		else return FALSE;
 	}
 	
-	public function getChapter( $story, $chapter, $counting = TRUE )
-	{
-		return parent::getChapter( $story, $chapter, $counting );
-	}
-	
 	public function storyData(array $replacements=[], array $bind=[])
 	{
 		$sql = $this->storySQL($replacements);
@@ -376,9 +371,12 @@ class Story extends Base
 		// If not in root, get parent category information
 		if ( $cid > 0 )
 		{
-			$sql = "SELECT C.category, C.description, C.image, C.stats, C.parent_cid
+			$sql = "SELECT C.cid, C.category, C.description, C.image, C.stats, C.parent_cid,
+						COUNT(DISTINCT rSC.lid) as count
 							FROM `tbl_categories`C 
-							WHERE C.cid ='{$cid}' ";
+								LEFT JOIN `tbl_stories_categories`rSC ON ( C.cid = rSC.cid )
+							WHERE C.cid ='{$cid}' 
+							GROUP BY C.cid";
 			$parent = $this->exec($sql);
 
 			if ( sizeof($parent)==1 )

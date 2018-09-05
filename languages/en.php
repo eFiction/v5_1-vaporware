@@ -59,6 +59,7 @@ return array(
 'Sort_ID'			=> 'ID',
 'Sort_Title'		=> 'Title',
 'Sort_Label'		=> 'Label',
+'Sort_Headline'		=> 'Headline',
 'Sort_Name'			=> 'Name',
 'Sort_Text'			=> 'Text',
 'Sort_Updated'		=> 'Updated',
@@ -172,6 +173,7 @@ return array(
 // [13] Story -- Edit 10
 'MainAuthor'	=> 'Main author',
 'MainAuthors'	=> 'Main authors',
+'MainAuthorNotEmpty' => 'Main author list cannot be empty',
 'SupAuthor'		=> 'Supporting author',
 'SupAuthors'	=> 'Supporting authors',
 'StoryNotes'			=> 'Notes',
@@ -181,6 +183,9 @@ return array(
 'ChapterText'			=> 'Chapter text',
 'ChapterTextExplained'	=> 'Your chapter\'s content goes here',
 ///DB
+'ReturnToOverview'		=> 'Return to overview',
+'StoryAddSimilar'		=> 'A similar story already exist, <a href="{0}">edit story instead</a>',
+'StoryConfirmSimilar'	=> 'Insert nevertheless',
 'StoryTitle'	=>	'Story title',
 'ChapterTitle'	=>	'Chapter title',
 'ChapterText'	=>	'Chapter text',
@@ -492,7 +497,8 @@ return array(
 // settings_datetime
 	'CFG_date_format_short'		=> 'Default short date.@SMALL@(See <a href="http://php.net/manual/en/function.date.php" target="_blank">php.net documentation</a> for syntax)',
 	'CFG_date_format_long'		=> 'Default long date.@SMALL@(See <a href="http://php.net/manual/en/function.date.php" target="_blank">php.net documentation</a> for syntax)',
-	'CFG_time_format'			=> 'Default time format.',
+	'CFG_time_format'			=> 'Time format presets.',
+	'CFG_date_format'			=> 'Date format presets.',
 	'CFG_monday_first_day'		=> 'Weeks in calendar start with ...',
 // settings_language
 	'CFG_language_forced'		=> 'Disable custom language selection:@SMALL@Default is <b>no</b>',
@@ -607,6 +613,9 @@ return array(
 'Button_writeComment'	=> 'Write comment',
 
 // Archive News
+'News_Headline'	=> 'Headline',
+'News_DateTimeExplain' => 'News entries will become visible at the time above',
+'News_Article'	=> 'Article',
 'News_Box' => 'Archive News',
 'News_Archive' => 'News Archive',
 'News_writtenby' => 'written by',

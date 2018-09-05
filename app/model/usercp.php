@@ -1,7 +1,7 @@
 <?php
 namespace Model;
 
-class UserCP extends Base
+class UserCP extends Controlpanel
 {
 	protected $menu = [];
 	
@@ -260,7 +260,7 @@ class UserCP extends Base
 		if (sizeof($data)>0) return $data;
 		return FALSE;
 	}
-
+/*
 	public function storyEditPrePop(array $storyData)
 	{
 		$categories = json_decode($storyData['cache_categories']);
@@ -295,7 +295,7 @@ class UserCP extends Base
 
 		return $pre;
 	}
-
+*/
 	public function authorStoryStatus($sid)
 	{
 		$sql = "SELECT S.title, S.validated, S.completed
@@ -367,7 +367,7 @@ class UserCP extends Base
 		$story->save();
 		
 		// Step two: check for changes in relation tables
-
+/*
 		// Check tags:
 		$post['tags'] = explode(",",$post['tags']);
 		$tags = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_tags');
@@ -456,61 +456,33 @@ class UserCP extends Base
 			}
 		}
 		unset($categories);
-
+		*/
+		/*
 		// Author and co-Author preparation:
 		$post['mainauthor'] = array_filter(explode(",",$post['mainauthor']));
 		$post['supauthor'] = array_filter(explode(",",$post['supauthor']));
 		// remove co-authors, that are already in the author field
 		$post['supauthor'] = array_diff($post['supauthor'], $post['mainauthor']);
 
-		// Check Authors:
-		$mainauthor = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors');
-
-		// refuse to leave an empty author list behind
-		if(sizeof($post['mainauthor']))
-		{
-			foreach ( $mainauthor->find(array('`sid` = ? AND `type` = ?',$story->sid,'M')) as $X )
-			{
-				$temp=array_search($X['aid'], $post['mainauthor']);
-				if ( $temp===FALSE )
-				{
-					// Excess relation, drop from table
-					$mainauthor->erase(['lid=?',$X['lid']]);
-				}
-				else unset($post['mainauthor'][$temp]);
-			}
-		}
-
-		// Insert any character IDs not already present
-		if ( sizeof($post['mainauthor'])>0 )
-		{
-			foreach ( $post['mainauthor'] as $temp)
-			{
-				// Add relation to table
-				$mainauthor->reset();
-				$mainauthor->sid = $story->sid;
-				$mainauthor->aid = $temp;
-				$mainauthor->type = 'M';
-				$mainauthor->save();
-			}
-		}
-		unset($mainauthor);
-		
 		// Check co-Authors:
 		$supauthor = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors');
 
 		foreach ( $supauthor->find(array('`sid` = ? AND `type` = ?',$story->sid,'S')) as $X )
 		{
-			$temp=array_search($X['aid'], $post['supauthor']);
-			if ( $temp===FALSE )
+			// delete entry if is no longer a supporting author or
+			$isSup=array_search($X['aid'], $post['supauthor']);
+			// delete if is now a main author
+			$isMain=array_search($X['aid'], $post['mainauthor']);
+			
+			if ( $isSup===FALSE OR $isMain===TRUE )
 			{
 				// Excess relation, drop from table
 				$supauthor->erase(['lid=?',$X['lid']]);
 			}
-			else unset($post['supauthor'][$temp]);
+			else unset($post['supauthor'][$isSup]);
 		}
 
-		// Insert any character IDs not already present
+		// Insert any supporting author IDs not already present
 		if ( sizeof($post['supauthor'])>0 )
 		{
 			foreach ( $post['supauthor'] as $temp)
@@ -525,28 +497,62 @@ class UserCP extends Base
 		}
 		unset($supauthor);
 
+		// Check Authors:
+		$mainauthor = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors');
+
+		// refuse to leave an empty author list behind
+		if(sizeof($post['mainauthor']))
+		{
+			foreach ( $mainauthor->find(array('`sid` = ? AND `type` = ?',$story->sid,'M')) as $X )
+			{
+				$isMain=array_search($X['aid'], $post['mainauthor']);
+				if ( $isMain===FALSE )
+				{
+					// Excess relation, drop from table
+					$mainauthor->erase(['lid=?',$X['lid']]);
+				}
+				else unset($post['mainauthor'][$isMain]);
+			}
+		}
+		else
+		{
+			$_SESSION['lastAction'] = [ "deleteWarning" => \Base::instance()->get('LN__MainAuthorNotEmpty') ];
+		}
+
+		// Insert any author IDs not already present
+		if ( sizeof($post['mainauthor'])>0 )
+		{
+			foreach ( $post['mainauthor'] as $temp)
+			{
+				// Add relation to table
+				$mainauthor->reset();
+				$mainauthor->sid = $story->sid;
+				$mainauthor->aid = $temp;
+				$mainauthor->type = 'M';
+				$mainauthor->save();
+			}
+		}
+		unset($mainauthor);
+		*/
+		
+		// Step two: check for changes in relation tables
+
+		// Check tags:
+		$this->storyRelationTag( $current->sid, $post['tags'] );
+		// Check Characters:
+		$this->storyRelationTag( $current->sid, $post['characters'], 1 );
+		// Check Categories:
+		$this->storyRelationCategories( $current->sid, $post['category'] );
+		// Check Authors:
+		$this->storyRelationAuthor( $current->sid, $post['mainauthor'], $post['supauthor'] );
+
+		// Rebuild story cache based on new data
 		$this->rebuildStoryCache($story->sid);
 	}
 
 	public function authorStoryChapterAdd($sid, $uid)
 	{
 		return parent::storyChapterAdd($sid, $uid);
-	}
-	
-	public function authorStoryChapterLoad( $story, $chapter )
-	{
-		$data = $this->exec
-		(
-			"SELECT Ch.sid,Ch.chapid,Ch.inorder,Ch.title,Ch.notes,Ch.validated,Ch.rating
-				FROM `tbl_chapters`Ch
-			WHERE Ch.sid = :sid AND Ch.chapid = :chapter",
-			[":sid" => $story, ":chapter" => $chapter ]
-		);
-		if (empty($data)) return FALSE;
-		$data = $data[0];
-		$data['chaptertext'] = parent::getChapter( $story, $data['inorder'], FALSE );
-		
-		return $data;
 	}
 
 	public function authorStoryChapterSave( $chapterID, array $post )
@@ -563,12 +569,7 @@ class UserCP extends Base
 		
 		parent::saveChapter($chapterID, $post['chapter_text']);
 	}
-/*	
-	public function saveChapter( $chapterID, $chapterText )
-	{
-		return parent::saveChapter( $chapterID, $chapterText );
-	}
-*/
+
 	public function authorCuratorRemove($uid=NULL)
 	{
 		$this->exec("UPDATE `tbl_users`U set U.curator = NULL WHERE U.uid = :uid;", [ ":uid" => ($uid ?: $_SESSION['userID']) ]);

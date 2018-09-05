@@ -7,7 +7,7 @@ class Privacy extends Base
 	
 	public function __construct()
 	{
-		//$this->model = \Model\News::instance();
+		//$this->model = \Model\Privacy::instance();
 		$this->config = \Config::instance();
 		$this->template = new \View\Privacy();
 	}

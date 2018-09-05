@@ -191,7 +191,7 @@ class UserCP extends Base
 		//$uid = isset($params['uid']) ? $params['uid'] : $_SESSION['userID'];
 		if ( FALSE !== $storyData = $this->model->authorStoryLoadInfo((int)$params['sid'], (int)$params['uid']) )
 		{
-			if (isset($_POST) and sizeof($_POST) )
+			if (isset($_POST) and sizeof($_POST)>0 )
 			{
 				if ( isset($params['chapter']) )
 				{
@@ -223,7 +223,7 @@ class UserCP extends Base
 					$f3->reroute($reroute, false);
 					exit;
 				}
-				$chapterData = $this->model->authorStoryChapterLoad($storyData['sid'],(int)$params['chapter']);
+				$chapterData = $this->model->loadChapter($storyData['sid'],(int)$params['chapter']);
 				// abusing $chapterData to carry a few more details
 				$chapterData['form'] = [ "uid" => $params['uid'], "returnpath" => $params['returnpath'], "storytitle" => $storyData['title'] ];
 
@@ -238,7 +238,7 @@ class UserCP extends Base
 				// abusing $storyData to carry a few more details
 				$storyData['form'] = [ "uid" => $params['uid'], "returnpath" => $params['returnpath'] ];
 				$prePopulate = $this->model->storyEditPrePop($storyData);
-				return \View\UserCP::authorStoryMetaEdit($storyData,$chapterList,$prePopulate);
+				return $this->template->authorStoryMetaEdit($storyData,$chapterList,$prePopulate);
 			}
 		}
 		else return "__Error";

@@ -1,5 +1,6 @@
-<a href="{{@BASE}}{{@data.form.returnpath}}">__return</a>
+<a href="{{@BASE}}{{@data.form.returnpath}}">{ICON:arrow-left} {{@LN__ReturnToOverview}}</a>
 <div class="grid-wrapper">
+	<check if="{{ isset(@deleteWarning) }}"><div class="gb-90 alert-box warning">{{ @deleteWarning }}</div></check>
 	<div class="gb-3qrt">
 		<form method="post" action="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}};returnpath={{@data.form.returnpath}}">
 			<div class="ym-grid">
