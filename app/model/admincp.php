@@ -1071,7 +1071,7 @@ class AdminCP extends Controlpanel {
 			[ 
 				"headline"	=> $data['headline'], 
 				"newstext"	=> $data['newstext'],
-				"datetime"	=> \DateTime::createFromFormat($this->config['date_preset'], $data['datetime'])->format('Y-m-d H:i'),
+				"datetime"	=> \DateTime::createFromFormat($this->config['date_preset']." ".$this->config['time_preset'], $data['datetime'])->format('Y-m-d H:i'),
 			]
 		);
 
