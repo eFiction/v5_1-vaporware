@@ -47,7 +47,7 @@
 		<td><check if="{{ @row['story_pending']==1 }}">{ICON:waiting}</check>&nbsp;</td>
 		<td><check if="{{ @row['chapid']!=NULL }}">{ICON:waiting}</check>&nbsp;</td>
 		<td>{{ @row['sid'] }}</td>
-		<td>{{ date( \Config::getPublic('date_format_short'), $row['timestamp']) }}</td>
+		<td>{{ date( \Config::getPublic('date_format'), $row['timestamp']) }}</td>
 		<td>{{ @row['title'] }}</td>
 	</tr>
 	</repeat>

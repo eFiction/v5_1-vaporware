@@ -76,7 +76,7 @@ __Nothing
 	<tr>
 		<td><a href="{{@BASE}}/userCP/author/uid={{@author}}/edit/sid={{ @row['sid'] }};returnpath=/userCP/author/uid={{@author}}/{{@select}}/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
 		<td>{{ @row.sid }}</td>
-		<td>{{ date( \Config::getPublic('date_format_long'), $row['updated']) }}</td>
+		<td>{{ date( \Config::getPublic('datetime_format'), $row['updated']) }}</td>
 		<td>{{ ${"LN__UCP_statusValidated_".@row.story_validated.0} }}</td>
 		<td>{{ ${"LN__UCP_statusValidated_".@row.chapter_validated.0} }}</td>
 		<td>{{ @row.title }}</td>

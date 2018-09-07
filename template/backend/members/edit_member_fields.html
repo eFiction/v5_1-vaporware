@@ -12,7 +12,7 @@
 	<div class="gb-60"><input type="text" value="{{@data.email}}" /></div>
 
 	<div class="gb-40">{{@LN__Registered}}:</div>
-	<div class="gb-60">{{ date(@CONFIG.date_format_long, @data.registered) }}</div>
+	<div class="gb-60">{{ date(@CONFIG.datetime_format, @data.registered) }}</div>
 </fieldset>
 {*
 	/*

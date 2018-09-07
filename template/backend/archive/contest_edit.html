@@ -54,12 +54,12 @@ $('#date_open').datetimepicker({
 	dayOfWeekStart : 1,
 	timepicker:false,
 	value:'{{ @data.date_open }}',
-	format:'{{\Config::getPublic("date_format_short")}}',
+	format:'{{\Config::getPublic("date_format")}}',
 });
 $('#date_close').datetimepicker({
 	dayOfWeekStart : 1,
 	timepicker:false,
 	value:'{{ @data.date_close }}',
-	format:'{{\Config::getPublic("date_format_short")}}',
+	format:'{{\Config::getPublic("date_format")}}',
 });
 </script>

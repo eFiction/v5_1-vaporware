@@ -573,10 +573,10 @@ class AdminCP extends Controlpanel {
 		if (sizeof($data)==1) 
 		{
 			$data[0]['date_open'] = ($data[0]['date_open']>0)
-				? $this->timeToUser($data[0]['date_open'],  $this->config['date_format_short'])
+				? $this->timeToUser($data[0]['date_open'],  $this->config['date_format'])
 				: "";
 			$data[0]['date_close'] = ($data[0]['date_close']>0)
-				? $this->timeToUser($data[0]['date_close'], $this->config['date_format_short'])
+				? $this->timeToUser($data[0]['date_close'], $this->config['date_format'])
 				: "";
 
 			//$data[0]['story_list']		 = parent::cleanResult($data[0]['story_list']);
@@ -630,10 +630,10 @@ class AdminCP extends Controlpanel {
 				"summary"		=> $data['summary'],
 				"date_open"		=> empty($data['date_open']) ?
 										NULL :
-										\DateTime::createFromFormat($this->config['date_format_short'], $data['date_open'])->format('Y-m-d')." 00:00:00",
+										\DateTime::createFromFormat($this->config['date_format'], $data['date_open'])->format('Y-m-d')." 00:00:00",
 				"date_close"	=> empty($data['date_close']) ?
 										NULL :
-										\DateTime::createFromFormat($this->config['date_format_short'], $data['date_close'])->format('Y-m-d')." 00:00:00",
+										\DateTime::createFromFormat($this->config['date_format'], $data['date_close'])->format('Y-m-d')." 00:00:00",
 			]
 		);
 
@@ -1035,7 +1035,7 @@ class AdminCP extends Controlpanel {
 			return NULL;
 
 		// going with the preset date/time versions to make sure the datetimepicker is happy
-		$data[0]['datetime'] = $this->timeToUser($data[0]['datetime'], $this->config['date_format']." ".$this->config['time_format']);
+		$data[0]['datetime'] = $this->timeToUser($data[0]['datetime'], $this->config['date_preset']." ".$this->config['time_preset']);
 
 		return $data[0];
 	}
@@ -1071,7 +1071,7 @@ class AdminCP extends Controlpanel {
 			[ 
 				"headline"	=> $data['headline'], 
 				"newstext"	=> $data['newstext'],
-				"datetime"	=> \DateTime::createFromFormat($this->config['date_format'], $data['datetime'])->format('Y-m-d H:i'),
+				"datetime"	=> \DateTime::createFromFormat($this->config['date_preset'], $data['datetime'])->format('Y-m-d H:i'),
 			]
 		);
 

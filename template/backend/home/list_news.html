@@ -69,7 +69,7 @@
 			</check>
 		</td>
 		<td>{{ @row['nid'] }}</td>
-		<td>{{ date(\Config::getPublic("date_format_long"), @row['timestamp']) }}</td>
+		<td>{{ date(\Config::getPublic("datetime_format"), @row['timestamp']) }}</td>
 		<td>{{ @row['headline'] }}</td>
 		<td>{{ @row['author'] }}</td>
 	</tr>

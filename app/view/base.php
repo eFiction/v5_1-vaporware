@@ -43,9 +43,9 @@ abstract class Base {
 	protected function dataProcess(&$item, $key=NULL)
 	{
 		if (isset($item['modified']))	$item['modified']	= ($item['modified'] > ($item['published'] + (24*60*60) ) ) ?
-																	date(\Config::getPublic('date_format_short'),$item['modified']) :
+																	date(\Config::getPublic('date_format'),$item['modified']) :
 																	NULL;
-		if (isset($item['published']))	$item['published']	= date(\Config::getPublic('date_format_short'),$item['published']);
+		if (isset($item['published']))	$item['published']	= date(\Config::getPublic('date_format'),$item['published']);
 		//								$item['number']		= isset($item['inorder']) ? "{$item['inorder']}&nbsp;" : "";
 		if (isset($item['wordcount'])) 	$item['wordcount']	= number_format($item['wordcount'], 0, '','.');
 		if (isset($item['count'])) 		$item['count']		= number_format($item['count'], 0, '','.');

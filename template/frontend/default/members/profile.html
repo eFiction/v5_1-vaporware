@@ -5,7 +5,7 @@
 		<div class="grid-wrapper">
 			<div class="gb-1qrt">{{@LN__Nickname}}:</div><div class="gb-3qrt">{{ @data.user.nickname }}</div>
 			<check if="{{!empty(@data.user.realname)}}"><div class="gb-1qrt">{{@LN__Realname}}:</div><div class="gb-3qrt">{{ @data.user.realname }}</div></check>
-			<div class="gb-1qrt">{{@LN__Registered}}:</div><div class="gb-3qrt">{{ date(@CONFIG.date_format_short, @data.user.registered) }}</div>
+			<div class="gb-1qrt">{{@LN__Registered}}:</div><div class="gb-3qrt">{{ date(@CONFIG.date_format, @data.user.registered) }}</div>
 			<div class="gb-1qrt">{{@LN__UserGroup}}:</div><div class="gb-3qrt">{{ floor(log(@data.user.groups, 2)) }}</div>
 		</div>
 		<br/>

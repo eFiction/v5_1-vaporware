@@ -19,7 +19,7 @@
     For over one decade, you shaped the way fanfiction sites were run.
     Humbly trying to pick up from where you left - because nobody else did.
 
-    @version 5.0.0-dev.0
+    @version 5.0.0-dev-2
 
     This software is based on the fat-free framework - http://fatfreeframework.com
 
@@ -39,7 +39,7 @@
 $f3 = @require('lib/f3/base.php');
 
 /** define the current version of eFiction **/
-$f3->set('APP_VERSION', '5.0.0-dev.1');
+$f3->set('APP_VERSION', '5.0.0-dev-2');
 
 //new Session();
 /** define debugging and error reporting options **/

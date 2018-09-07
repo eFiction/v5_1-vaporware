@@ -207,7 +207,7 @@ class AdminCP extends Base
 		$this->javascript( 'head', TRUE, "jquery.datetimepicker.js" );
 
 		$this->f3->set('data', $data);
-		$this->f3->set('format', $this->config['date_format']." ".$this->config['time_format']);
+		$this->f3->set('format', $this->config['date_preset']." ".$this->config['time_preset']);
 		$this->f3->set('returnpath', $returnpath);
 
 		return $this->render('home/edit_news.html');
@@ -334,6 +334,11 @@ class AdminCP extends Base
 		\Base::instance()->set('page', $page);
 		
 		return \Template::instance()->render('home/edit_shout.html');
+	}
+	
+	public function settingsDateTime()
+	{
+		return $this->render('settings/datetime_example.html');
 	}
 	
 	public static function language(array $data, array $config)

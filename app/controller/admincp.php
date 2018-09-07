@@ -503,8 +503,14 @@ class AdminCP extends Base
 		// add module title
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Settings') );
 
-		switch( $this->moduleInit([ "server", "registration", "security", "screening", "language", "layout" ], @$params['module']) )
+		switch( $this->moduleInit([ "datetime", "server", "registration", "security", "screening", "language", "layout" ], @$params['module']) )
 		{
+			case "datetime":
+				$this->response->addTitle( $f3->get('LN__AdminMenu_DateTime') );
+				$f3->set('title_h3', $f3->get('LN__AdminMenu_DateTime') );
+				$data['DateTime'] = $this->model->settingsFields('settings_datetime');
+				$extra = $this->settingsDateTime($f3, $params);
+				break;
 			case "server":
 				$this->response->addTitle( $f3->get('LN__AdminMenu_Server') );
 				$f3->set('title_h3', $f3->get('LN__AdminMenu_Server') );
@@ -565,18 +571,14 @@ class AdminCP extends Base
 			$results = $this->model->saveKeys($f3->get('POST.form_data'));
 		else
 			// Sava data from special forms (language, layout)
-			$results = $this->__settingsSaveData($f3, $params);
+			$results = $this->settingsSaveLLData($f3, $params);
 		
 		$this->__settings($f3, $params, $results);
 	}
 
-	protected function __settingsSaveData(\Base $f3, $params)
+	protected function settingsDateTime(\Base $f3, $params)
 	{
-		if ( $params['module'] == "language" )
-			return $this->model->saveLanguage($f3->get('POST.form_special'));
-
-		if ( $params['module'] == "layout" )
-			return $this->model->saveLayout($f3->get('POST.form_special'));
+		return $this->template->settingsDateTime();
 	}
 
  	protected function settingsLanguage(\Base $f3, $params)
@@ -618,6 +620,15 @@ class AdminCP extends Base
 		return \View\AdminCP::layout($layoutFiles, $layoutConfig);
 	}
 
+	protected function settingsSaveLLData(\Base $f3, $params)
+	{
+		if ( $params['module'] == "language" )
+			return $this->model->saveLanguage($f3->get('POST.form_special'));
+
+		if ( $params['module'] == "layout" )
+			return $this->model->saveLayout($f3->get('POST.form_special'));
+	}
+
 	protected function settingsServer(\Base $f3, &$data)
 	{
 		if ( !$this->model->checkAccess("settings/server") )
@@ -626,7 +637,7 @@ class AdminCP extends Base
 			return FALSE;
 		}
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Server') );
-		$data['DateTime'] = $this->model->settingsFields('settings_datetime');
+		//$data['DateTime'] = $this->model->settingsFields('settings_datetime');
 		$data['Mail'] = $this->model->settingsFields('settings_mail');
 		$data['Maintenance'] = $this->model->settingsFields('settings_maintenance');
 		$data['Report'] = $this->model->settingsFields('settings_report');

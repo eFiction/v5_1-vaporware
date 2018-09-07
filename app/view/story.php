@@ -119,8 +119,8 @@ class Story extends Base
 		\Registry::get('VIEW')->javascript('body', FALSE, "var url='".\Base::instance()->get('BASE')."/story/read/{$storyData['sid']},'" );
 
 		$storyData['cache_authors'] = json_decode($storyData['cache_authors'],TRUE);
-		$storyData['published'] = date( \Config::getPublic('date_format_short'), $storyData['published']);
-		$storyData['modified'] = date( \Config::getPublic('date_format_short'), $storyData['modified']);
+		$storyData['published'] = date( \Config::getPublic('date_format'), $storyData['published']);
+		$storyData['modified'] = date( \Config::getPublic('date_format'), $storyData['modified']);
 
 		\Base::instance()->set('data', [
 											"story" 	=> $storyData,

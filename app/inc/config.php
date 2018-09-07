@@ -136,6 +136,13 @@ class Config extends \Prefab
 			}
 		}
 		
+		if ( "" == trim($configData['date_format']) )
+			$configData['date_format'] = $configData['date_preset'];
+		if ( "" == trim($configData['time_format']) )
+			$configData['time_format'] = $configData['time_preset'];
+		if ( "" == trim($configData['datetime_format']) )
+			$configData['datetime_format'] = $configData['date_preset']." ".$configData['time_preset'];
+		
 		return $configData;
 	}
 

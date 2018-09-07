@@ -41,9 +41,6 @@ If it's not possible, no problem, it's an open project so using multiple
 
 
 
-
-
-
 SELECT * FROM
 (
 	SELECT F0.*, F1.user_id as u1, F2.user_id as u2,
@@ -56,3 +53,24 @@ SELECT * FROM
 ) as F
 WHERE user_id = 1 OR link_type = 'in'
 ORDER BY link_type
+
+
+
+
+
+
+
+-----------------------------------------------
+
+
+
+alter table `wox0905_stories_authors` drop foreign key `wox_efi5_wox0905_rSA_drop`
+
+Get all FK:
+
+SELECT CONSTRAINT_NAME as fk, TABLE_NAME as tbl
+	FROM information_schema.TABLE_CONSTRAINTS 
+		WHERE
+			information_schema.TABLE_CONSTRAINTS.CONSTRAINT_TYPE = 'FOREIGN KEY' 
+			AND information_schema.TABLE_CONSTRAINTS.TABLE_SCHEMA = 'wox_efi5'
+			AND information_schema.TABLE_CONSTRAINTS.TABLE_NAME LIKE 'wox0905_%';

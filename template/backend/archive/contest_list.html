@@ -107,8 +107,8 @@
 		</td>
 		<td>{{ @row['conid'] }}</td>
 		<td>{{ @row['title'] }}</td>
-		<td><check if="{{ @row.date_open>0 }}">{{ date(@CONFIG.date_format_short, @row.date_open) }}</check> </td>
-		<td><check if="{{ @row.date_close>0 }}">{{ date(@CONFIG.date_format_short, @row.date_close) }}</check> </td>
+		<td><check if="{{ @row.date_open>0 }}">{{ date(@CONFIG.date_format, @row.date_open) }}</check> </td>
+		<td><check if="{{ @row.date_close>0 }}">{{ date(@CONFIG.date_format, @row.date_close) }}</check> </td>
 		<td>{{ @row['count'] }}</td>
 	</tr>
 	</repeat>

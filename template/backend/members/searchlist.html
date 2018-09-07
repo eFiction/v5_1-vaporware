@@ -95,7 +95,7 @@
 		<td>{{ @row['uid'] }}</td>
 		<td>{{ @row['nickname'] }}</td>
 		<td>{{ @row['email'] }}</td>
-		<td>{{ date( \Config::getPublic('date_format_short'), $row['registered']) }}</td>
+		<td>{{ date( \Config::getPublic('date_format'), $row['registered']) }}</td>
 	</tr>
 	</repeat>
 </table>
