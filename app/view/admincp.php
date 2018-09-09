@@ -20,11 +20,11 @@ class AdminCP extends Base
 		return $html;
 	}
 
-	public static function homeWelcome($v, $c)
+	public function homeWelcome($v, $c)
 	{
-		\Base::instance()->set('script_versions', $v);
-		\Base::instance()->set('versions_compare', $c);
-		return \Template::instance()->render('home/welcome.html');
+		$this->f3->set('script_versions', $v);
+		$this->f3->set('versions_compare', $c);
+		return $this->render('home/welcome.html');
 	}
 	
 	public function listTags($data, $sort)
@@ -349,13 +349,23 @@ class AdminCP extends Base
 		return \Template::instance()->render('settings/language.html');
 	}
 
-	public static function layout(array $data, array $config)
+	public function layout(array $data, array $config)
 	{
 		// Array ( [0] => Array ( [folder] => default [name] => eFiction 5 default [author] => Rainer "the sheep" [email] => papaschaf@hotmail.com [url] => efiction.org [active] => ) ) 
-		\Base::instance()->set('data',			$data);
-		\Base::instance()->set('config',		$config);
+		$this->f3->set('data',		$data);
+		$this->f3->set('config',	$config);
 		
-		return \Template::instance()->render('settings/layout.html');
+		return $this->render('settings/layout.html');
+	}
+	
+	public function layoutIcons()
+	{
+		$icons = Iconset::instance()->_data;
+		foreach ( $icons as $key => $value )
+		{
+			$data[] = "Key: {$key}, Icon: ".str_replace("@T@", "title='{$key}'", $value);
+		}
+		return "<br/>\n".implode("<br/>\n", $data);
 	}
 
 	public static function listLog(array $data, array $menu, array $sort, $sub=FALSE)

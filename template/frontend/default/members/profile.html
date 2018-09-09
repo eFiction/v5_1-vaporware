@@ -15,22 +15,22 @@
 			<li><a href="{{@BASE}}/story/browse/author={{ @data.user.uid }};category={{ @category.cid }}">{{@category.name}}</a> ({{ @category.counted }})</li>
 		</repeat>
 		</ol>
-		{{ @data.cat.1 }} __total
-		<br/>
+		{{ @data.cat.1 }} {{@LN__total}}
+		<br/ ><br/ >
 		{{@LN__Tags}}:
 		<ol>
 		<repeat group="{{ @data.tag.0 }}" value="{{ @tag }}">
 			<li><a href="{{@BASE}}/story/browse/author={{ @data.user.uid }};tagIn={{ @tag.tid }}">{{@tag.label}}</a> ({{ @tag.counted }})</li>
 		</repeat>
 		</ol>
-		{{ @data.tag.1 }} __total
-		<br/>
+		{{ @data.tag.1 }} {{@LN__total}}
+		<br/ ><br/ >
 		{{@LN__Characters}}:
 		<ol>
 		<repeat group="{{ @data.char.0 }}" value="{{ @character }}">
 			<li><a href="{{@BASE}}/story/browse/author={{ @data.user.uid }};characters={{ @character.charid }}">{{@character.charname}}</a> ({{ @character.counted }})</li>
 		</repeat>
 		</ol>
-		{{ @data.char.1 }} __total
+		{{ @data.char.1 }} {{@LN__total}}
 	</div>
 </div>

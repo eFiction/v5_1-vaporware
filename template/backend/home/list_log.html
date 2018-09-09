@@ -19,13 +19,18 @@
 					<check if="{{@row.action.uid==@row.uid}}"><true>{{@row.action.name}}</true><false><del>{{@row.action.name}}</del></false></check>
 					{*<pre>{{print_r(@row.action,TRUE)}}</pre> *}
 				</case>
+				<case value="ED" break="TRUE">
+					{*<check if="{{@row.action.uid==@row.uid}}"><true>{{@row.action.name}}</true><false><del>{{@row.action.name}}</del></false></check> *}
+					{*<pre>{{print_r(@row.action,TRUE)}}</pre>*}
+					{{@row.action.title}}
+				</case>
 				<default>
 					Was anderes
 				</default>
 			</switch>
 		</true>
 		<false>{{@row.action|raw}}</false>
-	</check> - [{{ @row.ip }}: {{@@row.country}}] ({{@row.id}})<br/>
+	</check> - [{*{{ @row.ip }}: *}{{@@row.country}}] ({{@row.id}})<br/>
 </repeat>
 
 <F3:check if="{{isset(@paginate.firstPage) AND sizeof(@logEntries)>10}}"><include href="paginate.html" /></F3:check>

@@ -1502,6 +1502,8 @@ class AdminCP extends Controlpanel {
 		else
 			$data = $this->exec($sql);
 		
+		$geo = \Web\Geo::instance();
+		
 		foreach ( $data as &$item )
 		{
 			if ( $item['version']==0 )
@@ -1509,13 +1511,20 @@ class AdminCP extends Controlpanel {
 				// eFiction 3 original, try to do some cleanup
 				if ( $item['type']=="RG" )
 				{
-					//print_r($item);
 					preg_match('/(\w+[\s\w]*)\s+\((\d*)\).*/iU', $item['action'], $matches);
 					$item['action'] = [ 'name'=>$matches[1], 'uid'=>$matches[2], 'email'=>'', 'reason'=>'', 'admin'=>($matches[2]!=$item['uid_reg']) ];
-					$this->update('tbl_log', ['action' => json_encode($item['action']), 'version'=>1], "id = {$item['id']}" );
+					//$this->update('tbl_log', ['action' => json_encode($item['action']), 'version'=>1], "id = {$item['id']}" );
 					//print_r($matches);
 					//print_r($item);
+					$this->logResaveDate($item);
 				}
+				elseif ( $item['type']=="ED" )
+				{
+					preg_match("/.+\?sid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>(.*?)<\/.+/m", $item['action'], $matches);
+					$item['action'] = [ 'sid' => $matches[1], 'title' => $matches[2], 'aid' => $matches[3], 'author' => $matches[4] ];
+					$this->logResaveDate($item);
+				}
+				
 			}
 			elseif ( $item['version']==1 )
 			{
@@ -1529,7 +1538,8 @@ class AdminCP extends Controlpanel {
 			}
 			
 			$item['ip'] = long2ip($item['ip']);
-			if(function_exists('geoip_country_code_by_name')) $item['country'] = geoip_country_code_by_name($item['ip']);
+			//if(function_exists('geoip_country_code_by_name')) $item['country'] = geoip_country_code_by_name($item['ip']);
+			$item['country'] = $geo->location($item['ip'])['country_code'];
 		}
 				
 		$this->paginate(
@@ -1539,6 +1549,25 @@ class AdminCP extends Controlpanel {
 		);
 				
 		return $data;
+	}
+	
+	protected function logResaveDate($item)
+	{
+		$this->update(
+				'tbl_log',
+				[
+					'action' 	=> json_encode($item['action']),
+					'version'	=> 1
+/*					'origin'	=> json_encode(
+									[
+										$geo->location($item['ip'])['country_code'], 
+										$geo->location($item['ip'])['country_name'], 
+										$geo->location($item['ip'])['continent_code']
+									]
+					)	*/
+				],
+				"id = {$item['id']}"
+		);
 	}
 	
 	public function getLanguageConfig()

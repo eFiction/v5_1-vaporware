@@ -5,7 +5,7 @@
 		<h2><a href='{{@BASE}}/news/id={{ @news.nid }}'>{{ @news.headline }}</a></h2>
 		<div class="news-dateauthor">{{@LN__News_writtenby}} <a href='{{@BASE}}/member/profile/{{ @news.uid }}'>{{ @news.nickname }}</a> @ {{ date(@CONFIG.datetime_format, @news.timestamp) }}</div>
 		{{ @news.newstext | raw}}
-		<div class="news-comment"><a href='{{@BASE}}/news/id={{@news.nid}}#comments'><input class="button" type="submit" value="__comments"></a></div>
+		<div class="news-comment"><a href='{{@BASE}}/news/id={{@news.nid}}#comments'><input class="button" type="submit" value="{{LN__comments}}"></a></div>
 	</div>
 </repeat>
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="story/paginate.html" /></F3:check>

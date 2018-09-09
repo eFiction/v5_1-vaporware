@@ -28,20 +28,19 @@
 			<option value="both"<check if="{{(empty(@searchForm.chapters) OR @searchForm.chapters=='both')}}"> selected="selected"</check>>{{@LN__Size_All}}</option>
 		</select>
 	</div>
-	<div class="gb-full">{{@LN__Rating}} from <select class="search" name="rating[0]">
+	<div class="gb-full"><div class="search-rating">{{@LN__Rating}} from <select class="search" name="rating[0]">
 		<repeat group="{{ @searchRatings }}" value="{{ @rating }}">
 			<option value="{{ @rating.rid }}" <check if="{{@rating.rid==@searchForm.rating.0}}">selected="selected" </check> >{{ @rating.rating }}</option>
 		</repeat>
-</select> to <select class="search" name="rating[1]">
-	<repeat group="{{ @searchRatings }}" value="{{ @rating }}">
-		<option value="{{ @rating.rid }}" <check if="{{@rating.rid==@searchForm.rating.1}}">selected="selected" </check> >{{ @rating.rating }}</option>
-	</repeat>
-</select>
-</div>
-<div class="gb-full"><input type="checkbox" name="exclude_wip" <check if="{{isset(@searchForm.exclude_wip)}}">checked="checked"</check> value="1">{{@LN__SearchCompletedOnly}}</div>
-<div class="gb-1qrt"><button class="button" type="submit">{{@LN__Search}}</button></div>
-<div class="gb-1qrt"><button class="button" type="reset">{{@LN__Reset}}</button></div>
-<div class="gb-1qrt"><check if="{{!empty(@searchLink)}}"><a href="{{@BASE}}/story/browse/{{@searchLink}}<check if="{{isset(@paginate.page)}}">/page={{@paginate.page}}</check>">{{@LN__HideSearchForm}}</a></check>&nbsp;</div>
+		</select> to <select class="search" name="rating[1]">
+		<repeat group="{{ @searchRatings }}" value="{{ @rating }}">
+			<option value="{{ @rating.rid }}" <check if="{{@rating.rid==@searchForm.rating.1}}">selected="selected" </check> >{{ @rating.rating }}</option>
+		</repeat>
+		</select>
+	</div></div>
+<div class="gb-full"><input type="checkbox" name="exclude_wip" <check if="{{isset(@searchForm.exclude_wip)}}">checked="checked"</check> value="1"> {{@LN__SearchCompletedOnly}}</div>
+<div class="gb-full"><div class="search-buttons"><button class="button" type="submit">{{@LN__Search}}</button> <button class="button" type="reset">{{@LN__Reset}}</button></div></div>
+<div class="gb-full"><div align="center"><check if="{{!empty(@searchLink)}}"><a href="{{@BASE}}/story/browse/{{@searchLink}}<check if="{{isset(@paginate.page)}}">/page={{@paginate.page}}</check>">{{@LN__HideSearchForm}}</a></check>&nbsp;</div></div>
 </div>
 
 	</fieldset>

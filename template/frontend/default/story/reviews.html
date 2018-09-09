@@ -1,10 +1,11 @@
 <div class="story-titleauthor">
-	<h2><a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a><br /> {{@LN__by}} <repeat group="{{@story.cache_authors}}" value="{{@author}}" counter="{{ @i }}">
-													<check if="{{ @i>1 }}">, </check>
-													<check if="{{ @_SESSION.userID == @author[0] }}"><set no_review="1" /></check>
-													<a href="{{@BASE}}/authors/{{@author[0]}}">{{@author[1]}}</a>
-												</repeat>
-
+	<h2>
+		<a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a><br />
+		{{@LN__by}} <repeat group="{{@story.cache_authors}}" value="{{@author}}" counter="{{ @i }}">
+			<check if="{{ @i>1 }}">, </check>
+			<check if="{{ @_SESSION.userID == @author[0] }}"><set no_review="1" /></check>
+		<a href="{{@BASE}}/authors/{{@author[0]}}">{{@author[1]}}</a>
+		</repeat>
 	</h2>
 </div>
 <div id="story-container">
@@ -52,13 +53,13 @@
 			</check>
 		{* Debug *}[ Level {{@item.level}} ID {{@item.id}} ]{* /Debug *}
 			<check if="{{isset(@item.elements) AND @item.elements>0}}"><a href="{{@BASE}}/story/reviews/{{@item.story}},{{@item.chapternr}},{{@item.id}}#r{{@item.id}}">{{@LN__ReviewCommentsLink, @item.elements | format }}</a></check>
-		</div>
+		</div><br />
 {* End: DIV headline *}
 {* Begin: DIV text *}
 		<div class="review-content">
 			{* review or comment text *}
 			{{@item.text |raw}}
-		</div>
+		</div><br />
 {* End: DIV text *}
 {* Begin: DIV button *}
 			<check if="{{ @_SESSION.userID OR TRUE==@CONFIG.allow_guest_reviews }}">

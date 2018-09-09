@@ -33,6 +33,7 @@ return array(
 'Title' 		=>	'Titel',
 'Author' 		=>	'Autor',
 'Privacy'		=> 	'Datenschutz',
+'total'			=>	'gesamt', //db
 
 // [2] Global -- Login related
 'Login'			=> 'Anmelden',
@@ -198,7 +199,7 @@ return array(
 'SwitchVisual'		=> 'Zum Editor wechseln',
 
 // [14] Authors
-'NoAuthorsListed'	=> 'Momentan gibt es keine Autor, die angezeigt werden könnten',
+'NoAuthorsListed'	=> 'Momentan gibt es keine Autoren, die angezeigt werden könnten',
 'Overview'			=> 'Übersicht',
 
 // User panel - PM

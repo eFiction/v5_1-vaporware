@@ -1,7 +1,7 @@
 <div id="top-navbar"><include href="main/navbar.html" /></div>
 <!-- begin container -->
 <div class="grid-wrapper" id="container">
-	<div class="grid-wrapper header"><a href="{{@BASE}}"><h1>efiction 5.0</h1></a>
+	<div class="grid-wrapper header"><a href="{{@BASE}}"><h1>World of X</h1></a>
 		<div class="gb-full screen-micro">
 			<a href="{{@BASE}}"><div class="header_img"></div></a>
 		</div>
@@ -52,7 +52,7 @@
 	<!-- drop right bar for system  -->
 	<check if="{{ empty(@bigscreen) and empty(@systempage) }}">
 		<div class="gb-20">
-		{BLOCK:story.stats}{BLOCK:categories}{BLOCK:calendar}
+		{BLOCK:categories}{BLOCK:calendar}{BLOCK:story.stats}
 			{{@RIGHT|raw}}
 		</div>
 	</check>

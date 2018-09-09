@@ -27,6 +27,17 @@ __Nothing
 				</false>
 			</check></a> {{@LN__Sort_ID}}
 		</th>
+		<th><a href="{{@BASE}}/userCP/author/uid={{@author}}/{{@select}}/order=title,
+			<check if="{{ @sort['link']!='title' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-alpha-desc}</true>
+						<false>desc">{ICON:sort-alpha-asc}</false>
+					</check>
+				</false>
+			</check></a> {{@LN__Sort_Title}}
+		</th>
 		<th><a href="{{@BASE}}/userCP/author/uid={{@author}}/{{@select}}/order=updated,
 			<check if="{{ @sort['link']!='updated' }}">
 				<true>asc">{ICON:sort}</true>
@@ -60,26 +71,15 @@ __Nothing
 				</false>
 			</check></a> {{@LN__UCP_ChapterStatus}}
 		</th>
-		<th><a href="{{@BASE}}/userCP/author/uid={{@author}}/{{@select}}/order=title,
-			<check if="{{ @sort['link']!='title' }}">
-				<true>asc">{ICON:sort}</true>
-				<false>
-					<check if="{{ @sort['direction']=='desc' }}">
-						<true>asc">{ICON:sort-alpha-desc}</true>
-						<false>desc">{ICON:sort-alpha-asc}</false>
-					</check>
-				</false>
-			</check></a> {{@LN__Sort_Title}}
-		</th>
 	</tr>
 	<repeat group="{{ @storyEntries }}" value="{{ @row }}">
 	<tr>
 		<td><a href="{{@BASE}}/userCP/author/uid={{@author}}/edit/sid={{ @row['sid'] }};returnpath=/userCP/author/uid={{@author}}/{{@select}}/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
 		<td>{{ @row.sid }}</td>
-		<td>{{ date( \Config::getPublic('datetime_format'), $row['updated']) }}</td>
+		<td>{{ @row.title }}</td>
+		<td>{{ date( \Config::getPublic('datetime_format'), @row.updated ) }}</td>
 		<td>{{ ${"LN__UCP_statusValidated_".@row.story_validated.0} }}</td>
 		<td>{{ ${"LN__UCP_statusValidated_".@row.chapter_validated.0} }}</td>
-		<td>{{ @row.title }}</td>
 	</tr>
 	</repeat>
 </table>

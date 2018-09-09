@@ -81,22 +81,23 @@ class Iconset extends \DB\Jig\Mapper {
 	
 	static public function parse($key)
 	{
+		//var_dump(self::instance());exit;
 		list(, $label, $visibility, $text) = $key;
 		if (empty($label)) return NULL;
-
+		
 		// Empty $text should not overwrite a title tag of a parent item
 		if ($text)
-			return str_replace("@T@", "title='{$text}'", self::instance()->{$label});
+			return str_replace("@T@", "title='{$text}'", self::instance()->_data[$label]);
 		else
-			return str_replace("@T@", "", @self::instance()->{$label});
+			return str_replace("@T@", "", @self::instance()->_data[$label]);
 	}
 	
 	static protected function rebuild($icon)
 	{
 		$set = $_SESSION['tpl'][1];
-		$sql = "SELECT `name`, `value` FROM `tbl_iconsets` WHERE `set_id` = {$set}";
-		$db = \Model\Base::instance();
-		$data = $db->exec($sql);
+		// ORDER BY forces key fields to be read first
+		$sql = "SELECT `name`, `value` FROM `tbl_iconsets` WHERE `set_id` = {$set} ORDER BY `name` ASC";
+		$data = \Model\Base::instance()->exec($sql);
 		foreach ( $data as $item )
 		{
 			if(strpos($item["name"],"#")===0)
@@ -110,16 +111,18 @@ class Iconset extends \DB\Jig\Mapper {
 			}
 			else
 			{
-				if(strpos($item["name"],",")!==0)
-				{
+//				if(strpos($item["name"],",")!==0)
+//				{
 					$names = explode(",",$item['name']);
 					foreach ( $names as $name )
-						$icon->{$name} = str_replace("@1@",$item["value"],$pattern);
-				}
-				else
-					$icon->{$item['name']} = str_replace("@1@",$item["value"],$pattern);
+						//$icon->{$name} = str_replace("@1@",$item["value"],$pattern);
+						$icons[$name] = str_replace("@1@",$item["value"],$pattern);
+//				}
+//				else
+//					$icon->{$item['name']} = str_replace("@1@",$item["value"],$pattern);
 			}
 		}
+		$icon->_data = $icons;
 		$icon->save();
 		return $icon;
 	}

@@ -6,7 +6,7 @@ input[type=text], input[type=password] {
     border-radius: 4px;
     box-sizing: border-box;
     font-family: 'Open Sans', sans-serif;
-		outline: none;
+	outline: none;
 }
 input.readonly {
     width: 100%;
@@ -16,18 +16,18 @@ input.readonly {
     border-radius: 4px;
     box-sizing: border-box;
     font-family: 'Open Sans', sans-serif;
-		outline: none;
+	outline: none;
 }
 
 input[type=text].half, input[type=password].half {
-		width: 50%;
-		box-sizing: border-box;
+	width: 50%;
+	box-sizing: border-box;
 }
 
 input[type=text].navbar, input[type=password].navbar {
-		width: 100px;
-		padding: 5px;
-		box-sizing: border-box;
+	width: 100px;
+	padding: 5px;
+	box-sizing: border-box;
 }
 
 select {
@@ -55,6 +55,14 @@ input[type=button], .button {
     font-family: 'Open Sans', sans-serif;
 }
 
+.search-rating {
+	text-align: left;
+	}
+
+.search-buttons {
+	text-align: right;
+}
+
 .button {
     max-width: 60%;
     margin: 0 auto;
@@ -64,8 +72,14 @@ input[type=button], .button {
     color: white !important;
     text-decoration: none;
     text-align: center;
-	  cursor: pointer;
+	cursor: pointer;
     font-family: 'Open Sans', sans-serif;
+}
+.button:hover {
+	-webkit-transition: 1s;
+	-moz-transition: 1s;
+	transition: 1s; 
+	background-color: #dddddd;
 }
 
 input[type=submit], input[type=reset] {
@@ -80,15 +94,15 @@ input[type=submit], input[type=reset] {
 }
 
 input[type=submit].navbar {
-		background-color: #fafafa;
-		color: #2e2e2e;
+	background-color: #fafafa;
+	color: #2e2e2e;
    	padding: 6px 12px;
    	margin: 0 0 0 6px;
    	border-radius: 4px;
 }
 
 .delete {
-	  background-color: #cd2323;
+	background-color: #cd2323;
     border: none;
     color: white !important;
     padding: 9px 20px;
@@ -109,6 +123,7 @@ textarea {
     resize: none;
     font-family: 'Open Sans', sans-serif;
 }
+
 
 /* For user CP forms
 ---------------------------------------- */

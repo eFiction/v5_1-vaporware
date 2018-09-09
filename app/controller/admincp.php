@@ -119,7 +119,7 @@ class AdminCP extends Base
 		}
 		else $version = FALSE;
 		
-		$this->buffer( \View\AdminCP::homeWelcome($version, $compare) );
+		$this->buffer( $this->template->homeWelcome($version, $compare) );
 	}
 
 	protected function homeManual(\Base $f3)
@@ -616,8 +616,10 @@ class AdminCP extends Base
 				$layoutFiles[] = $data;
 			}
 		}
+		
+		$iconset = $this->template->layoutIcons();
 
-		return \View\AdminCP::layout($layoutFiles, $layoutConfig);
+		return $this->template->layout($layoutFiles, $layoutConfig).$iconset;
 	}
 
 	protected function settingsSaveLLData(\Base $f3, $params)

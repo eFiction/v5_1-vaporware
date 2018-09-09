@@ -33,6 +33,7 @@ return array(
 'Title' 		=>	'Title',
 'Author' 		=>	'Author',
 'Privacy'		=> 	'Privacy',
+'total'			=>	'total', //db
 
 // [2] Global -- Login related 20
 'Login'			=> 'Login',

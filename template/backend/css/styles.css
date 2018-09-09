@@ -211,7 +211,7 @@ table.tbody {
 }
 
 .tbody td {
-	padding: 4px 8px;
+	padding: 6px 8px;
 	margin: 0;
 }
 
@@ -223,9 +223,11 @@ table.tbody {
 
 .tbody tr:nth-child(odd) {
 	background-color: transparent;
+	padding: 3px;
 }
 .tbody tr:nth-child(even) {
 	background-color: #ededed;
+	padding: 3px;
 }
 
 /*-----------------  UPDATED/NEW STORIES  -----------------*/
