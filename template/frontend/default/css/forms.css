@@ -101,7 +101,7 @@ input[type=submit].navbar {
    	border-radius: 4px;
 }
 
-.delete {
+input[type=button].delete, .delete {
 	background-color: #cd2323;
     border: none;
     color: white !important;

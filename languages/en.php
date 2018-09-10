@@ -12,6 +12,7 @@ return array(
 'no'		=>	'no',
 'No'		=>	'No',
 'Cancel'	=>	'Cancel',
+'Delete'	=>	'Delete',//db
 'Return'	=>	'Return',
 'Date'		=>	'Date',
 'Time'		=>	'Time',
@@ -268,6 +269,7 @@ return array(
 	'Authoring_Finished'	=> 'Finished ({0})',
 	'Authoring_Unfinished'	=> 'Unfinished ({0})',
 	'Authoring_Drafts'		=> 'Drafts ({0})',
+	'Authoring_Deleted'		=> 'Deleted ({0})',
 'UserMenu_MyLibrary' => 'My Library',
 	'Library_Favourites'	=> 'Favourites ({0})',
 	'AddFavourite'			=> 'Add favourite',

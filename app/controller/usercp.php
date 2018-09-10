@@ -97,6 +97,7 @@ class UserCP extends Base
 					case "finished":
 					case "unfinished":
 					case "drafts":
+					case "deleted":
 						$buffer = $this->authorStorySelect($params);
 						break;
 					case "edit":
@@ -202,13 +203,36 @@ class UserCP extends Base
 				}
 				else
 				{
-					$this->model->authorStoryHeaderSave($params['sid'], $f3->get('POST.form'));
-					$reroute = "/userCP/author/uid={$params['uid']}/edit/sid={$params['sid']};returnpath=".$params['returnpath'];
-					$f3->reroute($reroute, false);
-					exit;
+					if  ( "" != $f3->get('POST.delete') )
+					{
+						// look for the confirmation checkboxes
+						if ( $storyData['completed']>0 OR ("" != $f3->get('POST.deleteComfirm1') AND "" != $f3->get('POST.deleteComfirm2')) )
+						{
+							// attempt to delete
+							if ( FALSE !== $deleted = $this->model->authorStoryDelete($params['sid'], $params['uid']) )
+							{
+								$_SESSION['lastAction'] = [ "deleted" =>  $deleted ];
+/*								if ( $deleted == "moved" )
+									$_SESSION['lastAction'] = [ "deleted" => "moved" ];
+								elseif ( $deleted == "success" )
+									$_SESSION['lastAction'] = [ "deleted" => "success" ];	*/
+								$f3->reroute($params['returnpath'], false);
+								exit;
+							}
+							// model failed to delete the story, let the user know
+							else $_SESSION['lastAction'] = [ "deleted" => "failed" ];
+						}
+						// delete confirmations not checked
+						else $_SESSION['lastAction'] = [ "deleted" => "confirm" ];
+					}
+					else
+					{
+						$this->model->authorStoryHeaderSave($params['sid'], $f3->get('POST.form'));
+						$reroute = "/userCP/author/uid={$params['uid']}/edit/sid={$params['sid']};returnpath=".$params['returnpath'];
+						$f3->reroute($reroute, false);
+						exit;
+					}
 				}
-				//
-				
 			}
 
 			// Chapter list is always needed, load after POST to catch chapter name changes
@@ -243,7 +267,7 @@ class UserCP extends Base
 		}
 		else return "__Error";
 	}
-
+	
 	public function feedback(\Base $f3, $params)
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Reviews') );

@@ -1,3 +1,16 @@
+<check if="{{isset(@deleted)}}">
+	<switch expr="{{ @deleted }}">
+		<case value="success" break="TRUE">
+			<div class="alert-box half success">{{@LN__MSG_deletedSuccess}}</div>
+		</case>
+		<case value="moved" break="TRUE">
+			<div class="alert-box half info">Story moved</div>
+		</case>
+		<case value="testing" break="TRUE">
+			<div class="alert-box half info">Fake Delete, stub model only</div>
+		</case>
+	</switch>
+</check>
 <F3:check if="{{ empty(@storyEntries) }}">
 <true>
 __Nothing

@@ -20,6 +20,12 @@ class UserCP extends Base
 	{
 		//\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 
+		if( isset($_SESSION['lastAction']) )
+		{
+			$this->f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
+			unset($_SESSION['lastAction']);
+		}
+
 		$this->f3->set('storyEntries', $data);
 		$this->f3->set('sort', $sort);
 		$this->f3->set('author', $params['uid']);

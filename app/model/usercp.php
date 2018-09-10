@@ -38,8 +38,8 @@ class UserCP extends Controlpanel
 
 				if ( isset($data['uid']) AND isset($authors["AUTHORS"][$data['uid']]) )
 				{
-					// create an empty array
-					$status = [ 'id' => $data['uid'], 1 => 0, 2 => 0, 3 => 0 ];
+					// create an empty array with zero-count to start with
+					$status = [ 'id' => $data['uid'], 0 => 0, 1 => 0, 2 => 0, 3 => 0 ];
 
 					// get story count by completion status
 					$authorData = $this->exec("SELECT S.completed, COUNT(DISTINCT S.sid) as count 
@@ -308,6 +308,42 @@ class UserCP extends Controlpanel
 		return ( empty($data) ) ? NULL : $data[0];
 	}
 	
+//	public function authorStoryDelete(int $sid,int $uid)
+	public function authorStoryDelete( $storyID, $authorID )
+	{
+		$sql = "SELECT S.completed, A2.aid
+					FROM `tbl_stories`S
+						INNER JOIN `tbl_stories_authors`A ON ( S.sid = A.sid AND A.type='M' AND A.aid = :aid )
+						LEFT JOIN  `tbl_stories_authors`A2 ON ( S.sid = A2.sid AND A2.type='M')
+					WHERE S.sid=:sid;";
+		$data = $this->exec($sql, [":sid" => $storyID, ":aid" => $authorID] );
+		
+		if ( sizeof($data)==0 )
+			return FALSE;
+		
+		// If the story previosly wasn't, it will now be moved to the deleted folder.
+		if ( $data[0]['completed']>0 )
+		{
+			$this->exec
+			(
+				"UPDATE `tbl_stories` SET `completed` = '0' WHERE `sid` = :sid;",
+				[ ":sid" => $storyID ]
+			);
+			return "moved";
+		}
+		else
+		{
+			/*
+			$this->exec
+			(
+				"UPDATE `tbl_stories` SET `completed` = '0' WHERE `sid` = :sid;",
+				[ ":sid" => $storyID ]
+			);
+			*/
+			return "testing";
+		}
+	}
+	
 	public function authorStoryList($select,$author,$sort,$page)
 	{
 		$limit = 20;
@@ -330,6 +366,9 @@ class UserCP extends Controlpanel
 				break;
 			case "drafts":
 				$sql .= "'1'";
+				break;
+			case "deleted":
+				$sql .= "'0'";
 				break;
 			default:
 				return FALSE;
@@ -538,13 +577,13 @@ class UserCP extends Controlpanel
 		// Step two: check for changes in relation tables
 
 		// Check tags:
-		$this->storyRelationTag( $current->sid, $post['tags'] );
+		$this->storyRelationTag( $story->sid, $post['tags'] );
 		// Check Characters:
-		$this->storyRelationTag( $current->sid, $post['characters'], 1 );
+		$this->storyRelationTag( $story->sid, $post['characters'], 1 );
 		// Check Categories:
-		$this->storyRelationCategories( $current->sid, $post['category'] );
+		$this->storyRelationCategories( $story->sid, $post['category'] );
 		// Check Authors:
-		$this->storyRelationAuthor( $current->sid, $post['mainauthor'], $post['supauthor'] );
+		$this->storyRelationAuthor( $story->sid, $post['mainauthor'], $post['supauthor'] );
 
 		// Rebuild story cache based on new data
 		$this->rebuildStoryCache($story->sid);

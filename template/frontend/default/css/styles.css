@@ -547,32 +547,30 @@ hr:after {
   padding: 10px 10px 10px 36px;
   margin: 10px;
 }
-.alert-box-half {
-	-webkit-border-radius: 10px;
-	-moz-border-radius: 10px;
-	border-radius: 10px; 
-  padding: 10px 10px 10px 36px;
-  margin: 10px;
+.alert-box.half {
   width: 50%;
 }
 .alert-box span {
   font-weight: bold;
   text-transform: uppercase;
 }
-.error {
+.alert-box.error {
   background-color:#ffecec;
   border: 1px solid #f5aca6;
 }
-.success {
+.alert-box.success {
   background-color:#e9ffd9;
   border: 1px solid #a6ca8a;
 }
-.warning {
+.alert-box.warning {
   background-color:#fff8c4;
   border: 1px solid #f2c779;
 }
-.info {
+.alert-box.info {
   background-color:#e3f7fc;
+  border: 1px solid #8ed9f6;
+}
+.alert-box.clear {
   border: 1px solid #8ed9f6;
 }
 

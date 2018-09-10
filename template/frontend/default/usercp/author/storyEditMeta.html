@@ -1,3 +1,13 @@
+<check if="{{isset(@deleted)}}">
+	<switch expr="{{ @deleted }}">
+		<case value="confirm" break="TRUE">
+			<div class="alert-box half info">__DeleteConfirm</div>
+		</case>
+		<case value="failed" break="TRUE">
+			<div class="alert-box half error">__DeleteFailed</div>
+		</case>
+	</switch>
+</check>
 <a href="{{@BASE}}{{@data.form.returnpath}}">{ICON:arrow-left} {{@LN__ReturnToOverview}}</a>
 <div class="grid-wrapper">
 	<check if="{{ isset(@deleteWarning) }}"><div class="gb-90 alert-box warning">{{ @deleteWarning }}</div></check>
@@ -39,9 +49,22 @@
 					</select>
 				</div>
 {*		<!-- end: story status fields -->	*}
-				<div class="gb-full" align="right">
-					{* <a class="delete" href="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}};returnpath={{@data.form.returnpath}}"><span class="fa fa-times"></span> __Delete</a> *}
-					<input class="button" type="reset"> <input class="button" type="submit">
+				<div class="gb-1thrd" align="left">
+					<div class="alert-box error">
+					<check if="{{ @data.completed==0 }}"><input type="checkbox" name="deleteComfirm1" />{ICON:check}</check>
+					<input type="submit" name="delete" value="{{@LN__Delete}}" />
+					<check if="{{ @data.completed==0 }}"><input type="checkbox" name="deleteComfirm2" />{ICON:check}</check>
+					</div>
+				</div>
+				<div class="gb-1thrd">
+					<div class="alert-box clear">
+					<input class="button" type="reset">
+					</div>
+				</div>
+				<div class="gb-1thrd">
+					<div class="alert-box success">
+					<input class="button" type="submit">
+					</div>
 				</div>
 			</div>
 		</form>
