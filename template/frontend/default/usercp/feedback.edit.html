@@ -1,7 +1,7 @@
 <div class="form-wrapper">
-<form method="post" action="{{@BASE}}/userCP/feedback/{{@block}}/{{@direction}}/save/id={{@data.type}},{{@data.id}};returnpath={{@returnpath}}">
+<form method="post" action="{{@BASE}}/userCP/feedback/{{@block}}/{{@direction}}/save/id={{@data.type}},{{@data.fid}};returnpath={{@returnpath}}">
 <check if="{{@data.fid}}">
-	<span class="alert-box error">__Check to delete: <input type="checkbox" name="delete" value="yes" /></span>
+	<span class="alert-box error">{{@LN__CheckToDelete}}: <input type="checkbox" name="delete" value="yes" /></span>
 	<br /><br />
 </check>
 <fieldset>
@@ -11,16 +11,10 @@
 	</check>
 	<table>
 		<tr><td colspan="2"><h6>{{@data.title}}:</h6></td></tr>
-		<tr><td colspan="2"><textarea class="textarea" name="comments">{{@data.text}}</textarea></td></tr>
+		<tr><td colspan="2"><textarea class="textarea" name="comment">{{@data.text}}</textarea></td></tr>
 {*		<tr><td>__Notification</td><td><input type="checkbox" name="notify" value="yes" <check if="{{@data.notify}}">checked="checked"</check> /> *}
 		<tr><td colspan="2"><input class="button" type="submit"></td></tr>
 	</table>
 </fieldset>
 </form>
 </div>
-<script type="text/javascript">
-$(function() {
-    // With a custom message
-   $('form').areYouSure();
-})
-</script>

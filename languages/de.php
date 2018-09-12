@@ -46,6 +46,7 @@ return array(
 'Email'			=> 'E-Mail',
 'Registered'	=> 'Registriert',
 'Guest'			=> 'Gast',
+'DeletedUser'	=> 'Gelöschter Benutzer',//db
 'ForgotPW'		=> 'Passwort vergessen',
 'ResetPW'		=> 'Passwort zurücksetzen',
 'ResetPWMail'	=> 'Falls ein Benutzer mit diesem Namen oder dieser E-Mail Adresse existiert, wurde eine E-Mail mit weiteren Anweisungen verschickt.',
@@ -104,14 +105,18 @@ return array(
 'Weekday' => '{0,date,custom,%A}',
 
 // [6] Global -- Forms
-'CaptchaMismatch'	=>	'Captcha stimmt nicht überein',
-'GuestURL'		=>	'Gäste dürfen keine URLs posten',
-'GuestNameEmpty' => 'Gäste müssen einen Namen angeben',
-'MessageEmpty'	=>	'Keine Nachricht eingegeben',
-'CommentEmpty'	=>	'Kein Kommentar eingegeben',
-'CannotSave'	=>	'Daten konnten nicht gespeichert werden, bitte erneut versuchen',
-'FormErrors'	=> '{0, plural, zero {Keine Fehler}, one {Beim Verarbeiten des Formulars ist ein Fehler aufgetreten}, other	{Beim Verarbeiten des Formulars sind Fehler aufgetreten} }',
-'Submit'	=>	'Absenden',
+'CaptchaMismatch'	=> 'Captcha stimmt nicht überein',
+'GuestURL'			=> 'Gäste dürfen keine URLs posten',
+'GuestNameEmpty' 	=> 'Gäste müssen einen Namen angeben',
+'GuestNoComment'	=> 'Gäste können keine Kommentare hinterlassen',
+'MessageEmpty'		=> 'Keine Nachricht eingegeben',
+'CommentEmpty'		=> 'Kein Kommentar eingegeben',
+'CannotSave'		=> 'Daten konnten nicht gespeichert werden, bitte erneut versuchen',
+'FormErrors'		=> '{0, plural, zero {Keine Fehler}, one {Beim Verarbeiten des Formulars ist ein Fehler aufgetreten}, other	{Beim Verarbeiten des Formulars sind Fehler aufgetreten} }',
+'Submit'			=> 'Absenden',
+'YourCommentHere'	=> 'Schreibe hier deinen Kommentar',
+'GuestComment'		=> 'Kommentar als Gast',
+'CheckToDelete'		=> 'Markieren um zu löschen',
 
 // [7] Global -- Search
 'NoEntries'			=> 'Keine Einträge',
@@ -647,6 +652,7 @@ return array(
 	// 'other	{# errors occurred while saving data.}
 // }',
 
+'Review'	=> 'Review',
 'ReviewHeadline' => 'Am {1} um {2} Uhr schrieb {0} eine Review zu Kapitel {3}',
 /*
 'ReviewHeadline' => '{3, plural,'.

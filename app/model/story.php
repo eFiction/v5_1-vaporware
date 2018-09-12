@@ -422,7 +422,7 @@ class Story extends Base
 					F.writer_uid as review_writer_uid, 
 					UNIX_TIMESTAMP(F.datetime) as date_review
 				FROM `tbl_feedback`F 
-					JOIN `tbl_users`U ON ( F.writer_uid = U.uid )
+					LEFT JOIN `tbl_users`U ON ( F.writer_uid = U.uid )
 					LEFT JOIN `tbl_chapters`Ch ON ( Ch.chapid = F.reference_sub )
 				WHERE F.reference = :storyid @CHAPTER@ AND F.type='ST' 
 				ORDER BY F.datetime DESC
@@ -438,15 +438,22 @@ class Story extends Base
 		*/
 		foreach ( $reviews as $item )
 		{
+			// Fix for deleted users
+			if ( $item['review_writer_uid'] > 0 AND $item['review_writer_name'] === NULL )
+			{
+				$item['review_writer_uid'] = -1;
+				$item['review_writer_name'] = \Base::instance()->get("LN__DeletedUser");
+			}
+
 			// remember current review ID
 			$current_id = $item['review_id'];
 			$data['r'.$current_id] =
 			[
 				"level"		=>	1,
 				"story"		=>	$item['review_story'],
-				"date"		=>	date( \Config::getPublic('date_format'), $item['date_review']),
-				"date_long"	=>	date( \Config::getPublic('datetime_format'), $item['date_review']),
-				"time"		=>	date( \Config::getPublic('time_preset'), $item['date_review']),
+				"date"		=>	date( $this->config['date_format'], $item['date_review']),
+				"date_long"	=>	date( $this->config['datetime_format'], $item['date_review']),
+				"time"		=>	date( $this->config['time_format'], $item['date_review']),
 				"chapter"	=>	$item['review_chapter'],
 				"chapternr"	=>	$item['inorder'],
 				"id"		=>	$item['review_id'],
@@ -468,6 +475,9 @@ class Story extends Base
 			
 			$tree += [ 'r'.$current_id => null ];
 		}
+		
+		// if $parents is empty, there are no reviews, and we are done here
+		if ( empty($parents) ) return NULL;
 
 		/*
 			for the above comments ( id in array $parent), get the associated comments
@@ -647,10 +657,9 @@ class Story extends Base
 
 	public function getChapterByReview($reviewID)
 	{
-		// SELECT Ch.inorder FROM `new5d_feedback`F INNER JOIN `new5d_chapters`Ch ON ( F.reference_sub = Ch.chapid ) WHERE F.fid = 4098
 		$data = $this->exec( "SELECT Ch.inorder 
-					FROM `new5d_feedback`F 
-						INNER JOIN `new5d_chapters`Ch ON ( F.reference_sub = Ch.chapid )
+					FROM `tbl_feedback`F 
+						INNER JOIN `tbl_chapters`Ch ON ( F.reference_sub = Ch.chapid )
 					WHERE F.fid = :review;", [ ":review" => $reviewID ] );
 		if ( sizeof ( $data ) )
 			return $data[0]['inorder'];

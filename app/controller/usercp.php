@@ -278,11 +278,11 @@ class UserCP extends Base
 		// delete function get's accompanied by a pseudo-post, this doesn't count here. Sorry dude
 		if( NULL != $post = $f3->get('POST') )
 		{
-			if ( array_key_exists("confirmed",$post) )
+			if ( array_key_exists("delete",$post) )
 			{
-				//$this->model->libraryBookFavDelete($params);
-				//$f3->reroute($params['returnpath'], false);
-				//exit;
+				$this->model->deleteFeedback($post, $params);
+				$f3->reroute($params['returnpath'], false);
+				exit;
 			}
 			else
 			{
@@ -340,6 +340,8 @@ class UserCP extends Base
 		
 		if(array_key_exists("edit",$params))
 			$this->feedbackReviewsEdit($f3, $params);
+		if(array_key_exists("save",$params))
+			$this->feedbackReviewsSave($f3, $params);
 		elseif(array_key_exists("delete",$params))
 		{
 			$this->feedbackReviewsDelete($f3, $params);
@@ -374,6 +376,18 @@ class UserCP extends Base
 	
 	protected function feedbackReviewsEdit(\Base $f3, $params)
 	{
+		if ( FALSE === $data = $this->model->loadReview($params) )
+		{
+			// test
+			$f3->reroute("/userCP/feedback/reviews", false);
+			exit;
+		}
+		$this->buffer ( $this->template->libraryFeedbackEdit($data, $params) );
+	}
+
+	protected function feedbackReviewsSave(\Base $f3, $params)
+	{
+		print_r($_POST);exit;
 		if ( FALSE === $data = $this->model->loadReview($params) )
 		{
 			// test

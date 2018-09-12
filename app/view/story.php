@@ -24,11 +24,6 @@ class Story extends Base
 			return $this->render('story/head.browse.html');
 	}
 
-	public function vTest()
-	{
-		return "nichts";
-	}
-
 	public function buildTOC($tocData, $storyData)
 	{
 		$this->javascript('body', TRUE, 'jquery.columnizer.js' );
@@ -43,7 +38,7 @@ class Story extends Base
 	public function buildInfoblock($storyData)
 	{
 		$storyData['cache_categories'] = json_decode($storyData['cache_categories'],TRUE);
-		$storyData['cache_tags'] = json_decode($storyData['cache_tags'],TRUE);
+		$storyData['cache_tags'] = 		 json_decode($storyData['cache_tags'],TRUE);
 		$storyData['cache_characters'] = json_decode($storyData['cache_characters'],TRUE);
 
 		$this->f3->set('storyData', $storyData);
@@ -51,37 +46,6 @@ class Story extends Base
 		return $this->render('story/information.html');
 	}
 
-/*	public static function buildReviews($reviewData,$selection)
-	{
-		\Base::instance()->set('returnpath', \Base::instance()->get('PATH') );
-		\Base::instance()->set('story_reviews', $reviewData);
-		\Base::instance()->set('selection', $selection);
-
-		return parent::render('story/reviews.html');
-	}		*/
-
-	// for AJAX purposes	- requires reviews.inner
-	// currently unused
-	/*
-	public static function buildReviewCell($data, $level = 1, $insert_id = NULL)
-	{
-		$item =
-		[
-			"name"		=> ($_SESSION['userID'] == 0) ? $data['name'] : $_SESSION['username'],
-			"timestamp" => time(),
-			"text"		=> $data['text'],
-			"uid"		=> $_SESSION['userID'],
-			"level"		=> $level,
-			"id"		=> $insert_id,
-		];
-		\Base::instance()->set('item', $item);
-		\Base::instance()->set('returnpath', \Base::instance()->get('PATH') );
-
-		return parent::render('story/reviews.inner.html');
-	}
-	*/
-	
-	
 	public function commentForm(array $in_structure)
 	{
 		// renaming fields for use in base comment form
@@ -94,7 +58,7 @@ class Story extends Base
 		
 		$data = [ 
 					"cancel" 				=> TRUE,
-					"feedback_form_label"	=> ($in_structure['level'] > 0) ? "__COMMENT" : "__REVIEW",
+					"feedback_form_label"	=> ($in_structure['level'] > 0) ? $this->f3->get("LN__Comment") : $this->f3->get("LN__Review"),
 					"postText"				=> \Base::instance()->get('POST.write.text'),
 					"postName"				=> \Base::instance()->get('POST.write.name'),
 				];
@@ -110,19 +74,19 @@ class Story extends Base
 		else $data['submit_button_label'] = $this->f3->get("LN__Button_writeComment");
 
 		// defined in \View\Base
-		return parent::commentFormBase($out_structure,$data);
+		return $this->commentFormBase($out_structure,$data);
 	}
 
 	public function buildStory($storyData,$content,$dropdown,$view=1)
 	{
-		\Registry::get('VIEW')->javascript('body', TRUE, 'chapter.js?' );
-		\Registry::get('VIEW')->javascript('body', FALSE, "var url='".\Base::instance()->get('BASE')."/story/read/{$storyData['sid']},'" );
+		$this->javascript('body', TRUE, 'chapter.js?' );
+		$this->javascript('body', FALSE, "var url='".\Base::instance()->get('BASE')."/story/read/{$storyData['sid']},'" );
 
 		$storyData['cache_authors'] = json_decode($storyData['cache_authors'],TRUE);
-		$storyData['published'] = date( \Config::getPublic('date_format'), $storyData['published']);
-		$storyData['modified'] = date( \Config::getPublic('date_format'), $storyData['modified']);
+		$storyData['published'] = date( $this->config['date_format'], $storyData['published']);
+		$storyData['modified']  = date( $this->config['date_format'], $storyData['modified']);
 
-		\Base::instance()->set('data', [
+		$this->f3->set('data', [
 											"story" 	=> $storyData,
 											"content" 	=> $content,
 											"dropdown" 	=> $dropdown,
@@ -131,25 +95,25 @@ class Story extends Base
 											"postName"	=> '',
 											"postText"	=> '',
 										]);
-		\Base::instance()->set('returnpath', \Base::instance()->get('PATH') );
+		$this->f3->set('returnpath', \Base::instance()->get('PATH') );
 		
 		return parent::render('story/single.html');
 	}
 	
 	public function buildReviews($storyData, $reviewData, $chapter, $selected)
 	{
-		\Registry::get('VIEW')->javascript('body', TRUE, 'chapter.js?' );
+		$this->javascript('body', TRUE, 'chapter.js?' );
 
-		parent::dataProcess($storyData);
-		\Base::instance()->set('story', $storyData);
-		\Base::instance()->set('data', [
-											"reviews" 	=> $reviewData,
-											"selected"	=> $selected,
-											"chapter"	=> $chapter,
-										]);
-		\Base::instance()->set('returnpath', \Base::instance()->get('PATH') );
+		$this->dataProcess($storyData);
+		$this->f3->set('story', $storyData);
+		$this->f3->set('data', [
+								"reviews" 	=> $reviewData,
+								"selected"	=> $selected,
+								"chapter"	=> $chapter,
+							]);
+		$this->f3->set('returnpath', $this->f3->get('PATH') );
 		
-		return parent::render('story/reviews.html');
+		return $this->render('story/reviews.html');
 	}
 
 	public function dropdown($data,$chapter)
@@ -290,10 +254,10 @@ class Story extends Base
 		}
 	}
 
-	public static function archiveStats($stats)
+	public function archiveStats($stats)
 	{
-		\Base::instance()->set('archiveStats', $stats);
-		return parent::render('blocks/stats.html');
+		$this->f3->set('archiveStats', $stats);
+		return $this->render('blocks/stats.html');
 	}
 	
 	public function blockStory($type, $stories=[], $extra=NULL)
@@ -313,20 +277,20 @@ class Story extends Base
 		else return NULL;
 	}
 	
-	public static function blockTagcloud($taglist)
+	public function blockTagcloud($taglist)
 	{
 		$max = current($taglist)['count'];
 		$min = end($taglist)['count'];
 		shuffle($taglist);
 		foreach ( $taglist as &$tag )
 		{
-			$size_factor = ( \Config::getPublic('tagcloud_spread') - 1 ) / ( ($min==$max)?1:($max - $min) ) * ( $tag['count'] - $min ) + 1;
+			$size_factor = ( $this->config['tagcloud_spread'] - 1 ) / ( ($min==$max)?1:($max - $min) ) * ( $tag['count'] - $min ) + 1;
 			$tag['z_index'] = $max-$tag['count'];
-			$tag['percent'] = intval(\Config::getPublic('tagcloud_basesize')*$size_factor);
+			$tag['percent'] = intval($this->config['tagcloud_basesize']*$size_factor);
 		}
 
-		\Base::instance()->set('renderData', $taglist);
-		return parent::render('story/block.tagcloud.html');
+		$this->f3->set('renderData', $taglist);
+		return $this->render('story/block.tagcloud.html');
 	}
 	
 }

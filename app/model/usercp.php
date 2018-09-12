@@ -13,7 +13,6 @@ class UserCP extends Controlpanel
 
 	public function showMenu($selected=FALSE, array $data=[])
 	{
-		//if ( empty($this->menu) ) $this->menu = $this->panelMenu();
 		if ( $selected )
 		{
 			if ( $selected == "author")
@@ -260,42 +259,7 @@ class UserCP extends Controlpanel
 		if (sizeof($data)>0) return $data;
 		return FALSE;
 	}
-/*
-	public function storyEditPrePop(array $storyData)
-	{
-		$categories = json_decode($storyData['cache_categories']);
-		if(sizeof($categories))
-		{
-			foreach ( $categories as $tmp ) $pre['cat'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
-			$pre['cat'] = json_encode($pre['cat']);
-		}
-		else $pre['cat'] = '""';
 
-		$tags = json_decode($storyData['cache_tags'],TRUE)['simple'];
-		if(sizeof($tags)>0)
-		{
-			foreach ( $tags as $tmp ) $pre['tag'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
-			$pre['tag'] = json_encode($pre['tag']);
-		}
-		else $pre['tag'] = '""';
-
-		$characters = json_decode($storyData['cache_characters']);
-		if(sizeof($characters))
-		{
-			foreach ( $characters as $tmp ) $pre['char'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
-			$pre['char'] = json_encode($pre['char']);
-		}
-		else $pre['char'] = '""';
-		
-		$authors = $this->exec ( "SELECT U.uid as id, U.nickname as name FROM `tbl_users`U INNER JOIN `tbl_stories_authors`Rel ON ( U.uid = Rel.aid AND Rel.sid = :sid AND Rel.type = 'M' );", [ ":sid" => $storyData['sid'] ]);
-		$pre['mainauth'] = json_encode($authors);
-
-		$supauthors = $this->exec ( "SELECT U.uid as id, U.nickname as name FROM `tbl_users`U INNER JOIN `tbl_stories_authors`Rel ON ( U.uid = Rel.aid AND Rel.sid = :sid AND Rel.type = 'S' );", [ ":sid" => $storyData['sid'] ]);
-		$pre['supauth'] = json_encode($supauthors);
-
-		return $pre;
-	}
-*/
 	public function authorStoryStatus($sid)
 	{
 		$sql = "SELECT S.title, S.validated, S.completed
@@ -406,175 +370,6 @@ class UserCP extends Controlpanel
 		$story->save();
 		
 		// Step two: check for changes in relation tables
-/*
-		// Check tags:
-		$post['tags'] = explode(",",$post['tags']);
-		$tags = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_tags');
-
-		foreach ( $tags->find(array('`sid` = ? AND `character` = ?',$story->sid,0)) as $X )
-		{
-			$temp=array_search($X['tid'], $post['tags']);
-			if ( $temp===FALSE )
-			{
-				// Excess relation, drop from table
-				$tags->erase(['lid=?',$X['lid']]);
-			}
-			else unset($post['tags'][$temp]);
-		}
-		
-		// Insert any tag IDs not already present
-		if ( sizeof($post['tags'])>0 )
-		{
-			foreach ( $post['tags'] as $temp)
-			{
-				// Add relation to table
-				$tags->reset();
-				$tags->sid = $story->sid;
-				$tags->tid = $temp;
-				$tags->character = 0;
-				$tags->save();
-			}
-		}
-		unset($tags);
-		
-		// Check Characters:
-		$post['characters'] = explode(",",$post['characters']);
-		$characters = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_tags');
-
-		foreach ( $characters->find(array('`sid` = ? AND `character` = ?',$story->sid,1)) as $X )
-		{
-			$temp=array_search($X['tid'], $post['characters']);
-			if ( $temp===FALSE )
-			{
-				// Excess relation, drop from table
-				$characters->erase(['lid=?',$X['lid']]);
-			}
-			else unset($post['characters'][$temp]);
-		}
-		
-		// Insert any character IDs not already present
-		if ( sizeof($post['characters'])>0 )
-		{
-			foreach ( $post['characters'] as $temp)
-			{
-				// Add relation to table
-				$characters->reset();
-				$characters->sid = $story->sid;
-				$characters->tid = $temp;
-				$characters->character = 1;
-				$characters->save();
-			}
-		}
-		unset($characters);
-		
-		// Check Categories:
-		$post['category'] = explode(",",$post['category']);
-		$categories = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_categories');
-
-		foreach ( $categories->find(array('`sid` = ?',$story->sid)) as $X )
-		{
-			$temp=array_search($X['cid'], $post['category']);
-			if ( $temp===FALSE )
-			{
-				// Excess relation, drop from table
-				$categories->erase(['lid=?',$X['lid']]);
-			}
-			else unset($post['category'][$temp]);
-		}
-		
-		// Insert any character IDs not already present
-		if ( sizeof($post['category'])>0 )
-		{
-			foreach ( $post['category'] as $temp)
-			{
-				// Add relation to table
-				$categories->reset();
-				$categories->sid = $story->sid;
-				$categories->cid = $temp;
-				$categories->save();
-			}
-		}
-		unset($categories);
-		*/
-		/*
-		// Author and co-Author preparation:
-		$post['mainauthor'] = array_filter(explode(",",$post['mainauthor']));
-		$post['supauthor'] = array_filter(explode(",",$post['supauthor']));
-		// remove co-authors, that are already in the author field
-		$post['supauthor'] = array_diff($post['supauthor'], $post['mainauthor']);
-
-		// Check co-Authors:
-		$supauthor = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors');
-
-		foreach ( $supauthor->find(array('`sid` = ? AND `type` = ?',$story->sid,'S')) as $X )
-		{
-			// delete entry if is no longer a supporting author or
-			$isSup=array_search($X['aid'], $post['supauthor']);
-			// delete if is now a main author
-			$isMain=array_search($X['aid'], $post['mainauthor']);
-			
-			if ( $isSup===FALSE OR $isMain===TRUE )
-			{
-				// Excess relation, drop from table
-				$supauthor->erase(['lid=?',$X['lid']]);
-			}
-			else unset($post['supauthor'][$isSup]);
-		}
-
-		// Insert any supporting author IDs not already present
-		if ( sizeof($post['supauthor'])>0 )
-		{
-			foreach ( $post['supauthor'] as $temp)
-			{
-				// Add relation to table
-				$supauthor->reset();
-				$supauthor->sid = $story->sid;
-				$supauthor->aid = $temp;
-				$supauthor->type = 'S';
-				$supauthor->save();
-			}
-		}
-		unset($supauthor);
-
-		// Check Authors:
-		$mainauthor = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors');
-
-		// refuse to leave an empty author list behind
-		if(sizeof($post['mainauthor']))
-		{
-			foreach ( $mainauthor->find(array('`sid` = ? AND `type` = ?',$story->sid,'M')) as $X )
-			{
-				$isMain=array_search($X['aid'], $post['mainauthor']);
-				if ( $isMain===FALSE )
-				{
-					// Excess relation, drop from table
-					$mainauthor->erase(['lid=?',$X['lid']]);
-				}
-				else unset($post['mainauthor'][$isMain]);
-			}
-		}
-		else
-		{
-			$_SESSION['lastAction'] = [ "deleteWarning" => \Base::instance()->get('LN__MainAuthorNotEmpty') ];
-		}
-
-		// Insert any author IDs not already present
-		if ( sizeof($post['mainauthor'])>0 )
-		{
-			foreach ( $post['mainauthor'] as $temp)
-			{
-				// Add relation to table
-				$mainauthor->reset();
-				$mainauthor->sid = $story->sid;
-				$mainauthor->aid = $temp;
-				$mainauthor->type = 'M';
-				$mainauthor->save();
-			}
-		}
-		unset($mainauthor);
-		*/
-		
-		// Step two: check for changes in relation tables
 
 		// Check tags:
 		$this->storyRelationTag( $story->sid, $post['tags'] );
@@ -639,7 +434,7 @@ class UserCP extends Controlpanel
 		return TRUE;
 	}
 	
-	public function feedbackHomeStats($data)
+	public function feedbackHomeStats(array $data)
 	{
 		$chapters = $this->exec("SELECT COUNT(1) as count FROM `tbl_chapters`C INNER JOIN `tbl_stories_authors`SA ON ( C.sid = SA.sid ) WHERE SA.aid = {$_SESSION['userID']};")[0]['count'];
 		$stats = 
@@ -654,11 +449,36 @@ class UserCP extends Controlpanel
 		return $stats;
 	}
 	
-	public function saveFeedback($post, $params)
+	public function saveFeedback(array $post, array $params)
 	{
-		
-		return FALSE;
+		$sql = "UPDATE `tbl_feedback`
+				SET `text` = :text
+				WHERE `fid` = :fid AND `type` = :type;";
+		return $this->exec( $sql,
+					[
+						":text"	=> $post['comment'],
+						":fid"	=> $params['id'][1],
+						":type"	=> $params['id'][0],
+					]
+		);
+		// no recount required, editing a feedback does not change stats
 	}
+	
+	public function deleteFeedback(array $post, array $params)
+	{
+		$sql = "DELETE FROM `tbl_feedback`
+				WHERE `fid` = :fid AND `type` = :type;";
+		return $this->exec( $sql,
+					[
+						":fid"	=> $params['id'][1],
+						":type"	=> $params['id'][0],
+					]
+		);
+		// drop user feedback stat cache
+		\Model\Routines::dropUserCache("feedback");
+		// purce stats cache, forcing re-cache
+		\Cache::instance()->clear('stats');
+}
 
 	public function reviewHasChildren($reference)
 	{
@@ -767,13 +587,10 @@ class UserCP extends Controlpanel
 
 		if ( isset($ajax_sql) ) return $this->exec($ajax_sql, $bind);
 		return NULL;
-
 	}
 	
 	public function msgInbox($offset=0)
 	{
-		//$this->title[] = "__Inbox";
-		
 		$sql = "SELECT m.mid,UNIX_TIMESTAMP(m.date_sent) as date_sent,UNIX_TIMESTAMP(m.date_read) as date_read,m.subject,m.sender as name_id,u.nickname as name, TRUE as can_delete
 						FROM `tbl_messaging`m 
 							INNER JOIN `tbl_users`u ON ( m.sender = u.uid ) 
@@ -784,8 +601,6 @@ class UserCP extends Controlpanel
 
 	public function msgOutbox($offset=0)
 	{
-		//$this->title[] = "__Inbox";
-		
 		$sql = "SELECT m.mid,UNIX_TIMESTAMP(m.date_sent) as date_sent,UNIX_TIMESTAMP(m.date_read) as date_read,m.subject,m.recipient as name_id,u.nickname as name, IF(m.date_read IS NULL,TRUE,FALSE) as can_delete
 						FROM `tbl_messaging`m 
 							INNER JOIN `tbl_users`u ON ( m.recipient = u.uid ) 
@@ -796,8 +611,6 @@ class UserCP extends Controlpanel
 	
 	public function msgRead($msgID)
 	{
-		//$this->title[] = "__ReadMessage";
-		
 		$sql = "SELECT m.mid,UNIX_TIMESTAMP(m.date_sent) as date_sent,UNIX_TIMESTAMP(m.date_read) as date_read,m.subject,m.message,
 								m.sender as sender_id, u1.nickname as sender,
 								m.recipient as recipient_id, u2.nickname as recipient 
@@ -821,7 +634,6 @@ class UserCP extends Controlpanel
 	
 	public function msgReply($msgID=NULL)
 	{
-		//$this->title[] = "__ReadMessage";
 		if ( $msgID )
 		{
 			$sql = "SELECT m.mid,UNIX_TIMESTAMP(m.date_sent) as date_sent,UNIX_TIMESTAMP(m.date_read) as date_read,m.subject,m.message,
@@ -1051,7 +863,12 @@ class UserCP extends Controlpanel
 			if ( $params['id'][0] == "ST" )
 			{
 				$sql = $this->sqlMaker("feedback".$params[1], "ST", FALSE) . 
-					"AND F.fid = :id ";
+					" AND F.fid = :id ";
+			}
+			elseif ( $params['id'][0] == "C" )
+			{
+				$sql = $this->sqlMaker("feedback".$params[1], "C", FALSE) . 
+					" AND F.fid = :id ";
 			}
 		}
 		else return FALSE;
@@ -1096,6 +913,20 @@ class UserCP extends Controlpanel
 							INNER JOIN `tbl_users`U ON ( U.uid = SA.aid )
 						LEFT JOIN `tbl_chapters`Ch ON ( F.reference_sub = Ch.chapid )
 						WHERE F.writer_uid = {$_SESSION['userID']} AND F.type='ST' ",
+			"C"
+				=>	"SELECT SQL_CALC_FOUND_ROWS
+							F.type as type, F.fid, F.text, UNIX_TIMESTAMP(F.datetime) as date,
+							F2.text as reviewtext, 
+							SA.sid as id, 
+							Ch.inorder as chapter, 
+							GROUP_CONCAT(DISTINCT U.nickname SEPARATOR ', ') as name, U.uid, S.title
+						FROM `tbl_feedback`F 
+							INNER JOIN `tbl_feedback`F2 ON ( F.reference = F2.fid )
+							INNER JOIN `tbl_stories`S ON ( F2.reference = S.sid ) 
+								{$join} JOIN `tbl_stories_authors`SA ON ( S.sid = SA.sid ) 
+									INNER JOIN `tbl_users`U ON ( U.uid = SA.aid ) 
+							LEFT JOIN `tbl_chapters`Ch ON ( F2.reference_sub = Ch.chapid ) 
+						WHERE F.writer_uid = {$_SESSION['userID']} AND F.type='C' ",
 			"SE"
 				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Ser.seriesid as id, GROUP_CONCAT(DISTINCT U.nickname SEPARATOR ', ') as name, U.uid, F.text, Ser.title, UNIX_TIMESTAMP(F.datetime) as date 
 						FROM `tbl_feedback`F
@@ -1258,6 +1089,5 @@ class UserCP extends Controlpanel
 										]);
 		$mapper->save();
 	}
-
 
 }

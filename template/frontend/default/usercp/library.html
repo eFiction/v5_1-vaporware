@@ -59,7 +59,7 @@
 			<check if="{{ @row['visibility']==2 }}">{ICON:visible}</check>
 		</td>
 		<td><a href="{{@BASE}}/
-			<check if="{{ @extra.type == 'AU' }}">member/profile/{{ @row['id'] }}"></check>
+			<check if="{{ @extra.type == 'AU' }}">members/id={{ @row['id'] }}"></check>
 			<check if="{{ @extra.type == 'RC' }}">story/read/{{ @row['id'] }}"></check>
 			<check if="{{ @extra.type == 'SE' }}">story/read/{{ @row['id'] }}"></check>
 			<check if="{{ @extra.type == 'ST' }}">story/read/{{ @row['id'] }}"></check>

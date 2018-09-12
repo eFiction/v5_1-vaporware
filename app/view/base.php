@@ -66,8 +66,8 @@ abstract class Base {
 	public function commentFormBase($structure,$data)
 	{
 		// 'structure' formating, clearing and naming in child function call
-		\Base::instance()->set('structure', $structure);
-		\Base::instance()->set('data', $data );
+		$this->f3->set('structure', $structure);
+		$this->f3->set('data', $data );
 
 		return $this->render('main/feedback_form.html');
 	}

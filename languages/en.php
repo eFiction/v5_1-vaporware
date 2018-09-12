@@ -46,6 +46,7 @@ return array(
 'Email'			=> 'e-Mail',
 'Registered'	=> 'Registered',
 'Guest'			=> 'Guest',
+'DeletedUser'	=> 'Deleted user',//db
 'ForgotPW'		=> 'Forgot you password',
 'ResetPW'		=> 'Reset my password',
 'ResetPWMail'	=> 'If a user with this name or e-mail exists, a mail containing instructions on how to reset the password has been sent',
@@ -107,11 +108,15 @@ return array(
 'CaptchaMismatch'	=> 'Captcha did not match',
 'GuestURL'			=> 'Guests are not allowed to post URLs',
 'GuestNameEmpty'	=> 'Name field cannot be empty',
+'GuestNoComment'	=> 'Gäste können keine Kommentare hinterlassen',//db
 'MessageEmpty'		=> 'No message entered',
 'CommentEmpty'		=> 'No comment entered',
 'CannotSave'		=> 'Could not save the data, please try again',
 'FormErrors'		=> '{0, plural,zero	{No errors},one	{There was an error while processing this form},other {There were errors while processing this form} }',
 'Submit'			=> 'Submit',
+'YourCommentHere'	=> 'Leave your comment here',
+'GuestComment'		=> 'Guest comment',
+'CheckToDelete'		=> 'Check the box to delete',
 
 // [7] Global -- Search 1
 'NoEntries'			=> 'No entries',
@@ -633,7 +638,7 @@ return array(
 'CommentsC' => '{0, plural,'.
 	'zero	{No comments yet},'.
 	'one	{One comment},'.
-'other	{# comments} }',
+	'other	{# comments} }',
 
 
 'Status_Changes' => '{0, plural,'.
@@ -647,6 +652,7 @@ return array(
 	'other	{# errors occurred while saving data.}
 }',
 
+'Review'	=> 'Review',
 'ReviewHeadline' => 'On {1} at {2}, {0} wrote a review for chapter {3}',
 /*
 'ReviewHeadline' => '{3, plural,'.

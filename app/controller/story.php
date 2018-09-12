@@ -617,7 +617,7 @@ class Story extends Base
 				\Cache::instance()->set('stats', $data, 3600);
 			}
 
-			return \View\Story::archiveStats($data);
+			return $this->template->archiveStats($data);
 		}
 		elseif ( $select[1] == "new" )
 		{
@@ -722,7 +722,7 @@ class Story extends Base
 			if ( sizeof($data)<\Config::getPublic('tagcloud_minimum_elements') ) return "";
 
 			// Wow, we are really getting a tag cloud, all eyes to the sky
-			return \View\Story::blockTagcloud($data);
+			return $this->template->blockTagcloud($data);
 		}
 		return "";
 	}

@@ -48,7 +48,7 @@
 			<td>{{ date(@CONFIG.date_format,@pm_line['date_sent']) }}</td>
 			<td><a href="{{@BASE}}/userCP/messaging/read/id={{ @pm_line['mid'] }}">{{ @pm_line['subject'] }}</a></td>
 			<td><check if="{{ @pm_line['date_read']!==NULL }}">
-				<true><a href="{{@BASE}}/member/profile/{{ @pm_line['name_id'] }}">{{ @pm_line['name'] }}</a></true>
+				<true><a href="{{@BASE}}/members/id={{ @pm_line['name_id'] }}">{{ @pm_line['name'] }}</a></true>
 				<false>{{ @pm_line['name'] }}</false>
 			</check></td>
 			{* check if mail can be deleted (inbox always, outbox only if not read by recipient *}

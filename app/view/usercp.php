@@ -144,7 +144,6 @@ class UserCP extends Base
 	
 	public static function libraryBookFavEdit($data, $params)
 	{
-		\Registry::get('VIEW')->javascript( 'head', TRUE, "jquery.are-you-sure.js" );
 		\Base::instance()->set('data', $data);
 		\Base::instance()->set('block', $params[0]);
 		\Base::instance()->set('returnpath', $params['returnpath']);
@@ -199,7 +198,6 @@ class UserCP extends Base
 
 	public function libraryFeedbackEdit($data, $params)
 	{
-		$this->javascript( 'head', TRUE, "jquery.are-you-sure.js" );
 		$this->f3->set('data', $data);
 		$this->f3->set('block', $params[0]);
 		$this->f3->set('direction', $params[1]);

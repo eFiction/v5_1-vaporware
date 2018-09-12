@@ -35,37 +35,45 @@
 		<a id="r{{@item.id}}"></a>
 {* Begin: DIV headline *}
 		<div class="review-headline">
+			{* This is quite an abuse of the "check" function, but there is no other way for a dynamic assignment of variables *}
+			<check if="{{@item.uid>0}}">
+				<true><check if="{{@namelink='<a href=\''.@BASE.'/members/id='.@item.uid.'\'>'.@item.name.'</a>' }}"></check></true>
+				<false><check if="{{@namelink='\''.@item.name.'\''}}"></check></false>
+			</check>
+			{* End of abuse, but this saves quite some work right below and keeps the link generation from the controller  *}
 			<check if="{{@item.level==1}}">
 				<true>
-					{{@LN__ReviewHeadline, "<a href='{@BASE}/members/id={@item.uid}'>{@item.name}</a>", @item.date, @item.time, @item.chapternr | format }}
+					{{@LN__ReviewHeadline, @namelink, @item.date, @item.time, @item.chapternr | format }}
+					<set edit='ST'>
 				</true>
 				<false>
+					<set edit='C'>
 					{* Is there a timestamp? eFiction 3 didn't save comment timestamp *}
 					<check if="{{@item.timestamp>0}}">
 						<true>
-						{{@LN__ReplyHeadline, "<a href='{@BASE}/members/id={@item.uid}'>{@item.name}</a>", @item.date, @item.time | format }}
+						{{@LN__ReplyHeadline, @namelink, @item.date, @item.time | format }}
 						</true>
 						<false>
-						{{@LN__ReplyHeadline_noDate, "<a href='{@BASE}/members/id={@item.uid}'>{@item.name}</a>" | format }}
+						{{@LN__ReplyHeadline_noDate, @namelink | format }}
 						</false>
 					</check>
 				</false>
 			</check>
-		{* Debug *}[ Level {{@item.level}} ID {{@item.id}} ]{* /Debug *}
+		{* Debug [ Level {{@item.level}} ID {{@item.id}} ] /Debug *}
 			<check if="{{isset(@item.elements) AND @item.elements>0}}"><a href="{{@BASE}}/story/reviews/{{@item.story}},{{@item.chapternr}},{{@item.id}}#r{{@item.id}}">{{@LN__ReviewCommentsLink, @item.elements | format }}</a></check>
 		</div><br />
 {* End: DIV headline *}
 {* Begin: DIV text *}
 		<div class="review-content">
 			{* review or comment text *}
-			{{@item.text |raw}}
+			{{nl2br(@item.text) |raw}}
 		</div><br />
 {* End: DIV text *}
 {* Begin: DIV button *}
 			<check if="{{ @_SESSION.userID OR TRUE==@CONFIG.allow_guest_reviews }}">
 				<check if="{{ @_SESSION.userID > 0 AND @_SESSION.userID == @item.uid }}">
 					<true>
-						<a href="{{@BASE}}/userCP/feedback/reviews/written/edit/id=ST,{{@item.id}}/returnpath={{@returnpath}}">{ICON:edit}</a>
+						<a href="{{@BASE}}/userCP/feedback/reviews/written/edit/id={{@edit}},{{@item.id}};returnpath={{@returnpath}}">{ICON:edit}</a>
 					</true>
 					<false>
 						<check if="{{isset(@item.id) AND empty(@item.nocomment)}}"><span id="{{@item.id}}" data-captcha="{{ (@_SESSION.userID==0) }}" data-level="{{@item.level}}" data-story="{{@item.story}}" data-chapter="{{@item.chapter}}" class="openform"><a class="opener" href="#">{{@LN__Reply}}</a></span></check>
