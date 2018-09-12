@@ -8,11 +8,11 @@
 			{{@LN__by}} <repeat group='@story.cache_authors' value='@author' counter='{{ @ctr }}'><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/members/id={{@author.0}}">{{@author.1}}</a></repeat><br />
 			<repeat group='@story.cache_categories' value='@category' counter='{{ @ctr }}'><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/story/browse/catIn={{@category.0}}">{{@category.1}}</a></repeat><br />
 			{{@LN__Rating}}: {{@story.cache_rating.1}}<br />
-			{{@LN__Summary}}: <span class="toggle">
-				<span class="toggle_more"><span class="fa fa-caret-square-o-down"></span></span>
-				<span class="toggle_less" style="display:none"><span class="fa fa-caret-square-o-up"></span></span>
+			<span class="toggle">
+				<span class="toggle_more">{ICON:square-down} __showDetails</span>
+				<span class="toggle_less" style="display:none">{ICON:square-up} __hideDetails</span>
 			</span>
-			<div class="toggle_container" style="display:none">{{ @story.summary | raw }}</div>
+			<div class="toggle_container" style="display:none">{{@LN__Summary}}: {{ @story.summary | raw }}</div>
 		</div>
 	</repeat>
 </true>

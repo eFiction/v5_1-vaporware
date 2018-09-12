@@ -63,8 +63,12 @@ input[type=button], .button {
 	text-align: right;
 }
 
+.buttons-alignment {
+	text-align: center;
+	padding: 15px 0;
+}
+
 .button {
-    max-width: 60%;
     margin: 0 auto;
     padding: 6px 12px;
     background-color: #2e2e2e;
@@ -74,11 +78,11 @@ input[type=button], .button {
     text-align: center;
 	cursor: pointer;
     font-family: 'Open Sans', sans-serif;
+	font-size: 10pt;
 }
 .button:hover {
-	-webkit-transition: 1s;
-	-moz-transition: 1s;
-	transition: 1s; 
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
 	background-color: #dddddd;
 }
 
@@ -122,6 +126,7 @@ textarea {
     background-color: #fff;
     resize: none;
     font-family: 'Open Sans', sans-serif;
+	font-size: 11pt;
 }
 
 

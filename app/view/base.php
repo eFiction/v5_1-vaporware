@@ -34,6 +34,22 @@ abstract class Base {
 	{
 		return "<!-- FILE: {$file} -->".\Template::instance()->render($file,$mime,$hive,$ttl)."<!-- END: {$file} -->";
 	}
+	
+	public static function directrender($file,$mime='text/html',array $hive=NULL,$ttl=0)
+	{
+		$content = \Template::instance()->render($file,$mime,$hive,$ttl);
+
+		$content = preg_replace_callback(
+						'/\{ICON:([\w-]+)(:|\!|#)?(.*?)\}/s',	// allowed seperators: ':' (normal), '!', '#' (id)
+						function ($icon)
+						{
+							return Iconset::parse($icon);
+						},
+						$content
+					);
+
+		return "<!-- FILE: {$file} -->".$content."<!-- END: {$file} -->";
+	}
 
 	public static function stub($text="")
 	{

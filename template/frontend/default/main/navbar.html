@@ -1,12 +1,12 @@
 <check if="{{ @SESSION['userID']==0 }}">
 	<true>
 		<form method="post" action="{{ @BASE }}/login">
-			{{@LN__Welcome }}  {{@LN__Guest}} | {{@LN__Login }}: {ICON:member} <input class="navbar" placeholder="login" type="text" name="login"> {ICON:key} <input class="navbar" placeholder="password" type="password" name="password"><input class="navbar" type="submit" value="{{@LN__Login}}"><check if="{{ @CONFIG.allow_registration AND @CONFIG.maintenance==FALSE }}"> | <a href="{{ @BASE }}/register">{{@LN__RegisterNow}}</a></check>
+			{{@LN__Welcome }}  {{@LN__Guest}} | {{@LN__Login }}: {ICON:member} <input class="navbar" placeholder="login" type="text" name="login"> {ICON:sign-in} <input class="navbar" placeholder="password" type="password" name="password"><input class="navbar" type="submit" value="{{@LN__Login}}"><check if="{{ @CONFIG.allow_registration AND @CONFIG.maintenance==FALSE }}"> | <a href="{{ @BASE }}/register">{{@LN__RegisterNow}}</a></check>
 			<input type="hidden" name="returnpath" value="{{ @PATH }}">
 		</form>
 	</true>
 	<false>{{ @LN__Welcome }} {{ @SESSION['username'] }}
 		<check if="{{ @CONFIG.maintenance==FALSE OR @SESSION['groups'] & 128 }}"> | {{ @SESSION['mail'][0] }} <a href="{{ @BASE }}/userCP/messaging/inbox">{ICON:mail}</a> ({{ @SESSION['mail'][1] }} {{@LN__PM_unread}})  *** <a href="{{ @BASE }}/userCP">{{@LN__UserCP}}</a></check>
-		<check if="{{ @SESSION['groups'] & 32 }}"> | <a href="{{ @BASE }}/adminCP">{{@LN__AdminCP}}</a></check> <span class="fa fa-power-off"></span> <a href="{{ @BASE }}/logout;returnpath={{ @PATH }}">{{@LN__Logout}}</a>
+		<check if="{{ @SESSION['groups'] & 32 }}"> | <a href="{{ @BASE }}/adminCP">{{@LN__AdminCP}}</a></check> {ICON:sign-out} <a href="{{ @BASE }}/logout;returnpath={{ @PATH }}">{{@LN__Logout}}</a>
 	</false>
 </check>

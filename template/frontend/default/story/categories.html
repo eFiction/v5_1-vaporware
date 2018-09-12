@@ -2,7 +2,7 @@
 		<h1>{{@categoriesData['parent']['category']}}</h1>
 		{{@categoriesData['parent']['description']}}
 		<br/>
-		<check if="{{@categoriesData.parent.count}}"><div class="button"><a href="{{@BASE}}/story/browse/category={{@categoriesData.parent.cid}}">{{ @LN__BrowseStories, @categoriesData.parent.count | format }}</a></div><br /></check>
+		<check if="{{@categoriesData.parent.count}}"><div class="buttons-alignment"><a class="button" href="{{@BASE}}/story/browse/category={{@categoriesData.parent.cid}}">{{ @LN__BrowseStories, @categoriesData.parent.count | format }}</a></div><br /><br /></check>
 		<br/>Go back <a href="{{@BASE}}/story/categories/{{@categoriesData['parent']['parent_cid']}}">up</a><br />
 </check>
 <div class="grid-wrapper">
@@ -14,7 +14,7 @@
 			<false><h3>{{@element.category}}</h3></false>
 		</check>
 		<div class="category-description">{{@element.description | raw}}</div><br />
-		<check if="{{@element.stats.count}}"><div class="button"><a href="{{@BASE}}/story/browse/category={{@element.cid}}">{{ @LN__BrowseStories, @element.stats.count | format }}</a></div><br /></check>
+		<check if="{{@element.stats.count}}"><div class="buttons-alignment"><a class="button" href="{{@BASE}}/story/browse/category={{@element.cid}}">{{ @LN__BrowseStories, @element.stats.count | format }}</a></div><br /><br /></check>
 		<check if="{{ sizeof(@element.stats.sub)}}">
 			<repeat group="{{ array_splice(@element['stats']['sub'],0,5) }}" key="{{@name}}" value="{{ @count }}" counter="{{@line}}">
 				{ICON:folder} {{@name}} [{{ @count }}]<br />

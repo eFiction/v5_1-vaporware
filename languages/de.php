@@ -264,9 +264,9 @@ return array(
 'UserMenu_PMOutbox' => 'Postausgang',
 'UserMenu_PMWrite' => 'Verfassen',
 	'MSG_deletedSuccess'	=> 'Nachricht gelöscht!',
-	'MSG_deleteRead'	=> 'Löschen nicht möglich, Nachricht wurde bereits gelesen.',
-	'MSG_deleteNotFound' => 'Löschen nicht möglich, Nachricht wurde nicht gefunden.',
-	'MSG_deleteNoAccess' => 'Du kannst auf diese Nachricht nicht zugreifen.',
+	'MSG_revokeSuccess'		=> 'Nachricht wurde zurückgezogen',
+	'MSG_revokeRead'	=> 'Zurückziehen nicht möglich, Nachricht wurde vom Empfänger bereits gelesen.',
+	'MSG_deleteNotFound' => 'Löschen nicht möglich, Nachricht wurde nicht gefunden oder kein Zugriff auf diese Nachricht.',
 'UserMenu_Shoutbox'			=> 'Shoutbox ({0})', 
 
 'UserMenu_Authoring' => 'Authoring',

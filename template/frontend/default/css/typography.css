@@ -31,6 +31,24 @@ a:hover { color: #efefef; }
 
 a.disabled { color: #141516; }
 
+
+a.button, a.button:active, a.button:visited {
+    margin: 0 auto;
+    padding: 6px 12px;
+    background-color: #2e2e2e;
+    border: none;
+    color: white !important;
+    text-decoration: none;
+    text-align: center;
+	cursor: pointer;
+    font-family: 'Open Sans', sans-serif;
+}
+a.button:hover {
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+	background-color: #dddddd;
+}
+
 /*-----------------  HEADLINES  -----------------*/
 
 h1, h2, h3, h4, h5, h6 {

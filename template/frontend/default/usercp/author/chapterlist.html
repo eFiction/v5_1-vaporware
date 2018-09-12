@@ -5,7 +5,7 @@
 		<br /><br />
 		<ul id="chapter-sort">
 		<repeat group="{{ @chapterList }}" value="{{ @row }}" counter="{{ @ctr }}">
-			<li id="{{ @row.chapid }}"><span class="ui-icon ui-icon-arrowthick-2-n-s"></span>{{ @ctr }}: <a href="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}}/chapter={{ @row.chapid }};returnpath={{@data.form.returnpath}}" class="fa fa-pencil-square-o"></a> {{ @row.title }}</li>
+			<li id="{{ @row.chapid }}">{ICON:arrow-vert} {{ @ctr }}: <a href="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}}/chapter={{ @row.chapid }};returnpath={{@data.form.returnpath}}">{ICON:edit}</a> {{ @row.title }}</li>
 		</repeat>
 		</ul>
 		</check>

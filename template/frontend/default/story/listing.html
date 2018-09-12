@@ -26,9 +26,9 @@
 			<a href="{{@BASE}}/story/reviews/{{@story.sid}}" title="{{@LN__TitleReadReviews, @story.title | format}}">{ICON:comments} {{@story.reviews}}</a>
 		</check>
 	</div>
-	<div class="story-info2"><span class="fa fa-folder-open"></span> <repeat group="{{@story.cache_categories}}" value="{{@category}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check>{{@category.1}}</repeat></div>
+	<div class="story-info2">{ICON:folder} <repeat group="{{@story.cache_categories}}" value="{{@category}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check>{{@category.1}}</repeat></div>
 	<div class="story-info2">{{@story.summary |raw}}</div>
-	<div class="story-info2"><span class="fa fa-tags"></span>
+	<div class="story-info2">{ICON:tags}
 		<check if="{{isset(@story.cache_tags.simple.0)}}">
 			<true><repeat group="{{@story.cache_tags.simple}}" value="{{@tag}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check>{{@tag.1}}</repeat></true>
 			<false>{{@LN__NoTags}}</false>

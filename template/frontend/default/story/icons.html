@@ -6,9 +6,9 @@
 		<a href="{{@BASE}}/userCP/library/favourite/edit/id=ST,{{@data.story.sid}};returnpath={{@PATH}}"<check if="{{@@data.story.is_favourite.0>0}}"><true> title="{{@LN__FavouriteRemove, @data.story.title | format }}">{ICON:favourite}</true><false> title="{{@LN__FavouriteAdd, @data.story.title | format }}">{ICON:favourite-off}</false></check></a>&nbsp;
 	</false>
 </check>
-<span class="fa fa-print"></span>&nbsp;
-<span class="fa fa-flag"></span>&nbsp;
-<span class="fa fa-download"></span>&nbsp;
-<a href="{{@BASE}}/story/print/{{@data.story.sid}},epub">epub</a>&nbsp;
+{ICON:print}&nbsp;
+{ICON:flag-off}&nbsp;
+{ICON:download}&nbsp;
+<a href="{{@BASE}}/story/print/{{@data.story.sid}},epub">__epub</a>&nbsp;
 <check if="{{ is_numeric(@data.story.can_edit) }}"> / <a href="{{@BASE}}/userCP/author/uid={{@data.story.can_edit}}/edit/sid={{@data.story.sid}};returnpath={{@PATH}}">{ICON:edit}</a></check>
 <check if="{{ @_SESSION.groups&64 }}"> / <a href="{{@BASE}}/adminCP/stories/edit/story={{@data.story.sid}}" target="_blank">{ICON:edit}</a></check>

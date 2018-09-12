@@ -7,12 +7,12 @@ class JSON extends Template {
 
 		$this->data = json_encode($this->data);
 		$this->data = preg_replace_callback(
-								'/\{ICON:([\w-]+)(:|\!)?(.*?)\}/s',	// for use with forced visibility
+								'/\{ICON:([\w-]+)(:|\!|#)?(.*?)\}/s',	// allowed seperators: ':' (normal), '!', '#' (id)
 								function ($icon)
 								{
 									return addslashes ( Iconset::parse($icon) );
-								}
-								, $this->data
+								},
+								$this->data
 							);
 		return $this->data;
 	}

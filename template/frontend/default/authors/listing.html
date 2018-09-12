@@ -23,7 +23,7 @@
 	<div class="columnize">
 		<ul class="alphabetical">
 		<repeat group="{{ @listing }}" value="{{ @author }}">
-			<li><i class="fa fa-user"></i> <a href="{{@BASE}}/authors/{{ @author.id }}">{{ @author.name }}</a> ({{ @author.stories }})</li>
+			<li><a href="{{@BASE}}/members/id={{ @author.id }}">{ICON:member}</a> <a href="{{@BASE}}/authors/{{ @author.id }}">{ICON:text}</a> {{ @author.name }}({{ @author.stories }})</li>
 		</repeat>
 		</ul>
 	</div>

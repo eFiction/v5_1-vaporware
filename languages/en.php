@@ -264,9 +264,9 @@ return array(
 'UserMenu_PMOutbox' => 'Outbox',
 'UserMenu_PMWrite' => 'Write',
 	'MSG_deletedSuccess'	=> 'Message deleted',
-	'MSG_deleteRead'	=> 'Unable to delete, this message has been read',
-	'MSG_deleteNotFound' => 'Unable to delete, Message not found',
-	'MSG_deleteNoAccess' => 'You have no access to this message',
+	'MSG_revokeSuccess'		=> 'Message revoked',
+	'MSG_revokeRead'		=> 'Unable to revoke, this message has already been read by the recipient',
+	'MSG_deleteNotFound' 	=> 'Unable to perform action, message not found or no access to it',
 'UserMenu_Shoutbox'			=> 'Shoutbox ({0})', 
 	
 'UserMenu_Authoring' => 'Authoring',

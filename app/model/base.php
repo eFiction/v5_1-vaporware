@@ -381,9 +381,9 @@ class Base extends \Prefab {
 			// we should not get here without a userID in session, but if we do, better bail out before zeeee error strikes
 			if(empty($_SESSION['userID'])) return NULL;
 			
-			$sql[]= "SET @inbox  := (SELECT COUNT(1) FROM `tbl_messaging`M WHERE M.recipient = {$_SESSION['userID']});";
-			$sql[]= "SET @unread := (SELECT COUNT(1) FROM `tbl_messaging`M WHERE M.recipient = {$_SESSION['userID']} AND M.date_read IS NULL);";
-			$sql[]= "SET @outbox := (SELECT COUNT(1) FROM `tbl_messaging`M WHERE M.sender = {$_SESSION['userID']});";
+			$sql[]= "SET @inbox  := (SELECT COUNT(1) FROM `tbl_messaging`M WHERE M.recipient = {$_SESSION['userID']} AND M.sent IS NULL);";
+			$sql[]= "SET @unread := (SELECT COUNT(1) FROM `tbl_messaging`M WHERE M.recipient = {$_SESSION['userID']} AND M.sent IS NULL AND M.date_read IS NULL);";
+			$sql[]= "SET @outbox := (SELECT COUNT(1) FROM `tbl_messaging`M WHERE M.sender = {$_SESSION['userID']} AND M.sent IS NOT NULL);";
 			
 			if(array_key_exists("shoutbox", $this->config['optional_modules']))
 			{

@@ -6,9 +6,9 @@
 </h3>
 
 <div class="calendar-flip">
-	<check if="{{@data.BACK}}"><true><a href="javascript:getCalendar('{{ @data.BACK }}');" title="back"><span class="fa fa-arrow-circle-left"></span></a></true><false><span class="fa fa-arrow-circle-left"></span></false></check>
-	<check if="{{@data.TODAY}}"><true><a href="javascript:getCalendar('{{ @data.TODAY }}');"><span class="fa fa-calendar" title="current"></span></a></true><false><span class="fa fa-calendar"></span></false></check>
-	<check if="{{@data.FORWARD}}"><true><a href="javascript:getCalendar('{{ @data.FORWARD }}');" title="forward"><span class="fa fa-arrow-circle-right"></span></a></true><false><span class="fa fa-arrow-circle-right"></span></false></check>
+	<check if="{{@data.BACK}}"><true><a href="javascript:getCalendar('{{ @data.BACK }}');">{ICON:angle-left:}</a></true><false>{ICON:angle-left}</false></check>
+	<check if="{{@data.TODAY}}"><true><a href="javascript:getCalendar('{{ @data.TODAY }}');">{ICON:calendar:current}</a></true><false>{ICON:calendar}</false></check>
+	<check if="{{@data.FORWARD}}"><true><a href="javascript:getCalendar('{{ @data.FORWARD }}');">{ICON:angle-right:forward}</a></true><false>{ICON:angle-right}</false></check>
 </div>
 <table class="calendar">
 	<tr>

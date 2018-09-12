@@ -1,19 +1,22 @@
 <check if="{{isset(@deleted)}}">
 	<switch expr="{{ @deleted }}">
 		<case value="success" break="TRUE">
-			<div class="alert-box-half success">{{@LN__MSG_deletedSuccess}}</div>
+			<div class="alert-box half success">{{@LN__MSG_deletedSuccess}}</div>
+		</case>
+		<case value="revoked" break="TRUE">
+			<div class="alert-box half success">{{@LN__MSG_revokeSuccess}}</div>
 		</case>
 		<case value="msgread" break="TRUE">
-			<div class="alert-box-half warning">{{@LN__MSG_deleteRead}}</div>
+			<div class="alert-box half warning">{{@LN__MSG_revokeRead}}</div>
 		</case>
 		<case value="notfound" break="TRUE">
-			<div class="alert-box-half warning">{{@LN__MSG_deleteNotFound}}</div>
-		</case>
-		<case value="noaccess" break="TRUE">
-			<div class="alert-box-half error">{{@LN__MSG_deleteNoAccess}}</div>
+			<div class="alert-box half warning">{{@LN__MSG_deleteNotFound}}</div>
 		</case>
 		<case value="unknown" break="TRUE">
-			<div class="alert-box-half error">{{@LN__UnknowError}}</div>
+			<div class="alert-box half error">{{@LN__UnknowError}}</div>
+		</case>
+		<case value="alreadydeleted" break="TRUE">
+			<div class="alert-box half info">__alreadydeleted</div>
 		</case>
 	</switch>
 </check>
@@ -51,11 +54,12 @@
 				<true><a href="{{@BASE}}/members/id={{ @pm_line['name_id'] }}">{{ @pm_line['name'] }}</a></true>
 				<false>{{ @pm_line['name'] }}</false>
 			</check></td>
-			{* check if mail can be deleted (inbox always, outbox only if not read by recipient *}
-			<td><check if="{{ @pm_line['can_delete'] }}">
-						<true><span class="fa fa-trash-o delete" id="{{ @pm_line['mid'] }}"></span></true>
+			{* check if mail can be revoked (inbox always, outbox only if not read by recipient *}
+			<td><check if="{{ @pm_line['can_revoke'] }}">
+						<true><span class="delete" id="{{ @pm_line['mid'] }},r">{ICON:alert:revoke}</span></true>
 						<false>&nbsp;</false>
-			</check></td>
+			</check>
+			<span class="delete" id="{{ @pm_line['mid'] }},d">{ICON:trash:delete}</span></td>
 		</tr>
 </repeat>
 {* END all messages *}
@@ -71,7 +75,7 @@
 </fieldset>
 
 <div id="delete-confirm" title="{{@LN__PM_question_Delete }}?" style="display:none">
-  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:0 7px 20px 0;"></span>{{@LN__PM_confirm_Delete }}</p>
+  <p>{ICON:alert} {{@LN__PM_confirm_Delete }}</p>
 </div>
 
 <script type="text/javascript">
@@ -84,7 +88,7 @@
     		{{@LN__Cancel}}: function() {
     			$(this).dialog('close');
     		},
-    		__OK: function() {
+    		{{@LN__Delete}}: function() {
     	              window.location.href = "{{@BASE}}/userCP/messaging/delete/message="+element_id+";returnpath=/userCP/messaging/{{strtolower(@WHICH)}}";
     		  $(this).dialog('close');
     		}

@@ -18,7 +18,46 @@
 		</tr>
 		<tr><td><h6>{{@LN__PM_Subject}}:</h6></td><td colspan="2">{{@message.subject}}</td></tr>
 		<tr><td colspan="3"><textarea class="textarea" readonly>{{@message.message}}</textarea></td></tr>
-		<tr><td><a class="button" href="{{@BASE}}/userCP/messaging/write/reply={{@message.mid}}"><check if="({{@forward}})"><true>__Forward</true><false>__Reply</false></check></a></td><td colspan="2"><input class="button delete" type="submit" value="delete" id="{{@message.mid}}"></td></tr>
+		<tr><td><a class="button" href="{{@BASE}}/userCP/messaging/write/reply={{@message.mid}}"><check if="({{@forward}})"><true><set whichbox='outbox' />__Forward</true><false><set whichbox='inbox' />__Reply</false></check></a></td><td colspan="2"><input class="button delete" type="submit" value="delete" id="{{@message.mid}}"></td></tr>
 	</table>
 </fieldset>
 </div>
+
+<div id="delete-confirm" title="{{@LN__PM_question_Delete }}?" style="display:none">
+  <p>{ICON:alert} {{@LN__PM_confirm_Delete }}</p>
+</div>
+
+
+<script type="text/javascript">
+  $(document).ready(function() {
+    $("#delete-confirm").dialog({
+    	dialogClass: 'efi-dialog',
+    	autoOpen: false,
+    	modal: true,
+    	buttons: {
+    		{{@LN__Cancel}}: function() {
+    			$(this).dialog('close');
+    		},
+    		__OK: function() {
+    	              window.location.href = "{{@BASE}}/userCP/messaging/delete/message="+element_id+";returnpath=/userCP/messaging/{{@whichbox}}";
+    		  $(this).dialog('close');
+    		}
+    	}
+    });
+    
+    /* capture delete requests in in-/outbox */
+    $('.pm-box .delete').click(function() {
+    	element_id = $(this).attr('id');
+    	$('#delete-confirm').dialog('open');
+    });
+    /* end */
+    
+    /* capture delete requests in view */
+    $('input.delete').click(function() {
+    	element_id = $(this).attr('id');
+    	$('#delete-confirm').dialog('open');
+    });
+    /* end */
+    
+  });
+</script>

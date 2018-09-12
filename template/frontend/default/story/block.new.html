@@ -15,8 +15,8 @@
 					<div class="listing">
 						<div class="updated-title">
 							<span class="toggle">
-								<span class="toggle_more"><span class="fa fa-caret-square-o-down"></span></span>
-								<span class="toggle_less" style="display:none" ><span class="fa fa-caret-square-o-up"></span></span>
+								<span class="toggle_more">{ICON:square-down}</span>
+								<span class="toggle_less" style="display:none" >{ICON:square-up}</span>
 							</span>
 							<a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a><br/>
 							{{ @LN__AuthorCounted, sizeof(@story.cache_authors) | format }}: <repeat group="{{@story.cache_authors}}"  value="{{ @author }}" counter="{{ @ctr }}"><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/members/id={{@author.0}}">{{@author.1}}</a></repeat><br />

@@ -37,12 +37,12 @@ class Frontend extends Template
 								);
 
 		$body = preg_replace_callback(
-								'/\{ICON:([\w-]+)(:|\!)?(.*?)\}/s',	// for use with forced visibility
+								'/\{ICON:([\w-]+)(:|\!|#)?(.*?)\}/s',	// allowed seperators: ':' (normal), '!', '#' (id)
 								function ($icon)
 								{
 									return Iconset::parse($icon);
-								}
-								, $body
+								},
+								$body
 							);
 
 		$f3->set('BODY', $body);

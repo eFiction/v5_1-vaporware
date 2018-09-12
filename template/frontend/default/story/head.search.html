@@ -40,7 +40,7 @@
 	</div></div>
 <div class="gb-full"><input type="checkbox" name="exclude_wip" <check if="{{isset(@searchForm.exclude_wip)}}">checked="checked"</check> value="1"> {{@LN__SearchCompletedOnly}}</div>
 <div class="gb-full"><div class="search-buttons"><button class="button" type="submit">{{@LN__Search}}</button> <button class="button" type="reset">{{@LN__Reset}}</button></div></div>
-<div class="gb-full"><div align="center"><check if="{{!empty(@searchLink)}}"><a href="{{@BASE}}/story/browse/{{@searchLink}}<check if="{{isset(@paginate.page)}}">/page={{@paginate.page}}</check>">{{@LN__HideSearchForm}}</a></check>&nbsp;</div></div>
+<div class="gb-full"><div class="buttons-alignment"><check if="{{!empty(@searchLink)}}"><a class="button" href="{{@BASE}}/story/browse/{{@searchLink}}<check if="{{isset(@paginate.page)}}">/page={{@paginate.page}}</check>">{{@LN__HideSearchForm}}</a></check>&nbsp;</div></div>
 </div>
 
 	</fieldset>

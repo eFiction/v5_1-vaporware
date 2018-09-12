@@ -87,7 +87,13 @@ class Iconset extends \DB\Jig\Mapper {
 		
 		// Empty $text should not overwrite a title tag of a parent item
 		if ($text)
-			return str_replace("@T@", "title='{$text}'", self::instance()->_data[$label]);
+		{
+			if ( $visibility == "#" )
+				return str_replace("@T@", " id='{$text}'", self::instance()->_data[$label]);
+			else
+				return str_replace("@T@", " title='{$text}'", self::instance()->_data[$label]);
+			
+		}
 		else
 			return str_replace("@T@", "", @self::instance()->_data[$label]);
 	}

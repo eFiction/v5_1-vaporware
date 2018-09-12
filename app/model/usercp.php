@@ -591,40 +591,42 @@ class UserCP extends Controlpanel
 	
 	public function msgInbox($offset=0)
 	{
-		$sql = "SELECT m.mid,UNIX_TIMESTAMP(m.date_sent) as date_sent,UNIX_TIMESTAMP(m.date_read) as date_read,m.subject,m.sender as name_id,u.nickname as name, TRUE as can_delete
-						FROM `tbl_messaging`m 
-							INNER JOIN `tbl_users`u ON ( m.sender = u.uid ) 
-						WHERE m.recipient = ".$_SESSION['userID']." 
+		$sql = "SELECT M.mid,UNIX_TIMESTAMP(M.date_sent) as date_sent, UNIX_TIMESTAMP(M.date_read) as date_read,M.subject,M.sender as name_id,U.nickname as name, FALSE as can_revoke
+						FROM `tbl_messaging`M
+							INNER JOIN `tbl_users`U ON ( M.sender = U.uid ) 
+						WHERE M.recipient = ".$_SESSION['userID']." AND M.sent IS NULL
 						ORDER BY date_sent DESC";
 		return $this->exec($sql);
 	}
 
 	public function msgOutbox($offset=0)
 	{
-		$sql = "SELECT m.mid,UNIX_TIMESTAMP(m.date_sent) as date_sent,UNIX_TIMESTAMP(m.date_read) as date_read,m.subject,m.recipient as name_id,u.nickname as name, IF(m.date_read IS NULL,TRUE,FALSE) as can_delete
-						FROM `tbl_messaging`m 
-							INNER JOIN `tbl_users`u ON ( m.recipient = u.uid ) 
-						WHERE m.sender = ".$_SESSION['userID']." 
+		$sql = "SELECT M.mid,UNIX_TIMESTAMP(M.date_sent) as date_sent, M2.mid as mid_read, UNIX_TIMESTAMP(M2.date_read) as date_read,M.subject,M.recipient as name_id,U.nickname as name, IF((M2.date_read IS NULL AND M2.mid IS NOT NULL),TRUE,FALSE) as can_revoke
+						FROM `tbl_messaging`M 
+							LEFT JOIN `tbl_messaging`M2 ON ( M.sent = M2.mid )
+							INNER JOIN `tbl_users`U ON ( M.recipient = U.uid ) 
+						WHERE M.sender = ".$_SESSION['userID']." AND M.sent IS NOT NULL
 						ORDER BY date_sent DESC";
 		return $this->exec($sql);
 	}
 	
 	public function msgRead($msgID)
 	{
-		$sql = "SELECT m.mid,UNIX_TIMESTAMP(m.date_sent) as date_sent,UNIX_TIMESTAMP(m.date_read) as date_read,m.subject,m.message,
-								m.sender as sender_id, u1.nickname as sender,
-								m.recipient as recipient_id, u2.nickname as recipient 
-								FROM `tbl_messaging`m 
-								INNER JOIN `tbl_users`u1 ON ( m.sender = u1.uid ) 
-								INNER JOIN `tbl_users`u2 ON ( m.recipient = u2.uid ) 
-								WHERE m.mid = :mid AND ( m.sender = {$_SESSION['userID']} OR m.recipient = {$_SESSION['userID']} ) ORDER BY date_sent DESC";
+		$sql = "SELECT M.mid,UNIX_TIMESTAMP(M.date_sent) as date_sent,UNIX_TIMESTAMP(M.date_read) as date_read,M.subject,M.message,
+								M.sender as sender_id, u1.nickname as sender,
+								M.recipient as recipient_id, u2.nickname as recipient 
+						FROM `tbl_messaging`M 
+							INNER JOIN `tbl_users`u1 ON ( M.sender = u1.uid ) 
+							INNER JOIN `tbl_users`u2 ON ( M.recipient = u2.uid ) 
+						WHERE M.mid = :mid AND ( M.sender = {$_SESSION['userID']} AND M.sent IS NOT NULL ) OR ( M.recipient = {$_SESSION['userID']} AND M.sent IS NULL ) ORDER BY date_sent DESC";
 		$data = $this->exec($sql, [":mid" => $msgID]);
 		if ( empty($data) ) return FALSE;
 
 		/* if unread, set read date and change unread counter in SESSION */
 		if($data[0]['date_read']==NULL AND $data[0]['recipient_id']==$_SESSION['userID'])
 		{
-			$this->exec("UPDATE `tbl_messaging`m SET m.date_read = CURRENT_TIMESTAMP WHERE m.mid = {$data[0]['mid']};");
+			$this->exec("UPDATE `tbl_messaging`M SET M.date_read = CURRENT_TIMESTAMP WHERE M.mid = {$data[0]['mid']};");
+			$data[0]['date_read'] = time();
 			$_SESSION['mail'][1]--;
 			// Drop user messaging cache
 			\Model\Routines::dropUserCache("messaging");
@@ -634,16 +636,16 @@ class UserCP extends Controlpanel
 	
 	public function msgReply($msgID=NULL)
 	{
-		if ( $msgID )
+		if ( is_numeric($msgID) )
 		{
-			$sql = "SELECT m.mid,UNIX_TIMESTAMP(m.date_sent) as date_sent,UNIX_TIMESTAMP(m.date_read) as date_read,m.subject,m.message,
-									IF(m.recipient = {$_SESSION['userID']},m.sender,NULL) as recipient_id,
-									IF(m.recipient = {$_SESSION['userID']},u1.nickname,NULL) as recipient,
+			$sql = "SELECT M.mid,UNIX_TIMESTAMP(M.date_sent) as date_sent,UNIX_TIMESTAMP(M.date_read) as date_read,M.subject,M.message,
+									IF(M.recipient = {$_SESSION['userID']},M.sender,NULL) as recipient_id,
+									IF(M.recipient = {$_SESSION['userID']},u1.nickname,NULL) as recipient,
 									u1.nickname as sender
-									FROM `tbl_messaging`m 
-									INNER JOIN `tbl_users`u1 ON ( m.sender = u1.uid ) 
-									INNER JOIN `tbl_users`u2 ON ( m.recipient = u2.uid ) 
-									WHERE m.mid = :mid AND ( m.sender = {$_SESSION['userID']} OR m.recipient = {$_SESSION['userID']} ) ORDER BY date_sent DESC";
+									FROM `tbl_messaging`M
+									INNER JOIN `tbl_users`u1 ON ( M.sender = u1.uid ) 
+									INNER JOIN `tbl_users`u2 ON ( M.recipient = u2.uid ) 
+									WHERE M.mid = :mid AND ( M.sender = {$_SESSION['userID']} OR M.recipient = {$_SESSION['userID']} ) ORDER BY date_sent DESC";
 			$data = $this->exec($sql, [":mid" => $msgID]);
 		}
 		
@@ -666,47 +668,92 @@ class UserCP extends Controlpanel
 	
 	public function msgSave($save)
 	{
-		$saveSQL = "INSERT INTO `tbl_messaging`
-					(`sender`, `recipient`, `subject`, `message`)
-					VALUES
-					( '".$_SESSION['userID']."', :recipient, :subject, :message );";
+		// initialize a mapper
+		$message = new \DB\SQL\Mapper($this->db, $this->prefix.'messaging');
 		
 		foreach ( $save['recipient'] as $recipient )
 		{
-			$bind =
-			[
-				":recipient" 	=> $recipient,
-				":subject"		=> $save['subject'],
-				":message"		=> $save['message']
-			];
-			$data = $this->exec($saveSQL, $bind);
-			// Drop the messaging cache of all recipients
+			// basic data
+			$message->sender	= $_SESSION['userID'];
+			$message->subject	= $save['subject'];
+			$message->message	= $save['message'];
+
+			// set recipient
+			$message->recipient	= $recipient;
+			// save message
+			$message->insert();
+			// take note of created ID to generate the outbox copy
+			$outboxID = $message->_id;
+			// Drop the messaging cache of the recipient
 			\Model\Routines::dropUserCache("messaging", (int)$recipient);
+
+			$message->reset();
+			// basic data - again
+			$message->sender	= $_SESSION['userID'];
+			$message->subject	= $save['subject'];
+			$message->message	= $save['message'];
+			// set recipient
+			$message->recipient	= $recipient;
+			// set outbox ID
+			$message->sent	= $outboxID;
+			// save outbox copy
+			$message->insert();
 		}
+		
+		// if we have no recorded ID, something went wrong
+		if ( empty($outboxID) ) return FALSE;
+		
 		return TRUE;
 	}
 	
 	public function msgDelete($message)
 	{
-		$sql = "DELETE FROM `tbl_messaging` WHERE mid = :message AND ( ( sender = {$_SESSION['userID']} AND date_read IS NULL ) OR ( recipient = {$_SESSION['userID']} ) )";
-		if ( 1 === $this->exec($sql, [ ":message" => $message ]) )
-			return TRUE;
+		@list ( $messageID, $action ) = $message;
 		
-		$trouble = $this->exec("SELECT mid,date_read,sender,recipient FROM `tbl_messaging` WHERE mid=:message;", [ ":message" => $message ]);
+		// initialize a mapper
+		$message = new \DB\SQL\Mapper($this->db, $this->prefix.'messaging');
 
-		// message doesn't exist
-		if ( sizeof($trouble)==0 )
-			return "notfound";
-		else $trouble = $trouble[0];
-		
-		// user is sender, but msg has been read
-		if ( $trouble['sender']==$_SESSION['userID'] AND $trouble['date_read']>0 )
-			return "msgread";
-		// user is neither recipient nor sender
-		if ( $trouble['recipient']!=$_SESSION['userID'] AND $trouble['sender']!=$_SESSION['userID'] )
-			return "noaccess";
-		// might not happen, but let's cover this
-		return "unknown";
+		if ( $action == "r" )
+		{
+			// attempting to revoke a message. therefore, the message must still exist and be unread by the recipient
+			$message->load(['mid = ? AND sender = ? AND sent IS NOT NULL', $messageID, $_SESSION['userID'] ]);
+			// if there is no such message belonging to the current user, drop an error
+			if ( $message->dry() )
+				return "notfound";
+
+			// load the message that corresponds to the sent_id
+			$inbox = $message->sent;
+			$message->load(['mid = ?', $inbox ]);
+
+			// no such message, might have been deleted
+			if ( $message->dry() )
+				return "alreadydeleted";
+			
+			elseif ( $message->date_read == NULL )
+			{
+				// message exists and is unread, delete it on the recipient side
+				$message->erase();
+				//load the outbox message and delete as well
+				$message->load(['mid = ? AND sender = ?', $messageID, $_SESSION['userID'] ]);
+				$message->erase();
+				return "revoked";
+			}
+			else
+				return "msgread";
+		}
+		else
+		{
+			// attempting to delete a message
+			$message->load(['mid = ? AND (sender = ? AND sent IS NOT NULL) OR ( recipient = ? AND sent IS NULL)', $messageID, $_SESSION['userID'], $_SESSION['userID'] ]);
+			// if the message can't be accessed, it's either gone or beyond reach
+			if ( $message->dry() )
+				return "notfound";
+			
+			// message found, delete and return result
+			$message->erase();
+			return TRUE;
+		}
+		return NULL;
 	}
 	
 	public function shoutboxList($page,$user=FALSE)

@@ -655,11 +655,11 @@ class UserCP extends Base
 				break;
 			case "outbox":
 				$data = $this->model->msgOutbox();
-				$this->buffer ( \View\UserCP::msgInOutbox($data, "outbox") );
+				$this->buffer ( $this->template->msgInOutbox($data, "outbox") );
 				break;
 			default:
 				$data = $this->model->msgInbox();
-				$this->buffer ( \View\UserCP::msgInOutbox($data, "inbox") );
+				$this->buffer ( $this->template->msgInOutbox($data, "inbox") );
 		}
 	}
 	
@@ -667,8 +667,9 @@ class UserCP extends Base
 	{
 		if ( $data = $this->model->msgRead($params['id']) )
 		{
-			$this->buffer ( \View\UserCP::msgRead($data) );
+			$this->buffer ( $this->template->msgRead($data) );
 		}
+		// todo: make a better error page
 		else $this->buffer( "*** No such message or access violation!");
 	}
 	
@@ -680,20 +681,17 @@ class UserCP extends Base
 		$f3->reroute($params['returnpath'], false);
 	}
 	
-	// fix me!
 	public function msgWrite(\Base $f3, $params)
 	{
 		if( isset($_POST['recipient']) )
 			$this->msgSave($f3);
 
-		if ( isset($params[0][1]) AND is_numeric($params[0][1]) )
-			$data = $this->model->msgReply($params[0][1]);
-		else $data = $this->model->msgReply();
+		$data = $this->model->msgReply(@$params['reply']);
 		
-		$this->buffer ( \View\UserCP::msgWrite($data) );
+		$this->buffer ( $this->template->msgWrite($data) );
 	}
 	
-	// fix me!
+	// todo: add reroute based on the outcome of the model
 	protected function msgSave(\Base $f3)
 	{
 		$save = $f3->get('POST');
@@ -705,12 +703,7 @@ class UserCP extends Base
 				return FALSE;
 			}
 			$save['recipient'] = explode(",",$save['recipient']);
-			/*
-			if ( sizeof($save['recipient'])>1 )
-			{
-				// Build an array of recipients
-			}
-			*/
+
 			$status = $this->model->msgSave($save); // return TRUE
 		}
 	}

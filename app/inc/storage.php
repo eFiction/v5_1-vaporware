@@ -59,5 +59,4 @@ class storage extends Prefab {
 		$cfg->set('DB_'.strtoupper($type), $conf);
 		$cfg->save();
 	}
-
 }
