@@ -3,4 +3,4 @@
 # Except this file
 !.gitignore
 # And the default template
-!/default/*
+#!/default/*
