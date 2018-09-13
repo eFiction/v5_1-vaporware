@@ -113,10 +113,8 @@ if ($_SESSION['groups'] & 1)
 			SuperMod/Admin routes
 		-------------------- */
 		// Archive
-		$f3->route(
-			[ 'GET /adminCP/archive', 'GET|POST /adminCP/archive/@module', 'GET|POST /adminCP/archive/@module/*' ],
-			'Controller\AdminCP_Archive->index' );
-		$f3->route( 'POST /adminCP/ajax/archive/@module [ajax]', 'Controller\AdminCP_Archive->ajax' );
+		$f3->route( [ 'GET /adminCP/archive', 'GET|POST /adminCP/archive/@module', 'GET|POST /adminCP/archive/@module/*' ], 'Controller\AdminCP->__archive' );
+		$f3->route( 'POST /adminCP/ajax/archive/@module [ajax]', 'Controller\AdminCP->archiveAjax' );
 
 		// Members
 		$f3->route( [ 'GET /adminCP/members', 'GET|POST /adminCP/members/@module', 'GET|POST /adminCP/members/@module/*' ],	'Controller\AdminCP->__members' );

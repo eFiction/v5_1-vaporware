@@ -3,6 +3,114 @@ namespace Model;
 
 class Controlpanel extends Base {
 
+	public function deleteStory($storyID)
+	{
+		// get a review mapper
+		$mapper = new \DB\SQL\Mapper($this->db, $this->prefix.'feedback');
+		$deleted['reviews'] = 0;
+		// go through all reviews
+		while( $mapper->load(array('reference=? AND type=?',$storyID, 'ST')) )
+		{
+			// Faster with a direct SQL call, delete all comments for this review
+			$this->exec
+			(
+				"DELETE FROM `tbl_feedback` WHERE `reference` = :ref AND `type` = 'C';",
+				[ ":ref" => $mapper->fid ]
+			);
+			$deleted['comments'] = $this->db->count();
+			// delete the review itself
+			$mapper->erase();
+			$deleted['reviews']++;
+		}
+		
+		// Load all series that housed this story
+		$mapper = new \DB\SQL\Mapper($this->db, $this->prefix.'series_stories');
+		$deleted['series'] = 0;
+		while( $mapper->load(array('sid=?',$storyID)) )
+		{
+			// rebuild cache of affected series
+			$this->rebuildSeriesCache($mapper->seriesid);
+			// delete link to the series
+			$mapper->erase();
+			$deleted['series']++;
+		}
+		
+		// Faster with a direct SQL call, delete all user-story relations for this story
+		$this->exec
+		(
+			"DELETE FROM `tbl_stories_authors` WHERE `sid` = :sid;",
+			[ ":sid" => $storyID ]
+		);
+		$deleted['authors'] = $this->db->count();
+		
+		// get a tag relation mapper
+		$mapper = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_tags');
+		$deleted['tags'] = 0;
+		$deleted['characters'] = 0;
+		while( $mapper->load(array('sid=?',$storyID)) )
+		{
+			// take note of character to recount
+			if ( $mapper->character == 1 )	$recountC[]= $mapper->tid;
+			// take note of tag to recount
+			else							$recountT[]= $mapper->tid;
+
+			// remove the relation
+			$mapper->erase();
+		}
+		// Tag recount
+		if ( !empty($recountT) )
+			$deleted['tags'] = $this->storyRecountTags($recountT);
+
+		// Character recount
+		if ( !empty($recountC) )
+			$deleted['characters'] = $this->storyRecountTags($recountC,1);
+
+		// get a categories relation mapper
+		$mapper = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_categories');
+		$deleted['categories'] = 0;
+		while( $mapper->load(array('sid=?',$storyID)) )
+		{
+			$category = $mapper->cid;
+			// remove the relation
+			$mapper->erase();
+			$this->cacheCategories($category);
+			$deleted['categories']++;
+		}
+
+		// Delete all tracker entries for the story
+		$this->exec
+		(
+			"DELETE FROM `tbl_tracker` WHERE `sid` = :sid;",
+			[ ":sid" => $storyID ]
+		);
+		$deleted['tracker'] = $this->db->count();
+		
+		// Delete chapters form local storag if required
+		if ( $this->config['chapter_data_location'] == "local" )
+		{
+			$db = \storage::instance()->localChapterDB();
+			$db->exec('DELETE FROM "chapters" WHERE "sid" = :sid', array(':sid' => $storyID ));
+			$deleted['chapterlocal'] = $db->count();
+		}
+		// Delete all chapters
+		$this->exec
+		(
+			"DELETE FROM `tbl_chapters` WHERE `sid` = :sid;",
+			[ ":sid" => $storyID ]
+		);
+		$deleted['chapterdb'] = $this->db->count();
+
+		// Remove the story from the db
+		$this->exec
+		(
+			"DELETE FROM `tbl_stories` WHERE `sid` = :sid;",
+			[ ":sid" => $storyID ]
+		);
+		$deleted['story'] = $this->db->count();
+		
+		return $deleted;
+	}
+	
 	public function storyEditPrePop(array $storyData)
 	{
 		$categories = json_decode($storyData['cache_categories']);
@@ -170,7 +278,7 @@ class Controlpanel extends Base {
 					)AS SELECT_OUTER
 				GROUP BY sid ORDER BY sid ASC";
 		
-		$item = $this->exec($sql, ['sid' => $sid] );
+		$item = $this->exec($sql, [':sid' => $sid] );
 		
 		if ( empty($item) ) return FALSE;
 		
@@ -196,6 +304,64 @@ class Controlpanel extends Base {
 		);
 	}
 	
+	public function rebuildSeriesCache($seriesID)
+	{
+		$sql = "SELECT 
+					SERIES.seriesid, 
+					SERIES.tagblock, 
+					SERIES.characterblock, 
+					SERIES.authorblock, 
+					SERIES.categoryblock, 
+					CONCAT(rating,'||',max_rating_id) as max_rating
+				FROM
+					(
+						SELECT 
+							Ser.seriesid,
+							MAX(Ra.rid) as max_rating_id,
+							GROUP_CONCAT(DISTINCT U.uid,',',U.nickname ORDER BY nickname ASC SEPARATOR '||' ) as authorblock,
+							GROUP_CONCAT(DISTINCT Chara.charid,',',Chara.charname ORDER BY charname ASC SEPARATOR '||') AS characterblock,
+							GROUP_CONCAT(DISTINCT C.cid,',',C.category ORDER BY category ASC SEPARATOR '||' ) as categoryblock,
+							GROUP_CONCAT(DISTINCT T.tid,',',T.label,',',TG.description,',',TG.tgid ORDER BY TG.order,TG.tgid,T.label ASC SEPARATOR '||') AS tagblock
+						FROM `tbl_series`Ser
+							LEFT JOIN `tbl_series_stories`TrS ON ( Ser.seriesid = TrS.seriesid )
+								LEFT JOIN `tbl_stories`S ON ( TrS.sid = S.sid )
+									LEFT JOIN `tbl_ratings`Ra ON ( Ra.rid = S.ratingid )
+									LEFT JOIN `tbl_stories_tags`rST ON ( rST.sid = S.sid )
+										LEFT JOIN `tbl_tags`T ON ( T.tid = rST.tid AND rST.character = 0 )
+											LEFT JOIN `tbl_tag_groups`TG ON ( TG.tgid = T.tgid )
+										LEFT JOIN `tbl_characters`Chara ON ( Chara.charid = rST.tid AND rST.character = 1 )
+									LEFT JOIN `tbl_stories_categories`rSC ON ( rSC.sid = S.sid )
+										LEFT JOIN `tbl_categories`C ON ( rSC.cid = C.cid )
+									LEFT JOIN `tbl_stories_authors`rSA ON ( rSA.sid = S.sid )
+										LEFT JOIN `tbl_users` U ON ( rSA.aid = U.uid )
+						WHERE Ser.seriesid = :series
+						GROUP BY Ser.seriesid
+					) AS SERIES
+				LEFT JOIN `tbl_ratings`R ON (R.rid = max_rating_id);";
+		$item = $this->exec($sql, [':series' => $seriesID] );
+		
+		if ( empty($item) ) return FALSE;
+		
+		$item = $item[0];
+
+		$tagblock['simple'] = $this->cleanResult($item['tagblock']);
+		if($tagblock['simple']!==NULL) foreach($tagblock['simple'] as $t)
+			$tagblock['structured'][$t[2]][] = [ $t[0], $t[1], $t[2], $t[3] ];
+
+		$this->update
+		(
+			'tbl_series',
+			[
+				'cache_tags'		=> json_encode($tagblock),
+				'cache_characters'	=> json_encode($this->cleanResult($item['characterblock'])),
+				'cache_authors'		=> json_encode($this->cleanResult($item['authorblock'])),
+				'cache_categories'	=> json_encode($this->cleanResult($item['categoryblock'])),
+				'max_rating'		=> json_encode(explode(",",$item['max_rating'])),
+			],
+			['seriesid=?',$seriesID]
+		);
+	}
+
 	public function rebuildContestCache($conid)
 	{
 		$sql = "SELECT SELECT_OUTER.conid,
@@ -221,7 +387,7 @@ class Controlpanel extends Base {
 					)AS SELECT_OUTER
 				GROUP BY conid ORDER BY conid ASC";
 		
-		$item = $this->exec($sql, ['conid' => $conid] );
+		$item = $this->exec($sql, [':conid' => $conid] );
 		
 		if ( empty($item) ) return FALSE;
 		
@@ -244,6 +410,55 @@ class Controlpanel extends Base {
 		);
 	}
 
+//	public function cacheCategories(int $catID=0)
+	public function cacheCategories($catID=0)
+	{
+		// clear stats of affected categories
+		$sql = "UPDATE `tbl_categories` SET `stats` = NULL";
+		if ($catID>0) $sql .=  " WHERE `cid` = {$catID};";
+		$this->exec($sql);
+		
+		$categories = new \DB\SQL\Mapper($this->db, $this->prefix.'categories' );
+		
+		$sql = "SELECT C.cid, C.category, COUNT(DISTINCT S.sid) as counted, 
+					GROUP_CONCAT(DISTINCT C1.category SEPARATOR '||' ) as sub_categories, 
+					GROUP_CONCAT(DISTINCT C1.stats SEPARATOR '||' ) as sub_stats
+			FROM `tbl_categories`C 
+				INNER JOIN (SELECT leveldown FROM `tbl_categories` WHERE `stats` = '' ORDER BY leveldown DESC LIMIT 0,1) c2 ON ( C.leveldown = c2.leveldown )
+				LEFT JOIN `tbl_stories_categories`SC ON ( C.cid = SC.cid )
+				LEFT JOIN `tbl_stories`S ON ( S.sid = SC.sid )
+				LEFT JOIN `tbl_categories`C1 ON ( C.cid = C1.parent_cid )
+			GROUP BY C.cid";
+			
+		do {
+			$items = $this->exec( $sql );
+			$change = FALSE;
+			foreach ( $items as $item)
+			{
+				if ( $item['sub_categories']==NULL ) $sub = NULL;
+				else
+				{
+					$sub_categories = explode("||", $item['sub_categories']);
+					$sub_stats = explode("||", $item['sub_stats']);
+					$sub_stats = array_map("json_decode", $sub_stats);
+					foreach( $sub_categories as $key => $value )
+					{
+						$item['counted'] += $sub_stats[$key]->count;
+						$sub[$value] = $sub_stats[$key]->count;
+					}
+				}
+				$stats = json_encode([ "count" => (int)$item['counted'], "cid" => $item['cid'], "sub" => $sub ]);
+				unset($sub);
+				
+				$categories->load(array('cid=?',$item['cid']));
+				$categories->stats = $stats;
+				$categories->save();
+				
+				$change = ($change) ? : $categories->changed();
+			}
+		} while ( $change != FALSE );
+	}
+
 	public function storyRelationCategories( $sid, $data )
 	{
 		$data = array_filter(explode(",",$data));
@@ -256,11 +471,13 @@ class Controlpanel extends Base {
 			{
 				// Excess relation, drop from table
 				$categories->erase(['lid=?',$X['lid']]);
+				// recache this category
+				$this->cacheCategories($X['cid']);
 			}
 			else unset($data[$temp]);
 		}
 		
-		// Insert any character IDs not already present
+		// Insert any category IDs not already present
 		if ( sizeof($data)>0 )
 		{
 			foreach ( $data as $temp)
@@ -270,6 +487,8 @@ class Controlpanel extends Base {
 				$categories->sid = $sid;
 				$categories->cid = $temp;
 				$categories->save();
+				// recache this category
+				$this->cacheCategories($temp);
 			}
 		}
 		unset($categories);
@@ -277,7 +496,6 @@ class Controlpanel extends Base {
 	
 	public function storyRelationTag( $sid, $data, $character = 0 )
 	{
-		print_r($data);
 		// Check tags:
 		$data = array_filter(explode(",",$data));
 		$relations = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_tags');
@@ -287,13 +505,14 @@ class Controlpanel extends Base {
 			$temp=array_search($X['tid'], $data);
 			if ( $temp===FALSE )
 			{
+				$recounts[] = $X['tid'];
 				// Excess relation, drop from table
 				$relations->erase(['lid=?',$X['lid']]);
 			}
 			else unset($data[$temp]);
 		}
 		
-		// Insert any tag IDs not already present
+		// Insert any tag/character IDs not already present
 		if ( sizeof($data)>0 )
 		{
 			foreach ( $data as $temp)
@@ -304,9 +523,50 @@ class Controlpanel extends Base {
 				$relations->tid = $temp;
 				$relations->character = $character;
 				$relations->save();
+				$recounts[] = $temp;
 			}
 		}
 		unset($relations);
+		
+		// call recount function
+		if ( isset( $recounts ) )
+			$this->storyRecountTags( $recounts, $character );
+	}
+	
+	public function storyRecountTags( $tags, $character = 0 )
+	{
+		// tags is either an array
+		if ( is_array($tags) ) $tags = implode(",",$tags);
+		// or a plain numeric
+		elseif ( !is_numeric($tags) ) return FALSE;
+		
+		if ( $character == 1 )
+		{
+			$this->exec("UPDATE `tbl_characters`C 
+							LEFT JOIN
+							(
+								SELECT C.charid, COUNT( DISTINCT RT.sid ) AS counter 
+								FROM `tbl_characters`C
+								LEFT JOIN `tbl_stories_tags`RT ON (RT.tid = C.charid AND RT.character = 1)
+									WHERE C.charid IN ({$tags})
+									GROUP BY C.charid
+							) AS C2 ON C.charid = C2.charid
+							SET C.count = C2.counter WHERE C.charid = C2.charid;");
+		}
+		else
+		{
+			$this->exec("UPDATE `tbl_tags`T1 
+							LEFT JOIN
+							(
+								SELECT T.tid, COUNT( DISTINCT RT.sid ) AS counter 
+								FROM `tbl_tags`T 
+								LEFT JOIN `tbl_stories_tags`RT ON (RT.tid = T.tid AND RT.character = 0)
+									WHERE T.tid IN ({$tags})
+									GROUP BY T.tid
+							) AS T2 ON T1.tid = T2.tid
+							SET T1.count = T2.counter WHERE T1.tid = T2.tid;");
+		}
+		return $this->db->count();
 	}
 	
 	public function storyRelationAuthor ( $storyID, $mainauthor, $supauthor, $allowEmptyAuthor = FALSE )

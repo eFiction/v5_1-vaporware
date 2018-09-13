@@ -12,7 +12,7 @@ return array(
 'no'		=>	'no',
 'No'		=>	'No',
 'Cancel'	=>	'Cancel',
-'Delete'	=>	'Delete',//db
+'Delete'	=>	'Delete',
 'Return'	=>	'Return',
 'Date'		=>	'Date',
 'Time'		=>	'Time',
@@ -47,7 +47,7 @@ return array(
 'Registered'	=> 'Registered',
 'Guest'			=> 'Guest',
 'DeletedUser'	=> 'Deleted user',//db
-'ForgotPW'		=> 'Forgot you password',
+'ForgotPW'		=> 'Forgot your password',
 'ResetPW'		=> 'Reset my password',
 'ResetPWMail'	=> 'If a user with this name or e-mail exists, a mail containing instructions on how to reset the password has been sent',
 'ChangePW'		=> 'Change password',

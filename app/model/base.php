@@ -16,12 +16,24 @@ class Base extends \Prefab {
 	
 	public function exec($cmds,$args=NULL,$ttl=0,$log=TRUE)
 	{
-		return $this->db->exec(str_replace("`tbl_", "`{$this->prefix}", $cmds), $args,$ttl,$log);
+		$result = $this->db->exec(str_replace("`tbl_", "`{$this->prefix}", $cmds), $args,$ttl,$log);
+		return $result;
 	}
 	
 	public function log()
 	{
 		return $this->db->log(TRUE);
+	}
+	
+	public function getFKeys()
+	{
+		$sql = "SELECT CONSTRAINT_NAME as fk, TABLE_NAME as tbl
+					FROM information_schema.TABLE_CONSTRAINTS 
+				WHERE
+					information_schema.TABLE_CONSTRAINTS.CONSTRAINT_TYPE = 'FOREIGN KEY' 
+					AND information_schema.TABLE_CONSTRAINTS.TABLE_SCHEMA = '".$this->db->name()."'
+					AND information_schema.TABLE_CONSTRAINTS.TABLE_NAME LIKE '{$this->prefix}%';";
+		return $this->exec($sql);
 	}
 
 	public function newPasswordQuality($password1, $password2)

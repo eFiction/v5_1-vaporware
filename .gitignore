@@ -2,5 +2,3 @@
 /data/*
 !/data/.htaccess
 !/data/config.ini
-/template/frontend/bulma/
-/template/frontend/bulma/*

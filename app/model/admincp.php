@@ -785,8 +785,8 @@ class AdminCP extends Controlpanel {
 			
 			$category->save();
 
-			\Model\Routines::instance()->cacheCategories($parent_cid);
-			\Model\Routines::instance()->cacheCategories($data['parent_cid']);
+			$this->cacheCategories($parent_cid);
+			$this->cacheCategories($data['parent_cid']);
 		}
 		else $category->save();
 
@@ -817,19 +817,29 @@ class AdminCP extends Controlpanel {
 		$this->moveCategory(0, NULL, $parent_cid);
 
 		$categories = new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
+
 		// get number of elements with same parent
 		$count = $categories->count(["parent_cid = ?", $parent_cid ]);
-		$leveldown = $categories->load(["parent_cid = ?", $parent_cid ])->leveldown;
+
+		// get parent level from siblings
+		$categories->load(["cid = ?", $parent_cid ]);
+		if ( $categories->dry() )	$leveldown = 0;
+		else 						$leveldown = $categories->leveldown + 1;
 		$categories->reset();
 		
 		$categories->category 		= $data['category'];
 		$categories->description 	= $data['description'];
-		$categories->locked 		= $data['locked'];
+		$categories->locked 		= isset($data['locked'])?1:0;
 		$categories->inorder		= $count;
 		$categories->leveldown		= $leveldown;
 		$categories->parent_cid		= $parent_cid;
 		
 		$categories->save();
+		$newCategory = $categories->get('_id'); 
+		
+		// recount parent category
+		if ( $parent_cid>0 )	$this->cacheCategories($parent_cid);
+		$this->cacheCategories($categories->_id);
 
 		$this->moveCategory(0, NULL, $parent_cid);
 
@@ -894,6 +904,7 @@ class AdminCP extends Controlpanel {
 			// moves forward even when the internal pointer is on last record
 			$categories->next();
 		}
+		$this->cacheCategories($parent);
 		return $parent;
 	}
 	
@@ -908,7 +919,7 @@ class AdminCP extends Controlpanel {
 		{
 			$parent = $delete->parent_cid;
 			$delete->erase( ["cid = ?", $cid ] );
-			\Model\Routines::instance()->cacheCategories($parent);
+			$this->cacheCategories($parent);
 			return TRUE;
 		}
 		else return FALSE;

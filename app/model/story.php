@@ -320,13 +320,11 @@ class Story extends Base
 			FROM `tbl_stories`S
 				@JOIN@
 			".((isset($this->config['optional_modules']['contests']))?"LEFT JOIN `tbl_contest_relations`rSC ON ( rSC.relid = S.sid AND rSC.type = 'story' )":"")."
-			LEFT JOIN `tbl_series_stories`rSS ON ( rSS.sid = S.sid )
-				LEFT JOIN `tbl_series`Ser ON ( Ser.seriesid=rSS.seriesid )
-			LEFT JOIN `tbl_ratings`Ra ON ( Ra.rid = S.ratingid )
-
-            LEFT JOIN `tbl_stories_authors`rSAE ON ( S.sid = rSAE.sid )
-				LEFT JOIN `tbl_users`Edit ON ( ".(int)$_SESSION['userID']." = rSAE.aid OR ( Edit.uid = rSAE.aid AND Edit.curator = ".(int)$_SESSION['userID']." ) )
-
+				LEFT JOIN `tbl_series_stories`rSS ON ( rSS.sid = S.sid )
+					LEFT JOIN `tbl_series`Ser ON ( Ser.seriesid=rSS.seriesid )
+				LEFT JOIN `tbl_ratings`Ra ON ( Ra.rid = S.ratingid )
+				LEFT JOIN `tbl_stories_authors`rSAE ON ( S.sid = rSAE.sid )
+					LEFT JOIN `tbl_users`Edit ON ( ( rSAE.aid = Edit.uid ) AND ( ( Edit.uid = ".(int)$_SESSION['userID']." ) OR ( Edit.curator = ".(int)$_SESSION['userID']." ) ) )
 				LEFT JOIN `tbl_user_favourites`Fav ON ( Fav.item = S.sid AND Fav. TYPE = 'ST' AND Fav.uid = ".(int)$_SESSION['userID'].")
 			WHERE S.completed @COMPLETED@ 2 AND S.validated >= 30 @WHERE@
 			GROUP BY S.sid

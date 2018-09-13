@@ -211,11 +211,12 @@ class UserCP extends Base
 							// attempt to delete
 							if ( FALSE !== $deleted = $this->model->authorStoryDelete($params['sid'], $params['uid']) )
 							{
-								$_SESSION['lastAction'] = [ "deleted" =>  $deleted ];
-/*								if ( $deleted == "moved" )
-									$_SESSION['lastAction'] = [ "deleted" => "moved" ];
-								elseif ( $deleted == "success" )
-									$_SESSION['lastAction'] = [ "deleted" => "success" ];	*/
+								// an array indicates the story was deleted, array contains the deleted elements
+								if ( is_array($deleted) )
+									$_SESSION['lastAction'] = [ "deleted" =>  "success", "results" =>  $deleted ];
+								else
+									$_SESSION['lastAction'] = [ "deleted" =>  "moved" ];
+
 								$f3->reroute($params['returnpath'], false);
 								exit;
 							}
@@ -265,7 +266,7 @@ class UserCP extends Base
 				return $this->template->authorStoryMetaEdit($storyData,$chapterList,$prePopulate);
 			}
 		}
-		else return "__Error";
+		else return "__ErrorFileEdit";
 	}
 	
 	public function feedback(\Base $f3, $params)

@@ -160,7 +160,7 @@ class Auth extends Base {
 	
 	}
 	
-	public function logout($f3,$params)
+	public function logout(\Base $f3,$params)
 	{
 		$return = explode("returnpath=",@$params['*']);
 		$returnpath = ( isset($return[1]) AND $return[1]!="") ? $return[1] : "/";
