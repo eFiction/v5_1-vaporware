@@ -4,4 +4,4 @@
 !.gitignore
 # And the default template
 !/default
-!/default/*
+!/default/**
