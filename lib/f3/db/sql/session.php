@@ -179,7 +179,7 @@ class Session extends Mapper {
 						((($name=$db->name())&&$db->driver()!='pgsql')?
 							($db->quotekey($name,FALSE).'.'):''))).
 				$db->quotekey($table,FALSE).' ('.$eol.
-					$tab.$db->quotekey('session_id').' VARCHAR(255),'.$eol.
+					$tab.$db->quotekey('session_id').' VARCHAR(255) CHARACTER SET UTF8,'.$eol.
 					$tab.$db->quotekey('data').' TEXT,'.$eol.
 					$tab.$db->quotekey('ip').' VARCHAR(45),'.$eol.
 					$tab.$db->quotekey('agent').' VARCHAR(300),'.$eol.

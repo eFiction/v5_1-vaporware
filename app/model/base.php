@@ -8,9 +8,10 @@ class Base extends \Prefab {
 
 	public function __construct()
 	{
+		$this->f3 = \Base::instance();
 		$this->i = 0;
-		$this->db = \Base::instance()->get('DB');
-		$this->config = \Base::instance()->get('CONFIG');
+		$this->db = $this->f3->get('DB');
+		$this->config = $this->f3->get('CONFIG');
 		$this->prefix = $this->config['prefix'];
 	}
 	

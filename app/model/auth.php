@@ -1,7 +1,8 @@
 <?php
 namespace Model;
 
-class Auth extends Base {
+class Auth extends Base
+{
 
 	public function userLoad($login, $password, $uid=-1)
 	{
@@ -98,23 +99,23 @@ class Auth extends Base {
 
 	public function createSession()
 	{
-        $f3 = \Base::instance();
+		$session_id = md5(time().openssl_random_pseudo_bytes(32));
 		
-		$session_id = md5(time());
-		
-		$f3->set('SESSION.session_id', $session_id );
+		$this->f3->set('SESSION.session_id', $session_id );
 //		echo "<br>new: ".$_SESSION['session_id'];
 		$this->exec("INSERT INTO `tbl_sessions`(`session`, `user`, `lastvisited`, `ip`) VALUES
 				('{$_SESSION['session_id']}', '{NULL}', NOW(), INET_ATON('{$_SERVER['REMOTE_ADDR']}') );");
 
-	  setcookie("session_id", $session_id, time()+31536000, $f3->get('BASE') );
+	  setcookie("session_id", $session_id, time()+31536000, $this->f3->get('BASE') );
 	  return $session_id;
 	}
 
 	public function validateSession($session_id)
 	{
-        $f3 = \Base::instance();
-
+		// future project: switch to f3-session handler
+		// $this->session = new \DB\SQL\Session($this->db, $this->prefix."session_new");
+		
+		// cleanup sessions
 		$sql[] = "DELETE FROM `tbl_sessions` WHERE (user = 0 AND TIMESTAMPDIFF(MINUTE,`lastvisited`,NOW())>60 )
 																						OR 
 																						TIMESTAMPDIFF(MONTH,`lastvisited`,NOW())>1;";
@@ -149,7 +150,7 @@ class Auth extends Base {
 		{
 			$_SESSION['userID']	= $user['userID'];
 			
-			$f3->set('usercount', 
+			$this->f3->set('usercount', 
 					[
 						"member"	=>	$user['@members']+1,
 						"guest"		=>	$user['@guests']
@@ -168,23 +169,24 @@ class Auth extends Base {
 
 			$user['preferences'] = json_decode($user['preferences'],TRUE);
 			// Check if language is available
-			$user['preferences']['language'] = ( FALSE===$f3->get('CONFIG.language_forced') AND array_key_exists($user['preferences']['language'], $f3->get('CONFIG.language_available' )) )
+			$user['preferences']['language'] = ( FALSE===$this->f3->get('CONFIG.language_forced') AND array_key_exists($user['preferences']['language'], $this->f3->get('CONFIG.language_available' )) )
 									? $user['preferences']['language']
 									// Fallback to page default
-									: $f3->get('CONFIG.language_default');
+									: $this->f3->get('CONFIG.language_default');
 			return $user;
 		}
 		else
 		{
 			$_SESSION['userID']	= FALSE;
 			
-			$f3->set('usercount', 
+			$this->f3->set('usercount', 
 					[
 						"member"	=>	$user['@members'],
 						"guest"		=>	$user['@guests']+1
 					]
 			);
-			if ( $user['session'] == '' )	Auth::instance()->createSession();
+			//if ( $user['session'] == '' )	Auth::instance()->createSession();
+			if ( $user['session'] == '' )	$this->createSession();
 			return FALSE;
 		}
 	}
