@@ -254,7 +254,13 @@ class UserCP extends Base
 
 				if ( isset($params['plain']) ) $editor = "plain";
 				elseif ( isset($params['visual']) ) $editor = "visual";
-				else $editor = ($_SESSION['preferences']['useEditor']==0) ? "plain" : "visual";
+				else
+				{
+					if (empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0)
+						$editor = "plain";
+					else
+						$editor = "visual";
+				}
 
 				return \View\UserCP::authorStoryChapterEdit($chapterData,$chapterList,$editor);
 			}

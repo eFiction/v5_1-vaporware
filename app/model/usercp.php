@@ -205,6 +205,8 @@ class UserCP extends Controlpanel
 		$newStory->title		= $data['new_title'];
 		$newStory->completed	= 1;
 		$newStory->validated	= 11;
+		$newStory->date			= date('Y-m-d H:i:s');
+		$newStory->updated		= $newStory->date;
 		$newStory->save();
 		
 		$newID = $newStory->_id;
@@ -222,6 +224,8 @@ class UserCP extends Controlpanel
 		if ( $editUser->groups < 4 )
 			$editUser->groups += 4;
 		$editUser->save();
+		
+		$this->rebuildStoryCache($newID);
 
 		return $newID;
 	}
@@ -246,19 +250,10 @@ class UserCP extends Controlpanel
 		return FALSE;
 	}
 	
+/*	
 	public function loadChapterList($sid)
-	{
-		$data = $this->exec
-		(
-			"SELECT Ch.sid,Ch.chapid,Ch.title
-				FROM `tbl_chapters`Ch
-			WHERE Ch.sid = :sid ORDER BY Ch.inorder ASC",
-			[":sid" => $sid ]
-		);
-		return $data;
-		if (sizeof($data)>0) return $data;
-		return FALSE;
-	}
+	moved to parent
+*/
 
 	public function authorStoryStatus($sid)
 	{
@@ -355,7 +350,7 @@ class UserCP extends Controlpanel
 		$story->title		= $post['story_title'];
 		$story->summary		= str_replace("\n","<br />",$post['story_summary']);
 		$story->storynotes	= str_replace("\n","<br />",$post['story_notes']);
-		$story->ratingid	= $post['ratingid'];
+		$story->ratingid	= @$post['ratingid'];	// Quick fix for when no rating is created
 		$story->completed	= $post['completed'];
 		/*
 		$story->validated 	= $post['validated'];

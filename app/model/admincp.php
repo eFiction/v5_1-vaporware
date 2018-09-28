@@ -1228,19 +1228,11 @@ class AdminCP extends Controlpanel {
 		return FALSE;
 	}
 
+/*	
 	public function loadChapterList($sid)
-	{
-		$data = $this->exec
-		(
-			"SELECT Ch.sid,Ch.chapid,Ch.title,Ch.validated
-				FROM `tbl_chapters`Ch
-			WHERE Ch.sid = :sid ORDER BY Ch.inorder ASC",
-			[":sid" => $sid ]
-		);
-		if (sizeof($data)>0) return $data;
-		return [];
-	}
-
+	moved to parent
+*/
+	
 	public function loadStoryMapper($sid)
 	{
 		$story=new \DB\SQL\Mapper($this->db, $this->prefix.'stories');
@@ -1366,7 +1358,7 @@ class AdminCP extends Controlpanel {
 		$current->title			= $post['story_title'];
 		$current->summary		= str_replace("\n","<br />",$post['story_summary']);
 		$current->storynotes	= str_replace("\n","<br />",$post['story_notes']);
-		$current->ratingid		= $post['ratingid'];
+		$current->ratingid		= @$post['ratingid'];	// Quick fix for when no rating is created
 		$current->completed		= $post['completed'];
 		$current->validated 	= $post['validated'].$post['valreason'];
 		$current->save();

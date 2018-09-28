@@ -213,6 +213,19 @@ class Controlpanel extends Base {
 		return $chapterID;
 	}
 
+	public function loadChapterList($sid)
+	{
+		$data = $this->exec
+		(
+			"SELECT Ch.sid,Ch.chapid,Ch.title,Ch.validated
+				FROM `tbl_chapters`Ch
+			WHERE Ch.sid = :sid ORDER BY Ch.inorder ASC",
+			[":sid" => $sid ]
+		);
+		if (sizeof($data)>0) return $data;
+		return [];
+	}
+
 	public function loadChapter( $story, $chapter )
 	{
 		$data = $this->exec

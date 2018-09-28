@@ -20,6 +20,7 @@
 					<repeat group="{{ @data.ratings }}" value="{{ @rating }}"><option value="{{ @rating.rid }}"<check if="{{@rating.rid==@data.ratingid}}"> selected="selected"</check>>{{ @rating.rating }}</option></repeat>
 					</select>
 				</div>
+				<div class="gb-full"></div>
 {*		<!-- The next fields will be filled by the javascript below, do not change the id! --> *}
 				<div class="gb-1qrt"><h6>{{@LN__Categories}}</h6></div><div class="gb-3qrt"><input type="text" id="category-select" name="form[category]" /></div>
 				<div class="gb-1qrt"><h6>{{@LN__MainAuthor}} <a class="contextual-popup" href="#mainauthorinfo">{ICON:info} <span> <b>Info:</b><br />{{@UCP_ExplainMainAuthor}}.</span></a></h6></div><div class="gb-3qrt"><input type="text" id="mainauthor-select" name="form[mainauthor]" /></div>
@@ -63,7 +64,8 @@
 				</div>
 				<div class="gb-1thrd">
 					<div class="alert-box success">
-					<input class="button" type="submit">
+					<input class="button" type="submit"><br/>
+					<input type="checkbox" name="registerUpdate" />__ThisIsAnUpdate
 					</div>
 				</div>
 			</div>
