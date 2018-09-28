@@ -1,3 +1,17 @@
+Logik:
+
+- Neue Geschichte erzeugt ein Kapitel
+- Neues Kapitel erzeugt Update timestamp, falls validiert (trusted)
+	- sonst erst update timestamp, wenn von mod freigeschaltet
+
+
+
+
+
+
+
+
+
 Hi, for a community-related project I am trying to setup a friend system.
 
 The table is simply consisting of 

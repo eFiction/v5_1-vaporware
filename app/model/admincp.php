@@ -32,7 +32,7 @@ class AdminCP extends Controlpanel {
 		{
 			if(isset($data['category']))
 			{
-				$ajax_sql = "SELECT category as name, cid as id from `tbl_categories`C WHERE C.category LIKE :category ORDER BY C.category ASC LIMIT 5";
+				$ajax_sql = "SELECT category as name, cid as id from `tbl_categories`C WHERE C.category LIKE :category AND C.locked = 0 ORDER BY C.category ASC LIMIT 5";
 				$bind = [ ":category" =>  "%{$data['category']}%" ];
 			}
 			elseif(isset($data['author']))
