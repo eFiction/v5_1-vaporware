@@ -1,9 +1,9 @@
-<h1>{{@LN__ACP_Tags}}*:</h1>
+<h1>{{@LN__ACP_Tags}}:</h1>
 <form action="{{@BASE}}/adminCP/archive/tags/edit/id={{ @data['id'] }}" method="post">
 	<div class="grid-wrapper">
-		<check if="{{ @data['errors'] }}"><div class="gb-90 alert-box error">{{ @data['errors'] }}</div></check>
-		<check if="{{ @data['changes'] }}"><div class="gb-90 alert-box success">{{ @data['changes'] }}</div></check>
-		<div class="gb-20">__A_TagName</div><div class="gb-80"><input type="text" size=80 name="form_data[label]" value="{{ @data['label'] }}" /></div>
+		<check if="{{ @data['errors'] }}"><div class="gb-90 alert-box error">{{ @LN__Status_Errors, @data['errors'] | format }}</div></check>
+		<check if="{{ @data['changes'] }}"><div class="gb-90 alert-box success">{{ @LN__Status_Changes, @data['changes'] |format }}</div></check>
+		<div class="gb-20">{{@LN__ACP_TagName}}</div><div class="gb-80"><input type="text" size=80 name="form_data[label]" value="{{ @data['label'] }}" /></div>
 		<div class="gb-20">{{@LN__ACP_TagGroup}}</div><div class="gb-80">
 			<select name="form_data[taggroup]" size="1">
 				<repeat group="{{ @data['groups'] }}" value="{{ @group }}">

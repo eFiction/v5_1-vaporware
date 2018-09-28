@@ -418,6 +418,7 @@ return array(
 'ACP_Categories_Error_badID' => 'Kann die Kategorien nicht löschen, keine gültige ID gefunden!',
 
 // 'ACP_Tags'				=> 'Tags',
+'ACP_NewTag'			=> 'Neuen Tag hinzufügen',
 'ACP_Character'			=> 'Charakter',
 //'ACP_Biography'			=> 'Biography',
 //'ACP_Contest'			=> 'Contest',
@@ -428,6 +429,8 @@ return array(
 // 'ACP_TagLabel_Advice'	=> 'Only change when required',
 // 'ACP_TagGroupLabel'		=> 'Tag group label',
 // 'ACP_TagGroup'			=> 'Tag group',
+// 'ACP_TagGroupAdvice'	=> 'eFiction 5 requires at least one tag group, do not attempt to delete all tag groups or it will break the output.',
+'ACP_NewTagGroup'		=> 'Neue Taggruppe hinzufügen',
 // 'ACP_TagGroups'			=> 'Tag groups',
 
 // Admin - Archive - Featured

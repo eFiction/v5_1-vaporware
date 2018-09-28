@@ -6,9 +6,12 @@
 <form method="post" action="{{@BASE}}/adminCP/archive/tags/groups">
 	<div class="grid-wrapper">
 		<div class="gb-30"><input class="text-input" type="text" name="newTagGroup"></div>
-		<div class="gb-70"><input class="button" type="submit" value="__NewTagGroup"></div>
+		<div class="gb-70"><input class="button" type="submit" value="{{@LN__ACP_NewTagGroup}}"></div>
 	</div>
 </form>
+
+<div class="alert-box info">{{@LN__ACP_TagGroupAdvice}}</div>
+
 <check if="{{ isset(@form_error) }}"><div class="gb-90 alert-box error">{{ @form_error }}</div></check>
 <table class="tbody" id="textblockForm">
 	<tr>
@@ -23,7 +26,7 @@
 						<false>asc">{ICON:sort-numeric-desc}</false>
 					</check>
 				</false>
-			</check></a> __ID
+			</check></a> {{@LN__Sort_ID}}
 		</th>
 		<th><a href="{{@BASE}}/adminCP/archive/tags/groups/order=group,
 			<check if="{{ @sort['link']!='group' }}">
@@ -34,7 +37,7 @@
 						<false>asc">{ICON:sort-alpha-desc}</false>
 					</check>
 				</false>
-			</check></a> __Name
+			</check></a> {{@LN__Sort_Label}}
 		</th>
 		<th><a href="{{@BASE}}/adminCP/archive/tags/groups/order=count,
 			<check if="{{ @sort['link']!='count' }}">
@@ -45,14 +48,14 @@
 						<false>asc">{ICON:sort-numeric-desc}</false>
 					</check>
 				</false>
-			</check></a> __Count
+			</check></a> {{@LN__Sort_Count}}
 		</th>
 	</tr>
 	<repeat group="{{ @grouplist }}" value="{{ @row }}">
 	<tr>
 		<td><a href="{{@BASE}}/adminCP/archive/tags/groups/id={{ @row['tgid'] }}">{ICON:edit}</a></td>
 		<td>
-		<check if="{{ @row['count'] == 0 }}">
+		<check if="{{ @row['count'] == 0 AND sizeof(@grouplist)>1 }}">
 			<true>
 				<a href="{{@BASE}}/adminCP/archive/tags/groups/delete={{ @row['tgid'] }}" class="deleteItem" title="#{{ @row['tgid'] }}: {{ @row['description'] }}">{ICON:trash}</a>
 			</true>

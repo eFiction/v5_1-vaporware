@@ -418,6 +418,7 @@ return array(
 'ACP_Categories_Error_badID'		=> 'Could not delete category, ID not found in database!',
 
 'ACP_Tags'				=> 'Tags',
+'ACP_NewTag'			=> 'Add new tag',
 'ACP_Character'			=> 'Character',
 'ACP_Biography'			=> 'Biography',
 'ACP_Contest'			=> 'Contest',
@@ -428,6 +429,8 @@ return array(
 'ACP_TagLabel_Advice'	=> 'Only change when required',
 'ACP_TagGroupLabel'		=> 'Tag group label',
 'ACP_TagGroup'			=> 'Tag group',
+'ACP_TagGroupAdvice'	=> 'eFiction 5 requires at least one tag group, do not attempt to delete all tag groups or it will break the output.',
+'ACP_NewTagGroup'		=> 'Add new tag group',
 'ACP_TagGroups'			=> 'Tag groups',
 
 // Admin - Archive - Featured

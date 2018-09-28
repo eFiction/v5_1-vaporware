@@ -1,8 +1,8 @@
 <h1>{{@LN__ACP_TagGroups}}:</h1>
 <form action="{{@BASE}}/adminCP/archive/tags/groups/id={{ @data['id'] }}" method="post">
 	<div class="grid-wrapper">
-		<check if="{{ @data['errors'] }}"><div class="gb-90 alert-box error">{{ @data['errors'] }}</div></check>
-		<check if="{{ @data['changes'] }}"><div class="gb-90 alert-box success">{{ @data['changes'] }}</div></check>
+		<check if="{{ @data['errors'] }}"><div class="gb-90 alert-box error">{{ @LN__Status_Errors, @data['errors'] | format }}</div></check>
+		<check if="{{ @data['changes'] }}"><div class="gb-90 alert-box success">{{ @LN__Status_Changes, @data['changes'] | format }}</div></check>
 		<div class="gb-20">{{@LN__ACP_TagGroupLabel}}</div>
 			<div class="gb-80"><input type="text" name="form_data[label]" value="{{ @data['label'] }}" />({{@LN__ACP_TagLabel_Advice}})</div>
 		<div class="gb-20">{{@LN__ACP_TagGroup}}</div>

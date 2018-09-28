@@ -239,7 +239,7 @@ class AdminCP extends Base
 	{
 		if ( sizeof($data)>0 )
 		{
-			$this->f3->set('storyInfo', $data['storyInfo']);
+			$this->f3->set('storyTitle', $data['storyInfo']['title']);
 			$this->f3->set('preAuthor', $data['preAuthor']);
 			$this->f3->set('storyLink', $this->f3->format($this->f3->get('LN__StoryAddSimilar'), $this->f3->get('BASE')."/adminCP/stories/edit/story=".$data['storyInfo']['sid']));
 		}

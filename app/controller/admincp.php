@@ -81,10 +81,10 @@ class AdminCP extends Base
 				$this->archiveFeatured($f3, $params, $feedback);
 				break;
 			case "contests":
-				$this->buffer( $this->contests($f3, $params, $feedback) );
+				$this->buffer( $this->archiveContests($f3, $params, $feedback) );
 				break;
 			case "characters":
-				$this->buffer( $this->characters($f3, $params, $feedback) );
+				$this->buffer( $this->archiveCharacters($f3, $params, $feedback) );
 				break;
 			case "tags":
 				$this->archiveTagsIndex($f3, $params, $feedback);
