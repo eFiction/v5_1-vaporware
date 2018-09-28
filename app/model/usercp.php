@@ -184,12 +184,12 @@ class UserCP extends Controlpanel
 				$user->save();
 			}
 			$this->menuCount['data']['feedback'] = $data;
-			
+			print_r($data);
 			$this->menuCount['FB']	=	[
-											"RW" => $data['rw']['sum'],
-											"RR" => $data['rr']['sum'],
-											"CW" => $data['cw']['sum'],
-											"CR" => $data['cr']['sum'],
+											"RW" => (int)$data['rw']['sum'],
+											"RR" => (int)$data['rr']['sum'],
+											"CW" => (int)$data['cw']['sum'],
+											"CR" => (int)$data['cr']['sum'],
 										];
 		}
 	}
@@ -433,15 +433,23 @@ class UserCP extends Controlpanel
 	public function feedbackHomeStats(array $data)
 	{
 		$chapters = $this->exec("SELECT COUNT(1) as count FROM `tbl_chapters`C INNER JOIN `tbl_stories_authors`SA ON ( C.sid = SA.sid ) WHERE SA.aid = {$_SESSION['userID']};")[0]['count'];
-		$stats = 
+
+		$stats =
 		[
 			"stories"				=> $data['st']['sum'],
 			"storiesReviewedQ"		=> $data['st']['sum'] > 0 ? round(($data['rq']['sum']/$data['st']['sum']*100),1) : NULL,
 			"storiesReviewedPie"	=> $data['st']['sum'] > 0 ? (int)($data['rq']['sum']/$data['st']['sum']*360) :NULL,
-			"reviewsPerStory"		=> $data['rq']['sum'] > 0 ? round(($data['rr']['details']['ST']/$data['rq']['sum']),1) : NULL,
-			"reviewsPerStoryTotal"	=> $data['st']['sum'] > 0 ? round(($data['rr']['details']['ST']/$data['st']['sum']),1) : NULL,
-			"reviewsPerChapter"		=> $chapters > 0 ?			round(($data['rr']['details']['ST']/$chapters),1) : NULL,
+			"reviewsPerStory"		=> ( isset($data['rr']['details']['ST']) AND $data['rq']['sum'] > 0)
+										? round(($data['rr']['details']['ST']/$data['rq']['sum']),1)
+										: NULL,
+			"reviewsPerStoryTotal"	=> ( isset($data['rr']['details']['ST']) AND $data['st']['sum'] > 0 )
+										? round(($data['rr']['details']['ST']/$data['st']['sum']),1)
+										: NULL,
+			"reviewsPerChapter"		=> ( isset($data['rr']['details']['ST']) AND $chapters > 0 )
+										? round(($data['rr']['details']['ST']/$chapters),1)
+										: NULL,
 		];
+
 		return $stats;
 	}
 	
