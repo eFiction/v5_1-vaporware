@@ -22,7 +22,7 @@
 			<a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a> {{@LN__by}} <repeat group='@story.cache_authors' value='@author' counter='{{ @ctr }}'><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/members/id={{@author.0}}">{{@author.1}}</a></repeat><br />
 			{* remove below to hide categories *}
 			 <repeat group='@story.cache_categories' value='@category' counter='{{ @ctr }}'><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/story/browse/catIn={{@category.0}}">{{@category.1}}</a></repeat><br />
-			{{@LN__Rating}}: {{@story.cache_rating.1}}<br />
+			<check if="{{isset(@story.cache_rating.1)}}">{{@LN__Rating}}: {{@story.cache_rating.1}}<br /></check>
 			<span class="toggle">
 				<span class="toggle_more">{ICON:square-down} __showDetails</span>
 				<span class="toggle_less" style="display:none">{ICON:square-up} __hideDetails</span>

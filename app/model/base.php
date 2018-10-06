@@ -289,7 +289,7 @@ class Base extends \Prefab {
 		{
 			$chapterLoad = $this->exec("SELECT C.chaptertext FROM `tbl_chapters`C WHERE C.sid=:sid AND C.inorder=:inorder", array(':sid' => $story, ':inorder' => $chapter ))[0];
 		}
-		if ( sizeof($chapterLoad)>0 ) $chapterText = $chapterLoad['chaptertext'];
+		if ( isset($chapterLoad['chaptertext']) ) $chapterText = $chapterLoad['chaptertext'];
 		else return FALSE;
 		
 		if ( $counting AND \Base::instance()->get('SESSION')['userID'] > 0 )

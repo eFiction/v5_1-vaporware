@@ -577,7 +577,12 @@ class Story extends Base
 				if( empty($view) OR !is_numeric($view) ) $view = 1;
 				$chapter = $view = max ( 1, min ( $view, $storyData['chapters']) );
 				\Base::instance()->set('bigscreen',TRUE);
-				$content = ($content = $this->model->getChapterText( $story, $chapter )) ? : "Error";
+				
+				// Will return error on empty chapter text
+				$content = ($content = $this->model->getChapterText( $story, $chapter )) ? : "Error (Load chaptertext)";
+				// Will allow empty chapter
+				//if ( FALSE === $content = $this->model->getChapterText( $story, $chapter ))
+				//	$content = "Error (Load chaptertext)";
 
 				$storyData['chapternr'] = $chapter;
 			}
