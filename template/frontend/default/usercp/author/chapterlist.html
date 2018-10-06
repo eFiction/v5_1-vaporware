@@ -5,7 +5,14 @@
 		<br /><br />
 		<ul id="chapter-sort">
 		<repeat group="{{ @chapterList }}" value="{{ @row }}" counter="{{ @ctr }}">
-			<li id="{{ @row.chapid }}">{ICON:arrow-vert} {{ @ctr }}: <a href="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}}/chapter={{ @row.chapid }};returnpath={{@data.form.returnpath}}">{ICON:edit}</a> {{ @row.title }} <check if="{{20 < @row.validated AND @row.validated < 30}}">{ICON:waiting}</check></li>
+<check if="{{@_SESSION.groups&8}}">
+<true>
+			<li id="{{ @row.chapid }}">{ICON:arrow-vert} {{ @ctr }}: <a href="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}}/chapter={{ @row.chapid }};returnpath={{@data.form.returnpath}}">{ICON:edit}</a> {{ @row.title }} <check if="{{10 < @row.validated AND @row.validated < 30}}">{ICON:alert:{{@LN__UCP_NotFinishedC}}}</check></li>
+</true>
+<false>
+			<li id="{{ @row.chapid }}">{ICON:arrow-vert} {{ @ctr }}: <a href="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}}/chapter={{ @row.chapid }};returnpath={{@data.form.returnpath}}">{ICON:edit}</a> {{ @row.title }} <check if="{{10 < @row.validated AND @row.validated < 20}}">{ICON:alert:{{@LN__UCP_NotValidatedC}}}</check><check if="{{20 < @row.validated AND @row.validated < 30}}">{ICON:waiting:{{@LN__UCP_BeingValidatedC}}}</check></li>
+</false>
+</check>
 		</repeat>
 		</ul>
 		</check>

@@ -146,6 +146,10 @@ class UserCP extends Base
 	
 	protected function authorStoryAdd(\Base $f3, $uid)
 	{
+		// check for an attempt to impersonate a different author
+		if(FALSE===in_array($uid, $_SESSION['allowed_authors']))
+			$f3->reroute("/userCP/author", false);
+		
 		$data = [ "uid" => $uid ];
 		// Check data
 		if ( sizeof($_POST) )
@@ -157,7 +161,7 @@ class UserCP extends Base
 			}
 		}
 		
-		return \View\UserCP::authorStoryAdd($data);
+		return $this->template->authorStoryAdd($data);
 	}
 	
 	protected function authorStorySelect($params)
@@ -190,7 +194,7 @@ class UserCP extends Base
 	{
 		if(empty($params['sid'])) return "__Error";
 		//$uid = isset($params['uid']) ? $params['uid'] : $_SESSION['userID'];
-		if ( FALSE !== $storyData = $this->model->authorStoryLoadInfo((int)$params['sid'], (int)$params['uid']) )
+		if ( FALSE !== $storyData = $this->model->authorStoryLoadInfo($params['sid'], $params['uid']) )
 		{
 			if (isset($_POST) and sizeof($_POST)>0 )
 			{
@@ -295,7 +299,6 @@ class UserCP extends Base
 			{
 				if ( FALSE === $result = $this->model->saveFeedback($post, $params) )
 				{
-					//$params['error'] = "saving";
 					$_SESSION['lastAction'] = [ "modified" => "unknown" ];
 					//$this->libraryBookFavEdit($f3, $params);
 				}
@@ -394,7 +397,7 @@ class UserCP extends Base
 
 	protected function feedbackReviewsSave(\Base $f3, $params)
 	{
-		print_r($_POST);exit;
+		//print_r($_POST);exit;
 		if ( FALSE === $data = $this->model->loadReview($params) )
 		{
 			// test

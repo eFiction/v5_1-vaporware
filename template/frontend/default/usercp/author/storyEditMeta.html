@@ -9,6 +9,15 @@
 	</switch>
 </check>
 <a href="{{@BASE}}{{@data.form.returnpath}}">{ICON:arrow-left} {{@LN__ReturnToOverview}}</a>
+<check if="{{@_SESSION.groups&8}}">
+	<true>
+		<check if="{{@data.validated.0<3}}"><div class="alert-box info">{{@LN__UCP_NotFinishedS}}</div></check>
+	</true>
+	<false>
+		<check if="{{@data.validated.0==1}}"><div class="alert-box warning">{{@LN__UCP_NotValidatedS}}</div></check>
+		<check if="{{@data.validated.0==2}}"><div class="alert-box info">{{@LN__UCP_BeingValidatedS}}</div></check>
+	</false>
+</check>
 <div class="grid-wrapper">
 	<check if="{{ isset(@deleteWarning) }}"><div class="gb-90 alert-box warning">{{ @deleteWarning }}</div></check>
 	<div class="gb-3qrt">
@@ -36,6 +45,16 @@
 				<div class="gb-1thrd">
 					<h6>{{@LN__UCP_statusValidated}}:<br/>
 					<strong>{{ ${"LN__UCP_statusValidated_".@data.validated.0} }}</strong></h6>
+<check if="{{@data.validated.0<3}}">
+	<check if="{{@_SESSION.groups&8}}">
+		<true>
+					<input type="checkbox" name="form[mark_validated]" />{{@LN__UCP_FinishStory}}
+		</true>
+		<false>					
+					<input type="checkbox" name="form[request_validation]" <check if="{{@data.validated.0==2}}">checked="checked" </check>/>{{@LN__UCP_RequestValidation}}
+		</false>
+	</check>
+</check>
 				</div>
 				<div class="gb-1thrd">
 					<h6>{{@LN__UCP_statusValidatedReason}}:<br/>
@@ -50,11 +69,10 @@
 					</select>
 				</div>
 {*		<!-- end: story status fields -->	*}
-				<div class="gb-1thrd" align="left">
-					<div class="alert-box error">
-					<check if="{{ @data.completed==0 }}"><input type="checkbox" name="deleteComfirm1" />{ICON:check}</check>
-					<input type="submit" name="delete" value="{{@LN__Delete}}" />
-					<check if="{{ @data.completed==0 }}"><input type="checkbox" name="deleteComfirm2" />{ICON:check}</check>
+				<div class="gb-full"></div>
+				<div class="gb-1thrd">
+					<div class="alert-box success">
+					<input class="button" type="submit">
 					</div>
 				</div>
 				<div class="gb-1thrd">
@@ -62,10 +80,11 @@
 					<input class="button" type="reset">
 					</div>
 				</div>
-				<div class="gb-1thrd">
-					<div class="alert-box success">
-					<input class="button" type="submit"><br/>
-					<input type="checkbox" name="registerUpdate" />__ThisIsAnUpdate
+				<div class="gb-1thrd" align="left">
+					<div class="alert-box error">
+					<check if="{{ @data.completed==0 }}"><input type="checkbox" name="deleteComfirm1" />{ICON:check}</check>
+					<input type="submit" name="delete" value="{{@LN__Delete}}" />
+					<check if="{{ @data.completed==0 }}"><input type="checkbox" name="deleteComfirm2" />{ICON:check}</check>
 					</div>
 				</div>
 			</div>

@@ -1,4 +1,13 @@
 <a href="{{@BASE}}{{@data.form.returnpath}}">{{@LN__Return}}</a>
+<check if="{{@_SESSION.groups&8}}">
+	<true>
+		<check if="{{@data.validated.0<3}}"><div class="alert-box info">{{@LN__UCP_NotFinishedC}}</div></check>
+	</true>
+	<false>
+		<check if="{{@data.validated.0==1}}"><div class="alert-box warning">{{@LN__UCP_NotValidatedC}}</div></check>
+		<check if="{{@data.validated.0==2}}"><div class="alert-box info">{{@LN__UCP_BeingValidatedC}}</div></check>
+	</false>
+</check>
 <div class="grid-wrapper">
 	<div class="gb-3qrt">
 		<form method="post" action="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}}/chapter={{@data.chapid}};returnpath={{@data.form.returnpath}}">
@@ -19,7 +28,38 @@
 				CKEDITOR.replace( 'editor1' );
 			</script></check>
 
-			<input class="button" type="submit"> <input class="button" type="reset">
+{*		<!-- story status fields -->	*}
+				<div class="gb-1thrd">
+					<h6>{{@LN__UCP_statusValidated}}:<br/>
+					<strong>{{ ${"LN__UCP_statusValidated_".@data.validated.0} }}</strong></h6>
+<check if="{{@data.validated.0<3}}">
+	<check if="{{@_SESSION.groups&8}}">
+		<true>
+					<input type="checkbox" name="form[mark_validated]" />{{@LN__UCP_FinishChapter}}
+		</true>
+		<false>					
+					<input type="checkbox" name="form[request_validation]" <check if="{{@data.validated.0==2}}">checked="checked" </check>/>{{@LN__UCP_RequestValidation}}
+		</false>
+	</check>
+</check>
+				</div>
+				<div class="gb-2thrd">
+					<h6>{{@LN__UCP_statusValidatedReason}}:<br/>
+					<strong>{{ ${"LN__UCP_statusValReason_".@data.validated.1} }}</strong></h6>
+				</div>
+{*		<!-- end: story status fields -->	*}
+				<div class="gb-full"></div>
+
+				<div class="gb-1thrd">
+					<div class="alert-box success">
+					<input class="button" type="submit">
+					</div>
+				</div>
+				<div class="gb-1thrd">
+					<div class="alert-box clear">
+					<input class="button" type="reset">
+					</div>
+				</div>
 		</form>
 	</div>
 	<div class="gb-1qrt">

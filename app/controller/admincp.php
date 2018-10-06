@@ -176,7 +176,7 @@ class AdminCP extends Base
 		}
 		elseif (isset($_POST['form_data']))
 		{
-			$this->buffer( print_r($f3->get('POST.form_data'),1) );
+			//$this->buffer( print_r($f3->get('POST.form_data'),1) );
 			$changes = $this->model->saveFeatured($params['sid'], $f3->get('POST.form_data') );
 		}
 

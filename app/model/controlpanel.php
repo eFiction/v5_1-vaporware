@@ -146,68 +146,86 @@ class Controlpanel extends Base {
 		return $pre;
 	}
 
-	public function storyChapterAdd($storyID, $userID=FALSE)
+	public function storyChapterAdd($storyID, $userID=FALSE, $date=NULL)
 	{
+		// get the current chapter count, and with it, check if the story exists
+		// if required, the user's permission to add a chapter to the story will also be checked, although the controller should have taken care of this
 		if ( $userID )
 		{
-			// coming from userCP, $userID is safe
 			$countSQL = "SELECT COUNT(chapid) as chapters, U.uid
 							FROM `tbl_stories`S
 								LEFT JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid )
 								INNER JOIN `tbl_stories_authors`SA ON ( SA.sid = S.sid AND SA.type='M' )
-									INNER JOIN `tbl_users`U ON ( ( U.uid=SA.aid ) AND ( U.uid={$userID} OR U.curator={$userID} ) )
+									INNER JOIN `tbl_users`U ON ( ( U.uid=SA.aid ) AND ( U.uid=:uidu OR U.curator=:uidc ) )
 						WHERE S.sid = :sid ";
-			$countBind = [ ":sid" => $storyID ];
+			$countBind = [ ":sid" => $storyID, ":uidu" => $userID, ":uidc" => $userID ];
 			
 			$chapterCount = $this->exec($countSQL, $countBind);
-
+			
 			if ( empty($chapterCount) OR  $chapterCount[0]['uid']==NULL )
 				return FALSE;
 
 			// Get current chapter count and raise
 			$chapterCount = $chapterCount[0]['chapters'] + 1;
+
+			// set the initial validation status
+			// even with a trusted author, we don't want the chapter to be marked as finished right away
+			$validated = 11;
 		}
 		else
 		{
-			if ( FALSE == $chapterCount = $this->exec("SELECT COUNT(chapid) as chapters FROM `tbl_chapters` WHERE `sid` = :sid ", [ ":sid" => $storyID ])[0]['chapters'] )
+			// coming from adminCP, no need to check user permission
+			$chapterCount = $this->exec("SELECT COUNT(Ch.chapid) as chapters
+											FROM `tbl_chapters`Ch
+										WHERE `sid` = :sid ", [ ":sid" => $storyID ])[0]['chapters'];
+			
+			if ( empty($chapterCount) )
 				return FALSE;
 
 			// Get current chapter count and raise
 			$chapterCount++;
+			
+			// coming from adminCP, we set the chapter to active assuming them people know what they are doing
+			if ( $_SESSION['groups']&32 )	$validated = 32;	// added by mod
+			if ( $_SESSION['groups']&128 )	$validated = 33;	// added by admin
+			
+			// date is NULL when adding additional chapters, in this context we also update the story entry
+			if ( !$date )
+			{
+				$this->exec(
+					"UPDATE `tbl_stories` SET `updated` = CURRENT_TIME() WHERE `sid` = :sid;",
+					[ ":sid" =>  $storyID ]
+				);
+			}
 		}
-
-		$validated = 1;
-		if ( $_SESSION['groups']&32 ) $validated = 2;
-		if ( $_SESSION['groups']&128 ) $validated = 3;
 		
-		$kv = [
-			'title'			=> \Base::instance()->get('LN__Chapter')." #{$chapterCount}",
-			'inorder'		=> $chapterCount,
-			//'notes'			=> '',
-			//'workingtext'
-			//'workingdate'
-			//'endnotes'
-			'validated'		=> "1".$validated,
-			'wordcount'		=> 0,
-			'rating'		=> "0", // allow rating later
-			'sid'			=> $storyID,
-		];
-
-		$chapterID = $this->insertArray($this->prefix.'chapters', $kv );
-
+		$chapterID = $this->exec("INSERT INTO `tbl_chapters` 
+			(`sid`, `title`, `inorder`, `created`, `validated`) 
+			VALUES 
+			(
+				:sid,
+				'".\Base::instance()->get('LN__Chapter')." #{$chapterCount}',
+				'{$chapterCount}',
+				CURRENT_TIMESTAMP,
+				'{$validated}'
+			);",
+			[ ":sid" => $storyID ]
+		);
+		
+		// if using local storage, create a chapter entry in SQLite
 		if ( "local" == $this->config['chapter_data_location'] )
 		{
 			$db = \storage::instance()->localChapterDB();
-			$chapterAdd= @$db->exec('INSERT INTO "chapters" ("chapid","sid","inorder","chaptertext") VALUES ( :chapid, :sid, :inorder, :chaptertext )', 
+			$chapterAdd= @$db->exec('INSERT INTO "chapters" ("chapid","sid","inorder") VALUES ( :chapid, :sid, :inorder )', 
 								[
 									':chapid' 		=> $chapterID,
 									':sid' 			=> $storyID,
-									':inorder' 		=> $chapterCount,
-									':chaptertext'	=> '',
+									':inorder' 		=> $chapterCount
 								]
 			);
 		}
 
+		// rebuild the story cache
 		$this->rebuildStoryCache($storyID);
 		
 		return $chapterID;
@@ -285,7 +303,7 @@ class Controlpanel extends Base {
 									LEFT JOIN `tbl_characters` Ch ON ( Ch.charid = rST.tid AND rST.character = 1 )
 								LEFT JOIN `tbl_stories_categories`rSC ON ( rSC.sid = S.sid )
 									LEFT JOIN `tbl_categories` Cat ON ( rSC.cid = Cat.cid )
-								LEFT JOIN `tbl_chapters` C ON ( C.sid = S.sid )
+								LEFT JOIN `tbl_chapters` C ON ( C.sid = S.sid AND C.validated >= 30 )
 								LEFT JOIN `tbl_feedback` F ON ( F.reference = S.sid AND F.type='ST' )
 							WHERE S.sid = :sid
 					)AS SELECT_OUTER

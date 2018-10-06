@@ -34,11 +34,11 @@ class UserCP extends Base
 		return $this->render('usercp/author/storyList.html');
 	}
 	
-	public static function authorStoryAdd(array $data)
+	public function authorStoryAdd(array $data)
 	{
-		\Base::instance()->set('storyAdd', $data);
+		$this->f3->set('storyAdd', $data);
 		
-		return \Template::instance()->render('usercp/author/storyAdd.html');
+		return $this->render('usercp/author/storyAdd.html');
 	}
 
 	public function authorStoryMetaEdit(array $storyData, array $chapterList, array $prePop)

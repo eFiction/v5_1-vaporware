@@ -1305,11 +1305,18 @@ class AdminCP extends Controlpanel {
 		$newStory = new \DB\SQL\Mapper($this->db, $this->prefix."stories");
 		$newStory->title		= $data['new_title'];
 		$newStory->completed	= 1;
-		$newStory->validated	= 11;
+		$newStory->validated	= ($_SESSION['groups']&128) ? 33 : 32;
 		$newStory->date			= date('Y-m-d H:i:s');
+		$newStory->updated		= $newStory->date;
 		$newStory->save();
 		
 		$newID = $newStory->_id;
+		
+		// add initial chapter to the story
+		if ( FALSE === $this->storyChapterAdd($newID, NULL, $newStory->date) )
+		{
+			
+		}
 		
 		$new_authors = explode(",",$data['new_author']);
 		foreach ( $new_authors as $new_author )

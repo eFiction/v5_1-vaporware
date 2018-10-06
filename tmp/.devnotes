@@ -6,8 +6,10 @@ Logik:
 
 
 
+Create story:
 
-
+trusted author: 31 (validate, user) as draft
+regular author: 21 (waiting, user) as draft
 
 
 

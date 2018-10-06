@@ -184,7 +184,7 @@ class UserCP extends Controlpanel
 				$user->save();
 			}
 			$this->menuCount['data']['feedback'] = $data;
-			print_r($data);
+			//print_r($data);
 			$this->menuCount['FB']	=	[
 											"RW" => (int)$data['rw']['sum'],
 											"RR" => (int)$data['rr']['sum'],
@@ -204,7 +204,7 @@ class UserCP extends Controlpanel
 		$newStory = new \DB\SQL\Mapper($this->db, $this->prefix."stories");
 		$newStory->title		= $data['new_title'];
 		$newStory->completed	= 1;
-		$newStory->validated	= 11;
+		$newStory->validated	= ($_SESSION['groups']&8) ? 31 : 11;
 		$newStory->date			= date('Y-m-d H:i:s');
 		$newStory->updated		= $newStory->date;
 		$newStory->save();
@@ -224,6 +224,16 @@ class UserCP extends Controlpanel
 		if ( $editUser->groups < 4 )
 			$editUser->groups += 4;
 		$editUser->save();
+		
+		// add initial chapter to the story
+		// must occur after the story-author relation to satisfy the check
+		if ( FALSE === $this->storyChapterAdd($newID, $data['uid'], $newStory->date) )
+		{
+			// **debug**
+			echo "Chapterfail";
+			exit;
+		}
+		
 		
 		$this->rebuildStoryCache($newID);
 
@@ -352,9 +362,17 @@ class UserCP extends Controlpanel
 		$story->storynotes	= str_replace("\n","<br />",$post['story_notes']);
 		$story->ratingid	= @$post['ratingid'];	// Quick fix for when no rating is created
 		$story->completed	= $post['completed'];
-		/*
-		$story->validated 	= $post['validated'];
-		*/
+		
+		// Toggle validation request, keeping the reason part untouched
+		if ( isset($post['request_validation']) AND $story->validated < 20 )
+			$story->validated 	= 	$story->validated + 10;
+		elseif ( empty($post['request_validation']) AND $story->validated >= 20 AND $story->validated < 30 )
+			$story->validated 	= 	$story->validated - 10;
+
+		// Allow trusted authors to set validation
+		if ( isset($post['mark_validated']) AND $_SESSION['groups']&8 AND $story->validated < 20 )
+			$story->validated 	= 	$story->validated + 20;
+
 		$story->save();
 		
 		// Step two: check for changes in relation tables
@@ -392,6 +410,30 @@ class UserCP extends Controlpanel
 		
 		$chapter->title = $post['chapter_title'];
 		$chapter->notes = $post['chapter_notes'];
+
+		// Toggle validation request, keeping the reason part untouched
+		if ( isset($post['request_validation']) AND $chapter->validated < 20 )
+			$chapter->validated 	= 	$chapter->validated + 10;
+		elseif ( empty($post['request_validation']) AND $chapter->validated >= 20 AND $chapter->validated < 30 )
+			$chapter->validated 	= 	$chapter->validated - 10;
+			
+		// Allow trusted authors to set validation
+		if ( isset($post['mark_validated']) AND $_SESSION['groups']&8 AND $chapter->validated < 20 )
+		{
+			$chapter->validated 	= 	$chapter->validated + 20;
+			$chapter->created		=	date('Y-m-d H:i:s');
+			
+			// Update the story entry, set updated field to now
+			$this->exec("UPDATE `tbl_stories`S 
+							INNER JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid AND Ch.chapid = :chapid ) 
+						SET S.updated = :updated;",
+						[
+							":chapid" => $chapterID,
+							":updated" => $chapter->created
+						]
+						);
+		}
+
 		$chapter->save();
 		
 		// plain and visual return different newline representations, this will bring things to standard.
