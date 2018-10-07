@@ -1,13 +1,13 @@
-__DeleteRating
+<h3>{{@LN__ACP_DeleteRating}}</h3>
 <div class="grid-wrapper">
-	<div class="gb-20">__RatingToDelete</div><div class="gb-80">{{ @data.rating }}</div>
-	<div class="gb-20">__StoriesWithRating</div><div class="gb-80">{{ @data.counter }}</div>
+	<div class="gb-20">{{@LN__ACP_RatingToDelete}}:</div><div class="gb-80">{{ @data.rating }}</div>
+	<div class="gb-20">{{@LN__ACP_RatingCount}}:</div><div class="gb-80">{{ @data.counter }}</div>
 </div>
 <form action="{{@BASE}}/adminCP/archive/ratings/id={{ @data['rid'] }}" method="post">
 	<div class="grid-wrapper">
 		<check if="{{ isset(@errors) }}"><div class="gb-90 alert-box error">{{ @errors }}</div></check>
 		<check if="{{ isset(@changes) }}"><div class="gb-90 alert-box success">{{ @LN__Status_Changes, @changes | format }}</div></check>
-		<div class="gb-20">__MoveToRating</div>
+		<div class="gb-20">{{@LN__ACP_RatingMove}}:</div>
 		<div class="gb-80">
 			<select name="moveTo" size="1">
 				<repeat group="{{ @ratings }}" value="{{ @rating }}">

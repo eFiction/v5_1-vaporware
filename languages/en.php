@@ -35,6 +35,8 @@ return array(
 'Author' 		=>	'Author',
 'Privacy'		=> 	'Privacy',
 'total'			=>	'total', //db
+'MoveUp'		=> 'Move upwards', //db
+'MoveDown'		=> 'Move downwards', // db
 
 // [2] Global -- Login related 20
 'Login'			=> 'Login',
@@ -416,6 +418,7 @@ return array(
 		'AdminMenu_Team_Group6' => 'Super Moderator',
 		'AdminMenu_Team_Group7' => 'Administrator',
 
+// AdminCP Archive elements
 'AdminMenu_Archive' => 'Archive',
 	'AdminMenu_Intro' => 'Intro',
 'AdminMenu_Submission' => 'Submissions',
@@ -429,6 +432,8 @@ return array(
 	'AdminMenu_Tagcloud' => 'Cloud',
 'AdminMenu_Categories' => 'Categories',
 'AdminMenu_Ratings' => 'Ratings',
+	'ACP_EditRating'	=> 'Edit rating',
+	'ACP_DeleteRating'	=> 'Delete rating',
 'ACP_Categories_Success_Deleted'	=> 'Category "{0}" successfully deleted!',
 'ACP_Categories_Error_notEmpty'		=> 'Could not delete category "{0}", because it is not empty!',
 'ACP_Categories_Error_DBError'		=> 'Could not delete category "{0}", database error occured!',
@@ -440,6 +445,10 @@ return array(
 'ACP_Biography'			=> 'Biography',
 'ACP_Contest'			=> 'Contest',
 'ACP_Category'			=> 'Category',
+'ACP_EditCategory'		=> 'Edit category',
+'ACP_MainCategory'		=> 'Main category',
+'ACP_AddMainCategory'	=> 'Add main category',
+'ACP_AddSubCategory'	=> 'Add sub category to \'{0}\'',
 'ACP_TagName'			=> 'Tag name',
 'ACP_TagLabel'			=> 'Tag label',
 'ACP_TagDescription'	=> 'Tag description',
@@ -450,6 +459,13 @@ return array(
 'ACP_NewTagGroup'		=> 'Add new tag group',
 'ACP_TagGroups'			=> 'Tag groups',
 'ACP_NewRating'			=> 'Add new rating',
+'ACP_RatingLabel'		=> 'Rating label',
+'ACP_RatingAge'			=> 'Rating age',
+'ACP_RatingWarning'		=> 'Show warning',
+'ACP_RatingWarningText' => 'Warning text',
+'ACP_RatingToDelete'	=> 'Rating label to delete',
+'ACP_RatingCount'		=> 'Number of stories with this rating',
+'ACP_RatingMove'		=> 'Move stories to this rating',
 
 // Admin - Archive - Featured
 'AdminMenu_Featured' => 'Featured',

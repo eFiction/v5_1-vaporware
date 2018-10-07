@@ -987,16 +987,27 @@ class AdminCP extends Controlpanel {
 		$rating->load(array('rid=?',$rid));
 		$rating->copyfrom( 
 			[
-				"rating" => $data['rating'],
-				"rating_age" => $data['rating_age'],
-				"ratingwarning" => (int)isset($data['ratingwarning']),
-				"warningtext" => $data['warningtext']
+				"rating" 		=> $data['rating'],
+				"rating_age"	=> ($data['rating_age']=="") ? NULL : $data['rating_age'],
+				//"rating_image"	=> empty($data['rating_image']) ? NULL : $data['rating_image'],
+				"ratingwarning"	=> (int)isset($data['ratingwarning']),
+				"warningtext"	=> $data['warningtext']
 			]
 		);
 
-		$i = $rating->changed("rating");
-		$i += $rating->changed("rating_age");
+		$i  = $rating->changed("rating");
+		//$i += $rating->changed("rating_image");
 		$i += $rating->changed("ratingwarning");
+
+		// If any of the cache-contained values has changed, update story table cache
+		if ( $i > 0 )
+		$this->exec
+		(
+			"UPDATE `tbl_stories` SET `cache_rating` = '{$this->ratingCache($rid)}' WHERE `tbl_stories`.`ratingid` = :rid;",
+			[ ":rid" => $rid ]
+		);
+
+		$i += $rating->changed("rating_age");
 		$i += $rating->changed("warningtext");
 		
 		$_SESSION['lastAction'] = [ "changes" => $i ];
@@ -1007,9 +1018,10 @@ class AdminCP extends Controlpanel {
 	
 	public function ratingDelete($oldID, $newID)
 	{
+		
 		$this->exec
 		(
-			"UPDATE `tbl_stories` SET `ratingid` = :new WHERE `tbl_stories`.`ratingid` = :old;",
+			"UPDATE `tbl_stories` SET `ratingid` = :new, `cache_rating` = '{$this->ratingCache($newID)}' WHERE `tbl_stories`.`ratingid` = :old;",
 			[ ":old" => $oldID, ":new" => $newID ]
 		);
 
@@ -1019,6 +1031,20 @@ class AdminCP extends Controlpanel {
 		$_SESSION['lastAction'] = [ "moved" => $moved ];
 		
 		return TRUE;
+	}
+	
+	protected function ratingCache( $rid )
+	{
+		$data = $this->exec("SELECT CONCAT_WS(',',`rid`,`rating`,`ratingwarning`,`rating_image`) as rating
+						FROM `tbl_ratings`
+						WHERE `tbl_ratings`.`rid` = :new;",
+					[ ":new" => $rid ]
+		);
+		
+		if ( isset($data[0]['rating']) )
+			return json_encode(explode(",",$data[0]['rating']));
+		else
+			return "[]";
 	}
 
 //	public function listCustompages(int $page, array $sort)

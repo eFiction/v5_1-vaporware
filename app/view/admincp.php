@@ -179,7 +179,7 @@ class AdminCP extends Base
 
 		\Base::instance()->set('categories', $data);
 		\Base::instance()->set('feedback', $feedback);
-		return \Template::instance()->render('archive/list_categories.html');
+		return \Template::instance()->render('archive/categories_list.html');
 	}
 	
 	public static function addCategory( \Base $f3, array $data )
@@ -192,14 +192,14 @@ class AdminCP extends Base
 			"locked"		=> TRUE,
 		], $data );
 		\Base::instance()->set('data', $data);
-		return \Template::instance()->render('archive/form_category.html');
+		return \Template::instance()->render('archive/categories_form.html');
 	}
 	
 	public static function editCategory(array $data)
 	{
 		if(empty($data['job'])) $data['job'] = "id";
 		\Base::instance()->set('data', $data);
-		return \Template::instance()->render('archive/form_category.html');
+		return \Template::instance()->render('archive/categories_form.html');
 	}
 
 	public static function listCustompages(array $data, array $sort)

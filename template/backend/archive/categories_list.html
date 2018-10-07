@@ -8,21 +8,22 @@
 		<loop from="{{ @i=@level }}" to="{{ @i < (@row['leveldown']+1) }}" step="{{ @i++ }}"><tr><td colspan=8><div style="padding: 3px 3px 3px 40px;" class="level{{@row['leveldown']}}"><table width="100%" style="border: 1px solid red;"></loop>
 		<tr>
 			<td style="padding: 1px 10px 1px 10px;"><a href="{{@BASE}}/adminCP/archive/categories/id={{ @row['cid'] }}">{ICON:edit}</a></td>
-			<td style="padding: 1px 10px 1px 10px;"><check if="{{@row['inorder']>1}}"><a href="{{@BASE}}/adminCP/archive/categories/move=up,{{ @row['cid'] }}" title="__MoveUp {{@row['category']}}">{ICON:arrow-up}</a></check>&nbsp;</td>
-			<td style="padding: 1px 10px 1px 10px;"><check if="{{@row['inorder']<@row['counter']}}"><a href="{{@BASE}}/adminCP/archive/categories/move=down,{{ @row['cid'] }}" title="__MoveDown {{@row['category']}}">{ICON:arrow-down}</a></check>&nbsp;</td>
+			<td style="padding: 1px 10px 1px 10px;"><check if="{{@row['inorder']>1}}"><a href="{{@BASE}}/adminCP/archive/categories/move=up,{{ @row['cid'] }}" title="{{@LN__MoveUp}} {{@row['category']}}">{ICON:arrow-up}</a></check>&nbsp;</td>
+			<td style="padding: 1px 10px 1px 10px;"><check if="{{@row['inorder']<@row['counter']}}"><a href="{{@BASE}}/adminCP/archive/categories/move=down,{{ @row['cid'] }}" title="{{@LN__MoveDown}} {{@row['category']}}">{ICON:arrow-down}</a></check>&nbsp;</td>
 			<td style="padding: 1px 10px 1px 10px;"><check if="{{@row['locked']}}"><true>{ICON:lock}</true><false>{ICON:unlock}</false></check></td>
 			<td style="padding: 1px 10px 1px 10px;">{{@row['category']}}</td>
 			<td style="padding: 1px 10px 1px 10px;">
 				<check if="{{@row.stats.count==0 AND @row.stats.sub===NULL}}">
 					<true><a href="{{@BASE}}/adminCP/archive/categories/delete={{ @row['cid'] }}" class="deleteItem" title="#{{ @row['cid'] }}: {{ @row['category'] }}">{ICON:trash}</a></true>
-					<false>X</false>
+					<false>{ICON:trash}</false>
 				</check>
 			</td>
-			<td style="padding: 1px 10px 1px 10px;"><a href="{{@BASE}}/adminCP/archive/categories/add={{ @row['cid'] }}" title="__AddSubcategory to {{@row['category']}}">{ICON:plus}</a></td>
+			<td style="padding: 1px 10px 1px 10px;"><a href="{{@BASE}}/adminCP/archive/categories/add={{ @row['cid'] }}" title="{{@LN__ACP_AddSubCategory, @row['category'] | format}}">{ICON:plus}</a></td>
 			<td style="padding: 1px 10px 1px 10px;">&nbsp;</td>
 		</tr>
 		<set level="{{ @row['leveldown']+1 }}" />
 	</repeat>
 	<loop from="{{ @i=@level }}" to="{{ @i > 0 }}" step="{{ @i-- }}"></table></div></loop>
 </check>
-<a href="{{@BASE}}/adminCP/archive/categories/add" title="__AddMainCategory">{ICON:plus} __AddMainCategory</a>
+<br/>
+<a href="{{@BASE}}/adminCP/archive/categories/add" title="{{@LN__ACP_AddMainCategory}}">{ICON:plus} {{@LN__ACP_AddMainCategory}}</a>

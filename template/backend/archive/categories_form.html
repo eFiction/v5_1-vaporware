@@ -1,7 +1,7 @@
 <check if="{{ @data.job=='add' }}">
 	__A_Category: <check if="{{isset(@data.info) }}">__creatingSubFor {{ @data.info.category }}</check>
 </check>
-<check if="{{ @data.job=='id' }}">__EditCategory</check>
+<check if="{{ @data.job=='id' }}">{{@LN__ACP_EditCategory}}</check>
 <form action="{{@BASE}}/adminCP/archive/categories/{{ @data['job'] }}={{ @data['id'] }}" method="post">
 	<div class="grid-wrapper">
 		<check if="{{ @data['errors'] }}"><div class="gb-90 alert-box error">{{ @data['errors'] }}</div></check>
@@ -9,7 +9,7 @@
 		<div class="gb-20">__A_CategoryName</div><div class="gb-80"><input type="text" size=80 name="form_data[category]" value="{{ @data['category'] }}" /></div>
 <!-- {*		<check if="{{ @data.parent_cid > 0 }}"><div class="gb-20">&nbsp;</div><div class="gb-80">__Category_MoveUp</div></check> *} -->
 		<check if="{{isset(@data.move)}}">
-		<div class="gb-20">Location:</div><div class="gb-80">
+		<div class="gb-20">__Location:</div><div class="gb-80">
 			<select name=form_data[parent_cid]>
 				<repeat group="{{@data.move}}"  value="{{ @move }}">
 					<option value="{{@move.cid}}" <check if="{{@move.cid == @data.parent_cid}}"> selected='selected'</check>> 
@@ -21,7 +21,7 @@
 			</select>
 		</div>
 		</check>
-		<div class="gb-20">Locked?</div><div class="gb-80"><input type="checkbox" name="form_data[locked]" value="locked" <check if="{{ @data['locked'] }}">checked="checked"</check> ></div>
+		<div class="gb-20">__Locked?</div><div class="gb-80"><input type="checkbox" name="form_data[locked]" value="locked" <check if="{{ @data['locked'] }}">checked="checked"</check> ></div>
 		<div class="gb-full">__A_CategoryDescription:<br /><textarea name="form_data[description]" rows="30" cols="80">{{ @data['description'] }}</textarea><br /></div>
 		<div class="gb-40" align="right"><input type="submit"></div><div class="gb-60"><input type="reset"></div>
 	</div>

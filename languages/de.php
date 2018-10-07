@@ -35,6 +35,8 @@ return array(
 'Author' 		=>	'Autor',
 'Privacy'		=> 	'Datenschutz',
 'total'			=>	'gesamt', //db
+//'MoveUp'		=> 'Move upwards', //db
+//'MoveDown'		=> 'Move downwards', //db
 
 // [2] Global -- Login related
 'Login'			=> 'Anmelden',
@@ -416,6 +418,7 @@ return array(
 		'AdminMenu_Team_Group6' => 'Super Moderator',
 		'AdminMenu_Team_Group7' => 'Administrator',
 
+// AdminCP Archive elements
 'AdminMenu_Archive' => 'Archive',
 	'AdminMenu_Intro' => 'Intro',
 'AdminMenu_Submission' => 'Einsendungen',
@@ -429,6 +432,8 @@ return array(
 	'AdminMenu_Tagcloud' => 'Tag-Cloud',
 'AdminMenu_Categories' => 'Kategorien',
 //'AdminMenu_Ratings' => 'Ratings',
+	'ACP_EditRating'	=> 'Rating bearbeiten',
+	'ACP_DeleteRating'	=> 'Rating löschen',
 'ACP_Categories_Success_Deleted' => 'Kategorien "{0}" wurde erfolgreich gelöscht!',
 'ACP_Categories_Error_notEmpty' => 'Kann Kategorien "{0}" nicht löschen, da sie nicht leer ist!',
 'ACP_Categories_Error_DBError' => 'Konnte Kategorien "{0}" wegen Datenbankfehler nicht löschen!',
@@ -440,6 +445,10 @@ return array(
 //'ACP_Biography'			=> 'Biography',
 //'ACP_Contest'			=> 'Contest',
 'ACP_Category'			=> 'Kategorie',
+'ACP_EditCategory'		=> 'Kategorie bearbeiten',
+'ACP_MainCategory'		=> 'Main category',
+'ACP_AddMainCategory'	=> 'Hauptkategorie hinzufügen',
+'ACP_AddSubCategory'	=> 'Unterkategorie zu \'{0}\' hinzufügen',
 // 'ACP_TagName'			=> 'Tag name',
 // 'ACP_TagLabel'			=> 'Tag label',
 // 'ACP_TagDescription'	=> 'Tag description',
@@ -450,6 +459,13 @@ return array(
 'ACP_NewTagGroup'		=> 'Neue Taggruppe hinzufügen',
 // 'ACP_TagGroups'			=> 'Tag groups',
 'ACP_NewRating'			=> 'Neues Rating hinzufügen',
+'ACP_RatingLabel'		=> 'Name des Ratings',
+'ACP_RatingAge'			=> 'Alter',
+'ACP_RatingWarning'		=> 'Warnung anzeigen',
+'ACP_RatingWarningText' => 'Warnhinweis',
+'ACP_RatingToDelete'	=> 'Rating, das gelöscht wird',
+'ACP_RatingCount'		=> 'Anzahl der Geschichten mit diesem Rating',
+'ACP_RatingMove'		=> 'Neues Rating für diese Geschichten',
 
 // Admin - Archive - Featured
 'AdminMenu_Featured' => 'Featured',

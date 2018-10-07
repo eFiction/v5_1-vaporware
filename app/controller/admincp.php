@@ -67,7 +67,7 @@ class AdminCP extends Base
 		$this->showMenu($this->moduleBase);
 		// add module title
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Archive') );
-		//$f3->set('title_h1', $f3->get('LN__AdminMenu_Archive') );
+		$f3->set('title_h1', $f3->get('LN__AdminMenu_Archive') );
 
 		switch( $this->moduleInit([ "submit", "featured", "contests", "characters", "tags", "categories", "ratings" ], @$params['module']) )
 		{
@@ -543,7 +543,7 @@ class AdminCP extends Base
 				$parent = $this->model->loadCategory($data['move'][0]['parent_cid']);
 				$data['move'] = array_merge([ [ "cid" => $parent['id'], "parent_cid" => $parent['parent_cid'], "leveldown" => $parent['leveldown']-1, "category" => $parent['category']." (one level up)" ] ], $data['move'] );
 			}
-			$data['move'] = array_merge([ [ "cid" => 0, "parent_cid" => 0, "leveldown" => -1, "category" => "__Category_MainCategory"] ], $data['move'] );
+			$data['move'] = array_merge([ [ "cid" => 0, "parent_cid" => 0, "leveldown" => -1, "category" => $f3->get('LN__ACP_MainCategory')] ], $data['move'] );
 			$data['stats'] = json_decode($data['stats'],TRUE);
 			$data['errors'] = @$errors;
 			$data['changes'] = @$changes;
@@ -609,8 +609,7 @@ class AdminCP extends Base
 		$this->showMenu($this->moduleBase);
 		// add module title
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Home') );
-
-//		$f3->set('title_h1', $f3->get('LN__AdminMenu_Home') );
+		$f3->set('title_h1', $f3->get('LN__AdminMenu_Home') );
 
 		switch( $this->moduleInit([ "manual", "custompages", "news", "modules", "logs", "shoutbox" ], @$params['module']) )
 		{

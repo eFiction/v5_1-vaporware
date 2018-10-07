@@ -82,7 +82,6 @@ class Story extends Base
 	
 	public function search ($terms, $return, $searchForm=FALSE)
 	{
-		print_r($terms);
 		if ( isset($terms['rating']) )
 		{
 			if ( $terms['rating'][0] == $terms['rating'][1] )
