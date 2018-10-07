@@ -1,0 +1,12 @@
+__EditRating
+<form action="{{@BASE}}/adminCP/archive/ratings/id={{ @data['rid'] }}" method="post">
+	<div class="grid-wrapper">
+		<check if="{{ isset(@errors) }}"><div class="gb-90 alert-box error">{{ @errors }}</div></check>
+		<check if="{{ isset(@changes) }}"><div class="gb-90 alert-box success">{{ @LN__Status_Changes, @changes | format }}</div></check>
+		<div class="gb-20">__A_CategoryName</div><div class="gb-80"><input type="text" size=80 name="form_data[rating]" value="{{ @data['rating'] }}" /></div>
+		<div class="gb-20">__A_RatingAge</div><div class="gb-80"><input type="text" size=5 name="form_data[rating_age]" value="{{ @data['rating_age'] }}" /></div>
+		<div class="gb-20">Warning?</div><div class="gb-80"><input type="checkbox" name="form_data[ratingwarning]" value="ratingwarning" <check if="{{ @data['ratingwarning'] }}">checked="checked"</check> ></div>
+		<div class="gb-full">__A_CategoryDescription:<br /><textarea name="form_data[warningtext]" rows="30" cols="80">{{ @data['warningtext'] }}</textarea><br /></div>
+		<div class="gb-40" align="right"><input type="submit"></div><div class="gb-60"><input type="reset"></div>
+	</div>
+</form>

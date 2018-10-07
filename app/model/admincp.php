@@ -80,6 +80,21 @@ class AdminCP extends Controlpanel {
 				}
 			}
 		}
+		elseif ( $key == "ratingsort" )
+		{
+			$chapters = new \DB\SQL\Mapper($this->db, $this->prefix.'ratings');
+			foreach ( $data["neworder"] as $order => $id )
+			{
+				echo $order."#".$id."*";
+				if ( is_numeric($order) && is_numeric($id) )
+				{
+					$chapters->load(array('rid = ?',$id));
+					$chapters->inorder = $order+1;
+					$chapters->save();
+				}
+			}
+			exit;
+		}
 
 		if ( isset($ajax_sql) ) return $this->exec($ajax_sql, $bind);
 		return NULL;
@@ -924,6 +939,87 @@ class AdminCP extends Controlpanel {
 		}
 		else return FALSE;
 	}
+	
+	public function ratingAdd($rating)
+	{
+		$ratings=new \DB\SQL\Mapper($this->db, $this->prefix.'ratings');
+		$ratings->load(null,['order'=>'inorder DESC']);
+		$inorder = $ratings->inorder + 1;
+		
+		$ratings->reset();
+		
+		$ratings->rating	= $rating;
+		$ratings->inorder	= $inorder;
+
+		$ratings->save();
+		return $ratings->_id;
+	}
+	
+	public function ratingList()
+	{
+		$sql = "SELECT R.rid, R.inorder, R.rating, R.rating_age, R.ratingwarning, COUNT(S.sid) as counter
+					FROM `tbl_ratings`R
+						LEFT JOIN `tbl_stories`S ON ( R.rid = S.ratingid )
+					GROUP BY R.rid
+					ORDER BY inorder ASC;";
+		$data = $this->exec($sql);
+		return $data;
+	}
+	
+	public function ratingLoad( $rid )
+	{
+		$sql = "SELECT R.rid, R.inorder, R.rating, R.rating_age, R.rating_image, R.ratingwarning, R.warningtext, COUNT(S.sid) as counter
+					FROM `tbl_ratings`R
+						LEFT JOIN `tbl_stories`S ON ( R.rid = S.ratingid )
+					WHERE R.rid = :rid
+					GROUP BY R.rid;";
+		$data = $this->exec($sql, [ ":rid" => $rid ]);
+		
+		if (sizeof($data)!=1) 
+			return NULL;
+
+		return $data[0];	
+	}
+	
+	public function ratingSave($rid, array $data)
+	{
+		$rating=new \DB\SQL\Mapper($this->db, $this->prefix.'ratings');
+		$rating->load(array('rid=?',$rid));
+		$rating->copyfrom( 
+			[
+				"rating" => $data['rating'],
+				"rating_age" => $data['rating_age'],
+				"ratingwarning" => (int)isset($data['ratingwarning']),
+				"warningtext" => $data['warningtext']
+			]
+		);
+
+		$i = $rating->changed("rating");
+		$i += $rating->changed("rating_age");
+		$i += $rating->changed("ratingwarning");
+		$i += $rating->changed("warningtext");
+		
+		$_SESSION['lastAction'] = [ "changes" => $i ];
+
+		$rating->save();
+		return TRUE;
+	}
+	
+	public function ratingDelete($oldID, $newID)
+	{
+		$this->exec
+		(
+			"UPDATE `tbl_stories` SET `ratingid` = :new WHERE `tbl_stories`.`ratingid` = :old;",
+			[ ":old" => $oldID, ":new" => $newID ]
+		);
+
+		$rating=new \DB\SQL\Mapper($this->db, $this->prefix.'ratings');
+		$moved = $rating->erase(array('rid=?',$oldID));
+		
+		$_SESSION['lastAction'] = [ "moved" => $moved ];
+		
+		return TRUE;
+	}
 
 //	public function listCustompages(int $page, array $sort)
 	public function listCustompages($page, array $sort)
@@ -1526,13 +1622,13 @@ class AdminCP extends Controlpanel {
 					//$this->update('tbl_log', ['action' => json_encode($item['action']), 'version'=>1], "id = {$item['id']}" );
 					//print_r($matches);
 					//print_r($item);
-					$this->logResaveDate($item);
+					$this->logResaveData($item);
 				}
 				elseif ( $item['type']=="ED" )
 				{
 					preg_match("/.+\?sid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>(.*?)<\/.+/m", $item['action'], $matches);
 					$item['action'] = [ 'sid' => $matches[1], 'title' => $matches[2], 'aid' => $matches[3], 'author' => $matches[4] ];
-					$this->logResaveDate($item);
+					$this->logResaveData($item);
 				}
 				
 			}
@@ -1561,7 +1657,7 @@ class AdminCP extends Controlpanel {
 		return $data;
 	}
 	
-	protected function logResaveDate($item)
+	protected function logResaveData($item)
 	{
 		$this->update(
 				'tbl_log',
@@ -1651,6 +1747,20 @@ class AdminCP extends Controlpanel {
 			];
 			
 		return $this->saveKeys($post);
+	}
+	
+	public function deleteOrphanRelations()
+	{
+		// remove orphaned story-author relations
+		$sql = "DELETE FROM `tbl_stories_authors`
+					WHERE NOT EXISTS (SELECT * FROM `tbl_stories` WHERE `tbl_stories_authors`.`sid` = `tbl_stories`.`sid`);";
+		// remove orphaned story-category relations
+		$sql = "DELETE FROM `tbl_stories_categories`
+					WHERE NOT EXISTS (SELECT * FROM `tbl_stories` WHERE `tbl_stories_categories`.`sid` = `tbl_stories`.`sid`);";
+		// remove orphaned story-tag relations
+		$sql = "DELETE FROM `tbl_stories_tags`
+					WHERE NOT EXISTS (SELECT * FROM `tbl_stories` WHERE `tbl_stories_tags`.`sid` = `tbl_stories`.`sid`);";
+		
 	}
 
 }

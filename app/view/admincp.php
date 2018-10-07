@@ -75,6 +75,38 @@ class AdminCP extends Base
 		return \Template::instance()->render('archive/edit_tag_group.html');
 	}
 	
+	public function ratingEdit(array $data)
+	{
+		if( isset($_SESSION['lastAction']) )
+		{
+			$this->f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
+			unset($_SESSION['lastAction']);
+		}
+
+		$this->f3->set('data', $data);
+		return $this->render('archive/rating_edit.html');
+	}
+	
+	public function ratingDelete(array $data, array $ratings)
+	{
+		$this->f3->set('data', 		$data);
+		$this->f3->set('ratings', 	$ratings);
+
+		return $this->render('archive/rating_delete.html');
+	}
+	
+	public function ratingList(array $data)
+	{
+		if( isset($_SESSION['lastAction']) )
+		{
+			$this->f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
+			unset($_SESSION['lastAction']);
+		}
+
+		$this->f3->set('ratingList', $data);
+		return $this->render('archive/rating_list.html');
+	}
+	
 	public function listCharacters(array $data, array $sort)
 	{
 		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );

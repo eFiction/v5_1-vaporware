@@ -82,23 +82,32 @@ class Story extends Base
 	
 	public function search ($terms, $return, $searchForm=FALSE)
 	{
-		if ( $terms['rating'][0] == $terms['rating'][1] )
+		print_r($terms);
+		if ( isset($terms['rating']) )
 		{
-			$where[] = "AND Ra.rid = :rating";
-			$bind = [ ":rating" => $terms['rating'][0] ];
+			if ( $terms['rating'][0] == $terms['rating'][1] )
+			{
+				$where[] = "AND Ra.rid = :rating";
+				$bind = [ ":rating" => $terms['rating'][0] ];
+			}
+			else
+			{
+				$where[] = "AND Ra.rid >= :ratingMin";
+				$where[] = "AND Ra.rid <= :ratingMax";
+				$bind = [ ":ratingMin" => $terms['rating'][0], ":ratingMax" => $terms['rating'][1] ];
+			}
 		}
 		else
 		{
-			$where[] = "AND Ra.rid >= :ratingMin";
-			$where[] = "AND Ra.rid <= :ratingMax";
-			$bind = [ ":ratingMin" => $terms['rating'][0], ":ratingMax" => $terms['rating'][1] ];
+			$where[] = "";
+			$bind	 = [];
 		}
 
 		if ( isset($terms['chapters']) )
 		{
-			if ( $terms['chapters'] == "multichapters" )
+			if ( $terms['chapters'] == "multi" )
 				$where[] = "AND S.chapters > 1";
-			elseif ( $terms['chapters'] == "oneshot" )
+			elseif ( $terms['chapters'] == "single" )
 				$where[] = "AND S.chapters = 1";
 
 		}
@@ -326,7 +335,7 @@ class Story extends Base
 				LEFT JOIN `tbl_stories_authors`rSAE ON ( S.sid = rSAE.sid )
 					LEFT JOIN `tbl_users`Edit ON ( ( rSAE.aid = Edit.uid ) AND ( ( Edit.uid = ".(int)$_SESSION['userID']." ) OR ( Edit.curator = ".(int)$_SESSION['userID']." ) ) )
 				LEFT JOIN `tbl_user_favourites`Fav ON ( Fav.item = S.sid AND Fav. TYPE = 'ST' AND Fav.uid = ".(int)$_SESSION['userID'].")
-			WHERE S.completed @COMPLETED@ 2 AND S.validated >= 30 @WHERE@
+			WHERE S.completed @COMPLETED@ 6 AND S.validated >= 30 @WHERE@
 			GROUP BY S.sid
 			@ORDER@
 			@LIMIT@";
@@ -667,20 +676,27 @@ class Story extends Base
 	public function getTOC($story)
 	{
 		return $this->exec( "SELECT UNIX_TIMESTAMP(T.last_read) as tracker_last_read, T.last_chapter, IF(T.last_chapter=Ch.inorder,1,0) as last,
-		Ch.title, Ch.notes, Ch.wordcount, Ch.inorder as chapter,
-		COUNT(DISTINCT F.fid) as reviews
-		FROM `tbl_chapters`Ch 
-		INNER JOIN `tbl_stories`S ON ( S.sid = Ch.sid )
-		LEFT JOIN `tbl_tracker`T ON ( T.sid = Ch.sid AND T.uid = :user )
-		LEFT JOIN `tbl_feedback`F ON ( F.reference_sub = Ch.chapid AND F.type='ST' ) 
-		WHERE Ch.sid = :story GROUP BY Ch.inorder ORDER BY Ch.inorder ASC", [ ":story" => $story, ":user" => \Base::instance()->get('SESSION.userID') ]);
+								Ch.title, Ch.notes, Ch.wordcount, Ch.inorder as chapter,
+								COUNT(DISTINCT F.fid) as reviews
+							FROM `tbl_chapters`Ch 
+								INNER JOIN `tbl_stories`S ON ( S.sid = Ch.sid )
+								LEFT JOIN `tbl_tracker`T ON ( T.sid = Ch.sid AND T.uid = :user )
+								LEFT JOIN `tbl_feedback`F ON ( F.reference_sub = Ch.chapid AND F.type='ST' ) 
+							WHERE Ch.sid = :story AND Ch.validated >= 30 
+							GROUP BY Ch.inorder 
+							ORDER BY Ch.inorder ASC", 
+							[ ":story" => $story, ":user" => \Base::instance()->get('SESSION.userID') ]
+						);
 	}
 
 	public function getMiniTOC($story)
 	{
-		return $this->exec( "SELECT Ch.title, Ch.inorder as chapter
-		FROM `tbl_chapters`Ch 
-		WHERE Ch.sid = :story ORDER BY Ch.inorder ASC", [ ":story" => $story ]);
+		return $this->exec( "SELECT Ch.title, Ch.inorder as chapter, Ch.chapid
+								FROM `tbl_chapters`Ch 
+								WHERE Ch.sid = :story AND Ch.validated >= 30 
+								ORDER BY Ch.inorder ASC;",
+							[ ":story" => $story ]
+						);
 	}
 
 	public function blockStats()
@@ -689,12 +705,16 @@ class Story extends Base
 		$statSQL = [
 			"SET @users = (SELECT COUNT(*) FROM `tbl_users`U WHERE U.groups > 0);",
 			// more precise stats, only counting authors with actual stories
-			"SET @authors = ( SELECT COUNT(DISTINCT rSA.aid) FROM `tbl_stories_authors`rSA INNER JOIN `tbl_stories`S ON ( S.sid = rSA.sid AND S.validated >= 20 AND S.completed >= 2 ) );",
+			"SET @authors = ( SELECT COUNT(DISTINCT rSA.aid) FROM `tbl_stories_authors`rSA INNER JOIN `tbl_stories`S ON ( S.sid = rSA.sid AND S.validated >= 20 AND S.completed >= 6 ) );",
 			//"SET @authors = (SELECT COUNT(*) FROM `tbl_users`U WHERE ( U.groups & 4 ) );",
 			"SET @reviews = (SELECT COUNT(*) FROM `tbl_feedback`F WHERE F.type='ST');",
 			"SET @stories = (SELECT COUNT(DISTINCT sid) FROM `tbl_stories`S WHERE S.validated >= 30 );",
-			"SET @chapters = (SELECT COUNT(DISTINCT chapid) FROM `tbl_chapters`C INNER JOIN `tbl_stories`S ON ( C.sid=S.sid AND S.validated >= 30 AND C.validated >= 20 ) );",
-			"SET @words = (SELECT SUM(C.wordcount) FROM `tbl_chapters`C INNER JOIN `tbl_stories`S ON ( C.sid=S.sid AND S.validated >= 30 AND C.validated >= 20 ) );",
+			//"SET @chapters = (SELECT COUNT(DISTINCT chapid) FROM `tbl_chapters`C INNER JOIN `tbl_stories`S ON ( C.sid=S.sid AND S.validated >= 30 AND C.validated >= 20 ) );",
+			// Count chapters from validated stories that are at least w.i.p.
+			"SET @chapters = (SELECT SUM(S.chapters) FROM `tbl_stories`S WHERE S.validated >= 30 AND S.completed >= 6 );",
+			//"SET @words = (SELECT SUM(C.wordcount) FROM `tbl_chapters`C INNER JOIN `tbl_stories`S ON ( C.sid=S.sid AND S.validated >= 30 AND C.validated >= 30 ) );",
+			// Count words from validated stories that are at least w.i.p.
+			"SET @words = (SELECT SUM(S.wordcount) FROM `tbl_stories`S WHERE S.validated >= 30 AND S.completed >= 6 );",
 			"SET @newmember = (SELECT CONCAT_WS(',', U.uid, U.nickname) FROM `tbl_users`U WHERE U.groups>0 ORDER BY U.registered DESC LIMIT 1);",
 			"SELECT @users as users, @authors as authors, @reviews as reviews, @stories as stories, @chapters as chapters, @words as words, @newmember as newmember;",
 		];
@@ -721,7 +741,7 @@ class Story extends Base
 	public function blockRandomStory($items=1)
 	{
 		return $this->exec('SELECT S.title, S.sid, S.summary, S.cache_authors, S.cache_rating, S.cache_categories, S.cache_tags
-				FROM `tbl_stories`S WHERE S.validated >= 30
+				FROM `tbl_stories`S WHERE S.validated >= 30 AND S.completed >= 6
 			ORDER BY RAND() 
 			LIMIT '.(int)$items);
 	}

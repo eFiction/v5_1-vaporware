@@ -199,19 +199,16 @@ class Controlpanel extends Base {
 			}
 		}
 		
-		$chapterID = $this->exec("INSERT INTO `tbl_chapters` 
-			(`sid`, `title`, `inorder`, `created`, `validated`) 
-			VALUES 
-			(
-				:sid,
-				'".\Base::instance()->get('LN__Chapter')." #{$chapterCount}',
-				'{$chapterCount}',
-				CURRENT_TIMESTAMP,
-				'{$validated}'
-			);",
-			[ ":sid" => $storyID ]
-		);
+		$newChapter = new \DB\SQL\Mapper($this->db, $this->prefix."chapters");
+		$newChapter->sid		= $storyID;
+		$newChapter->title		= \Base::instance()->get('LN__Chapter')." #{$chapterCount}";
+		$newChapter->inorder	= $chapterCount;
+		$newChapter->validated	= $validated;
+		$newChapter->created	= 'CURRENT_TIMESTAMP';
+		$newChapter->save();
 		
+		$chapterID = $newChapter->_id;
+
 		// if using local storage, create a chapter entry in SQLite
 		if ( "local" == $this->config['chapter_data_location'] )
 		{
@@ -264,7 +261,7 @@ class Controlpanel extends Base {
 		if ( $this->config['chapter_data_location'] == "local" )
 		{
 			$db = \storage::instance()->localChapterDB();
-			$chapterSave= @$db->exec('UPDATE "chapters" SET "chaptertext" = :chaptertext WHERE "chapid" = :chapid', array(':chapid' => $chapterID, ':chaptertext' => $chapterText ));
+			$chapterSave= $db->exec('UPDATE "chapters" SET "chaptertext" = :chaptertext WHERE "chapid" = :chapid', array(':chapid' => $chapterID, ':chaptertext' => $chapterText ));
 		}
 		else
 		{
@@ -335,6 +332,20 @@ class Controlpanel extends Base {
 		);
 	}
 	
+	public function rebuildStoryWordcount($sid)
+	{
+		$this->exec("UPDATE `tbl_stories`S
+						INNER JOIN
+						(
+							SELECT sid, SUM(wordcount)'wordcount' FROM `tbl_chapters`
+							WHERE sid = :sid AND validated >= 30
+							GROUP BY sid
+						) Ch ON ( S.sid = Ch.sid  )
+					SET S.wordcount = Ch.wordcount;",
+					[ ":sid" => $sid ]
+					);
+	}
+
 	public function rebuildSeriesCache($seriesID)
 	{
 		$sql = "SELECT 

@@ -1,5 +1,5 @@
 {
-    "5b9966d5f3a692.42688725": {
+    "5bb8f46d54e123.95308067": {
         "_name": "Font Awesome CSS Icons",
         "_data": {
             "alert": "<span class=\"fas fa-exclamation-triangle\"@T@><\/span>",
@@ -62,6 +62,7 @@
             "plus": "<span class=\"fas fa-plus-square\"@T@><\/span>",
             "print": "<span class=\"fas fa-print\"@T@><\/span>",
             "profile": "<span class=\"fas fa-user-cog\"@T@><\/span>",
+            "rating": "<span class=\"fas fa-registered\"@T@><\/span>",
             "reader": "<span class=\"fas fa-book-reader\"@T@><\/span>",
             "recommendation-off": "<span class=\"far fa-star\"@T@><\/span>",
             "register": "<span class=\"fas fa-sign-in-alt\"@T@><\/span>",

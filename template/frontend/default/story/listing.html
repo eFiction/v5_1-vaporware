@@ -1,7 +1,6 @@
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="story/paginate.html" /></F3:check>
 <repeat group="{{ @stories }}" value="{{ @story }}" counter="{{ @ctr }}">
 	<div class="story-box">
-	<!-- {RATING_IMG} -->
 	<h5><check if="{{ isset(@story.inorder) }}">{{@item.inorder}}&nbsp;</check><a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a> {{@LN__by}} <repeat group="{{@story.cache_authors}}" value="{{@author}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check><a href="{{@BASE}}/members/uid={{@author.0}}">{{@author.1}}</a></repeat></h5>
 	<div class="story-info1">
 		&nbsp;
@@ -26,7 +25,9 @@
 			<a href="{{@BASE}}/story/reviews/{{@story.sid}}" title="{{@LN__TitleReadReviews, @story.title | format}}">{ICON:comments} {{@story.reviews}}</a>
 		</check>
 	</div>
-	<div class="story-info2">{ICON:folder} <repeat group="{{@story.cache_categories}}" value="{{@category}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check>{{@category.1}}</repeat></div>
+	<check if="{{!empty(@storyData.cache_categories)}}">
+		<div class="story-info2">{ICON:folder} <repeat group="{{@story.cache_categories}}" value="{{@category}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check>{{@category.1}}</repeat></div>
+	</check>
 	<div class="story-info2">{{@story.summary |raw}}</div>
 	<div class="story-info2">{ICON:tags}
 		<check if="{{isset(@story.cache_tags.simple.0)}}">
@@ -34,7 +35,7 @@
 			<false>{{@LN__NoTags}}</false>
 		</check>
 	</div>
-	<div class="story-info3"><small>{{@LN__Published}}: {{@story.published}} &bull; <check if="{{@story.modified}}">{{@LN__Updated}}: {{@story.modified}} &bull; </check>{{@LN__Chapters}}: {{@story.chapters}} &bull; {{@LN__Words}}: {{@story.wordcount}} &bull; {{@LN__Status}}: {{@story.completed==0 ? @LN__WIP : @LN__Completed }} &bull; {{@LN__Rating}}: {{@story.rating_name}} &bull; {{@LN__Clicks}}: {{@story.count}} &bull; {ICON:report}</small></div>
+	<div class="story-info3"><small>{{@LN__Published}}: {{@story.published}} &bull; <check if="{{@story.modified}}">{{@LN__Updated}}: {{@story.modified}} &bull; </check>{{@LN__Chapters}}: {{@story.chapters}} &bull; {{@LN__Words}}: {{@story.wordcount}} &bull; {{@LN__Status}}: {{@story.completed==9 ? @LN__Completed : @LN__WIP}} &bull; <check if="{{!empty(@story.rating_name)}}">{{@LN__Rating}}: {{@story.rating_name}} &bull; </check>{{@LN__Clicks}}: {{@story.count}}</small></div>
 	</div>
 </repeat>
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="story/paginate.html" /></F3:check>

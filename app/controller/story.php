@@ -21,7 +21,7 @@ class Story extends Base
 		switch(@$params['action'])
 		{
 			case 'read':
-				$data = $this->read($params['*']);
+				$data = $this->read($params);
 				break;
 			case 'reviews':
 				$data = $this->reviews($params['*']);
@@ -477,18 +477,19 @@ class Story extends Base
 		$searchData = array_filter(array_merge($get, $searchData));
 
 		// get the available ratings
-		$ratings = $this->model->ratings();
-		$f3->set('searchRatings', $ratings);
-		$ratingMaxID = end($ratings)['rid'];
-		// Add personal search preferences at some point
-		$searchData['rating'][0] = min( (@$searchData['rating'][0] ?: 0), $ratingMaxID);
+		if ( [] !== $ratings = $this->model->ratings() )
+		{
+			$f3->set('searchRatings', $ratings);
+			$ratingMaxID = end($ratings)['rid'];
+			// Add personal search preferences at some point
+			$searchData['rating'][0] = min( (@$searchData['rating'][0] ?: 0), $ratingMaxID);
 
-		// Add personal search preferences at some point
-		$searchData['rating'][1] = min (
-									max ( (@$searchData['rating'][1] ?: end($ratings)['rid']), $searchData['rating'][0] ),
-									$ratingMaxID
-									);
-		
+			// Add personal search preferences at some point
+			$searchData['rating'][1] = min (
+										max ( (@$searchData['rating'][1] ?: end($ratings)['rid']), $searchData['rating'][0] ),
+										$ratingMaxID
+										);
+		}
 		$this->template->addTitle($f3->get('LN__Search'));
 		
 		// Author
@@ -558,9 +559,15 @@ class Story extends Base
 
 	protected function read($id)
 	{
-		@list($story, $view, $selected) = explode(",",$id);
-
-		if($storyData = $this->model->getStory($story,empty($view)?1:$view))
+		@list($story, $view, $selected) = explode(",",$id['*']);
+		
+		// do away with malformed requests right here
+		if ( $story == "" OR !is_numeric($story) )
+		{
+			\Base::instance()->reroute("/story", false);
+			exit;			
+		}
+		elseif($storyData = $this->model->getStory($story,empty($view)?1:$view))
 		{
 			if ( empty($view) AND $storyData['chapters']>1 )
 				$view = (TRUE===\Config::getPublic('story_toc_default')) ? "toc" : 1;

@@ -69,7 +69,7 @@ class AdminCP extends Base
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Archive') );
 		//$f3->set('title_h1', $f3->get('LN__AdminMenu_Archive') );
 
-		switch( $this->moduleInit([ "submit", "featured", "contests", "characters", "tags", "categories" ], @$params['module']) )
+		switch( $this->moduleInit([ "submit", "featured", "contests", "characters", "tags", "categories", "ratings" ], @$params['module']) )
 		{
 			case "home":
 				$this->archiveHome($f3);
@@ -91,6 +91,9 @@ class AdminCP extends Base
 				break;
 			case "categories":
 				$this->archiveCategories($f3, $params);
+				break;
+			case "ratings":
+				$this->archiveRatings($f3, $params);
 				break;
 			default:
 				$this->buffer(\Template::instance()->render('access.html'));
@@ -114,6 +117,11 @@ class AdminCP extends Base
 		{
 			$data = $this->model->ajax("storySearch", $post);
 		}
+		elseif ( $params['module']=="ratingsort" )
+		{
+			$data = $this->model->ajax("ratingsort", $post);
+		}
+
 		echo json_encode($data);
 		exit;
 	}
@@ -548,6 +556,49 @@ class AdminCP extends Base
 		$feedback['changes'] = @$changes;
 
 		$this->buffer ( \View\AdminCP::listCategories($data, $feedback) );
+	}
+
+	protected function archiveRatings(\Base $f3, $params)
+	{
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		
+		$this->response->addTitle( $f3->get('LN__AdminMenu_Ratings') );
+		$f3->set('title_h3', $f3->get('LN__AdminMenu_Ratings') );
+		
+		if ( isset($params['delete']) )
+		{
+			$data = $this->model->ratingLoad($params['delete']);
+			$allRatings = $this->model->ratingList();
+			$this->buffer( $this->template->ratingDelete($data, $allRatings) );
+			return TRUE;
+		}
+		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
+		{
+			if ( isset($_POST['form_data']) )
+			{
+				$changes = $this->model->ratingSave($params['id'], $f3->get('POST.form_data') );
+			}
+			elseif ( isset($_POST['newRating']) )
+			{
+				$newID = $this->model->ratingAdd( $f3->get('POST.newRating') );
+				$f3->reroute('/adminCP/archive/ratings/id='.$newID, false);
+			}
+			elseif ( isset($_POST['moveTo']) )
+			{
+				$this->model->ratingDelete( $params['id'], $f3->get('POST.moveTo') );
+				$f3->reroute('/adminCP/archive/ratings', false);
+			}
+		}
+		
+		if( isset ($params['id']) )
+		{
+			$data = $this->model->ratingLoad($params['id']);
+			$this->buffer( $this->template->ratingEdit($data) );
+			return TRUE;
+		}
+
+		$data = $this->model->ratingList();
+		$this->buffer ( $this->template->ratingList($data) );
 	}
 
 	public function __home(\Base $f3, $params)

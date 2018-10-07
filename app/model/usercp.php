@@ -38,14 +38,38 @@ class UserCP extends Controlpanel
 				if ( isset($data['uid']) AND isset($authors["AUTHORS"][$data['uid']]) )
 				{
 					// create an empty array with zero-count to start with
-					$status = [ 'id' => $data['uid'], 0 => 0, 1 => 0, 2 => 0, 3 => 0 ];
+					$status = [ 'id' => $data['uid'], 0 => 0, 1 => 0, 6 => 0, 9 => 0 ];
 
 					// get story count by completion status
 					$authorData = $this->exec("SELECT S.completed, COUNT(DISTINCT S.sid) as count 
 													FROM `tbl_stories`S
 														INNER JOIN `tbl_stories_authors`SA ON (S.sid = SA.sid AND SA.aid = :aid AND SA.type='M') 
 													GROUP BY S.completed", [ ":aid" => $data['uid'] ]);
-					foreach ( $authorData as $aD ) $status[$aD["completed"]] = $aD["count"];
+					foreach ( $authorData as $aD )
+					{
+						switch ( $aD["completed"] )
+						{
+							case 0:
+								$status[0] += $aD["count"];
+								break;
+							case 1:
+								$status[1] += $aD["count"];
+								break;
+							case 2:
+							case 3:
+							case 4:
+							case 5:
+								$status[6] += $aD["count"];
+								break;
+							case 6:
+								$status[6] += $aD["count"];
+								break;
+							case 9:
+								$status[9] += $aD["count"];
+								break;
+						}
+						//$status[$aD["completed"]] = $aD["count"];
+					}
 
 					// get second sub menu segment and place under selected author
 					$sub2 = $this->panelMenu('author_sub', $status);
@@ -229,11 +253,8 @@ class UserCP extends Controlpanel
 		// must occur after the story-author relation to satisfy the check
 		if ( FALSE === $this->storyChapterAdd($newID, $data['uid'], $newStory->date) )
 		{
-			// **debug**
-			echo "Chapterfail";
-			exit;
+
 		}
-		
 		
 		$this->rebuildStoryCache($newID);
 
@@ -245,10 +266,11 @@ class UserCP extends Controlpanel
 		
 		$data = $this->exec
 		(
-			"SELECT S.*, COUNT(DISTINCT Ch.chapid) as chapters
+			"SELECT S.*, COUNT(DISTINCT Ch.chapid) as chapters, COUNT(DISTINCT Ch2.chapid) as validchapters
 				FROM `tbl_stories`S
 					INNER JOIN `tbl_stories_authors`A ON ( S.sid = A.sid AND A.type='M' AND A.aid = :aid )
 					LEFT JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid)
+					LEFT JOIN `tbl_chapters`Ch2 ON ( S.sid = Ch2.sid AND Ch2.validated >= 30)
 				WHERE S.sid = :sid",
 			[":sid" => $sid, ":aid" => $uid ]
 		);
@@ -316,21 +338,21 @@ class UserCP extends Controlpanel
 						LEFT JOIN `tbl_stories_authors`A ON ( S.sid = A.sid AND A.type='M' )
 							INNER JOIN `tbl_users`U ON ( A.aid = U.uid AND ( U.uid = {$_SESSION['userID']} OR U.curator = {$_SESSION['userID']} ) )
 						LEFT JOIN `tbl_chapters`Ch ON ( Ch.sid = S.sid )
-					WHERE A.aid=:aid AND S.completed = ";
+					WHERE A.aid=:aid AND ";
 
 		switch ($select)
 		{
 			case "finished":
-				$sql .= "'3'";
+				$sql .= "S.completed = 9";
 				break;
 			case "unfinished":
-				$sql .= "'2'";
+				$sql .= "S.completed >= 2 AND Scompleted <= 6";
 				break;
 			case "drafts":
-				$sql .= "'1'";
+				$sql .= "S.completed = 1";
 				break;
 			case "deleted":
-				$sql .= "'0'";
+				$sql .= "S.completed = 0";
 				break;
 			default:
 				return FALSE;
@@ -371,7 +393,15 @@ class UserCP extends Controlpanel
 
 		// Allow trusted authors to set validation
 		if ( isset($post['mark_validated']) AND $_SESSION['groups']&8 AND $story->validated < 20 )
+		{
+			$chapterCheck=new \DB\SQL\Mapper($this->db, $this->prefix.'stories');
+			$chapterCheck->load(array('sid=? AND validated >= 29',$storyID));
+			if ( $chapterCheck->dry() )
+				exit;
+			else echo $chapterCheck->chapid;
+			exit;
 			$story->validated 	= 	$story->validated + 20;
+		}
 
 		$story->save();
 		
@@ -405,20 +435,28 @@ class UserCP extends Controlpanel
 
 	public function authorStoryChapterSave( $chapterID, array $post )
 	{
+		// plain and visual return different newline representations, this will bring things to standard.
+		$chaptertext = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $post['chapter_text']);
+
 		$chapter=new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
 		$chapter->load(array('chapid=?',$chapterID));
 		
-		$chapter->title = $post['chapter_title'];
-		$chapter->notes = $post['chapter_notes'];
-
+		$chapter->title 	= $post['chapter_title'];
+		$chapter->notes 	= $post['chapter_notes'];
+		$chapter->wordcount	= max(count(preg_split("/\p{L}[\p{L}\p{Mn}\p{Pd}'\x{2019}]{0,}/u",$chaptertext))-1, 0);
+		
 		// Toggle validation request, keeping the reason part untouched
 		if ( isset($post['request_validation']) AND $chapter->validated < 20 )
+		{
 			$chapter->validated 	= 	$chapter->validated + 10;
+			// Insert time of creation (internal data)
+			$chapter->created		=	date('Y-m-d H:i:s');
+		}
 		elseif ( empty($post['request_validation']) AND $chapter->validated >= 20 AND $chapter->validated < 30 )
 			$chapter->validated 	= 	$chapter->validated - 10;
 			
 		// Allow trusted authors to set validation
-		if ( isset($post['mark_validated']) AND $_SESSION['groups']&8 AND $chapter->validated < 20 )
+		if ( isset($post['mark_validated']) AND $_SESSION['groups']&8 AND $chapter->validated < 20 AND $chapter->wordcount > 0 )
 		{
 			$chapter->validated 	= 	$chapter->validated + 20;
 			$chapter->created		=	date('Y-m-d H:i:s');
@@ -434,12 +472,12 @@ class UserCP extends Controlpanel
 						);
 		}
 
+		// save chapter information
 		$chapter->save();
-		
-		// plain and visual return different newline representations, this will bring things to standard.
-		$post['chapter_text'] = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $post['chapter_text']);
-		
-		parent::saveChapter($chapterID, $post['chapter_text']);
+		// save the chapter text
+		parent::saveChapter($chapterID, $chaptertext);
+		// recount words for entire story
+		$this->rebuildStoryWordcount($chapter->sid);
 	}
 
 	public function authorCuratorRemove($uid=NULL)

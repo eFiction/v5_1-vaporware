@@ -11,7 +11,10 @@
 <a href="{{@BASE}}{{@data.form.returnpath}}">{ICON:arrow-left} {{@LN__ReturnToOverview}}</a>
 <check if="{{@_SESSION.groups&8}}">
 	<true>
-		<check if="{{@data.validated.0<3}}"><div class="alert-box info">{{@LN__UCP_NotFinishedS}}</div></check>
+		<check if="{{@data.validated.0<3}}">
+			<div class="alert-box info">{{@LN__UCP_NotFinishedS}}</div>
+			<check if="{{@data.validchapters==0}}"><div class="alert-box warning">{{@LN__UCP_CannotValidateNoChapter}}</div></check>
+		</check>
 	</true>
 	<false>
 		<check if="{{@data.validated.0==1}}"><div class="alert-box warning">{{@LN__UCP_NotValidatedS}}</div></check>
@@ -48,7 +51,7 @@
 <check if="{{@data.validated.0<3}}">
 	<check if="{{@_SESSION.groups&8}}">
 		<true>
-					<input type="checkbox" name="form[mark_validated]" />{{@LN__UCP_FinishStory}}
+					<check if="{{@data.validchapters>0}}"><input type="checkbox" name="form[mark_validated]" />{{@LN__UCP_FinishStory}}</check>
 		</true>
 		<false>					
 					<input type="checkbox" name="form[request_validation]" <check if="{{@data.validated.0==2}}">checked="checked" </check>/>{{@LN__UCP_RequestValidation}}
@@ -63,9 +66,10 @@
 				<div class="gb-1thrd">
 					<h6>{{@LN__UCP_statusCompleted}}: <strong>{{ ${"LN__UCP_statusCompleted_".@data.completed} }}</strong></h6>
 					{{@LN__ChangeTo}}:<select id="completed" name="form[completed]">
-						<loop from="{{ @i=0 }}" to="{{ @i < 4 }}" step="{{ @i++ }}">
+						<loop from="{{ @i=0 }}" to="{{ @i <= 6 }}" step="{{ @i++ }}">
 							<option value="{{ @i }}"<check if="{{@i==@data.completed}}"> selected="selected"</check>>{{ ${"LN__UCP_statusCompleted_".@i} }}</option>
 						</loop>
+						<option value="9"<check if="{{9==@data.completed}}"> selected="selected"</check>>{{ @LN__UCP_statusCompleted_9 }}</option>
 					</select>
 				</div>
 {*		<!-- end: story status fields -->	*}

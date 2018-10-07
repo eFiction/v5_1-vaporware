@@ -1,0 +1,41 @@
+<form method="post" action="{{@BASE}}/adminCP/archive/ratings">
+	<div class="grid-wrapper">
+		<div class="gb-30"><input class="text-input" type="text" name="newRating"></div>
+		<div class="gb-70"><input class="button" type="submit" value="{{@LN__ACP_NewRating}}"></div>
+	</div>
+</form>
+
+<check if="{{ isset(@moved) }}"><div class="gb-90 alert-box success">{{ @LN__Status_Changes, @moved | format }}</div></check>
+
+<check if="{{ sizeof(@ratingList) }}">
+		<ol id="rating-sort">
+		<repeat group="{{ @ratingList }}" value="{{ @row }}"">
+			<li id="{{ @row.rid }}">
+			<div class="grid-wrapper">
+				<div class="gb-10">{ICON:arrow-vert} {{ @row.inorder }}: <a href="{{@BASE}}/adminCP/archive/ratings/id={{@row.rid}}">{ICON:edit}</a>&nbsp;<a href="{{@BASE}}/adminCP/archive/ratings/delete={{@row.rid}}">{ICON:trash}</a></div>
+				<div class="gb-10">{{ @row.rating }}</div>
+				<div class="gb-10">({{ @row.counter }})</div>
+				<div class="gb-70"><check if="{{@row.ratingwarning == 1}}">{ICON:alert}</check>&nbsp;</div>
+			</div>
+			</li>
+		</repeat>
+		</ol>
+</check>
+
+<script type="text/javascript">
+$(function () {
+	$("#rating-sort").sortable({
+		cursor: "move",
+		placeholder: "ui-state-highlight",
+		update: function () {
+			var neworder = $('#rating-sort').sortable('toArray');
+			$.ajax({
+				type: "post",
+				url: "{{@BASE}}/adminCP/ajax/archive/ratingsort",
+				data: { neworder: neworder },
+				dataType: "html"
+			});
+		}
+	});
+});
+</script>

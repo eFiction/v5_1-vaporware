@@ -243,8 +243,12 @@ class Base extends \Prefab {
 		[
 			0 => "deleted",
 			1 => "draft",
-			2 => "wip",
-			3 => "completed",
+			2 => "abandoned",
+			3 => "adoption"
+			4 => "paused",
+			5 => "help",
+			6 => "wip",
+			9 => "completed",
 		];
 		
 		$state['validated'] =
@@ -261,11 +265,11 @@ class Base extends \Prefab {
 			1 => "user",
 			2 => "moderator",
 			3 => "admin",
-			4 => "forcedRework",
-			5 => "minorWorking",
-			6 => "majorWorking",
-			7 => "minorDone",
-			8 => "majorDone",
+			**4 => "forcedRework",
+			**5 => "minorWorking",
+			**6 => "majorWorking",
+			**7 => "minorDone",
+			**8 => "majorDone",
 			9 => "lockedOrphaned",
 		];
 		return $state;
@@ -283,7 +287,7 @@ class Base extends \Prefab {
 		if ( $this->config['chapter_data_location'] == "local" )
 		{
 			$db = \storage::instance()->localChapterDB();
-			$chapterLoad= @$db->exec('SELECT "chaptertext" FROM "chapters" WHERE "sid" = :sid AND "inorder" = :inorder', array(':sid' => $story, ':inorder' => $chapter ))[0];
+			@$chapterLoad= $db->exec('SELECT "chaptertext" FROM "chapters" WHERE "sid" = :sid AND "inorder" = :inorder', array(':sid' => $story, ':inorder' => $chapter ))[0];
 		}
 		else
 		{
@@ -291,7 +295,7 @@ class Base extends \Prefab {
 		}
 		if ( isset($chapterLoad['chaptertext']) ) $chapterText = $chapterLoad['chaptertext'];
 		else return FALSE;
-		
+
 		if ( $counting AND \Base::instance()->get('SESSION')['userID'] > 0 )
 		{
 			$sql_tracker = "INSERT INTO `tbl_tracker` (sid,uid,last_chapter) VALUES (".(int)$story.", ".\Base::instance()->get('SESSION')['userID'].",".(int)$chapter.") 

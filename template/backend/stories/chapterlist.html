@@ -24,7 +24,6 @@ $(function () {
 			$.ajax({
 				type: "post",
 				url: "{{@BASE}}/adminCP/ajax/stories/chaptersort",
-				//data: { chaptersort: {{@data.sid}}, neworder: neworder },
 				data: { story: {{@data.sid}}, neworder: neworder },
 				dataType: "html"
 			});
