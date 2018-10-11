@@ -36,7 +36,7 @@
 						<false>desc">{ICON:sort-alpha-asc}</false>
 					</check>
 				</false>
-			</check></a> __Author
+			</check></a> {{@LN__Author}}
 		</th>
 		<th><a href="{{@BASE}}/adminCP/home/shoutbox/order=message,
 			<check if="{{ @sort['link']!='message' }}">
@@ -47,7 +47,7 @@
 						<false>desc">{ICON:sort-alpha-asc}</false>
 					</check>
 				</false>
-			</check></a> __Message
+			</check></a> {{@LN__Message}}
 		</th>
 	</tr>
 	<repeat group="{{ @shoutEntries }}" value="{{ @row }}">
@@ -68,10 +68,10 @@
 							<div class="alert-box warning">
 						</false>
 					</check>
-					{{ @row['message'] }}</div>
+					{{ @row['message'] | raw }}</div>
 				</true>
 				<false>
-					{{ @row['message'] }}
+					{{ @row['message'] | raw }}
 				</false>
 			</check>
 		</td>

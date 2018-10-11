@@ -135,7 +135,7 @@ class AdminCP extends Base
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Archive') );
 		$data['General'] = $this->model->settingsFields('archive_general');
 		$data['Intro'] = $this->model->settingsFields('archive_intro');
-		$this->buffer( \View\AdminCP::settingsFields($data, "archive/home", $feedback) );
+		$this->buffer( $this->template->settingsFields($data, "archive/home", $feedback) );
 	}
 	
 	protected function archiveSubmit(\Base $f3, $feedback = [ NULL, NULL ])
@@ -148,7 +148,7 @@ class AdminCP extends Base
 		$data['Stories'] = $this->model->settingsFields('archive_submit');
 		$data['Images'] = $this->model->settingsFields('archive_images');
 		$data['Reviews'] = $this->model->settingsFields('archive_reviews');
-		$this->buffer( \View\AdminCP::settingsFields($data, "archive/submit", $feedback) );
+		$this->buffer( $this->template->settingsFields($data, "archive/submit", $feedback) );
 	}
 	
 	protected function archiveFeatured(\Base $f3, $params, $feedback)
@@ -178,13 +178,12 @@ class AdminCP extends Base
 			$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
 
 			$data = $this->model->listStoryFeatured($page, $sort, $params['select']);
-			$this->buffer( \View\AdminCP::listFeatured($data, $sort, $params['select']) );
+			$this->buffer( $this->template->featuredList($data, $sort, $params['select']) );
 			
 			return TRUE;
 		}
 		elseif (isset($_POST['form_data']))
 		{
-			//$this->buffer( print_r($f3->get('POST.form_data'),1) );
 			$changes = $this->model->saveFeatured($params['sid'], $f3->get('POST.form_data') );
 		}
 
@@ -193,7 +192,7 @@ class AdminCP extends Base
 			$data = $this->model->loadFeatured($params['sid']);
 			$data['errors'] = @$errors;
 			$data['changes'] = @$changes;
-			$this->buffer( \View\AdminCP::editFeatured($data) );
+			$this->buffer( $this->template->featuredEdit($data) );
 			// return TRUE;
 		}
 		else
@@ -310,7 +309,7 @@ class AdminCP extends Base
 			$data['categories'] = $this->model->getCategories();
 			$data['errors'] = @$errors;
 			$data['changes'] = @$changes;
-			return $this->template->editCharacter($data, @$params['returnpath']);
+			return $this->template->characterEdit($data, @$params['returnpath']);
 		}
 
 		// page will always be an integer > 0
@@ -329,7 +328,7 @@ class AdminCP extends Base
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="desc") ?	"desc" : "asc";
 		
 		$data = $this->model->charactersList($page, $sort);
-		return $this->template->listCharacters($data, $sort);
+		return $this->template->characterList($data, $sort);
 	}
 	
 	protected function archiveTagsIndex(\Base $f3, $params, $feedback)
@@ -352,7 +351,7 @@ class AdminCP extends Base
 				$feedback = $this->model->saveKeys($f3->get('POST.form_data'));
 			}
 			$data['Settings'] = $this->model->settingsFields('archive_tags_cloud');
-			$this->buffer( \View\AdminCP::settingsFields($data, "archive/tags/cloud", $feedback ) );
+			$this->buffer( $this->template->settingsFields($data, "archive/tags/cloud", $feedback ) );
 		}
 		else
 			$this->archiveTagsEdit($f3, $params);
@@ -386,7 +385,7 @@ class AdminCP extends Base
 			$data['groups'] = $this->model->tagGroups();
 			$data['errors'] = @$errors;
 			$data['changes'] = @$changes;
-			$this->buffer( \View\AdminCP::editTag($data) );
+			$this->buffer( $this->template->tagEdit($data) );
 			return TRUE;
 		}
 
@@ -407,7 +406,7 @@ class AdminCP extends Base
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="desc") ?	"desc" : "asc";
 		
 		$data = $this->model->tagsList($page, $sort);
-		$this->buffer ( $this->template->listTags($data, $sort) );
+		$this->buffer ( $this->template->tagList($data, $sort) );
 	}
 	
 	protected function archiveTagsGroups(\Base $f3, $params)
@@ -439,7 +438,7 @@ class AdminCP extends Base
 			$data = $this->model->loadTagGroup($params['id']);
 			$data['errors'] = @$errors;
 			$data['changes'] = @$changes;
-			$this->buffer( \View\AdminCP::editTagGroup($data) );
+			$this->buffer( $this->template->tagGroupEdit($data) );
 			return TRUE;
 		}
 
@@ -459,7 +458,7 @@ class AdminCP extends Base
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="desc") ?	"desc" : "asc";
 		
 		$data = $this->model->tagGroupsList($page, $sort);
-		$this->buffer ( $this->template->listTagGroups($data, $sort) );
+		$this->buffer ( $this->template->tagGroupList($data, $sort) );
 	}
 	
 	protected function archiveCategories(\Base $f3, $params)
@@ -497,7 +496,7 @@ class AdminCP extends Base
 					'id'		=> $parent_cid,
 					'info'		=> @$parent_info,
 				];
-				$this->buffer( \View\AdminCP::addCategory( $f3, $data ) );
+				$this->buffer( $this->template->categoryAdd( $f3, $data ) );
 				
 				// Leave function without creating further forms or mishap
 				return TRUE;
@@ -547,7 +546,7 @@ class AdminCP extends Base
 			$data['stats'] = json_decode($data['stats'],TRUE);
 			$data['errors'] = @$errors;
 			$data['changes'] = @$changes;
-			$this->buffer( \View\AdminCP::editCategory($data) );
+			$this->buffer( $this->template->categoryEdit($data) );
 			return TRUE;
 		}
 
@@ -555,7 +554,7 @@ class AdminCP extends Base
 		$feedback['errors'] = @$errors;
 		$feedback['changes'] = @$changes;
 
-		$this->buffer ( \View\AdminCP::listCategories($data, $feedback) );
+		$this->buffer ( $this->template->categoryList($data, $feedback) );
 	}
 
 	protected function archiveRatings(\Base $f3, $params)
@@ -704,7 +703,7 @@ class AdminCP extends Base
 				$data['raw'] = @$params['raw'];
 				$data['errors'] = @$errors;
 				$data['changes'] = @$changes;
-				$this->buffer( \View\AdminCP::editCustompage($data) );
+				$this->buffer( $this->template->custompageEdit($data) );
 				return TRUE;
 			}
 			else $f3->set('form_error', "__failedLoad");
@@ -728,7 +727,7 @@ class AdminCP extends Base
 		
 		$data = $this->model->listCustompages($page, $sort);
 
-		$this->buffer ( \View\AdminCP::listCustompages($data, $sort) );
+		$this->buffer ( $this->template->custompageList($data, $sort) );
 	}
 
 	protected function homeLogs(\Base $f3, array $params)
@@ -764,8 +763,7 @@ class AdminCP extends Base
 		$data = $this->model->logGetData($sub, $page, $sort);
 		
 		
-		$this->buffer( \View\AdminCP::listLog($data, $menuCount, [], $sub ) );
-		//$this->buffer( "<pre>".print_r($data,TRUE)."</pre>" );
+		$this->buffer( $this->template->logList($data, $menuCount, [], $sub ) );
 	}
 	
 	protected function homeShoutbox(\Base $f3, array $params)
@@ -812,7 +810,7 @@ class AdminCP extends Base
 				$data['raw'] = @$params['raw'];
 				$data['errors'] = @$errors;
 				$data['changes'] = @$changes;
-				$this->buffer( \View\AdminCP::editShout($data, $sort, $page) );
+				$this->buffer( $this->template->shoutEdit($data, $sort, $page) );
 				return TRUE;
 			}
 			else $f3->set('form_error', "__failedLoad");
@@ -821,7 +819,7 @@ class AdminCP extends Base
 		$data = $this->model->listShoutbox($page, $sort);
 		$changes = [ @$params['id'], @$changes ];
 
-		$this->buffer ( \View\AdminCP::listShoutbox($data, $sort, $changes) );
+		$this->buffer ( $this->template->shoutList($data, $sort, $changes) );
 	}
 	
 	protected function homeNews(\Base $f3, array $params)
@@ -858,7 +856,7 @@ class AdminCP extends Base
 				$data['raw'] = @$params['raw'];
 				$data['errors'] = @$errors;
 				$data['changes'] = @$changes;
-				$this->buffer( $this->template->editNews($data, @$params['returnpath']) );
+				$this->buffer( $this->template->newsEdit($data, @$params['returnpath']) );
 				return TRUE;
 			}
 			else $f3->set('form_error', "__failedLoad");
@@ -882,7 +880,7 @@ class AdminCP extends Base
 		
 		$data = $this->model->listNews($page, $sort);
 
-		$this->buffer ( $this->template->listNews($data, $sort) );
+		$this->buffer ( $this->template->newsList($data, $sort) );
 	}
 
 	public function __members(\Base $f3, $params)
@@ -992,7 +990,7 @@ class AdminCP extends Base
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
 		
 		$data = $this->model->listUsers($page, $sort, $search);
-		return $this->template->userSearchList($data, $sort, $search);
+		return $this->template->userEditList($data, $sort, $search);
 	}
 
 	protected function membersHome(\Base $f3, $feedback = [ NULL, NULL ])
@@ -1003,13 +1001,13 @@ class AdminCP extends Base
 		}
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Members') );
 		$data['General'] = $this->model->settingsFields('members_general');
-		$this->buffer( \View\AdminCP::settingsFields($data, "members/home", $feedback) );
+		$this->buffer( $this->template->settingsFields($data, "members/home", $feedback) );
 	}
 
 	protected function membersTeam(\Base $f3)
 	{
 		$team = $this->model->listTeam();
-		$this->buffer( $this->template->userListTeam($team) );
+		$this->buffer( $this->template->userTeamList($team) );
 	}
 
 	protected function membersProfile(\Base $f3, $params)
@@ -1032,7 +1030,7 @@ class AdminCP extends Base
 		foreach ( $fields as $field )
 			$data[$field['field_type']][] = $field;
 		
-		$this->buffer ( $this->template->listUserFields( $data ) );
+		$this->buffer ( $this->template->userFieldsList( $data ) );
 	}
 
 	public function __settings(\Base $f3, $params, $feedback = [ NULL, NULL ] )
@@ -1095,7 +1093,7 @@ class AdminCP extends Base
 			default:
 				$this->buffer(\Template::instance()->render('access.html'));
 		}
-		if (isset($data))  $this->buffer( \View\AdminCP::settingsFields($data, "settings/".$params['module'], $feedback) );
+		if (isset($data))  $this->buffer( $this->template->settingsFields($data, "settings/".$params['module'], $feedback) );
 		if (isset($extra)) $this->buffer( $extra );
 	}
 
@@ -1136,7 +1134,7 @@ class AdminCP extends Base
 			$languageFiles[] = $data;
 		}
 		
-		return \View\AdminCP::language($languageFiles, $languageConfig);
+		return $this->template->language($languageFiles, $languageConfig);
 	}
 
  	protected function settingsLayout(\Base $f3, $params)
@@ -1260,7 +1258,7 @@ class AdminCP extends Base
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
 
 		$data = $this->model->getPendingStories($page, $sort);
-		$this->buffer( $this->template->listPendingStories($data, $sort) );
+		$this->buffer( $this->template->storyListPending($data, $sort) );
 	}
 	
 	protected function storiesEdit(\Base $f3, $params)
@@ -1271,7 +1269,7 @@ class AdminCP extends Base
 		if ( empty($params['story']) )
 		{
 			// Select story form
-			$this->buffer( $this->template->searchStoryForm() );
+			$this->buffer( $this->template->storySearch() );
 			return TRUE;
 		}
 		elseif ( FALSE !== $storyInfo = $this->model->loadStoryInfo((int)$params['story']) )

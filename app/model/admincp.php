@@ -1639,24 +1639,109 @@ class AdminCP extends Controlpanel {
 		foreach ( $data as &$item )
 		{
 			if ( $item['version']==0 )
+			// eFiction 3 original, try to do some cleanup
+			// tested against english and german log entries, considering the order of elements
 			{
-				// eFiction 3 original, try to do some cleanup
-				if ( $item['type']=="RG" )
+				if ( $item['type']=="DL" )
 				{
-					preg_match('/(\w+[\s\w]*)\s+\((\d*)\).*/iU', $item['action'], $matches);
-					$item['action'] = [ 'name'=>$matches[1], 'uid'=>$matches[2], 'email'=>'', 'reason'=>'', 'admin'=>($matches[2]!=$item['uid_reg']) ];
-					//$this->update('tbl_log', ['action' => json_encode($item['action']), 'version'=>1], "id = {$item['id']}" );
-					//print_r($matches);
-					//print_r($item);
-					$this->logResaveData($item);
+					if ( preg_match("/.+\?sid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>([^<]*?)<\/a>[.^<]+/i", $item['action'], $matches) )
+					// matching _LOG_ADMIN_DEL
+					{
+						$item['action'] = [ 'sid' => $matches[1], 'title' => $matches[2], 'aid' => $matches[3], 'author' => $matches[4] ];
+					}
+					elseif ( preg_match("/.+\?sid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>(.*?)<\/.+\s(\d).*/i", $item['action'], $matches) )
+					// matching _LOG_ADMIN_DEL_CHAPTER
+					{
+						$item['action'] = [ 
+							'sid' => $matches[1], 'title' => $matches[2],
+							'aid' => $matches[3], 'name' => $matches[4],
+							'chapter' => $matches[5]
+						];
+						$item['type'] = 'DC';
+					}
+					elseif ( preg_match("/(.*<\/a>)*+.*\'(.*)\'.*/i", $item['action'], $matches) )
+					// matching _LOG_ADMIN_DEL_SERIES
+					{
+						$item['action'] = [ 'seriestitle' => $matches[2] ];
+						$item['type'] = 'DS';
+					}
+					elseif ( preg_match("/.*?\?uid=(\d*)\'>(.*?)<.*\?sid=(\d*)\'>(.*?)<.*\?uid=(\d*)\'>(.*?)<.*\?seriesid=(\d*)\'>(.*?)<.*/i", $item['action'], $matches) )
+					// matching _LOG_ADMIN_DEL_FROM_SERIES
+					{
+						$item['action'] = [
+							'uid' => $matches[1], 'uname' => $matches[2],
+							'sid' => $matches[3], 'sname' => $matches[4],
+							'aid' => $matches[5], 'aname' => $matches[6],
+							'seriesid' => $matches[7], 'sername' => $matches[8],
+						];
+						$item['type'] = 'DF';
+					}
 				}
 				elseif ( $item['type']=="ED" )
 				{
-					preg_match("/.+\?sid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>(.*?)<\/.+/m", $item['action'], $matches);
-					$item['action'] = [ 'sid' => $matches[1], 'title' => $matches[2], 'aid' => $matches[3], 'author' => $matches[4] ];
-					$this->logResaveData($item);
+					if ( preg_match("/.+\?sid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>(.*?)<\/.+/i", $item['action'], $matches) )
+					// matching _LOG_ADMIN_EDIT_AUTHOR
+					{
+						$item['action'] = [ 
+							'sid'     => $matches[1], 'title'    => $matches[2],
+							'fromaid' => $matches[3], 'fromname' => $matches[4],
+							'toaid'   => $matches[5], 'toname'   => $matches[6]
+						];
+						$item['type'] = 'EA';
+					}
+					elseif ( preg_match("/.+\?sid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>(.*?)<\/.+(\d).*/i", $item['action'], $matches) )
+					// matching _LOG_ADMIN_EDIT_CHAPTER
+					{
+						$item['action'] = [ 
+							'sid' => $matches[1], 'title' => $matches[2],
+							'aid' => $matches[3], 'author' => $matches[4],
+							'chapter' => $matches[5]
+						];
+						$item['type'] = 'EC';
+					}
+					elseif ( preg_match("/.+\?series[i]?d=(\d*)'>(.*?)<\/.+/i", $item['action'], $matches) )
+					// matching _LOG_ADMIN_EDIT_SERIES
+					{
+						$item['action'] = [ 'seriesid' => $matches[1], 'title' => $matches[2] ];
+						$item['type'] = 'ES';
+					}
+					elseif ( preg_match("/.+\?sid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>(.*?)<\/.+/i", $item['action'], $matches) )
+					// matching _LOG_ADMIN_EDIT
+					{
+						$item['action'] = [
+							'sid' => $matches[1], 'title' => $matches[2],
+							'aid' => $matches[3], 'author' => $matches[4]
+						];
+					}
+				}
+				elseif ( $item['type']=="LP" AND preg_match("/.*\?uid=(\d*)\'>(.*)<.*:\s*(\w+).*/im", $item['action'], $matches) )
+				// matching _LOG_LOST_PASSWORD
+				{
+					$item['action'] = [ 'uid'=>$matches[1], 'name'=>$matches[2], 'result'=>$matches[3] ];
+				}
+				elseif ( $item['type']=="RE" AND preg_match("/(.+?)\s*\(.*?'(.*)'.*?'.*?\?sid=(\d+).*/im", $item['action'], $matches) )
+				// matching _LOG_REVIEW
+				{
+					$item['action'] = [ 'name'=>$matches[1], 'review'=>$matches[2], 'sid'=>$matches[3] ];
+				}
+				elseif ( $item['type']=="RG" AND preg_match('/(\w+[\s\w]*)\s+\((\d*)\).*/iU', $item['action'], $matches) )
+				// matching _LOG_REGISTER & _LOG_ADMIN_REG
+				{
+					$item['action'] = [ 'name'=>$matches[1], 'uid'=>$matches[2], 'admin'=>($matches[2]!=$item['uid_reg']) ];
 				}
 				
+				/*
+				
+				define ("_LOG_BAD_LOGIN", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> hat ein falsches Passwort beim einloggen eingegeben.");
+				define ("_LOG_BAD_LOGIN", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> entered a wrong password trying to log in.");
+
+				define ("_LOG_EDIT_REVIEW", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> hat    <a href='reviews.php?reviewid=%4\$d'>ein Review</a> für '%3\$s' bearbeitet.");
+				define ("_LOG_EDIT_REVIEW", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> edited <a href='reviews.php?reviewid=%4\$d'>a review  </a> for '%3\$s'.");
+				
+				*/
+
+				if ( is_array($item['action']) )
+					$this->logResaveData($item);
 			}
 			elseif ( $item['version']==1 )
 			{
