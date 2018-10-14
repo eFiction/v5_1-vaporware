@@ -1264,10 +1264,14 @@ class AdminCP extends Controlpanel {
 		
 		$sql = "SELECT SQL_CALC_FOUND_ROWS
 					S.sid, S.title, IF(S.validated >= 20 AND S.validated <= 30,1,0) as pStory,
-					COUNT(Ch.chapid) as pChapters,
+					COUNT(DISTINCT Ch.chapid) as pChapters,
 					IF(
-						Ch2.chapid<MIN(Ch.chapid) 
-						OR (COUNT(Ch.chapid)=0 AND Ch3.chapid IS NOT NULL)
+						Ch4.chapid IS NULL
+						AND
+						(
+							Ch2.chapid<MIN(Ch.chapid) 
+							OR (COUNT(Ch.chapid)=0 AND Ch3.chapid IS NOT NULL)
+						)
 					,1,0) as blocked,
 					UNIX_TIMESTAMP(IF(Ch.chapid IS NULL,S.updated,Ch.created)) as lastdate,
                     GROUP_CONCAT(DISTINCT U.uid ORDER BY U.nickname ASC SEPARATOR ', ') as aid,
@@ -1282,11 +1286,12 @@ class AdminCP extends Controlpanel {
 							AND Ch2.inorder < Ch.inorder
 						)
 					LEFT JOIN `tbl_chapters`Ch3 ON ( S.sid = Ch3.sid AND Ch3.validated >= 10 AND Ch3.validated <= 20 )
+					LEFT JOIN `tbl_chapters`Ch4 ON ( S.sid = Ch4.sid AND Ch4.validated >= 30 AND S.validated <= 30 )
 					LEFT JOIN `tbl_stories_authors`rSA ON ( rSA.sid = S.sid )
 						LEFT JOIN `tbl_users`U ON ( rSA.aid = U.uid )
 				WHERE Ch.chapid IS NOT NULL OR ( S.validated >= 20 AND S.validated <= 30 )
 				GROUP BY S.sid
-				ORDER BY blocked ASC, lastdate ASC
+				ORDER BY blocked ASC, pChapters DESC, lastdate ASC
 				LIMIT ".(max(0,$pos*$limit)).",".$limit;
 				
 		$data = $this->exec($sql);
@@ -1306,8 +1311,12 @@ class AdminCP extends Controlpanel {
 						S.sid, S.title, S.completed, S.storynotes, S.summary, S.translation, S.trans_from, S.trans_to,
 						IF(S.validated >= 20 AND S.validated <= 30,1,0) as pStory, 
 						IF(
-							Ch2.chapid<MIN(Ch.chapid) 
-							OR (COUNT(Ch.chapid)=0 AND Ch3.chapid IS NOT NULL)
+							Ch4.chapid IS NULL
+							AND
+							(
+								Ch2.chapid<MIN(Ch.chapid) 
+								OR (COUNT(Ch.chapid)=0 AND Ch3.chapid IS NOT NULL)
+							)
 						,1,0) as blocked,
 						S.cache_authors, S.cache_tags, S.cache_characters, S.cache_categories, S.cache_rating, 
 						Ch.chapid, Ch.title as chap_title, UNIX_TIMESTAMP(Ch.created) as chap_lastdate, Ch.inorder as chap_inorder
@@ -1321,6 +1330,7 @@ class AdminCP extends Controlpanel {
 								AND Ch2.inorder < Ch.inorder
 							)
 						LEFT JOIN `tbl_chapters`Ch3 ON ( S.sid = Ch3.sid AND Ch3.validated >= 10 AND Ch3.validated <= 20 )
+						LEFT JOIN `tbl_chapters`Ch4 ON ( S.sid = Ch4.sid AND Ch4.validated >= 30 AND S.validated <= 30 )
 					WHERE S.sid = :sid AND ((S.validated >= 20 AND S.validated <= 30 ) OR Ch.chapid IS NOT NULL)
 					GROUP BY Ch.chapid
 					HAVING blocked = 0

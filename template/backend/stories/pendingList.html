@@ -15,6 +15,7 @@
 				</false>
 			</check></a> {{@LN__Sort_Title}}
 		</th>
+		<th>&nbsp;</th>
 		<th>S</th>
 		<th>C</th>
 		<th><a href="{{@BASE}}/adminCP/stories/pending/order=id,
@@ -44,7 +45,7 @@
 <check if="{{ @row.blocked==0 }}">
 	<tr>
 		<td><a href="{{@BASE}}/adminCP/stories/pending/story={{ @row['sid'] }};returnpath=/adminCP/stories/pending/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
-		<td>{{ @row.title }} ({{ @row.authors }})</td>
+		<td>{{ @row.title }}</td><td>{{ @row.authors }}</td>
 		<td><check if="{{ @row.pStory==1 }}">{ICON:waiting}</check>&nbsp;</td>
 		<td><check if="{{ @row.pChapters>0 }}">{ICON:waiting}</check>&nbsp;</td>
 		<td>{{ @row.sid }}</td>
@@ -55,8 +56,8 @@
 	<repeat group="{{ @data }}" value="{{ @row }}">
 <check if="{{ @row.blocked==1 }}">
 	<tr>
-		<td>{ICON:alert}</a></td>
-		<td>{{ @row.title }} ({{ @row.authors }})</td>
+		<td>{ICON:keyboard}</a></td>
+		<td>{{ @row.title }}</td><td>{{ @row.authors }}</td>
 		<td><check if="{{ @row.pStory==1 }}">{ICON:waiting}</check>&nbsp;</td>
 		<td>{ICON:alert}<check if="{{ @row.pChapters>0 }}"><true>__firstBlock</true><false>__noChapter</false></check></td>
 		<td>{{ @row.sid }}</td>
