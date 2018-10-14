@@ -4,10 +4,10 @@ namespace View;
 class AdminCP extends Base
 {
 
-	public static function showMenu($menu="")
+	public function menuShow($menu="")
 	{
-		\Base::instance()->set('panel_menu', $menu);
-		return \Template::instance()->render('menu.html');
+		$this->f3->set('panel_menu', $menu);
+		return $this->render('menu.html');
 	}
 	
 	public function settingsFields($data,$target,$feedback)
@@ -337,9 +337,32 @@ class AdminCP extends Base
 	{
 		$this->f3->set('data', $data);
 		$this->f3->set('sort', $sort);
-		return $this->render('stories/pending.html');
+		return $this->render('stories/pendingList.html');
 	}
 	
+	public function storyValidatePending(array $data, $returnpath)
+	{
+		$data['story']['cache_authors'] 	= json_decode($data['story']['cache_authors'],TRUE);
+		$data['story']['cache_tags'] 		= json_decode($data['story']['cache_tags'],TRUE);
+		$data['story']['cache_characters']	= json_decode($data['story']['cache_characters'],TRUE);
+		$data['story']['cache_categories'] 	= json_decode($data['story']['cache_categories'],TRUE);
+		$data['story']['cache_rating'] 		= json_decode($data['story']['cache_rating'],TRUE);
+
+		$this->f3->set('data', 		 $data);
+		$this->f3->set('returnpath', $returnpath);
+		return $this->render('stories/pendingView.html');
+	}
+	
+	public function storyValidateChapter(array $data, $chapterText, $returnpath)
+	{
+		$data['cache_authors'] 	= json_decode($data['cache_authors'],TRUE);
+		
+		$this->f3->set('data', 			$data);
+		$this->f3->set('chapterText', 	$chapterText);
+		$this->f3->set('returnpath',	$returnpath);
+		return $this->render('stories/pendingChapter.html');
+	}
+
 	public function tagList($data, $sort)
 	{
 		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );

@@ -232,7 +232,7 @@ class Controlpanel extends Base {
 	{
 		$data = $this->exec
 		(
-			"SELECT Ch.sid,Ch.chapid,Ch.title,Ch.validated
+			"SELECT Ch.sid,Ch.chapid,Ch.title,Ch.validated,Ch.inorder
 				FROM `tbl_chapters`Ch
 			WHERE Ch.sid = :sid ORDER BY Ch.inorder ASC",
 			[":sid" => $sid ]
@@ -278,14 +278,14 @@ class Controlpanel extends Base {
 					GROUP_CONCAT(DISTINCT charid,',',charname ORDER BY charname ASC SEPARATOR '||') AS characterblock,
 					GROUP_CONCAT(DISTINCT uid,',',nickname ORDER BY nickname ASC SEPARATOR '||' ) as authorblock,
 					GROUP_CONCAT(DISTINCT cid,',',category ORDER BY category ASC SEPARATOR '||' ) as categoryblock,
-					GROUP_CONCAT(DISTINCT ratingid,',',rating_name,',',ratingwarning,',',rating_image SEPARATOR '||' ) as rating
+					GROUP_CONCAT(DISTINCT ratingid,',',rating_name,',',ratingwarning,',',rating_image SEPARATOR '||' ) as rating,
 					COUNT(DISTINCT fid) AS reviews,
 					COUNT(DISTINCT chapid) AS chapters
 					FROM
 					(
 						SELECT S.sid,C.chapid,UNIX_TIMESTAMP(S.date) as published, UNIX_TIMESTAMP(S.updated) as modified,
 								F.fid,
-								S.ratingid, Ra.rating as rating_name, IF(Ra.rating_image,Ra.rating_image,'') as rating_image,
+								S.ratingid, Ra.rating as rating_name, IF(Ra.rating_image,Ra.rating_image,'') as rating_image, Ra.ratingwarning,
 								U.uid, U.nickname,
 								Cat.cid, Cat.category,
 								TG.description,TG.order,TG.tgid,T.label as tag,T.tid,

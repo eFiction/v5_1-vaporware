@@ -394,13 +394,9 @@ class UserCP extends Controlpanel
 		// Allow trusted authors to set validation
 		if ( isset($post['mark_validated']) AND $_SESSION['groups']&8 AND $story->validated < 20 )
 		{
-			$chapterCheck=new \DB\SQL\Mapper($this->db, $this->prefix.'stories');
-			$chapterCheck->load(array('sid=? AND validated >= 29',$storyID));
-			if ( $chapterCheck->dry() )
-				exit;
-			else echo $chapterCheck->chapid;
-			exit;
 			$story->validated 	= 	$story->validated + 20;
+			// Log validation
+			\Logging::addEntry('VS', $storyID);
 		}
 
 		$story->save();
@@ -468,8 +464,9 @@ class UserCP extends Controlpanel
 						[
 							":chapid" => $chapterID,
 							":updated" => $chapter->created
-						]
-						);
+						]);
+			// Log validation
+			\Logging::addEntry(['VS','c'], [$chapter->sid,$chapterID]);
 		}
 
 		// save chapter information

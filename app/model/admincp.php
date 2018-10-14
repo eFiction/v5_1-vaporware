@@ -126,86 +126,6 @@ class AdminCP extends Controlpanel {
 		return [ "section" => $select, "fields" => $data];
 	}
 	
-	public function listTeam()
-	{
-		$sql = "SELECT SQL_CALC_FOUND_ROWS `uid`, `nickname`, `realname`, `groups` FROM `tbl_users` WHERE `groups` > 16 ORDER BY groups,nickname ASC";
-		return $this->exec($sql);
-	}
-	
-	public function listUserFields()
-	{
-		$sql = "SELECT `field_id`, `field_type`, `field_name`, `field_title`, `field_options`, `enabled` FROM `tbl_user_fields` ORDER BY `field_type` ASC";
-		return $this->exec($sql);
-	}
-	
-	public function listUsers($page, array $sort, $search=NULL)
-	{
-		$limit = 20;
-		$pos = $page - 1;
-		$bind = [];
-
-		$sql = "SELECT SQL_CALC_FOUND_ROWS `uid`, `nickname`, `login`, `email`, UNIX_TIMESTAMP(registered) as registered, `groups`
-					FROM `tbl_users`
-					WHERE `uid`>0";
-
-		if ( $search['fromlevel'] )
-			$sql .= " AND `groups` >= POW(2,{$search['fromlevel']})";
-		else 
-			$sql .= " AND `groups` >= 1";
-		
-		if ( $search['tolevel'] )
-			$sql .=	" AND groups < POW(2,".($search['tolevel']+1).") ";
-
-		if($search['term'])
-		{
-			$sql .="	AND (`login` LIKE :term1
-							or `nickname` LIKE :term2
-							or `realname` LIKE :term3
-							or `email` LIKE :term4
-							or `about` LIKE :term5) ";
-			$bind = [ ":term1" => "%{$search['term']}%", ":term2" => "%{$search['term']}%", ":term3" => "%{$search['term']}%", ":term4" => "%{$search['term']}%", ":term5" => "%{$search['term']}%" ];
-		}
-
-		$sql .= " ORDER BY {$sort['order']} {$sort['direction']}
-				LIMIT ".(max(0,$pos*$limit)).",".$limit;
-
-		$data = $this->exec($sql,$bind);
-
-		$this->paginate(
-			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
-			"/adminCP/members/edit/{$search['follow']}order={$sort['link']},{$sort['direction']}",
-			$limit
-		);
-		return $data;
-	}
-	
-	//public function loadUser(int $uid)
-	public function loadUser($uid)
-	{
-		$sql = "SELECT uid, login, nickname, realname, email, UNIX_TIMESTAMP(registered) as registered, groups, curator, about
-					FROM `tbl_users`
-					WHERE uid = :uid;";
-		$data = $this->exec( $sql, [ ":uid" => $uid ] );
-		
-		if ( sizeof($data)==1 ) $user = $data[0];
-		else return FALSE;
-		
-		$sql = "SELECT F.field_id as id, F.field_title as title, F.field_type as type, F.field_options as options, I.info
-					FROM `tbl_user_fields`F
-					LEFT JOIN `tbl_user_info`I ON ( F.field_id = I.field AND I.uid = :uid )
-					WHERE F.enabled = 1
-					ORDER BY F.field_type, F.field_order";
-		$user['fields'] = $this->exec( $sql, [ ":uid" => $uid ] );
-		
-		foreach ( $user['fields'] as &$field )
-		{
-			if ( $field['type']==2 )
-				$field['options'] = json_decode($field['options'],TRUE);
-		}
-		
-		return $user;
-	}
-	
 	public function saveKeys($data)
 	{
 		$affected=0;
@@ -227,13 +147,22 @@ class AdminCP extends Controlpanel {
 		return [ $affected, FALSE ]; // prepare for error check
 	}
 	
+	public function jsonPrepop($rawData)
+	{
+		if ( $rawData == NULL ) return "[]";
+		foreach ( parent::cleanResult($rawData) as $tmp )
+			$data[] = [ "id" => $tmp[0], "name" => $tmp[1] ];
+		return json_encode( $data );	
+	}
+
 	public function checkAccess($link, $exists = FALSE)
 	{
 		if ( $exists ) return isset($this->access[$link]);
 		return ( isset($this->access[$link]) AND (int)$this->access[$link]&(int)$_SESSION['groups'] );
 	}
 
-	public function showMenu($selected=FALSE)
+//	public function menuShow($selected=FALSE)
+	public function menuShow($selected=FALSE)
 	{
 		$sql = "SELECT M.label, M.link, M.icon, M.child_of, M.link, M.evaluate, ";
 		if ( !($_SESSION['groups']&128) )
@@ -276,7 +205,7 @@ class AdminCP extends Controlpanel {
 		**/
 		if ( !($_SESSION['groups']&128) )
 		{
-			$menu = $this->secureMenu($menu);
+			$menu = $this->menuSecure($menu);
 			foreach ( $menu as $key => &$m )
 				if ( $key != $selected ) unset ( $m['sub'] );
 		}
@@ -284,17 +213,8 @@ class AdminCP extends Controlpanel {
 		return $menu;
 	}
 	
-	protected function secureMenu($menu)
-	{
-		foreach ( $menu as &$m )
-		{
-			if ( isset($m['sub']) ) $m['sub'] = $this->secureMenu($m['sub']);
-			if ( !((int)$_SESSION['groups']&(int)$m['requires']) AND @sizeof($m['sub'])==0) $m = [];
-		}
-		return array_filter($menu);
-	}
-
-	public function showMenuUpper($selected=FALSE)
+//	public function menuShowUpper($selected=FALSE)
+	public function menuShowUpper($selected=FALSE)
 	{
 		if(!$selected) return NULL;
 		$sql = "SELECT M.*
@@ -304,159 +224,241 @@ class AdminCP extends Controlpanel {
 		return $this->exec( $sql, [ ":selected" => $selected ] );
 	}
 	
-	public function tagsList($page, $sort)
+	protected function menuSecure($menu)
 	{
-		/*
-		$tags = new \DB\SQL\Mapper($this->db, $this->prefix.'tags' );
-		$data = $tags->paginate($page, 10, NULL, [ 'order' => "{$sort['order']} {$sort['direction']}", ] );
-		*/
-		$limit = 20;
-		$pos = $page - 1;
-
-		$sql = "SELECT SQL_CALC_FOUND_ROWS T.tid,T.tgid,T.label,T.count,G.description as `group`
-				FROM `tbl_tags`T 
-				LEFT JOIN `tbl_tag_groups`G ON ( T.tgid=G.tgid)
-				ORDER BY {$sort['order']} {$sort['direction']}
-				LIMIT ".(max(0,$pos*$limit)).",".$limit;
-
-		$data = $this->exec($sql);
-				
-		$this->paginate(
-			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
-			"/adminCP/archive/tags/edit/order={$sort['link']},{$sort['direction']}",
-			$limit
-		);
-				
-		return $data;
-	}
-
-	public function tagGroupsList($page, $sort)
-	{
-		/*
-		CREATE OR REPLACE VIEW tbl_list_tag_groups AS SELECT G.tgid,G.description,COUNT(T.tid) as `count`
-				FROM `tbl_tag_groups`G 
-				LEFT JOIN `tbl_tags`T ON ( G.tgid = T.tgid )
-		
-
-		$tags = new \DB\SQL\Mapper($this->db, 'tbl_list_tag_groups' );
-		$data = $tags->paginate($page, 10, NULL, [ 'order' => "{$sort['order']} {$sort['direction']}", ] );
-		*/
-		$limit = 20;
-		$pos = $page - 1;
-
-		$sql = "SELECT SQL_CALC_FOUND_ROWS G.tgid,G.description,COUNT(T.tid) as `count`
-				FROM `tbl_tag_groups`G 
-				LEFT JOIN `tbl_tags`T ON ( G.tgid = T.tgid )
-				GROUP BY G.tgid
-				ORDER BY {$sort['order']} {$sort['direction']}
-				LIMIT ".(max(0,$pos*$limit)).",".$limit;
-
-		$data = $this->exec($sql);
-				
-		$this->paginate(
-			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
-			"/adminCP/archive/tags/edit/",
-			$limit
-		);
-
-		return $data;
-	}
-	
-//	public function loadTag(int $tid)
-	public function loadTag($tid)
-	{
-		$sql = "SELECT T.tid as id, T.tgid, T.label, T.description, T.count, G.description as groupname FROM `tbl_tags`T LEFT JOIN `tbl_tag_groups`G ON ( T.tgid=G.tgid) WHERE T.tid = :tid";
-		$data = $this->exec($sql, [":tid" => $tid ]);
-		if (sizeof($data)==1) return $data[0];
-		return NULL;
-	}
-
-//	public function loadTagGroup(int $tgid)
-	public function loadTagGroup($tgid)
-	{
-		$sql = "SELECT TG.tgid as id, TG.label as label, TG.description FROM `tbl_tag_groups`TG WHERE TG.tgid = :tgid";
-		$data = $this->exec($sql, [":tgid" => $tgid ]);
-		if (sizeof($data)==1) return $data[0];
-		return NULL;
-	}
-	
-//	public function addTag(string $name) : int
-	public function addTag($name)
-	{
-		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'tags');
-		$tag->label = $name;
-		$tag->save();
-		return $tag->get('_id');
-	}
-
-	public function addTagGroup($name)
-	{
-		$taggroup=new \DB\SQL\Mapper($this->db, $this->prefix.'tag_groups');
-		$taggroup->description = $name;
-		$taggroup->save();
-		return $taggroup->get('_id');
-	}
-
-//	public function saveTag(int $tid, array $data)
-	public function saveTag($tid, array $data)
-	{
-		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'tags');
-		$tag->load(array('tid=?',$tid));
-		$tag->copyfrom( [ "tgid" => $data['taggroup'], "label" => $data['label'], "description" => $data['description'] ]);
-
-		//if ( TRUE === $i = $tag->changed("tgid") ) $this->tagGroupRecount();
-		$i = $tag->changed("tgid");
-		$i += $tag->changed("label");
-		$i += $tag->changed("description");
-
-		$tag->save();
-		return $i;
-	}
-	
-//	public function saveTagGroup(int $tgid, array $data)
-	public function saveTagGroup($tgid, array $data)
-	{
-		$taggroup=new \DB\SQL\Mapper($this->db, $this->prefix.'tag_groups');
-		$taggroup->load(array('tgid=?',$tgid));
-		$taggroup->copyfrom( [ "label" => $data['label'], "description" => $data['description'] ]);
-
-		$i = $taggroup->changed("label");
-		$i += $taggroup->changed("description");
-
-		$taggroup->save();
-		return $i;
-	}
-	
-//	public function deleteTag(int $tid)
-	public function deleteTag($tid)
-	{
-		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'tags');
-		$tag->load(array('tid=?',$tid));
-		$_SESSION['lastAction'] = [ "deleteResult" => $tag->erase() ];
-	}
-
-//	public function deleteTagGroup(int $tgid)
-	public function deleteTagGroup($tgid)
-	{
-		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'tags');
-		if($tag->count(array('tgid=?',$tgid)))
+		foreach ( $menu as &$m )
 		{
-			$_SESSION['lastAction'] = [ "deleteResult" => 0 ];
-			return FALSE;
+			if ( isset($m['sub']) ) $m['sub'] = $this->menuSecure($m['sub']);
+			if ( !((int)$_SESSION['groups']&(int)$m['requires']) AND @sizeof($m['sub'])==0) $m = [];
 		}
-		$taggroup=new \DB\SQL\Mapper($this->db, $this->prefix.'tag_groups');
-		$taggroup->load(array('tgid=?',$tgid));
-		$_SESSION['lastAction'] = [ "deleteResult" => $taggroup->erase() ];
-		return TRUE;
+		return array_filter($menu);
 	}
 
-	public function tagGroups()
+//	public function categoryAdd( int $parent_cid, array $data=[] )
+	public function categoryAdd($parent_cid, array $data=[] )
 	{
-		$sql = "SELECT TG.tgid as id, TG.description FROM `tbl_tag_groups`TG ORDER BY TG.description ASC";
-		return $this->exec($sql);
+		// "clean" target category level
+		$this->categoryMove(0, NULL, $parent_cid);
+
+		$categories = new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
+
+		// get number of elements with same parent
+		$count = $categories->count(["parent_cid = ?", $parent_cid ]);
+
+		// get parent level from siblings
+		$categories->load(["cid = ?", $parent_cid ]);
+		if ( $categories->dry() )	$leveldown = 0;
+		else 						$leveldown = $categories->leveldown + 1;
+		$categories->reset();
+		
+		$categories->category 		= $data['category'];
+		$categories->description 	= $data['description'];
+		$categories->locked 		= isset($data['locked'])?1:0;
+		$categories->inorder		= $count;
+		$categories->leveldown		= $leveldown;
+		$categories->parent_cid		= $parent_cid;
+		
+		$categories->save();
+		$newCategory = $categories->get('_id'); 
+		
+		// recount parent category
+		if ( $parent_cid>0 )	$this->cacheCategories($parent_cid);
+		$this->cacheCategories($categories->_id);
+
+		$this->categoryMove(0, NULL, $parent_cid);
+
+		return $categories->_id;
 	}
 	
-	public function charactersList($page, $sort)
+	public function categories()
+	{
+		return $this->exec("SELECT Cat.cid as id, Cat.category FROM `tbl_categories`Cat ORDER BY Cat.category ASC;");
+	}
+
+	public function categoryListFlat()
+	{
+		$sql = "SELECT 
+					C.cid, C.parent_cid, C.category, C.locked, C.leveldown, C.inorder, C.stats,
+					COUNT(C1.cid) as counter 
+				FROM `tbl_categories`C 
+				INNER JOIN `tbl_categories`C1 ON C.parent_cid=C1.parent_cid 
+				GROUP BY C.cid 
+				ORDER BY C.leveldown DESC, C.inorder ASC";
+		$data = $this->exec($sql);
+
+		if ( sizeof($data) == 0 ) return NULL;
+		
+		foreach ( $data as $item )
+		{
+			$item['stats'] = json_decode($item['stats'],TRUE);
+			$temp[$item['parent_cid']][] = $item;
+			if ( isset($temp[$item['cid']]) ) $temp[$item['parent_cid']] = array_merge ( $temp[$item['parent_cid']], $temp[$item['cid']]);
+		}
+		return $temp[0];
+	}
+
+//	public function categoryLoad(int $cid)
+	public function categoryLoad($cid)
+	{
+		if ( $cid == 0 ) return NULL;
+		$sql = "SELECT cid as id, parent_cid, category, description, image, locked, leveldown, inorder, stats FROM `tbl_categories`C WHERE C.cid = :cid";
+		$data = $this->exec($sql, [":cid" => $cid ]);
+		if (sizeof($data)==1) return $data[0];
+		return FALSE;
+	}
+
+//	public function categoryLoadPossibleParents(int $cid)
+	public function categoryLoadPossibleParents($cid)
+	{
+		$sql = "SELECT C.cid, C.parent_cid, C.leveldown, C.category
+					FROM `tbl_categories`C 
+					INNER JOIN `tbl_categories`C2 ON ( ( C.parent_cid = C2.parent_cid OR C.cid = C2.parent_cid )AND C2.cid = :cid ) 
+				WHERE C.cid != :cid2
+				ORDER BY C.leveldown, C.inorder ASC ";
+		
+		$data = $this->exec($sql, [":cid" => $cid, ":cid2" => $cid ]);
+
+		return $data;
+	}
+
+//	public function categorySave(int $cid, array $data)
+	public function categorySave($cid, array $data)
+	{
+		$category=new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
+		$category->load(array('cid=?',$cid));
+		$parent_cid = $category->parent_cid;
+		$category->copyfrom( 
+			[ 
+				"category" => $data['category'], 
+				"description" => $data['description'],
+				"locked" => isset($data['locked']) ? : 0,
+				"parent_cid" => $data['parent_cid'], 
+			]
+		);
+
+		$i = $category->changed("category");
+		$i += $category->changed("description");
+		$i += $category->changed("locked");
+		if ( $category->changed("parent_cid") )
+		{
+			$i++;
+			if ( $data['parent_cid']==0 )
+				$new_level = 0;
+			else
+			{
+				$parent=new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
+				$parent->load(array('cid=?',$data['parent_cid']));
+				$new_level = $parent->leveldown+1;
+			}
+			$this->categoryLevelAdjust($cid, $new_level);
+			
+			$category->save();
+
+			$this->cacheCategories($parent_cid);
+			$this->cacheCategories($data['parent_cid']);
+		}
+		else $category->save();
+
+		return $i;
+	}
+	
+//	protected function categoryLevelAdjust( int $cid, int $level)
+	protected function categoryLevelAdjust($cid, $level)
+	{
+		$category=new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
+		$category->load(array('cid=?',$cid));
+		$category->leveldown = $level;
+		$category->save();
+		
+		$subCategories = new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
+		$subCategories->load(array('parent_cid=?',$cid));
+		while ( !$subCategories->dry() )
+		{
+			$this->categoryLevelAdjust( $subCategories->cid, $level+1 );
+			$subCategories->next();
+		}
+	}
+	
+//	public function categoryMove(int $catID=0, $direction=NULL, $parent=NULL)
+	public function categoryMove($catID=0, $direction=NULL, $parent=NULL)
+	{
+		if ( $parent === NULL )
+		{
+			$sql = "SELECT C.parent_cid 
+						FROM `tbl_categories`C 
+						WHERE C.`cid`= :catID";
+
+			$data = $this->exec ( $sql, [ ":catID" => $catID ] );
+			if ( empty($data[0]) OR !is_numeric($data[0]['parent_cid']) ) return FALSE;
+			$parent = $data[0]['parent_cid'];
+		}
+		
+		$categories = new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
+		$categories->load(
+			["parent_cid = ?", $parent ],
+			[
+				'order' => "inorder ".(($direction=="up") ? "DESC" : "ASC"),
+			]
+		);
+		$elements = $categories->count(["parent_cid = ?", $parent ]);
+
+		// when moving elements upwards, we need to invert the entire logic
+		if ( $direction == "up" ) $i = $elements + 1;
+		else $i = 0;
+
+		// init vacant spot
+		$vacant = -1;
+		
+		while ( !$categories->dry() )
+		{  // gets dry when we passed the last record
+			if ( $direction == "up" ) $i--; 
+			else $i++;
+			if ( $categories->cid == $catID AND $direction!==NULL )
+			{
+				if ( $direction == "up" )
+					$categories->inorder = max(1,($i-1));
+
+				else
+					$categories->inorder = min($elements,($i+1));
+
+				// remember the vacant spot
+				$vacant = $i;
+			}
+			elseif ( $direction == "down" AND $i == $vacant+1 )
+				$categories->inorder = ($i-1);
+
+			elseif ( $direction == "up" AND $i == $vacant-1 )
+				$categories->inorder = ($i+1);
+
+			else 
+				$categories->inorder = $i;
+
+			$categories->save();
+			// moves forward even when the internal pointer is on last record
+			$categories->next();
+		}
+		$this->cacheCategories($parent);
+		return $parent;
+	}
+	
+//	public function categoryDelete( int $cid )
+	public function categoryDelete( $cid )
+	{
+		$delete = new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
+		$delete->load( ["cid = ?", $cid ] );
+		if ( 1 != $delete->count( ["cid = ?", $cid ] ) ) return FALSE;
+		$stats = json_decode( $delete->stats, TRUE );
+		if ( $stats['sub']===NULL AND $stats['count']==0 )
+		{
+			$parent = $delete->parent_cid;
+			$delete->erase( ["cid = ?", $cid ] );
+			$this->cacheCategories($parent);
+			return TRUE;
+		}
+		else return FALSE;
+	}
+	
+	public function characterList($page, $sort)
 	{
 		/*
 		$tags = new \DB\SQL\Mapper($this->db, $this->prefix.'characters' );
@@ -481,9 +483,9 @@ class AdminCP extends Controlpanel {
 				
 		return $data;
 	}
-	
-//	public function loadCharacter(int $tid)
-	public function loadCharacter($charid)
+
+//	public function characterLoad(int $tid)
+	public function characterLoad($charid)
 	{
 		$sql = "SELECT Ch.charid as id, Ch.charname, Ch.biography, Ch.count, Cat.cid, Cat.category 
 					FROM `tbl_characters`Ch
@@ -492,46 +494,6 @@ class AdminCP extends Controlpanel {
 		$data = $this->exec($sql, [":charid" => $charid ]);
 		if (sizeof($data)==1) return $data[0];
 		return NULL;
-	}
-	
-	public function getCategories()
-	{
-		$sql = "SELECT Cat.cid as id, Cat.category FROM `tbl_categories`Cat ORDER BY Cat.category ASC;";
-		return $this->exec($sql);
-	}
-
-//	public function addTag(string $name) : int
-	public function addCharacter($name)
-	{
-		$character=new \DB\SQL\Mapper($this->db, $this->prefix.'characters');
-		$character->charname = $name;
-		$character->save();
-		return $character->get('_id');
-	}
-	
-//	public function saveCharacter(int $charid, array $data)
-	public function saveCharacter($charid, array $data)
-	{
-		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'characters');
-		$tag->load(array('charid=?',$charid));
-		$tag->copyfrom( [ "catid" => $data['catid'], "charname" => $data['charname'], "biography" => $data['biography'] ]);
-
-		//if ( TRUE === $i = $tag->changed("tgid") ) $this->tagGroupRecount();
-		$i = $tag->changed("catid");
-		$i += $tag->changed("charname");
-		$i += $tag->changed("biography");
-
-		$tag->save();
-		return $i;
-	}
-
-//	public function deleteCharacter(int $tid)
-	public function deleteCharacter($charid)
-	{
-		$character=new \DB\SQL\Mapper($this->db, $this->prefix.'characters');
-		$character->load(array('charid=? and count=0',$charid));
-		
-		$_SESSION['lastAction'] = [ "deleteResult" => $character->erase() ];
 	}
 	
 //	public function contestsList(int $page, array $sort) : array
@@ -713,231 +675,360 @@ class AdminCP extends Controlpanel {
 		$_SESSION['lastAction'] = [ "deleteResult" => $contest->erase() ];
 	}
 
-	public function jsonPrepop($rawData)
+//	public function featuredList ( int $page, array $sort, string &$status )
+	public function featuredList( $page, array $sort, &$status )
 	{
-		if ( $rawData == NULL ) return "[]";
-		foreach ( parent::cleanResult($rawData) as $tmp )
-			$data[] = [ "id" => $tmp[0], "name" => $tmp[1] ];
-		return json_encode( $data );	
-	}
+		/*
+		int status = 
+			1: active
+			2: past
+			3: future
+		*/
 
-	public function categoriesListFlat()
-	{
-		$sql = "SELECT 
-					C.cid, C.parent_cid, C.category, C.locked, C.leveldown, C.inorder, C.stats,
-					COUNT(C1.cid) as counter 
-				FROM `tbl_categories`C 
-				INNER JOIN `tbl_categories`C1 ON C.parent_cid=C1.parent_cid 
-				GROUP BY C.cid 
-				ORDER BY C.leveldown DESC, C.inorder ASC";
-		$data = $this->exec($sql);
+		/*
+		active:
+		SELECT * FROM `tbl_featured` WHERE status=1 OR ( start < NOW() AND end > NOW() )
+		*/
+		/*
+		past:
+		SELECT * FROM `tbl_featured` WHERE status=2 OR end < NOW()
+		*/
+		/*
+		future:
+		SELECT * FROM `tbl_featured` WHERE start > NOW()
+		*/
 
-		if ( sizeof($data) == 0 ) return NULL;
+		$limit = 20;
+		$pos = $page - 1;
 		
-		foreach ( $data as $item )
+		switch( $status )
 		{
-			$item['stats'] = json_decode($item['stats'],TRUE);
-			$temp[$item['parent_cid']][] = $item;
-			if ( isset($temp[$item['cid']]) ) $temp[$item['parent_cid']] = array_merge ( $temp[$item['parent_cid']], $temp[$item['cid']]);
+			case "future":
+				$join = "F.status=3 OR ( F.status IS NULL AND F.start > NOW() )";
+				break;
+			case "past":
+				$join = "F.status=2 OR ( F.status IS NULL AND F.end < NOW() )";
+				break;
+			default:
+				$status = "current";
+				$join = "F.status=1 OR ( F.status IS NULL AND F.start < NOW() AND F.end > NOW() )";
 		}
-		return $temp[0];
-	}
 
-//	public function loadCategory(int $cid)
-	public function loadCategory($cid)
-	{
-		if ( $cid == 0 ) return NULL;
-		$sql = "SELECT cid as id, parent_cid, category, description, image, locked, leveldown, inorder, stats FROM `tbl_categories`C WHERE C.cid = :cid";
-		$data = $this->exec($sql, [":cid" => $cid ]);
-		if (sizeof($data)==1) return $data[0];
-		return FALSE;
-	}
+		$sql = str_replace
+				(
+					"%JOIN%",
+					$join,
+					"SELECT SQL_CALC_FOUND_ROWS S.title, S.sid, S.summary, S.cache_authors, S.cache_rating
+						FROM `tbl_stories`S
+						INNER JOIN `tbl_featured`F ON ( F.type='ST' AND F.id = S.sid AND %JOIN% )
+					ORDER BY {$sort['order']} {$sort['direction']}
+					LIMIT ".(max(0,$pos*$limit)).",".$limit
+				);
 
-//	public function loadCategoryPossibleParents(int $cid)
-	public function loadCategoryPossibleParents($cid)
-	{
-		$sql = "SELECT C.cid, C.parent_cid, C.leveldown, C.category
-					FROM `tbl_categories`C 
-					INNER JOIN `tbl_categories`C2 ON ( ( C.parent_cid = C2.parent_cid OR C.cid = C2.parent_cid )AND C2.cid = :cid ) 
-				WHERE C.cid != :cid2
-				ORDER BY C.leveldown, C.inorder ASC ";
+		$data = $this->exec($sql);
+				
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/adminCP/archive/featured/select={$status}/order={$sort['link']},{$sort['direction']}",
+			$limit
+		);
 		
-		$data = $this->exec($sql, [":cid" => $cid, ":cid2" => $cid ]);
-
 		return $data;
 	}
-
-//	public function saveCategory(int $cid, array $data)
-	public function saveCategory($cid, array $data)
+	
+//	public function featuredLoad ( int $sid )
+	public function featuredLoad( $sid )
 	{
-		$category=new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
-		$category->load(array('cid=?',$cid));
-		$parent_cid = $category->parent_cid;
-		$category->copyfrom( 
+		$sql = "SELECT SQL_CALC_FOUND_ROWS S.title, S.sid, S.summary, F.status, F.start, F.end, F.uid, U.nickname, S.cache_authors, S.cache_rating
+					FROM `tbl_stories`S
+						LEFT JOIN `tbl_featured`F ON ( F.type='ST' AND F.id = S.sid )
+						LEFT JOIN `tbl_users`U ON ( F.uid = U.uid )
+				WHERE S.sid = :sid";
+		$data = $this->exec($sql, [":sid" => $sid ]);
+		if (sizeof($data)==1)
+		{
+			$data[0]['cache_authors'] = json_decode($data[0]['cache_authors'], TRUE);
+			return $data[0];
+		}
+		return NULL;
+	}
+
+//	public function featuredSave(int $sid, array $data)
+	public function featuredSave($sid, array $data)
+	{
+		$i = NULL;
+		$feature=new \DB\SQL\Mapper($this->db, $this->prefix.'featured');
+		$feature->load(array('sid=?',$sid));
+		$feature->copyfrom( 
 			[ 
-				"category" => $data['category'], 
-				"description" => $data['description'],
-				"locked" => isset($data['locked']) ? : 0,
-				"parent_cid" => $data['parent_cid'], 
+				"status"	=> $data['status'], 
+				"sid"		=> $sid,
+				"uid"		=> $_SESSION['userID']
 			]
 		);
 
-		$i = $category->changed("category");
-		$i += $category->changed("description");
-		$i += $category->changed("locked");
-		if ( $category->changed("parent_cid") )
+		if ( TRUE === $feature->changed("status") )
 		{
-			$i++;
-			if ( $data['parent_cid']==0 )
-				$new_level = 0;
-			else
-			{
-				$parent=new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
-				$parent->load(array('cid=?',$data['parent_cid']));
-				$new_level = $parent->leveldown+1;
-			}
-			$this->adjustCategoryLevel($cid, $new_level);
-			
-			$category->save();
-
-			$this->cacheCategories($parent_cid);
-			$this->cacheCategories($data['parent_cid']);
+			if ( $data['status'] < 3 AND $feature->start === NULL )
+				$feature->start = date('Y-m-d H:i:s');
+			if ( $data['status'] == 1 AND $feature->end === NULL )
+				$feature->end = date('Y-m-d H:i:s');
+			$i = 1;
 		}
-		else $category->save();
 
+		$feature->save();
 		return $i;
 	}
 	
-//	protected function adjustCategoryLevel( int $cid, int $level)
-	protected function adjustCategoryLevel($cid, $level)
+	public function logGetCount()
 	{
-		$category=new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
-		$category->load(array('cid=?',$cid));
-		$category->leveldown = $level;
-		$category->save();
-		
-		$subCategories = new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
-		$subCategories->load(array('parent_cid=?',$cid));
-		while ( !$subCategories->dry() )
+		$count = [];
+		$countSQL = "SELECT L.type, COUNT(L.id) as items FROM `tbl_log`L @WHERE@ GROUP BY L.type;";
+		$data = $this->exec(str_replace("@WHERE@","",$countSQL));
+		if ( sizeof($data) )
 		{
-			$this->adjustCategoryLevel( $subCategories->cid, $level+1 );
-			$subCategories->next();
+			foreach ( $data as $dat )
+				$count[$dat['type']]['all'] = $dat['items'];
 		}
+		$data = $this->exec(str_replace("@WHERE@","WHERE L.new=1",$countSQL));
+		if ( sizeof($data) )
+		{
+			foreach ( $data as $dat )
+				$count[$dat['type']]['new'] = $dat['items'];
+		}
+		return $count;
 	}
 	
-//	public function addCategory( int $parent_cid, array $data=[] )
-	public function addCategory($parent_cid, array $data=[] )
+	public function logGetData($sub=FALSE, $page, array $sort)
 	{
-		// "clean" target category level
-		$this->moveCategory(0, NULL, $parent_cid);
+		$limit = 50;
+		$pos = $page - 1;
 
-		$categories = new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
+		$sql = "SELECT SQL_CALC_FOUND_ROWS U.uid, U.nickname, 
+					L.uid as uid_reg, L.id, L.action, L.ip, UNIX_TIMESTAMP(L.timestamp) as timestamp, L.type, L.subtype, L.version, L.new
+				FROM `tbl_log`L LEFT JOIN `tbl_users`U ON L.uid=U.uid ";
 
-		// get number of elements with same parent
-		$count = $categories->count(["parent_cid = ?", $parent_cid ]);
+		if ( $sub )
+			$sql .= "WHERE L.type = :sub ";
 
-		// get parent level from siblings
-		$categories->load(["cid = ?", $parent_cid ]);
-		if ( $categories->dry() )	$leveldown = 0;
-		else 						$leveldown = $categories->leveldown + 1;
-		$categories->reset();
+		$sql .= "ORDER BY {$sort['order']} {$sort['direction']}
+				LIMIT ".(max(0,$pos*$limit)).",".$limit;
+
+		if ($sub)
+			$data = $this->exec($sql, [":sub" => $sub]);
+		else
+			$data = $this->exec($sql);
 		
-		$categories->category 		= $data['category'];
-		$categories->description 	= $data['description'];
-		$categories->locked 		= isset($data['locked'])?1:0;
-		$categories->inorder		= $count;
-		$categories->leveldown		= $leveldown;
-		$categories->parent_cid		= $parent_cid;
-		
-		$categories->save();
-		$newCategory = $categories->get('_id'); 
-		
-		// recount parent category
-		if ( $parent_cid>0 )	$this->cacheCategories($parent_cid);
-		$this->cacheCategories($categories->_id);
+		$geo = \Web\Geo::instance();
 
-		$this->moveCategory(0, NULL, $parent_cid);
-
-		return $categories->_id;
-	}
-	
-//	public function moveCategory(int $catID=0, $direction=NULL, $parent=NULL)
-	public function moveCategory($catID=0, $direction=NULL, $parent=NULL)
-	{
-		if ( $parent === NULL )
+		foreach ( $data as &$item )
 		{
-			$sql = "SELECT C.parent_cid 
-						FROM `tbl_categories`C 
-						WHERE C.`cid`= :catID";
-
-			$data = $this->exec ( $sql, [ ":catID" => $catID ] );
-			if ( empty($data[0]) OR !is_numeric($data[0]['parent_cid']) ) return FALSE;
-			$parent = $data[0]['parent_cid'];
-		}
-		
-		$categories = new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
-		$categories->load(
-			["parent_cid = ?", $parent ],
-			[
-				'order' => "inorder ".(($direction=="up") ? "DESC" : "ASC"),
-			]
-		);
-		$elements = $categories->count(["parent_cid = ?", $parent ]);
-
-		// when moving elements upwards, we need to invert the entire logic
-		if ( $direction == "up" ) $i = $elements + 1;
-		else $i = 0;
-
-		// init vacant spot
-		$vacant = -1;
-		
-		while ( !$categories->dry() )
-		{  // gets dry when we passed the last record
-			if ( $direction == "up" ) $i--; 
-			else $i++;
-			if ( $categories->cid == $catID AND $direction!==NULL )
+			if ( $item['version']==0 )
+			// eFiction 3 original, try to do some cleanup
+			// tested against english and german log entries, considering the order of elements
 			{
-				if ( $direction == "up" )
-					$categories->inorder = max(1,($i-1));
+				if ( $item['type']=="AM" AND preg_match("/.+> (.*)./i", $item['action'], $matches) )
+				// matching _LOG_RECALCREVIEWS / _LOG_CATCOUNTS, _LOG_OPTIMIZE, _LOG_BACKUP
+				{
+					$item['action'] = [ 'job'=>$matches[1] ];
+				}
+				elseif ( $item['type']=="DL" )
+				{
+					if ( preg_match("/.+\?sid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>(.*?)<\/.+\s(\d).*/i", $item['action'], $matches) )
+					// matching _LOG_ADMIN_DEL_CHAPTER
+					{
+						$item['action'] = [ 
+							'sid' => $matches[1], 'title' => $matches[2],
+							'aid' => $matches[3], 'name' => $matches[4],
+							'chapter' => $matches[5]
+						];
+						$item['subtype'] = 'c';
+					}
+					elseif ( preg_match("/(.*<\/a>)*+.*\'(.*)\'.*/i", $item['action'], $matches) )
+					// matching _LOG_ADMIN_DEL_SERIES
+					{
+						$item['action'] = [ 'seriestitle' => $matches[2] ];
+						$item['subtype'] = 's';
+					}
+					elseif ( preg_match("/.*?\?uid=(\d*)\'>(.*?)<.*\?sid=(\d*)\'>(.*?)<.*\?uid=(\d*)\'>(.*?)<.*\?seriesid=(\d*)\'>(.*?)<.*/i", $item['action'], $matches) )
+					// matching _LOG_ADMIN_DEL_FROM_SERIES
+					{
+						$item['action'] = [
+							'uid' => $matches[1], 'uname' => $matches[2],
+							'sid' => $matches[3], 'sname' => $matches[4],
+							'aid' => $matches[5], 'aname' => $matches[6],
+							'seriesid' => $matches[7], 'sername' => $matches[8],
+						];
+						$item['subtype'] = 'f';
+					}
+					elseif ( preg_match("/.+\?sid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>([^<]*?)<\/a>.*/i", $item['action'], $matches) )
+					// matching _LOG_ADMIN_DEL
+					{
+						$item['action'] = [ 'sid' => $matches[1], 'title' => $matches[2], 'aid' => $matches[3], 'author' => $matches[4] ];
+					}
+				}
+				elseif ( $item['type']=="EB" )
+				{
+					if ( preg_match("/.+name[n]?\s(\w*).*?(\d+).*[in|to]\s(\w*).*/i", $item['action'], $matches) )
+					// matching _NEWPEN for 'en' and 'de'
+					{
+						$item['action'] = [
+							'uid'		=> $matches[2],
+							'oldname'	=> $matches[1], 'newname'	=> $matches[3],
+						];
+					}
+					$item['subtype'] = 'n';
+				}
+				elseif ( $item['type']=="ED" )
+				{
+					if ( preg_match("/.+\?sid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>(.*?)<\/.+/i", $item['action'], $matches) )
+					// matching _LOG_ADMIN_EDIT_AUTHOR
+					{
+						$item['action'] = [ 
+							'sid'     => $matches[1], 'title'    => $matches[2],
+							'fromaid' => $matches[3], 'fromname' => $matches[4],
+							'toaid'   => $matches[5], 'toname'   => $matches[6]
+						];
+						$item['subtype'] = 'a';
+					}
+					elseif ( preg_match("/.+\?sid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>(.*?)<\/.+(\d).*/i", $item['action'], $matches) )
+					// matching _LOG_ADMIN_EDIT_CHAPTER
+					{
+						$item['action'] = [ 
+							'sid' => $matches[1], 'title' => $matches[2],
+							'aid' => $matches[3], 'author' => $matches[4],
+							'chapter' => $matches[5]
+						];
+						$item['subtype'] = 'c';
+					}
+					elseif ( preg_match("/.+\?series[i]?d=(\d*)'>(.*?)<\/.+/i", $item['action'], $matches) )
+					// matching _LOG_ADMIN_EDIT_SERIES
+					{
+						$item['action'] = [ 'seriesid' => $matches[1], 'title' => $matches[2] ];
+						$item['subtype'] = 's';
+					}
+					elseif ( preg_match("/.+\?sid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>(.*?)<\/.+/i", $item['action'], $matches) )
+					// matching _LOG_ADMIN_EDIT
+					{
+						$item['action'] = [
+							'sid' => $matches[1], 'title' => $matches[2],
+							'aid' => $matches[3], 'author' => $matches[4]
+						];
+					}
+				}
+				elseif ( $item['type']=="LP" AND preg_match("/.*\?uid=(\d*)\'>(.*)<.*:\s*(\w+).*/im", $item['action'], $matches) )
+				// matching _LOG_LOST_PASSWORD
+				{
+					$item['action'] = [ 'uid'=>$matches[1], 'name'=>$matches[2], 'result'=>$matches[3] ];
+				}
+				elseif ( $item['type']=="RE" AND preg_match("/(.+?)\s*\(.*?'(.*)'.*?'.*?\?sid=(\d+).*/im", $item['action'], $matches) )
+				// matching _LOG_REVIEW
+				{
+					$item['action'] = [ 'name'=>$matches[1], 'review'=>$matches[2], 'sid'=>$matches[3] ];
+				}
+				elseif ( $item['type']=="RG" AND preg_match('/(\w+[\s\w]*)\s+\((\d*)\).*/iU', $item['action'], $matches) )
+				// matching _LOG_REGISTER & _LOG_ADMIN_REG
+				{
+					$item['action'] = [ 'name'=>$matches[1], 'uid'=>$matches[2], 'admin'=>($matches[2]!=$item['uid_reg']) ];
+				}
+				elseif ( $item['type']=="VS" )
+				{
+					if ( preg_match("/.+\?sid=(\d+)\'>(.+?)<\/a> \(.+?(\d+).+\?uid=(\d+)\'>(.+?)</i", $item['action'], $matches) )
+					// _LOG_VALIDATE_CHAPTER
+					{
+						$item['action'] = [
+							'sid' 	 => $matches[1], 'title'  => $matches[2],
+							'chapter'=> $matches[3],
+							'aid' 	 => $matches[4], 'author' => $matches[5]
+						];
+						$item['subtype'] = 'c';
+					}
+					elseif ( preg_match("/.+\?sid=(\d+)\'>(.+?)<.*\?uid=(\d+)\'>(.+?)</i", $item['action'], $matches) )
+					// _LOG_VALIDATE_STORY
+					{
+						$item['action'] = [
+							'sid' 	 => $matches[1], 'title'  => $matches[2],
+							'aid' 	 => $matches[3], 'author' => $matches[4]
+						];
+					}
+					elseif ( preg_match("/.+\?sid=(\d+)\'>(.+?)<.*\/>(.*)/i", $item['action'], $matches) )
+					// _LOG_REJECTION
+					{
+						$item['action'] = [
+							'sid' 	 => $matches[1], 'title' => $matches[2],
+							'reason' => $matches[3]
+						];
+						$item['subtype'] = 'r';
+					}
+				}
+				
+				/*
+				
+				define ("_LOG_BAD_LOGIN", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> hat ein falsches Passwort beim einloggen eingegeben.");
+				define ("_LOG_BAD_LOGIN", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> entered a wrong password trying to log in.");
 
-				else
-					$categories->inorder = min($elements,($i+1));
+				define ("_LOG_EDIT_REVIEW", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> hat    <a href='reviews.php?reviewid=%4\$d'>ein Review</a> für '%3\$s' bearbeitet.");
+				define ("_LOG_EDIT_REVIEW", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> edited <a href='reviews.php?reviewid=%4\$d'>a review  </a> for '%3\$s'.");
+				
+				AM
+				("_LOG_RECALCREVIEWS", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> recalculated the reviews.");
+				("_LOG_CATCOUNTS", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> recalculated the category counts.");
+				("_LOG_OPTIMIZE", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> optimized the database tables.");
+				("_LOG_BACKUP", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> backed up the database tables.");
+				
+				*/
 
-				// remember the vacant spot
-				$vacant = $i;
+				if ( is_array($item['action']) )
+				{
+					$item['ip'] = long2ip($item['ip']);
+					$item['action']['origin'] =
+					[
+						$geo->location($item['ip'])['country_code'], 
+						$geo->location($item['ip'])['country_name'], 
+						$geo->location($item['ip'])['continent_code']
+					];
+					$this->logResaveData($item);
+				}
 			}
-			elseif ( $direction == "down" AND $i == $vacant+1 )
-				$categories->inorder = ($i-1);
-
-			elseif ( $direction == "up" AND $i == $vacant-1 )
-				$categories->inorder = ($i+1);
-
-			else 
-				$categories->inorder = $i;
-
-			$categories->save();
-			// moves forward even when the internal pointer is on last record
-			$categories->next();
+			elseif ( $item['version']==1 )
+			{
+				// eFiction 3 reworked
+				$item['action'] = json_decode($item['action'], TRUE);
+			}
+			elseif ( $item['version']==2 )
+			{
+				// eFiction 5
+				$item['action'] = json_decode($item['action'], TRUE);
+			}
 		}
-		$this->cacheCategories($parent);
-		return $parent;
+				
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/adminCP/home/logs/type=".($sub?"{$sub}/":"")."order={$sort['link']},{$sort['direction']}",
+			$limit
+		);
+				
+		return $data;
 	}
 	
-//	public function deleteCategory( int $cid )
-	public function deleteCategory( $cid )
+	protected function logResaveData($item)
 	{
-		$delete = new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
-		$delete->load( ["cid = ?", $cid ] );
-		if ( 1 != $delete->count( ["cid = ?", $cid ] ) ) return FALSE;
-		$stats = json_decode( $delete->stats, TRUE );
-		if ( $stats['sub']===NULL AND $stats['count']==0 )
-		{
-			$parent = $delete->parent_cid;
-			$delete->erase( ["cid = ?", $cid ] );
-			$this->cacheCategories($parent);
-			return TRUE;
-		}
-		else return FALSE;
+		$this->update(
+				'tbl_log',
+				[
+					'action' 	=> json_encode($item['action']),
+					'version'	=> 1,
+					'subtype'	=> isset($item['subtype'])? $item['subtype'] : NULL,
+/*					'origin'	=> json_encode(
+									[
+										$geo->location($item['ip'])['country_code'], 
+										$geo->location($item['ip'])['country_name'], 
+										$geo->location($item['ip'])['continent_code']
+									]
+					)	*/
+				],
+				"id = {$item['id']}"
+		);
 	}
 	
 	public function ratingAdd($rating)
@@ -1047,6 +1138,548 @@ class AdminCP extends Controlpanel {
 			return "[]";
 	}
 
+	public function storyAdd(array $data)
+	{
+		$newStory = new \DB\SQL\Mapper($this->db, $this->prefix."stories");
+		$newStory->title		= $data['new_title'];
+		$newStory->completed	= 1;
+		$newStory->validated	= ($_SESSION['groups']&128) ? 33 : 32;
+		$newStory->date			= date('Y-m-d H:i:s');
+		$newStory->updated		= $newStory->date;
+		$newStory->save();
+		
+		$newID = $newStory->_id;
+		
+		// add initial chapter to the story
+		if ( FALSE === $this->storyChapterAdd($newID, NULL, $newStory->date) )
+		{
+			
+		}
+		
+		$new_authors = explode(",",$data['new_author']);
+		foreach ( $new_authors as $new_author )
+		{
+			// add the story-author relation
+			$newRelation = new \DB\SQL\Mapper($this->db, $this->prefix."stories_authors");
+			$newRelation->sid	= $newID;
+			$newRelation->aid	= $new_author;
+			$newRelation->type	= 'M';
+			$newRelation->save();
+			
+			// already counting as author? mainly for stats ...
+			$editUser = new \DB\SQL\Mapper($this->db, $this->prefix."users");
+			$editUser->load(array("uid=?",$new_author));
+			if ( $editUser->groups < 4 )
+				$editUser->groups += 4;
+			$editUser->save();
+		}
+		
+		$this->rebuildStoryCache($newID);
+
+		return $newID;
+	}
+
+	public function storyAddCheck(array $formData)
+	{
+		$sql = "SELECT S.sid, S.title 
+					FROM `tbl_stories`S 
+						INNER JOIN `tbl_stories_authors`A ON ( S.sid = A.sid ) 
+					WHERE S.title LIKE :title and A.aid IN(:aid)";
+		$similarExists = $this->exec($sql,  [ ':title' => $formData['new_title'], ':aid' => $formData['new_author'] ] );
+		
+		// no hits, seems to be a new story
+		if ( sizeof($similarExists) == 0 ) return NULL;
+		
+		// might be an existing title up for dual entry, let's notify the mod/admin
+		$sqlAuthors = "SELECT U.uid as id, U.nickname as name FROM `tbl_users`U WHERE FIND_IN_SET(U.uid,:uid);";
+		$authors = $this->exec($sqlAuthors,  [ ':uid' => $formData['new_author'] ] );
+		
+		return [ "storyInfo" => $similarExists[0], "preAuthor" => json_encode($authors) ];
+	}
+
+//	public function storyLoadInfo(int $sid)
+	public function storyLoadInfo($sid)
+	{
+		$data = $this->exec
+		(
+			"SELECT S.*, COUNT(DISTINCT Ch.chapid) as chapters
+				FROM `tbl_stories`S
+					LEFT JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid)
+				WHERE S.sid = :sid",
+			[":sid" => $sid ]
+		);
+		if (sizeof($data)==1)
+		{
+			$data[0]['ratings'] = $this->exec("SELECT rid, rating, ratingwarning FROM `tbl_ratings`");
+			return $data[0];
+		}
+		return FALSE;
+	}
+
+	public function storySaveChanges(\DB\SQL\Mapper $current, array $post)
+	{
+		// remember old validation status
+		$oldValidated = $current->validated;
+		
+		// Step one: save the plain data
+		$current->title			= $post['story_title'];
+		$current->summary		= str_replace("\n","<br />",$post['story_summary']);
+		$current->storynotes	= str_replace("\n","<br />",$post['story_notes']);
+		$current->ratingid		= @$post['ratingid'];	// Quick fix for when no rating is created
+		$current->completed		= $post['completed'];
+		$current->validated 	= $post['validated'].$post['valreason'];
+		
+		if ( $current->changed("validated") )
+		{
+			if ( $post['validated'] == 3 AND substr($oldValidated,0,1)!=3 )
+			// story got validated
+			\Logging::addEntry('VS', $current->sid);
+		}
+		
+		$current->save();
+
+		// Step two: check for changes in relation tables
+		
+
+		// Check tags:
+		$this->storyRelationTag( $current->sid, $post['tags'] );
+		// Check Characters:
+		$this->storyRelationTag( $current->sid, $post['characters'], 1 );
+		// Check Categories:
+		$this->storyRelationCategories( $current->sid, $post['category'] );
+		// Check Authors:
+		$this->storyRelationAuthor( $current->sid, $post['mainauthor'], $post['supauthor'] );
+
+		// Rebuild story cache based on new data
+		$this->rebuildStoryCache($current->sid);
+		
+		return TRUE;
+	}
+
+	//public function storyListPending(int $page, array $sort)
+	public function storyListPending($page, array $sort)
+	{
+		$limit = 20;
+		$pos = $page - 1;
+		
+		$sql = "SELECT SQL_CALC_FOUND_ROWS
+					S.sid, S.title, IF(S.validated >= 20 AND S.validated <= 30,1,0) as pStory,
+					COUNT(Ch.chapid) as pChapters,
+					IF(
+						Ch2.chapid<MIN(Ch.chapid) 
+						OR (COUNT(Ch.chapid)=0 AND Ch3.chapid IS NOT NULL)
+					,1,0) as blocked,
+					UNIX_TIMESTAMP(IF(Ch.chapid IS NULL,S.updated,Ch.created)) as lastdate,
+                    GROUP_CONCAT(DISTINCT U.uid ORDER BY U.nickname ASC SEPARATOR ', ') as aid,
+					GROUP_CONCAT(DISTINCT U.nickname ORDER BY U.nickname ASC SEPARATOR ', ') as authors
+				FROM `tbl_stories`S
+					LEFT JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid AND Ch.validated >= 20 AND Ch.validated <= 30 )
+						LEFT JOIN `tbl_chapters`Ch2 ON
+						( 
+							(Ch.validated >= 20 AND Ch.validated <= 30) 
+							AND (Ch2.validated >= 10 AND Ch2.validated <= 20) 
+							AND Ch.sid = Ch2.sid 
+							AND Ch2.inorder < Ch.inorder
+						)
+					LEFT JOIN `tbl_chapters`Ch3 ON ( S.sid = Ch3.sid AND Ch3.validated >= 10 AND Ch3.validated <= 20 )
+					LEFT JOIN `tbl_stories_authors`rSA ON ( rSA.sid = S.sid )
+						LEFT JOIN `tbl_users`U ON ( rSA.aid = U.uid )
+				WHERE Ch.chapid IS NOT NULL OR ( S.validated >= 20 AND S.validated <= 30 )
+				GROUP BY S.sid
+				ORDER BY blocked ASC, lastdate ASC
+				LIMIT ".(max(0,$pos*$limit)).",".$limit;
+				
+		$data = $this->exec($sql);
+
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/adminCP/stories/pending/order={$sort['link']},{$sort['direction']}",
+			$limit
+		);
+				
+		return $data;
+	}
+
+	public function storyLoadPending($sid)
+	{
+		$jobs = $this->exec("SELECT
+						S.sid, S.title, S.completed, S.storynotes, S.summary, S.translation, S.trans_from, S.trans_to,
+						IF(S.validated >= 20 AND S.validated <= 30,1,0) as pStory, 
+						IF(
+							Ch2.chapid<MIN(Ch.chapid) 
+							OR (COUNT(Ch.chapid)=0 AND Ch3.chapid IS NOT NULL)
+						,1,0) as blocked,
+						S.cache_authors, S.cache_tags, S.cache_characters, S.cache_categories, S.cache_rating, 
+						Ch.chapid, Ch.title as chap_title, UNIX_TIMESTAMP(Ch.created) as chap_lastdate, Ch.inorder as chap_inorder
+					FROM `tbl_stories`S
+						LEFT JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid AND Ch.validated >= 20 AND Ch.validated <= 30 )
+							LEFT JOIN `tbl_chapters`Ch2 ON
+							( 
+								(Ch.validated >= 20 AND Ch.validated <= 30) 
+								AND (Ch2.validated >= 10 AND Ch2.validated <= 20) 
+								AND Ch.sid = Ch2.sid 
+								AND Ch2.inorder < Ch.inorder
+							)
+						LEFT JOIN `tbl_chapters`Ch3 ON ( S.sid = Ch3.sid AND Ch3.validated >= 10 AND Ch3.validated <= 20 )
+					WHERE S.sid = :sid AND ((S.validated >= 20 AND S.validated <= 30 ) OR Ch.chapid IS NOT NULL)
+					GROUP BY Ch.chapid
+					HAVING blocked = 0
+					ORDER BY Ch.inorder ASC;",
+				[":sid"=>$sid]
+		);
+		
+		if ( sizeof($jobs)>0 )
+		{
+			$data = 
+			[
+				"story"			=> $jobs[0],
+				"chapterList"	=> [],
+			];
+			
+			if ( $jobs[0]['chapid']!==NULL )
+			// Only build a chapter list if there are chapters that require validation
+			{
+				$data['chapterList'] = $this->loadChapterList($sid);
+				$first  = 0;
+				$closed = 0;
+				
+				foreach ( $data['chapterList'] as $key => &$chapter )
+				{
+					if ( $chapter['validated'] >= 20 AND $chapter['validated'] <= 29 AND $closed == 0 )
+					// chapter requires validation and the queue has not yet been closed
+					{
+						if ( $first==0 )
+						// first job
+						{
+							$first = 1;
+							$chapter['first'] = TRUE;
+						}
+						// remember the last chapter that requires validation
+						$last = $key;
+						$chapter['active'] = 1;
+					}
+					elseif ( $chapter['validated'] <= 19 )
+					// encountering the first non-mod chapter, we close the queue
+					{
+						$closed = 1;
+					}
+				}
+				// tag the last chapter that can be validated
+				$data['chapterList'][$last]['last'] = TRUE;
+				
+			}
+
+			if ( sizeof($jobs)==1 AND $jobs[0]['chapid']==NULL )
+				$data['state'] = 'storyOnly';
+			elseif ( $jobs[0]['pStory']==0 AND $jobs[0]['chapid']!=NULL )
+				$data['state'] = 'chapterOnly';
+			else
+				$data['state'] = 'chapterFirst';
+
+			return ($data);
+		}
+		return NULL;
+	}
+	
+	public function storyValidatePending($sid, $chapid = FALSE)
+	{
+		if 		( $_SESSION['groups']&128 ) $validated = 33;
+		elseif 	( $_SESSION['groups']&64 )	$validated = 32;
+		else								$validated = 32;
+		
+		if ( $chapid )
+		{
+			// Try to set validation on chapter
+			if ( 1 == $result = $this->exec("UPDATE `tbl_chapters` SET `validated`=:validated WHERE `chapid`=:chapid;",
+						[
+							":validated"	=> $validated,
+							":chapid"		=> $chapid
+						])
+			)
+			// Log success
+			\Logging::addEntry(['VS','c'], [$sid,$chapid]);
+		}
+		else
+		{
+			// Try to set story to validated
+			if ( 1 == $result = $this->exec("UPDATE `tbl_stories` SET `validated`=:validated WHERE `sid`=:sid;",
+						[
+							":validated"	=> $validated,
+							":sid"			=> $sid
+						])
+			)
+			// Log success
+			\Logging::addEntry('VS', $sid);
+		}
+		return $result;
+	}
+
+//	public function tagAdd(string $name) : int
+	public function tagAdd($name)
+	{
+		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'tags');
+		$tag->label = $name;
+		$tag->save();
+		return $tag->get('_id');
+	}
+
+	public function tagList($page, $sort)
+	{
+		/*
+		$tags = new \DB\SQL\Mapper($this->db, $this->prefix.'tags' );
+		$data = $tags->paginate($page, 10, NULL, [ 'order' => "{$sort['order']} {$sort['direction']}", ] );
+		*/
+		$limit = 20;
+		$pos = $page - 1;
+
+		$sql = "SELECT SQL_CALC_FOUND_ROWS T.tid,T.tgid,T.label,T.count,G.description as `group`
+				FROM `tbl_tags`T 
+				LEFT JOIN `tbl_tag_groups`G ON ( T.tgid=G.tgid)
+				ORDER BY {$sort['order']} {$sort['direction']}
+				LIMIT ".(max(0,$pos*$limit)).",".$limit;
+
+		$data = $this->exec($sql);
+				
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/adminCP/archive/tags/edit/order={$sort['link']},{$sort['direction']}",
+			$limit
+		);
+				
+		return $data;
+	}
+
+//	public function tagLoad(int $tid)
+	public function tagLoad($tid)
+	{
+		$sql = "SELECT T.tid as id, T.tgid, T.label, T.description, T.count, G.description as groupname FROM `tbl_tags`T LEFT JOIN `tbl_tag_groups`G ON ( T.tgid=G.tgid) WHERE T.tid = :tid";
+		$data = $this->exec($sql, [":tid" => $tid ]);
+		if (sizeof($data)==1) return $data[0];
+		return NULL;
+	}
+
+//	public function tagSave(int $tid, array $data)
+	public function tagSave($tid, array $data)
+	{
+		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'tags');
+		$tag->load(array('tid=?',$tid));
+		$tag->copyfrom( [ "tgid" => $data['taggroup'], "label" => $data['label'], "description" => $data['description'] ]);
+
+		//if ( TRUE === $i = $tag->changed("tgid") ) $this->tagGroupRecount();
+		$i = $tag->changed("tgid");
+		$i += $tag->changed("label");
+		$i += $tag->changed("description");
+
+		$tag->save();
+		return $i;
+	}
+	
+//	public function tagDelete(int $tid)
+	public function tagDelete($tid)
+	{
+		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'tags');
+		$tag->load(array('tid=?',$tid));
+		$_SESSION['lastAction'] = [ "deleteResult" => $tag->erase() ];
+	}
+
+//	public function tagGroupAdd(string $name)
+	public function tagGroupAdd($name)
+	{
+		$taggroup=new \DB\SQL\Mapper($this->db, $this->prefix.'tag_groups');
+		$taggroup->description = $name;
+		$taggroup->save();
+		return $taggroup->get('_id');
+	}
+
+	public function tagGroups()
+	{
+		return $this->exec("SELECT TG.tgid as id, TG.description FROM `tbl_tag_groups`TG ORDER BY TG.description ASC");
+	}
+
+	public function tagGroupsList($page, $sort)
+	{
+		/*
+		CREATE OR REPLACE VIEW tbl_list_tag_groups AS SELECT G.tgid,G.description,COUNT(T.tid) as `count`
+				FROM `tbl_tag_groups`G 
+				LEFT JOIN `tbl_tags`T ON ( G.tgid = T.tgid )
+		
+
+		$tags = new \DB\SQL\Mapper($this->db, 'tbl_list_tag_groups' );
+		$data = $tags->paginate($page, 10, NULL, [ 'order' => "{$sort['order']} {$sort['direction']}", ] );
+		*/
+		$limit = 20;
+		$pos = $page - 1;
+
+		$sql = "SELECT SQL_CALC_FOUND_ROWS G.tgid,G.description,COUNT(T.tid) as `count`
+				FROM `tbl_tag_groups`G 
+				LEFT JOIN `tbl_tags`T ON ( G.tgid = T.tgid )
+				GROUP BY G.tgid
+				ORDER BY {$sort['order']} {$sort['direction']}
+				LIMIT ".(max(0,$pos*$limit)).",".$limit;
+
+		$data = $this->exec($sql);
+				
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/adminCP/archive/tags/edit/",
+			$limit
+		);
+
+		return $data;
+	}
+	
+//	public function tagGroupLoad(int $tgid)
+	public function tagGroupLoad($tgid)
+	{
+		$sql = "SELECT TG.tgid as id, TG.label as label, TG.description FROM `tbl_tag_groups`TG WHERE TG.tgid = :tgid";
+		$data = $this->exec($sql, [":tgid" => $tgid ]);
+		if (sizeof($data)==1) return $data[0];
+		return NULL;
+	}
+	
+//	public function tagGroupSave(int $tgid, array $data)
+	public function tagGroupSave($tgid, array $data)
+	{
+		$taggroup=new \DB\SQL\Mapper($this->db, $this->prefix.'tag_groups');
+		$taggroup->load(array('tgid=?',$tgid));
+		$taggroup->copyfrom( [ "label" => $data['label'], "description" => $data['description'] ]);
+
+		$i = $taggroup->changed("label");
+		$i += $taggroup->changed("description");
+
+		$taggroup->save();
+		return $i;
+	}
+	
+//	public function tagGroupDelete(int $tgid)
+	public function tagGroupDelete($tgid)
+	{
+		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'tags');
+		if($tag->count(array('tgid=?',$tgid)))
+		{
+			$_SESSION['lastAction'] = [ "deleteResult" => 0 ];
+			return FALSE;
+		}
+		$taggroup=new \DB\SQL\Mapper($this->db, $this->prefix.'tag_groups');
+		$taggroup->load(array('tgid=?',$tgid));
+		$_SESSION['lastAction'] = [ "deleteResult" => $taggroup->erase() ];
+		return TRUE;
+	}
+
+	public function listTeam()
+	{
+		$sql = "SELECT SQL_CALC_FOUND_ROWS `uid`, `nickname`, `realname`, `groups` FROM `tbl_users` WHERE `groups` > 16 ORDER BY groups,nickname ASC";
+		return $this->exec($sql);
+	}
+	
+	public function listUserFields()
+	{
+		$sql = "SELECT `field_id`, `field_type`, `field_name`, `field_title`, `field_options`, `enabled` FROM `tbl_user_fields` ORDER BY `field_type` ASC";
+		return $this->exec($sql);
+	}
+	
+	public function listUsers($page, array $sort, $search=NULL)
+	{
+		$limit = 20;
+		$pos = $page - 1;
+		$bind = [];
+
+		$sql = "SELECT SQL_CALC_FOUND_ROWS `uid`, `nickname`, `login`, `email`, UNIX_TIMESTAMP(registered) as registered, `groups`
+					FROM `tbl_users`
+					WHERE `uid`>0";
+
+		if ( $search['fromlevel'] )
+			$sql .= " AND `groups` >= POW(2,{$search['fromlevel']})";
+		else 
+			$sql .= " AND `groups` >= 1";
+		
+		if ( $search['tolevel'] )
+			$sql .=	" AND groups < POW(2,".($search['tolevel']+1).") ";
+
+		if($search['term'])
+		{
+			$sql .="	AND (`login` LIKE :term1
+							or `nickname` LIKE :term2
+							or `realname` LIKE :term3
+							or `email` LIKE :term4
+							or `about` LIKE :term5) ";
+			$bind = [ ":term1" => "%{$search['term']}%", ":term2" => "%{$search['term']}%", ":term3" => "%{$search['term']}%", ":term4" => "%{$search['term']}%", ":term5" => "%{$search['term']}%" ];
+		}
+
+		$sql .= " ORDER BY {$sort['order']} {$sort['direction']}
+				LIMIT ".(max(0,$pos*$limit)).",".$limit;
+
+		$data = $this->exec($sql,$bind);
+
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/adminCP/members/edit/{$search['follow']}order={$sort['link']},{$sort['direction']}",
+			$limit
+		);
+		return $data;
+	}
+	
+	//public function loadUser(int $uid)
+	public function loadUser($uid)
+	{
+		$sql = "SELECT uid, login, nickname, realname, email, UNIX_TIMESTAMP(registered) as registered, groups, curator, about
+					FROM `tbl_users`
+					WHERE uid = :uid;";
+		$data = $this->exec( $sql, [ ":uid" => $uid ] );
+		
+		if ( sizeof($data)==1 ) $user = $data[0];
+		else return FALSE;
+		
+		$sql = "SELECT F.field_id as id, F.field_title as title, F.field_type as type, F.field_options as options, I.info
+					FROM `tbl_user_fields`F
+					LEFT JOIN `tbl_user_info`I ON ( F.field_id = I.field AND I.uid = :uid )
+					WHERE F.enabled = 1
+					ORDER BY F.field_type, F.field_order";
+		$user['fields'] = $this->exec( $sql, [ ":uid" => $uid ] );
+		
+		foreach ( $user['fields'] as &$field )
+		{
+			if ( $field['type']==2 )
+				$field['options'] = json_decode($field['options'],TRUE);
+		}
+		
+		return $user;
+	}
+	
+//	public function addTag(string $name) : int
+	public function addCharacter($name)
+	{
+		$character=new \DB\SQL\Mapper($this->db, $this->prefix.'characters');
+		$character->charname = $name;
+		$character->save();
+		return $character->get('_id');
+	}
+	
+//	public function saveCharacter(int $charid, array $data)
+	public function saveCharacter($charid, array $data)
+	{
+		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'characters');
+		$tag->load(array('charid=?',$charid));
+		$tag->copyfrom( [ "catid" => $data['catid'], "charname" => $data['charname'], "biography" => $data['biography'] ]);
+
+		//if ( TRUE === $i = $tag->changed("tgid") ) $this->tagGroupRecount();
+		$i = $tag->changed("catid");
+		$i += $tag->changed("charname");
+		$i += $tag->changed("biography");
+
+		$tag->save();
+		return $i;
+	}
+
+//	public function deleteCharacter(int $tid)
+	public function deleteCharacter($charid)
+	{
+		$character=new \DB\SQL\Mapper($this->db, $this->prefix.'characters');
+		$character->load(array('charid=? and count=0',$charid));
+		
+		$_SESSION['lastAction'] = [ "deleteResult" => $character->erase() ];
+	}
+	
 //	public function listCustompages(int $page, array $sort)
 	public function listCustompages($page, array $sort)
 	{
@@ -1226,130 +1859,6 @@ class AdminCP extends Controlpanel {
 		return TRUE;
 	}
 
-//	public function listStoryFeatured ( int $page, array $sort, string &$status )
-	public function listStoryFeatured ( $page, array $sort, &$status )
-	{
-		/*
-		int status = 
-			1: active
-			2: past
-			3: future
-		*/
-
-		/*
-		active:
-		SELECT * FROM `tbl_featured` WHERE status=1 OR ( start < NOW() AND end > NOW() )
-		*/
-		/*
-		past:
-		SELECT * FROM `tbl_featured` WHERE status=2 OR end < NOW()
-		*/
-		/*
-		future:
-		SELECT * FROM `tbl_featured` WHERE start > NOW()
-		*/
-
-		$limit = 20;
-		$pos = $page - 1;
-		
-		switch( $status )
-		{
-			case "future":
-				$join = "F.status=3 OR ( F.status IS NULL AND F.start > NOW() )";
-				break;
-			case "past":
-				$join = "F.status=2 OR ( F.status IS NULL AND F.end < NOW() )";
-				break;
-			default:
-				$status = "current";
-				$join = "F.status=1 OR ( F.status IS NULL AND F.start < NOW() AND F.end > NOW() )";
-		}
-
-		$sql = str_replace
-				(
-					"%JOIN%",
-					$join,
-					"SELECT SQL_CALC_FOUND_ROWS S.title, S.sid, S.summary, S.cache_authors, S.cache_rating
-						FROM `tbl_stories`S
-						INNER JOIN `tbl_featured`F ON ( F.type='ST' AND F.id = S.sid AND %JOIN% )
-					ORDER BY {$sort['order']} {$sort['direction']}
-					LIMIT ".(max(0,$pos*$limit)).",".$limit
-				);
-
-		$data = $this->exec($sql);
-				
-		$this->paginate(
-			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
-			"/adminCP/archive/featured/select={$status}/order={$sort['link']},{$sort['direction']}",
-			$limit
-		);
-		
-		return $data;
-	}
-	
-//	public function loadFeatured ( int $sid )
-	public function loadFeatured ( $sid )
-	{
-		$sql = "SELECT SQL_CALC_FOUND_ROWS S.title, S.sid, S.summary, F.status, F.start, F.end, F.uid, U.nickname, S.cache_authors, S.cache_rating
-					FROM `tbl_stories`S
-						LEFT JOIN `tbl_featured`F ON ( F.type='ST' AND F.id = S.sid )
-						LEFT JOIN `tbl_users`U ON ( F.uid = U.uid )
-				WHERE S.sid = :sid";
-		$data = $this->exec($sql, [":sid" => $sid ]);
-		if (sizeof($data)==1)
-		{
-			$data[0]['cache_authors'] = json_decode($data[0]['cache_authors'], TRUE);
-			return $data[0];
-		}
-		return NULL;
-	}
-
-//	public function saveFeatured(int $sid, array $data)
-	public function saveFeatured($sid, array $data)
-	{
-		$i = NULL;
-		$feature=new \DB\SQL\Mapper($this->db, $this->prefix.'featured');
-		$feature->load(array('sid=?',$sid));
-		$feature->copyfrom( 
-			[ 
-				"status"	=> $data['status'], 
-				"sid"		=> $sid,
-				"uid"		=> $_SESSION['userID']
-			]
-		);
-
-		if ( TRUE === $feature->changed("status") )
-		{
-			if ( $data['status'] < 3 AND $feature->start === NULL )
-				$feature->start = date('Y-m-d H:i:s');
-			if ( $data['status'] == 1 AND $feature->end === NULL )
-				$feature->end = date('Y-m-d H:i:s');
-			$i = 1;
-		}
-
-		$feature->save();
-		return $i;
-	}
-	
-	//public function loadStoryInfo(int $sid)
-	public function loadStoryInfo($sid)
-	{
-		$data = $this->exec
-		(
-			"SELECT S.*, COUNT(DISTINCT Ch.chapid) as chapters
-				FROM `tbl_stories`S
-					LEFT JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid)
-				WHERE S.sid = :sid",
-			[":sid" => $sid ]
-		);
-		if (sizeof($data)==1)
-		{
-			$data[0]['ratings'] = $this->exec("SELECT rid, rating, ratingwarning FROM `tbl_ratings`");
-			return $data[0];
-		}
-		return FALSE;
-	}
-
 /*	
 	public function loadChapterList($sid)
 	moved to parent
@@ -1368,9 +1877,20 @@ class AdminCP extends Controlpanel {
 		$chapter=new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
 		$chapter->load(array('chapid=?',$chapterID));
 		
+		// remember old validation status
+		$oldValidated = $chapter->validated;
+
 		$chapter->title 		= $post['chapter_title'];
 		$chapter->notes 		= $post['chapter_notes'];
 		$chapter->validated 	= $post['validated'].$post['valreason'];
+
+		if ( $chapter->changed("validated") )
+		{
+			if ( $post['validated'] == 3 AND substr($oldValidated,0,1)!=3 )
+			// story got validated
+			\Logging::addEntry(['VS','c'], [ $chapter->sid, $chapter->inorder] );
+		}
+
 		$chapter->save();
 		
 		// plain and visual return different newline representations, this will bring things to standard.
@@ -1420,126 +1940,6 @@ class AdminCP extends Controlpanel {
 	public function addChapterText( $chapterData )
 	{
 		return parent::addChapterText( $chapterData );
-	}
-	
-	public function storyAdd(array $data)
-	{
-		$newStory = new \DB\SQL\Mapper($this->db, $this->prefix."stories");
-		$newStory->title		= $data['new_title'];
-		$newStory->completed	= 1;
-		$newStory->validated	= ($_SESSION['groups']&128) ? 33 : 32;
-		$newStory->date			= date('Y-m-d H:i:s');
-		$newStory->updated		= $newStory->date;
-		$newStory->save();
-		
-		$newID = $newStory->_id;
-		
-		// add initial chapter to the story
-		if ( FALSE === $this->storyChapterAdd($newID, NULL, $newStory->date) )
-		{
-			
-		}
-		
-		$new_authors = explode(",",$data['new_author']);
-		foreach ( $new_authors as $new_author )
-		{
-			// add the story-author relation
-			$newRelation = new \DB\SQL\Mapper($this->db, $this->prefix."stories_authors");
-			$newRelation->sid	= $newID;
-			$newRelation->aid	= $new_author;
-			$newRelation->type	= 'M';
-			$newRelation->save();
-			
-			// already counting as author? mainly for stats ...
-			$editUser = new \DB\SQL\Mapper($this->db, $this->prefix."users");
-			$editUser->load(array("uid=?",$new_author));
-			if ( $editUser->groups < 4 )
-				$editUser->groups += 4;
-			$editUser->save();
-		}
-		
-		$this->rebuildStoryCache($newID);
-
-		return $newID;
-	}
-
-	public function storyAddCheck(array $formData)
-	{
-		$sql = "SELECT S.sid, S.title 
-					FROM `tbl_stories`S 
-						INNER JOIN `tbl_stories_authors`A ON ( S.sid = A.sid ) 
-					WHERE S.title LIKE :title and A.aid IN(:aid)";
-		$similarExists = $this->exec($sql,  [ ':title' => $formData['new_title'], ':aid' => $formData['new_author'] ] );
-		
-		// no hits, seems to be a new story
-		if ( sizeof($similarExists) == 0 ) return NULL;
-		
-		// might be an existing title up for dual entry, let's notify the mod/admin
-		$sqlAuthors = "SELECT U.uid as id, U.nickname as name FROM `tbl_users`U WHERE FIND_IN_SET(U.uid,:uid);";
-		$authors = $this->exec($sqlAuthors,  [ ':uid' => $formData['new_author'] ] );
-		
-		return [ "storyInfo" => $similarExists[0], "preAuthor" => json_encode($authors) ];
-	}
-
-	public function storySaveChanges(\DB\SQL\Mapper $current, array $post)
-	{
-		// Step one: save the plain data
-		$current->title			= $post['story_title'];
-		$current->summary		= str_replace("\n","<br />",$post['story_summary']);
-		$current->storynotes	= str_replace("\n","<br />",$post['story_notes']);
-		$current->ratingid		= @$post['ratingid'];	// Quick fix for when no rating is created
-		$current->completed		= $post['completed'];
-		$current->validated 	= $post['validated'].$post['valreason'];
-		$current->save();
-		
-		// Step two: check for changes in relation tables
-
-		// Check tags:
-		$this->storyRelationTag( $current->sid, $post['tags'] );
-		// Check Characters:
-		$this->storyRelationTag( $current->sid, $post['characters'], 1 );
-		// Check Categories:
-		$this->storyRelationCategories( $current->sid, $post['category'] );
-		// Check Authors:
-		$this->storyRelationAuthor( $current->sid, $post['mainauthor'], $post['supauthor'] );
-
-		// Rebuild story cache based on new data
-		$this->rebuildStoryCache($current->sid);
-		
-		return TRUE;
-	}
-
-	//public function getPendingStories(int $page, array $sort)
-	public function getPendingStories($page, array $sort)
-	{
-		$limit = 20;
-		$pos = $page - 1;
-		
-		$sql = "SELECT SQL_CALC_FOUND_ROWS * FROM
-				(					
-					SELECT S.sid, S.title, '1' as story_pending, UNIX_TIMESTAMP(S.updated) as timestamp, Ch.chapid
-						FROM `tbl_stories`S
-							LEFT JOIN `tbl_chapters`Ch
-						ON ( S.sid = Ch.sid AND Ch.validated >= 20 AND Ch.validated < 30 ) 
-						WHERE S.validated >= 20 AND S.validated < 30
-					UNION
-					SELECT S.sid, S.title, IF((S.validated >= 20 AND S.validated < 30),1,0) as story_pending, UNIX_TIMESTAMP(S.updated) as timestamp, Ch.chapid
-						FROM `tbl_stories`S
-							INNER JOIN `tbl_chapters`Ch
-						ON ( S.sid = Ch.sid AND Ch.validated >= 20 AND Ch.validated < 30)
-				) P
-				ORDER BY {$sort['order']} {$sort['direction']}
-				LIMIT ".(max(0,$pos*$limit)).",".$limit;
-		
-		$data = $this->exec($sql);
-
-		$this->paginate(
-			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
-			"/adminCP/stories/pending/order={$sort['link']},{$sort['direction']}",
-			$limit
-		);
-				
-		return $data;
 	}
 	
 	//public function listShoutbox(int $page, array $sort)
@@ -1593,198 +1993,6 @@ class AdminCP extends Controlpanel {
 
 		$shout->save();
 		return $i;
-	}
-	
-	public function logGetCount()
-	{
-		$count = [];
-		$countSQL = "SELECT L.type, COUNT(L.id) as items FROM `tbl_log`L @WHERE@ GROUP BY L.type;";
-		$data = $this->exec(str_replace("@WHERE@","",$countSQL));
-		if ( sizeof($data) )
-		{
-			foreach ( $data as $dat )
-				$count[$dat['type']]['all'] = $dat['items'];
-		}
-		$data = $this->exec(str_replace("@WHERE@","WHERE L.new=1",$countSQL));
-		if ( sizeof($data) )
-		{
-			foreach ( $data as $dat )
-				$count[$dat['type']]['new'] = $dat['items'];
-		}
-		return $count;
-	}
-	
-	public function logGetData($sub=FALSE, $page, array $sort)
-	{
-		$limit = 50;
-		$pos = $page - 1;
-
-		$sql = "SELECT SQL_CALC_FOUND_ROWS U.uid, U.nickname, 
-					L.uid as uid_reg, L.id, L.action, L.ip, UNIX_TIMESTAMP(L.timestamp) as timestamp, L.type, L.version, L.new
-				FROM `tbl_log`L LEFT JOIN `tbl_users`U ON L.uid=U.uid ";
-
-		if ( $sub )
-			$sql .= "WHERE L.type = :sub ";
-
-		$sql .= "ORDER BY {$sort['order']} {$sort['direction']}
-				LIMIT ".(max(0,$pos*$limit)).",".$limit;
-
-		if ($sub)
-			$data = $this->exec($sql, [":sub" => $sub]);
-		else
-			$data = $this->exec($sql);
-		
-		$geo = \Web\Geo::instance();
-		
-		foreach ( $data as &$item )
-		{
-			if ( $item['version']==0 )
-			// eFiction 3 original, try to do some cleanup
-			// tested against english and german log entries, considering the order of elements
-			{
-				if ( $item['type']=="DL" )
-				{
-					if ( preg_match("/.+\?sid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>([^<]*?)<\/a>[.^<]+/i", $item['action'], $matches) )
-					// matching _LOG_ADMIN_DEL
-					{
-						$item['action'] = [ 'sid' => $matches[1], 'title' => $matches[2], 'aid' => $matches[3], 'author' => $matches[4] ];
-					}
-					elseif ( preg_match("/.+\?sid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>(.*?)<\/.+\s(\d).*/i", $item['action'], $matches) )
-					// matching _LOG_ADMIN_DEL_CHAPTER
-					{
-						$item['action'] = [ 
-							'sid' => $matches[1], 'title' => $matches[2],
-							'aid' => $matches[3], 'name' => $matches[4],
-							'chapter' => $matches[5]
-						];
-						$item['type'] = 'DC';
-					}
-					elseif ( preg_match("/(.*<\/a>)*+.*\'(.*)\'.*/i", $item['action'], $matches) )
-					// matching _LOG_ADMIN_DEL_SERIES
-					{
-						$item['action'] = [ 'seriestitle' => $matches[2] ];
-						$item['type'] = 'DS';
-					}
-					elseif ( preg_match("/.*?\?uid=(\d*)\'>(.*?)<.*\?sid=(\d*)\'>(.*?)<.*\?uid=(\d*)\'>(.*?)<.*\?seriesid=(\d*)\'>(.*?)<.*/i", $item['action'], $matches) )
-					// matching _LOG_ADMIN_DEL_FROM_SERIES
-					{
-						$item['action'] = [
-							'uid' => $matches[1], 'uname' => $matches[2],
-							'sid' => $matches[3], 'sname' => $matches[4],
-							'aid' => $matches[5], 'aname' => $matches[6],
-							'seriesid' => $matches[7], 'sername' => $matches[8],
-						];
-						$item['type'] = 'DF';
-					}
-				}
-				elseif ( $item['type']=="ED" )
-				{
-					if ( preg_match("/.+\?sid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>(.*?)<\/.+/i", $item['action'], $matches) )
-					// matching _LOG_ADMIN_EDIT_AUTHOR
-					{
-						$item['action'] = [ 
-							'sid'     => $matches[1], 'title'    => $matches[2],
-							'fromaid' => $matches[3], 'fromname' => $matches[4],
-							'toaid'   => $matches[5], 'toname'   => $matches[6]
-						];
-						$item['type'] = 'EA';
-					}
-					elseif ( preg_match("/.+\?sid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>(.*?)<\/.+(\d).*/i", $item['action'], $matches) )
-					// matching _LOG_ADMIN_EDIT_CHAPTER
-					{
-						$item['action'] = [ 
-							'sid' => $matches[1], 'title' => $matches[2],
-							'aid' => $matches[3], 'author' => $matches[4],
-							'chapter' => $matches[5]
-						];
-						$item['type'] = 'EC';
-					}
-					elseif ( preg_match("/.+\?series[i]?d=(\d*)'>(.*?)<\/.+/i", $item['action'], $matches) )
-					// matching _LOG_ADMIN_EDIT_SERIES
-					{
-						$item['action'] = [ 'seriesid' => $matches[1], 'title' => $matches[2] ];
-						$item['type'] = 'ES';
-					}
-					elseif ( preg_match("/.+\?sid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>(.*?)<\/.+/i", $item['action'], $matches) )
-					// matching _LOG_ADMIN_EDIT
-					{
-						$item['action'] = [
-							'sid' => $matches[1], 'title' => $matches[2],
-							'aid' => $matches[3], 'author' => $matches[4]
-						];
-					}
-				}
-				elseif ( $item['type']=="LP" AND preg_match("/.*\?uid=(\d*)\'>(.*)<.*:\s*(\w+).*/im", $item['action'], $matches) )
-				// matching _LOG_LOST_PASSWORD
-				{
-					$item['action'] = [ 'uid'=>$matches[1], 'name'=>$matches[2], 'result'=>$matches[3] ];
-				}
-				elseif ( $item['type']=="RE" AND preg_match("/(.+?)\s*\(.*?'(.*)'.*?'.*?\?sid=(\d+).*/im", $item['action'], $matches) )
-				// matching _LOG_REVIEW
-				{
-					$item['action'] = [ 'name'=>$matches[1], 'review'=>$matches[2], 'sid'=>$matches[3] ];
-				}
-				elseif ( $item['type']=="RG" AND preg_match('/(\w+[\s\w]*)\s+\((\d*)\).*/iU', $item['action'], $matches) )
-				// matching _LOG_REGISTER & _LOG_ADMIN_REG
-				{
-					$item['action'] = [ 'name'=>$matches[1], 'uid'=>$matches[2], 'admin'=>($matches[2]!=$item['uid_reg']) ];
-				}
-				
-				/*
-				
-				define ("_LOG_BAD_LOGIN", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> hat ein falsches Passwort beim einloggen eingegeben.");
-				define ("_LOG_BAD_LOGIN", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> entered a wrong password trying to log in.");
-
-				define ("_LOG_EDIT_REVIEW", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> hat    <a href='reviews.php?reviewid=%4\$d'>ein Review</a> für '%3\$s' bearbeitet.");
-				define ("_LOG_EDIT_REVIEW", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> edited <a href='reviews.php?reviewid=%4\$d'>a review  </a> for '%3\$s'.");
-				
-				*/
-
-				if ( is_array($item['action']) )
-					$this->logResaveData($item);
-			}
-			elseif ( $item['version']==1 )
-			{
-				// eFiction 3 reworked
-				$item['action'] = json_decode($item['action'], TRUE);
-			}
-			elseif ( $item['version']==2 )
-			{
-				// eFiction 5
-				$item['action'] = json_decode($item['action'], TRUE);
-			}
-			
-			$item['ip'] = long2ip($item['ip']);
-			//if(function_exists('geoip_country_code_by_name')) $item['country'] = geoip_country_code_by_name($item['ip']);
-			$item['country'] = $geo->location($item['ip'])['country_code'];
-		}
-				
-		$this->paginate(
-			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
-			"/adminCP/home/logs/".($sub?"{$sub}/":"")."order={$sort['link']},{$sort['direction']}",
-			$limit
-		);
-				
-		return $data;
-	}
-	
-	protected function logResaveData($item)
-	{
-		$this->update(
-				'tbl_log',
-				[
-					'action' 	=> json_encode($item['action']),
-					'version'	=> 1
-/*					'origin'	=> json_encode(
-									[
-										$geo->location($item['ip'])['country_code'], 
-										$geo->location($item['ip'])['country_name'], 
-										$geo->location($item['ip'])['continent_code']
-									]
-					)	*/
-				],
-				"id = {$item['id']}"
-		);
 	}
 	
 	public function getLanguageConfig()

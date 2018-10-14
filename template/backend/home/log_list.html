@@ -3,7 +3,7 @@
 		<div class="gb-10">
 			<check if="{{@key==@sub}}">
 				<true>{{ ${'LN__AdminMenu_Logs_'.@key} }}</true>
-				<false><a href="{{@BASE}}/adminCP/home/logs/{{@key}}">{{ ${'LN__AdminMenu_Logs_'.@key} }}</a></false>
+				<false><a href="{{@BASE}}/adminCP/home/logs/type={{@key}}">{{ ${'LN__AdminMenu_Logs_'.@key} }}</a></false>
 			</check>
 			<br/>
 			{{@menu.all}} <check if="{{ isset(@menu.new) }}">({{@menu.new}})</check>
@@ -11,26 +11,45 @@
 	</repeat>
 </div>
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
+<table>
 <repeat group="{{ @logEntries }}" value="{{ @row }}">
+<tr>
+	<td>{{ date( \Config::getPublic('date_format'), @row.timestamp) }}</td>
+	<td><check if="{{NULL===@row.uid}}"><true><del>{{@row.action.name}}</del></true><false>{{@row.nickname}}</false></check></td>
 	<check if="{{is_array(@row.action)}}">
 		<true>
 			<switch expr="{{ @row.type }}">
-				<case value="RG" break="TRUE">
-					<check if="{{@row.action.uid==@row.uid}}"><true>{{@row.action.name}}</true><false><del>{{@row.action.name}}</del></false></check>
+				<case value="AM" break="TRUE">
+					<td colspan="2">{{@row.action.job}}</td>
+				</case>
+				<case value="DL" break="TRUE">
+					<td>__storyDel</td>
+					<td>{{@row.action.title}}</td>
 					{*<pre>{{print_r(@row.action,TRUE)}}</pre> *}
 				</case>
-				<case value="ED" break="TRUE">
-					{*<check if="{{@row.action.uid==@row.uid}}"><true>{{@row.action.name}}</true><false><del>{{@row.action.name}}</del></false></check> *}
+				<case value="EB" break="TRUE">
+					<td>__editNick</td>
+					<td>{{@row.action.oldname}} -> {{@row.action.newname}}</td>
 					{*<pre>{{print_r(@row.action,TRUE)}}</pre>*}
-					{{@row.action.title}}
+				</case>
+				<case value="ED" break="TRUE">
+					<td>__storyEdit</td>
+					<td>{{@row.action.title}}</td>
+					{*<pre>{{print_r(@row.action,TRUE)}}</pre>*}
+				</case>
+				<case value="RG" break="TRUE">
+					<td colspan="2"><check if="{{@row.action.uid==@row.uid}}"><true>reg</true><false>admreg</false></check></td>
+					{*<pre>{{print_r(@row.action,TRUE)}}</pre> *}
 				</case>
 				<default>
-					Was anderes
+					<td colspan="2"><pre>{{print_r(@row.action,TRUE)}}</pre></td>
 				</default>
 			</switch>
 		</true>
-		<false>{{@row.action|raw}}</false>
-	</check> - [{*{{ @row.ip }}: *}{{@@row.country}}] ({{@row.id}})<br/>
+		<false><td colspan="2">{{@row.action|raw}}</td></false>
+	</check>
+	<td>[{*{{ @row.ip }}: *}{{@@row.country}}] ({{@row.id}})</td>
+</tr>
 </repeat>
-
+</table>
 <F3:check if="{{isset(@paginate.firstPage) AND sizeof(@logEntries)>10}}"><include href="paginate.html" /></F3:check>

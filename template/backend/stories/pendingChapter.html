@@ -1,0 +1,28 @@
+		<div class="story-titleauthor">
+			<h2>{{@data.title}}<br />
+			{* prepare for translation functionality *}
+			<check if="{{ @data.translation }}">
+				<true>
+				{{@LN__translatedBy}} <repeat group="{{@data.cache_authors}}" value="{{@author}}" counter="{{ @i }}">
+														<check if="{{ @i>1 }}">, </check>
+														<a href="{{@BASE}}/authors/{{@author[0]}}">{{@author[1]}}</a>
+													</repeat><br/>
+				__transFrom {{ locale_get_display_language(@data.trans_from, @_SESSION['preferences']['language']) }} __transTo {{ locale_get_display_language(@data.story.trans_to, @_SESSION['preferences']['language']) }}
+				</true>
+				<false>
+				{{@LN__by}} <repeat group="{{@data.cache_authors}}" value="{{@author}}" counter="{{ @i }}">
+														<check if="{{ @i>1 }}">, </check>
+														<a href="{{@BASE}}/authors/{{@author[0]}}">{{@author[1]}}</a>
+													</repeat>
+				</false>
+			</check>
+			</h2>
+		</div>
+
+		<div class="alert-box success"><a href="{{@BASE}}/adminCP/stories/pending/validate/story={{@data.sid}}/chapter={{@data.chapid}};returnpath={{@returnpath}}">__validateChapter #{{@data.chap_inorder}}: {{@data.chap_title}}</a></div>
+		
+		<div class="story-text">
+			{{@chapterText | raw }}
+		</div>
+
+		<div class="alert-box success"><a href="{{@BASE}}/adminCP/stories/pending/validate/story={{@data.sid}}/chapter={{@data.chapid}};returnpath={{@returnpath}}">__validateChapter #{{@data.chap_inorder}}: {{@data.chap_title}}</a></div>

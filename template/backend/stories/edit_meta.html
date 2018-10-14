@@ -32,7 +32,7 @@
 				<div class="gb-1thrd">
 					<h6>{{@LN__UCP_statusValidatedReason}}: <strong>{{ ${"LN__UCP_statusValReason_".@data.validated.1} }}</strong></h6>
 					{{@LN__ChangeTo}}:<select id="validated" name="form[valreason]">
-					<loop from="{{ @i=0 }}" to="{{ @i < 10 }}" step="{{ @i++ }}">
+					<loop from="{{ @i=0 }}" to="{{ @i < 4 }}" step="{{ @i++ }}">
 						<option value="{{ @i }}"<check if="{{@i==@data.validated.1}}"> selected="selected"</check>>{{ ${"LN__UCP_statusValReason_".@i} }}</option>
 					</loop>
 					</select>
@@ -40,9 +40,10 @@
 				<div class="gb-1thrd">
 					<h6>{{@LN__UCP_statusCompleted}}: <strong>{{ ${"LN__UCP_statusCompleted_".@data.completed} }}</strong></h6>
 					{{@LN__ChangeTo}}:<select id="completed" name="form[completed]">
-						<loop from="{{ @i=0 }}" to="{{ @i < 4 }}" step="{{ @i++ }}">
+						<loop from="{{ @i=0 }}" to="{{ @i <= 6 }}" step="{{ @i++ }}">
 							<option value="{{ @i }}"<check if="{{@i==@data.completed}}"> selected="selected"</check>>{{ ${"LN__UCP_statusCompleted_".@i} }}</option>
 						</loop>
+						<option value="9"<check if="{{9==@data.completed}}"> selected="selected"</check>>{{ @LN__UCP_statusCompleted_9 }}</option>
 					</select>
 				</div>
 {*		<!-- end: story status fields -->	*}

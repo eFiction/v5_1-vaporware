@@ -1,0 +1,84 @@
+<div class="alert-box info">
+<check if="{{@data.state=='storyOnly'}}">__ValidateStory</check>
+<check if="{{@data.state=='chapterOnly'}}">__ValidateChapterOnly</check>
+<check if="{{@data.state=='chapterFirst'}}">__ValidateChapterFirst</check>
+</div>
+
+		<div class="story-titleauthor">
+			<h2>{{@data.story.title}}<br />
+			{* prepare for translation functionality *}
+			<check if="{{ @data.story.translation }}">
+				<true>
+				{{@LN__translatedBy}} <repeat group="{{@data.story.cache_authors}}" value="{{@author}}" counter="{{ @i }}">
+														<check if="{{ @i>1 }}">, </check>
+														<a href="{{@BASE}}/authors/{{@author[0]}}">{{@author[1]}}</a>
+													</repeat><br/>
+				__transFrom {{ locale_get_display_language(@data.story.trans_from, @_SESSION['preferences']['language']) }} __transTo {{ locale_get_display_language(@data.story.trans_to, @_SESSION['preferences']['language']) }}
+				</true>
+				<false>
+				{{@LN__by}} <repeat group="{{@data.story.cache_authors}}" value="{{@author}}" counter="{{ @i }}">
+														<check if="{{ @i>1 }}">, </check>
+														<a href="{{@BASE}}/authors/{{@author[0]}}">{{@author[1]}}</a>
+													</repeat>
+				</false>
+			</check>
+			</h2>
+		</div>
+		<check if="{{!empty(@data.story.rating_name)}}"><div class="story-info2"><b>{{@LN__Rating}}:</b> {{@data.story.rating_name}}</div></check>
+		<check if="{{!empty(@data.story.cache_categories)}}"><div class="story-info2"><b>{{@LN__Categories}}:</b> <repeat group="{{ @data.story.cache_categories }}" value="{{ @group }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check>{{ @group[1] }}</repeat></div></check>
+		<div class="story-info2"><b>{{@LN__Status}}:</b> <check if="{{@data.story.completed==1}}"><true>{{@LN__Completed}}</true><false>{{@LN__WIP}}</false></check></div>
+	{* Different tag views: uncomment the one you prefer *}
+	{* Simple view, all tags in one list *}
+		{* 
+		<check if="{{ isset(@data.story.cache_tags.simple) }}">
+			<div class="story-info2"><b>{{@LN__Tags}}:</b> <repeat group="{{ @data.story.cache_tags.simple }}" value="{{ @tag }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check>{{ @tag[1] }}</repeat></div>
+		</check>
+		*}
+	{* Structured, tags by tag group *}
+		<check if="{{ isset(@data.story.cache_tags.structured) }}">
+			<div class="story-info2"><b>{{@LN__Tags}}:</b> <repeat group="{{ @data.story.cache_tags.structured }}" value="{{ @tags }}" counter="{{ @i }}"><check if="{{ @i }}>1"> * </check><repeat group="{{ @tags }}" value="{{ @tag }}" counter="{{ @j }}"><check if="{{ @j>1 }}">, </check>{{ @tag[1] }}</repeat></repeat></div>		</check>
+<check if="{{ isset(@data.story.cache_characters.0.1) }}">
+		<div class="story-info2"><b>{{@LN__Characters}}:</b> <repeat group="{{ @data.story['cache_characters'] }}" value="{{ @tag }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check>{{ @tag[1] }}</repeat></div>
+</check>
+<check if="{{ @data.story.storynotes > '' }}">
+		<div class="story-info2"><b>{{@LN__Foreword}}:</b> {{ @data.story.storynotes | raw}}</div>
+</check>
+		<div class="story-info2"><b>{{@LN__Summary}}:</b> {{@data.story.summary | raw}}</div>
+		<hr />
+
+<check if="{{@data.state=='storyOnly'}}">
+<true>
+	<a href="{{@BASE}}/adminCP/stories/pending/validate/story={{@data.story.sid}};returnpath={{@returnpath}}">__validationLink</a>
+</true>
+<false>
+	__chapterList
+<div class="grid-wrapper">
+	<repeat group="{{@data.chapterList}}" value="{{@chapter}}" counter="{{ @i }}">
+		<div class="gb-full">
+		<check if="{{ isset(@chapter.active) }}">
+		<true>
+			<check if="{{ isset(@chapter.first) }}">
+			<true><div class="alert-box success"><a href="{{@BASE}}/adminCP/stories/pending/story={{@data.story.sid}}/chapter={{@chapter.chapid}};returnpath={{@returnpath}}">{{@chapter.chapid}}</a></div></true>
+			<false><div class="alert-box info">{{@chapter.chapid}}</div></false>
+			</check>
+		</true>
+		<false>
+			<check if="{{ @chapter.validated >= 30 }}">
+			<true><div class="alert-box">{{@chapter.chapid}}</div></true>
+			<false>
+				<check if="{{ @chapter.validated >= 20 }}">
+				<true><div class="alert-box warning">{{@chapter.chapid}}</div></true>
+				<false>
+					<div class="alert-box error">{{@chapter.chapid}}</div>
+				</false>
+				</check>
+			</false>
+			</check>
+		</false>
+		</check>
+		</div>
+	</repeat>
+</div>
+</false>
+</check>
+

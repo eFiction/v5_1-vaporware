@@ -21,12 +21,12 @@ class AdminCP extends Base
 		$this->response->addTitle( \Base::instance()->get('LN__AdminCP') );
 	}
 
-	protected function showMenu($selected=FALSE)
+	protected function menuShow($selected=FALSE)
 	{
-		$menu = $this->model->showMenu($selected);
+		$menu = $this->model->menuShow($selected);
 		$this->buffer
 		( 
-			\View\AdminCP::showMenu($menu), 
+			$this->template->menuShow($menu), 
 			"LEFT"
 		);
 		
@@ -46,9 +46,9 @@ class AdminCP extends Base
 			return $submodule;
 	}
 
-	protected function showMenuUpper($selected=FALSE)
+	protected function menuShowUpper($selected=FALSE)
 	{
-		$menu = $this->model->showMenuUpper($selected);
+		$menu = $this->model->menuShowUpper($selected);
 		\Base::instance()->set('menu_upper', $menu);
 		foreach ( $menu as $m ) $link[] = $m['link'];
 		return $link;
@@ -64,7 +64,7 @@ class AdminCP extends Base
 		// declare module
 		$this->moduleBase = "archive";
 		// build menu and access list
-		$this->showMenu($this->moduleBase);
+		$this->menuShow($this->moduleBase);
 		// add module title
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Archive') );
 		$f3->set('title_h1', $f3->get('LN__AdminMenu_Archive') );
@@ -154,7 +154,7 @@ class AdminCP extends Base
 	protected function archiveFeatured(\Base $f3, $params, $feedback)
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Featured') );
-		$allowedSubs = $this->showMenuUpper("archive/featured");
+		$allowedSubs = $this->menuShowUpper("archive/featured");
 		
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 
@@ -177,19 +177,19 @@ class AdminCP extends Base
 			
 			$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
 
-			$data = $this->model->listStoryFeatured($page, $sort, $params['select']);
+			$data = $this->model->featuredList($page, $sort, $params['select']);
 			$this->buffer( $this->template->featuredList($data, $sort, $params['select']) );
 			
 			return TRUE;
 		}
 		elseif (isset($_POST['form_data']))
 		{
-			$changes = $this->model->saveFeatured($params['sid'], $f3->get('POST.form_data') );
+			$changes = $this->model->featuredSave($params['sid'], $f3->get('POST.form_data') );
 		}
 
 		if( isset ($params['sid']) )
 		{
-			$data = $this->model->loadFeatured($params['sid']);
+			$data = $this->model->featuredLoad($params['sid']);
 			$data['errors'] = @$errors;
 			$data['changes'] = @$changes;
 			$this->buffer( $this->template->featuredEdit($data) );
@@ -305,8 +305,8 @@ class AdminCP extends Base
 		
 		if( isset ($params['id']) )
 		{
-			$data = $this->model->loadCharacter($params['id']);
-			$data['categories'] = $this->model->getCategories();
+			$data = $this->model->characterLoad($params['id']);
+			$data['categories'] = $this->model->categories();
 			$data['errors'] = @$errors;
 			$data['changes'] = @$changes;
 			return $this->template->characterEdit($data, @$params['returnpath']);
@@ -327,7 +327,7 @@ class AdminCP extends Base
 		$sort["order"]		= $allow_order[$sort["link"]];
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="desc") ?	"desc" : "asc";
 		
-		$data = $this->model->charactersList($page, $sort);
+		$data = $this->model->characterList($page, $sort);
 		return $this->template->characterList($data, $sort);
 	}
 	
@@ -337,7 +337,7 @@ class AdminCP extends Base
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Tags') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Tags') );
 
-		$allowedSubs = $this->showMenuUpper("archive/tags");
+		$allowedSubs = $this->menuShowUpper("archive/tags");
 
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 		
@@ -362,18 +362,18 @@ class AdminCP extends Base
 
 		if ( isset($params['delete']) )
 		{
-			$this->model->deleteTag( (int)$params['delete'] );
+			$this->model->tagDelete( (int)$params['delete'] );
 			$f3->reroute('/adminCP/archive/tags/edit', false);
 		}
 		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
 		{
 			if ( isset($_POST['form_data']) )
 			{
-				$changes = $this->model->saveTag($params['id'], $f3->get('POST.form_data') );
+				$changes = $this->model->tagSave($params['id'], $f3->get('POST.form_data') );
 			}
 			elseif ( isset($_POST['newTag']) )
 			{
-				$newID = $this->model->addTag( $f3->get('POST.newTag') );
+				$newID = $this->model->tagAdd( $f3->get('POST.newTag') );
 				$f3->reroute('/adminCP/archive/tags/edit/id='.$newID, false);
 			}
 			elseif ( isset($_POST['tid']) ) $params['id'] = $f3->get('POST.tid');
@@ -381,7 +381,7 @@ class AdminCP extends Base
 		
 		if( isset ($params['id']) )
 		{
-			$data = $this->model->loadTag($params['id']);
+			$data = $this->model->tagLoad($params['id']);
 			$data['groups'] = $this->model->tagGroups();
 			$data['errors'] = @$errors;
 			$data['changes'] = @$changes;
@@ -405,7 +405,7 @@ class AdminCP extends Base
 		$sort["order"]		= $allow_order[$sort["link"]];
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="desc") ?	"desc" : "asc";
 		
-		$data = $this->model->tagsList($page, $sort);
+		$data = $this->model->tagList($page, $sort);
 		$this->buffer ( $this->template->tagList($data, $sort) );
 	}
 	
@@ -416,7 +416,7 @@ class AdminCP extends Base
 		
 		if ( isset($params['delete']) )
 		{
-			if ( $this->model->deleteTagGroup( (int)$params['delete'] ) )
+			if ( $this->model->tagGroupDelete( (int)$params['delete'] ) )
 				$f3->reroute('/adminCP/archive/tags/groups', false);
 			else $f3->set('form_error', "__failedDelete");
 		}
@@ -424,18 +424,18 @@ class AdminCP extends Base
 		{
 			if ( isset($_POST['form_data']) )
 			{
-				$changes = $this->model->saveTagGroup($params['id'], $f3->get('POST.form_data') );
+				$changes = $this->model->tagGroupSave($params['id'], $f3->get('POST.form_data') );
 			}
 			elseif ( isset($_POST['newTagGroup']) )
 			{
-				$newID = $this->model->addTagGroup( $f3->get('POST.newTagGroup') );
+				$newID = $this->model->tagGroupAdd( $f3->get('POST.newTagGroup') );
 				$f3->reroute('/adminCP/archive/tags/groups/id='.$newID, false);
 			}
 		}
 
 		if( isset ($params['id']) )
 		{
-			$data = $this->model->loadTagGroup($params['id']);
+			$data = $this->model->tagGroupLoad($params['id']);
 			$data['errors'] = @$errors;
 			$data['changes'] = @$changes;
 			$this->buffer( $this->template->tagGroupEdit($data) );
@@ -470,14 +470,14 @@ class AdminCP extends Base
 
 		if ( isset($params['move']) )
 		{
-			$parent = $this->model->moveCategory( $params['move'][1], $params['move'][0] );
+			$parent = $this->model->categoryMove( $params['move'][1], $params['move'][0] );
 		}
 		elseif ( isset($params['add']) )
 		{
 			$parent_cid = (isset($params['add']) AND $params['add']!==TRUE) ? (int)$params['add'] : 0;
 
 			if ( isset($_POST['form_data']) )
-				$newID = $this->model->addCategory( $parent_cid, $f3->get('POST.form_data') );
+				$newID = $this->model->categoryAdd( $parent_cid, $f3->get('POST.form_data') );
 
 			if ( empty($newID) )
 			{
@@ -485,7 +485,7 @@ class AdminCP extends Base
 				if ( @$newID === FALSE )
 					$errors = '__failAddCategory';
 				
-				$parent_info = $this->model->loadCategory($parent_cid);
+				$parent_info = $this->model->categoryLoad($parent_cid);
 				// Non-existent category, go back to overview
 				if ( $parent_info === FALSE ) $f3->reroute('/adminCP/archive/categories', false);
 
@@ -509,14 +509,14 @@ class AdminCP extends Base
 		}
 		elseif ( isset($params['delete']) )
 		{
-			$data = $this->model->loadCategory((int)$params['delete']);
+			$data = $this->model->categoryLoad((int)$params['delete']);
 			if ( isset($data['category']) )
 			{
 				$data['stats'] = json_decode($data['stats'],TRUE);
 
 				if ( $data['stats']['sub']===NULL AND $data['stats']['count']==0 )
 				{
-					if ( FALSE === $this->model->deleteCategory( (int)$params['delete'] ) )
+					if ( FALSE === $this->model->categoryDelete( (int)$params['delete'] ) )
 						$errors = $f3->get('ACP_Categories_Error_DBError', $data['category']);
 					else
 						$changes = $f3->get('ACP_Categories_Success_Deleted', $data['category']);
@@ -530,16 +530,16 @@ class AdminCP extends Base
 		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
 		{
 			if ( isset($_POST['form_data']) )
-				$changes = $this->model->saveCategory($params['id'], $f3->get('POST.form_data') );
+				$changes = $this->model->categorySave($params['id'], $f3->get('POST.form_data') );
 		}
 
 		if ( isset($params['id']) )
 		{
-			$data = $this->model->loadCategory($params['id']);
-			$data['move'] = $this->model->loadCategoryPossibleParents($params['id']);
+			$data = $this->model->categoryLoad($params['id']);
+			$data['move'] = $this->model->categoryLoadPossibleParents($params['id']);
 			if ( $data['leveldown'] > 1 )
 			{
-				$parent = $this->model->loadCategory($data['move'][0]['parent_cid']);
+				$parent = $this->model->categoryLoad($data['move'][0]['parent_cid']);
 				$data['move'] = array_merge([ [ "cid" => $parent['id'], "parent_cid" => $parent['parent_cid'], "leveldown" => $parent['leveldown']-1, "category" => $parent['category']." (one level up)" ] ], $data['move'] );
 			}
 			$data['move'] = array_merge([ [ "cid" => 0, "parent_cid" => 0, "leveldown" => -1, "category" => $f3->get('LN__ACP_MainCategory')] ], $data['move'] );
@@ -550,7 +550,7 @@ class AdminCP extends Base
 			return TRUE;
 		}
 
-		$data = $this->model->categoriesListFlat();
+		$data = $this->model->categoryListFlat();
 		$feedback['errors'] = @$errors;
 		$feedback['changes'] = @$changes;
 
@@ -605,7 +605,7 @@ class AdminCP extends Base
 		// declare module
 		$this->moduleBase = "home";
 		// build menu and access list
-		$this->showMenu($this->moduleBase);
+		$this->menuShow($this->moduleBase);
 		// add module title
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Home') );
 		$f3->set('title_h1', $f3->get('LN__AdminMenu_Home') );
@@ -743,7 +743,7 @@ class AdminCP extends Base
 		$menuCount = $this->model->logGetCount();
 
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
-		$sub = isset($params['module'])?FALSE:$params['0'];
+		$sub = isset($params['type'])?$params['type']:FALSE;
 
 		// page will always be an integer > 0
 		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
@@ -888,7 +888,7 @@ class AdminCP extends Base
 		// declare module
 		$this->moduleBase = "members";
 		// build menu and access list
-		$this->showMenu($this->moduleBase);
+		$this->menuShow($this->moduleBase);
 		// add module title
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Members') );
 
@@ -1038,7 +1038,7 @@ class AdminCP extends Base
 		// declare module
 		$this->moduleBase = "settings";
 		// build menu and access list
-		$this->showMenu($this->moduleBase);
+		$this->menuShow($this->moduleBase);
 		// add module title
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Settings') );
 
@@ -1178,7 +1178,6 @@ class AdminCP extends Base
 			return FALSE;
 		}
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Server') );
-		//$data['DateTime'] = $this->model->settingsFields('settings_datetime');
 		$data['Mail'] = $this->model->settingsFields('settings_mail');
 		$data['Maintenance'] = $this->model->settingsFields('settings_maintenance');
 		$data['Report'] = $this->model->settingsFields('settings_report');
@@ -1189,14 +1188,14 @@ class AdminCP extends Base
 		// declare module
 		$this->moduleBase = "stories";
 		// build menu and access list
-		$this->showMenu($this->moduleBase);
+		$this->menuShow($this->moduleBase);
 		// add module title
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Stories') );
 
 		switch( $this->moduleInit([ "pending", "edit", "add" ], @$params['module']) )
 		{
 			case "pending":
-				$this->storiesPending($f3, $params);
+				$this->buffer( $this->storiesPending($f3, $params) );
 				break;
 			case "edit":
 				$this->storiesEdit($f3, $params);
@@ -1241,6 +1240,84 @@ class AdminCP extends Base
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Pending') );
 
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		
+		if ( isset($params['validate']) )
+		{
+			if ( isset($params['story']) AND NULL!==$situation=$this->model->storyLoadPending($params['story']) )
+			// need a story id, it must be valid and not blocked by chapters that are not up for validation yet
+			{
+				if ( $situation['state']=='storyOnly' )
+				// only need to validate the story, don't care if any chapter is added to the query
+				{
+					// change story validation status
+					if ( 1 == $this->model->storyValidatePending($situation['story']['sid']) )
+					{
+						// make note of the success
+						$_SESSION['lastAction'] = [ 'storyValidation' => 'success' ];
+						// nothing else to do, reroute to the pending list
+						if ( isset($params['returnpath']) )	$f3->reroute($params['returnpath'], false);
+						else								$f3->reroute("/adminCP/stories/pending", false);
+						exit;
+					}
+					else
+					{
+						// make note of an error event
+						$_SESSION['lastAction'] = [ 'storyValidation' => 'dberror' ];
+						// return to story
+						$f3->reroute("/adminCP/stories/pending/story={$situation['story']['sid']};returnpath={$params['returnpath']}", false);
+						exit;
+					}
+				}
+				elseif ( isset($params['chapter']) AND $situation['story']['chapid']==$params['chapter'] )
+				// either chapterFirst or chapterOnly, so all we need is a chapter number and it must be tagged 'first'
+				{
+					// validate chapter-story association
+					if ( 1 == $this->model->storyValidatePending($situation['story']['sid'], $situation['story']['chapid']) )
+					{
+						// make note of the success
+						$_SESSION['lastAction'] = [ 'chapterValidation' => 'success' ];
+					}
+					else
+					{
+						// make note of an error event
+						$_SESSION['lastAction'] = [ 'chapterValidation' => 'dberror' ];
+					}
+					// return to story, if the story should require no further moderation this will lead to the overview
+					$f3->reroute("/adminCP/stories/pending/story={$situation['story']['sid']};returnpath={$params['returnpath']}", false);
+					exit;
+				}
+			}
+			else
+			{
+				if ( isset($params['returnpath']) )	$f3->reroute($params['returnpath'], false);
+				else								$f3->reroute("/adminCP/stories/pending", false);
+				exit;
+			}
+		}
+		
+		if( isset ($params['story']) )
+		{
+			if ( NULL !== $data = $this->model->storyLoadPending($params['story']) )
+			// We have a story that requires validation, let's get to it
+			{
+				if ( isset($params['chapter']) AND $data['story']['chapid']==$params['chapter'] )
+				// we have a chapter selected and it is marked as first one to be validated
+				{
+					// Load chapter text
+					$chapterText = $this->model->getChapterText( $data['story']['sid'], $data['story']['chap_inorder'], FALSE );
+					return $this->template->storyValidateChapter($data['story'], $chapterText, $params['returnpath']);
+				}
+				
+				// no chapter selected, let's look at the story overview
+				return $this->template->storyValidatePending($data, $params['returnpath']);
+			}
+			else
+			{
+				if ( isset($params['returnpath']) )	$f3->reroute($params['returnpath'], false);
+				else								$f3->reroute("/adminCP/stories/pending", false);
+				exit;
+			}
+		}
 
 		// search/browse
 		$allow_order = array (
@@ -1257,8 +1334,8 @@ class AdminCP extends Base
 		$sort["order"]		= $allow_order[$sort["link"]];
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
 
-		$data = $this->model->getPendingStories($page, $sort);
-		$this->buffer( $this->template->storyListPending($data, $sort) );
+		$data = $this->model->storyListPending($page, $sort);
+		return $this->template->storyListPending($data, $sort);
 	}
 	
 	protected function storiesEdit(\Base $f3, $params)
@@ -1272,7 +1349,7 @@ class AdminCP extends Base
 			$this->buffer( $this->template->storySearch() );
 			return TRUE;
 		}
-		elseif ( FALSE !== $storyInfo = $this->model->loadStoryInfo((int)$params['story']) )
+		elseif ( FALSE !== $storyInfo = $this->model->storyLoadInfo((int)$params['story']) )
 		{
 			// save data
 			if (isset($_POST) and sizeof($_POST)>0 )

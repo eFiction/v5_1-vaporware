@@ -31,8 +31,8 @@
 
 			<div class="gb-full"><h6>{{@LN__ChapterText}}
 			<check if="{{@data.editmode=='visual'}}">
-				<true> <a href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}};chapter={{@data.chapid}};style=plain">{{@LN__SwitchPlainHTML}}</a></true>
-				<false> <a href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}};chapter={{@data.chapid}}">{{@LN__SwitchVisual}}</a></false>
+				<true> <a href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}};chapter={{@data.chapid}}/plain">{{@LN__SwitchPlainHTML}}</a></true>
+				<false> <a href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}};chapter={{@data.chapid}}/visual">{{@LN__SwitchVisual}}</a></false>
 			</check></h6>
 			<textarea placeholder="Your chapter's content goes here" name="form[chapter_text]" id="editor1">{{@data.chaptertext}}</textarea></div>
 			<check if="{{@data.editmode=='visual'}}"><script>

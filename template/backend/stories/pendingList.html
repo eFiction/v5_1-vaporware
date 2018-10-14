@@ -41,6 +41,7 @@
 		</th>
 	</tr>
 	<repeat group="{{ @data }}" value="{{ @row }}">
+<check if="{{ @row.blocked==0 }}">
 	<tr>
 		<td><a href="{{@BASE}}/adminCP/stories/pending/story={{ @row['sid'] }};returnpath=/adminCP/stories/pending/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
 		<td>{{ @row.title }} ({{ @row.authors }})</td>
@@ -49,6 +50,19 @@
 		<td>{{ @row.sid }}</td>
 		<td><check if="{{@row.lastdate>0}}">{{ date( \Config::getPublic('date_format'), @row.lastdate) }}</check>&nbsp;</td>
 	</tr>
+</check>
+	</repeat>
+	<repeat group="{{ @data }}" value="{{ @row }}">
+<check if="{{ @row.blocked==1 }}">
+	<tr>
+		<td>{ICON:alert}</a></td>
+		<td>{{ @row.title }} ({{ @row.authors }})</td>
+		<td><check if="{{ @row.pStory==1 }}">{ICON:waiting}</check>&nbsp;</td>
+		<td>{ICON:alert}<check if="{{ @row.pChapters>0 }}"><true>__firstBlock</true><false>__noChapter</false></check></td>
+		<td>{{ @row.sid }}</td>
+		<td><check if="{{@row.lastdate>0}}">{{ date( \Config::getPublic('date_format'), @row.lastdate) }}</check>&nbsp;</td>
+	</tr>
+</check>
 	</repeat>
 </table>
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
