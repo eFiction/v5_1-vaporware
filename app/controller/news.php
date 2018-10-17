@@ -25,8 +25,7 @@ class News extends Base
 		
 	}
 	
-//	public function index(\Base $f3, array $params): void
-	public function index(\Base $f3, array $params)
+	public function index(\Base $f3, array $params)//: void
 	{
 		$this->model->canAdmin('home/news');
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
@@ -46,8 +45,7 @@ class News extends Base
 		$this->buffer( \View\News::listNews($data) );
 	}
 
-//	public function save(\Base $f3, array $params): void
-	public function save(\Base $f3, array $params)
+	public function save(\Base $f3, array $params)//: void
 	{
 		$params = $this->parametric($params['*']);
 		if($_SESSION['userID']!=0 || \Config::getPublic('allow_guest_comment_news') )

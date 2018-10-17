@@ -10,14 +10,13 @@ class Story extends Base
 		$this->template = new \View\Story();
 	}
 
-	public function beforeroute()
+	public function beforeroute()//: void
 	{
 		parent::beforeroute();
 		$this->template->addTitle( \Base::instance()->get('LN__Stories') );
 	}
 
-//	public function index(\Base $f3, array $params): void
-	public function index(\Base $f3, array $params)
+	public function index(\Base $f3, array $params)//: void
 	{
 		switch(@$params['action'])
 		{
@@ -128,8 +127,7 @@ class Story extends Base
 		exit;
 	}
 	
-//	public function ajax(\Base $f3, array $params): void
-	public function ajax(\Base $f3, array $params)
+	public function ajax(\Base $f3, array $params)//: void
 	{
 		if ( isset($params['segment']) AND $params['segment']=="search" )
 		{
@@ -460,8 +458,7 @@ class Story extends Base
 
 	}
 	
-//	public function series(array $params): void
-	public function series(array $params)
+	public function series(array $params)//: void
 	{
 		
 		$this->buffer ( \View\Base::stub("Series") );
@@ -560,8 +557,7 @@ class Story extends Base
 		return $arr;
 	}
 
-//	protected function read(string $id): void
-	protected function read(string $id)
+	protected function read(string $id)//: void
 	{
 		@list($story, $view, $selected) = explode(",",$id['*']);
 		
@@ -605,8 +601,7 @@ class Story extends Base
 		else $this->buffer("Error, not found");
 	}
 	
-//	protected function reviews(string $id): void
-	protected function reviews(string $id)
+	protected function reviews(string $id)//: void
 	{
 		@list($story, $chapter, $selected) = explode(",",$id);
 
@@ -747,9 +742,9 @@ class Story extends Base
 	
 }
 
-function uuid_v5(string $namespace, string $name)
+function uuid_v5(string $namespace, string $name)//: ?string
 {
-  if(!uuid_validate($namespace)) return false;
+  if(!uuid_validate($namespace)) return null;
 
   // Get hexadecimal components of namespace
   $nhex = str_replace(array('-','{','}'), '', $namespace);

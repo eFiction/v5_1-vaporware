@@ -11,8 +11,7 @@ class Blocks extends Base
 		$this->template = new \View\Blocks();
 	}
 
-//	public function shoutbox(\Base $f3, array $params): void
-	public function shoutbox(\Base $f3, array $params)
+	public function shoutbox(\Base $f3, array $params)//: void
 	{
 		$params = $this->parametric( $params['*'] ); // 3.6
 
@@ -109,8 +108,7 @@ class Blocks extends Base
 		}
 	}
 
-//	public function calendar(\Base $f3, array $params): void
-	public function calendar(\Base $f3, array $params)
+	public function calendar(\Base $f3, array $params)//: void
 	{
 		$data = $this->model->ajaxCalendar($params);
 		

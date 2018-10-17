@@ -16,8 +16,7 @@ class Members extends Base {
 		$this->template->addTitle( \Base::instance()->get('LN__AS_Members') );
 	}
 
-//	public function index(\Base $f3, array $params): void
-	public function index(\Base $f3, array $params)
+	public function index(\Base $f3, array $params)//: void
 	{
 		// reroute /u/Membername type links to uid
 		if ( isset($params['membername']) AND ( 0 !== $uid = $this->model->uidByName($params['membername']) ) )

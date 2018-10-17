@@ -72,8 +72,7 @@ class Auth extends Base {
 		}
 	}
 	
-//	public function login(\Base $f3, array $params): void
-	public function login(\Base $f3, array $params)
+	public function login(\Base $f3, array $params)//: void
 	{
 		if ( isset($params['*']) ) $params = ($this->parametric($params['*']));  // 3.6
 		\Registry::get('VIEW')->addTitle( $f3->get('LN__Login') );
@@ -129,8 +128,7 @@ class Auth extends Base {
 		return FALSE;
 	}
 	
-//	protected function recoveryForm(\Base $f3, $token): void
-	protected function recoveryForm(\Base $f3, $token)
+	protected function recoveryForm(\Base $f3, $token)//: void
 	{
 		if ( TRUE === $token OR $user = $this->model->getRecoveryToken($token) )
 		{
@@ -160,8 +158,7 @@ class Auth extends Base {
 		}
 	}
 	
-//	public function logout(\Base $f3, array $params): void
-	public function logout(\Base $f3, array $params)
+	public function logout(\Base $f3, array $params)//: void
 	{
 		$return = explode("returnpath=",@$params['*']);
 		$returnpath = ( isset($return[1]) AND $return[1]!="") ? $return[1] : "/";
@@ -176,8 +173,7 @@ class Auth extends Base {
 		exit;
 	}
 	
-//	public function register(\Base $f3): void
-	public function register(\Base $f3)
+	public function register(\Base $f3)//: void
 	{
 		// check if configuration is disabled
 		if( FALSE == \Config::getPublic('allow_registration') )
@@ -280,8 +276,7 @@ class Auth extends Base {
 		}
 	}
 
-//	public function captcha(\Base $f3): void
-	public function captcha(\Base $f3)
+	public function captcha(\Base $f3)//: void
 	{
 		unset($_SESSION['captcha']);
 

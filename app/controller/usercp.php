@@ -11,14 +11,13 @@ class UserCP extends Base
 		\Base::instance()->set('systempage', TRUE);
 	}
 	
-	public function beforeroute()
+	public function beforeroute()//: void
 	{
 		parent::beforeroute();
 		$this->response->addTitle( \Base::instance()->get('LN__UserCP') );
 	}
 
-//	public function index(\Base $f3, array $params): void
-	public function index(\Base $f3, array $params)
+	public function index(\Base $f3, array $params)//: void
 	{
 		$modules = [ "library", "messaging", "author", "feedback", "settings" ];
 
@@ -39,8 +38,7 @@ class UserCP extends Base
 			$this->showMenu();
 	}
 
-//	public function ajax(\Base $f3, array $params): void
-	public function ajax(\Base $f3, array $params)
+	public function ajax(\Base $f3, array $params)//: void
 	{
 		$data = [];
 		if ( empty($params['module']) ) return NULL;
@@ -73,8 +71,7 @@ class UserCP extends Base
 		exit;
 	}
 	
-//	public function author(\Base $f3, array $params): void
-	public function author(\Base $f3, array $params)
+	public function author(\Base $f3, array $params)//: void
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_MyLibrary') );
 		// Menu must be built at first because it also generates the list of allowed authors
@@ -285,8 +282,7 @@ class UserCP extends Base
 		else return "__ErrorFileEdit";
 	}
 	
-//	public function feedback(\Base $f3, array $params): void
-	public function feedback(\Base $f3, array $params)
+	public function feedback(\Base $f3, array $params)//: void
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Reviews') );
 
@@ -333,8 +329,7 @@ class UserCP extends Base
 
 	}
 	
-//	protected function feedbackReviews(\Base $f3, array $params): void
-	protected function feedbackReviews(\Base $f3, array $params)
+	protected function feedbackReviews(\Base $f3, array $params)//: void
 	{
 		if ( empty($params[1]) OR !in_array($params[1], [ "written","received" ]) )
 			$f3->reroute("/userCP/feedback/reviews/written", false);
@@ -392,8 +387,7 @@ class UserCP extends Base
 		}
 	}
 	
-//	protected function feedbackReviewsEdit(\Base $f3, array $params): void
-	protected function feedbackReviewsEdit(\Base $f3, array $params)
+	protected function feedbackReviewsEdit(\Base $f3, array $params)//: void
 	{
 		if ( FALSE === $data = $this->model->loadReview($params) )
 		{
@@ -404,8 +398,7 @@ class UserCP extends Base
 		$this->buffer ( $this->template->libraryFeedbackEdit($data, $params) );
 	}
 
-//	protected function feedbackReviewsSave(\Base $f3, array $params): void
-	protected function feedbackReviewsSave(\Base $f3, array $params)
+	protected function feedbackReviewsSave(\Base $f3, array $params)//: void
 	{
 		if ( FALSE === $data = $this->model->loadReview($params) )
 		{
@@ -449,16 +442,14 @@ class UserCP extends Base
 		return TRUE;
 	}
 	
-//	protected function feedbackHome(\Base $f3, array $params): void
-	protected function feedbackHome(\Base $f3, array $params)
+	protected function feedbackHome(\Base $f3, array $params)//: void
 	{
 		$stats = $this->model->feedbackHomeStats($this->counter);
 		$this->buffer ( \View\UserCP::feedbackHome($stats) );
 		//return "Noch nix";
 	}
 	
-//	public function settings(\Base $f3, array $params): void
-	public function settings(\Base $f3, array $params)
+	public function settings(\Base $f3, array $params)//: void
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Settings') );
 		$sub = [ "profile", "preferences", "changepw" ];
@@ -482,8 +473,7 @@ class UserCP extends Base
 		$this->showMenu("settings");
 	}
 	
-//	protected function settingsProfile(\Base $f3, array $params): void
-	protected function settingsProfile(\Base $f3, array $params)
+	protected function settingsProfile(\Base $f3, array $params)//: void
 	{
 		/*
 			1 = URL
@@ -502,8 +492,7 @@ class UserCP extends Base
 		$this->buffer ( \View\UserCP::settingsProfile($profile) );
 	}
 
-//	protected function settingsPreferences(\Base $f3, array $params): void
-	protected function settingsPreferences(\Base $f3, array $params)
+	protected function settingsPreferences(\Base $f3, array $params)//: void
 	{
 		if( NULL != $post = $f3->get('POST') )
 		{
@@ -518,8 +507,7 @@ class UserCP extends Base
 		$this->buffer ( \View\UserCP::settingsPreferences($preferences) );
 	}
 
-//	protected function settingsChangePW(\Base $f3, array $params): void
-	protected function settingsChangePW(\Base $f3, array $params)
+	protected function settingsChangePW(\Base $f3, array $params)//: void
 	{
 		$feedback ="";
 		if( NULL != $post = $f3->get('POST') )
@@ -539,14 +527,12 @@ class UserCP extends Base
 		$this->buffer ( \View\UserCP::settingsChangePW($feedback) );
 	}
 
-//	protected function settingsUser(\Base $f3, array $params): void
-	protected function settingsUser(\Base $f3, array $params)
+	protected function settingsUser(\Base $f3, array $params)//: void
 	{
 		$this->buffer ( \View\Base::stub("user") );
 	}
 
-//	public function library(\Base $f3, array $params): void
-	public function library(\Base $f3, array $params)
+	public function library(\Base $f3, array $params)//: void
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_MyLibrary') );
 
@@ -598,8 +584,7 @@ class UserCP extends Base
 		}
 	}
 	
-//	private function libraryBookFav(\Base $f3, array $params): void
-	private function libraryBookFav(\Base $f3, array $params)
+	private function libraryBookFav(\Base $f3, array $params)//: void
 	{
 		// Build upper micro-menu
 		$counter = $this->counter[$params[0]]['details'];
@@ -651,8 +636,7 @@ class UserCP extends Base
 		
 	}
 	
-//	private function libraryBookFavEdit(\Base $f3, array $params): void
-	private function libraryBookFavEdit(\Base $f3, array $params)
+	private function libraryBookFavEdit(\Base $f3, array $params)//: void
 	{
 		if ( FALSE !== $data = $this->model->loadBookFav($params) )
 		{
@@ -660,8 +644,7 @@ class UserCP extends Base
 		}
 	}
 	
-//	public function messaging(\Base $f3, array $params): void
-	public function messaging(\Base $f3, array $params)
+	public function messaging(\Base $f3, array $params)//: void
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Message') );
 		

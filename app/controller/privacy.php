@@ -12,7 +12,7 @@ class Privacy extends Base
 		$this->template = new \View\Privacy();
 	}
 	
-	public function beforeroute()
+	public function beforeroute()//: void
 	{
 		parent::beforeroute();
 		\Registry::get('VIEW')->addTitle( \Base::instance()->get('LN__Privacy') );

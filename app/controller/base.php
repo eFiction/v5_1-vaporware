@@ -19,7 +19,7 @@ class Base extends \Prefab {
 	/**
 	 * init the View
 	 */
-	public function beforeroute()
+	public function beforeroute()//:void
 	{
 		$f3 = \Base::instance();
 		
@@ -57,7 +57,7 @@ class Base extends \Prefab {
 		*/
 	}
 	
-	protected function buffer($content, $section="BODY", $destroy = FALSE)
+	protected function buffer(string $content, string $section="BODY", bool $destroy = FALSE)//:void
 	{
 		if ( $destroy )
 			$this->data[$section]  = $content;
@@ -136,7 +136,7 @@ class Base extends \Prefab {
 	 * and do something else with it.
 	 * @return string
 	 */
-	public function afterroute()
+	public function afterroute()//: void
 	{
 		if (!$this->response)
 			trigger_error('No View has been set.');

@@ -9,8 +9,7 @@ class Page extends Base {
 		$this->model = \Model\Page::instance();
 	}
 
-//	public function getMain(\Base $f3, array $params): void
-	public function getMain(\Base $f3, array $params)
+	public function getMain(\Base $f3, array $params)//: void
 	{
 		if ( !empty($params['*']) )
 		{
@@ -27,7 +26,7 @@ class Page extends Base {
 			$this->buffer ( \Template::instance()->render('main/welcome.html') );
 	}
 	
-	public function maintenance(\Base $f3)
+	public function maintenance(\Base $f3)//: void
 	{
 		$this->getMain($f3, ["*" => "maintenance"]);
 	}
