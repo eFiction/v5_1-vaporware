@@ -58,9 +58,9 @@
 		<td>{{ @row['date'] }}</td>
 		<td>{{ @row['author'] }}</td>
 		<td>
-			<check if="{{@changes.0 == @row.id }}">
+			<check if="{{isset(@form_changes.1) AND (@form_changes.0 == @row.id) }}">
 				<true>
-					<check if="{{@changes.1 == TRUE }}">
+					<check if="{{@form_changes.1 == TRUE }}">
 						<true>
 							<div class="alert-box success">
 						</true>
@@ -80,6 +80,6 @@
 </table>
 </true>
 <false>
-	No items found
+	__noItemsFound
 </false>
 </check>

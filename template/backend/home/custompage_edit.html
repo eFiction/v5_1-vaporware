@@ -2,7 +2,7 @@
 <form action="{{@BASE}}/adminCP/home/custompages/id={{@data.id}}<check if="{{ @data.raw }}">/raw=1</check>" method="post">
 	<div class="grid-wrapper">
 		<check if="{{ isset(@form_error) }}"><div class="gb-90 alert-box error">{{ @form_error }}</div></check>
-		<check if="{{ @data['changes'] }}"><div class="gb-90 alert-box success">{{ @LN__Status_Changes, @data['changes'] | format }}</div></check>
+		<check if="{{ isset(@form_changes) }}"><div class="gb-90 alert-box success">{{ @LN__Status_Changes, @form_changes | format }}</div></check>
 		<div class="gb-20">__TextblockLabel</div><div class="gb-70"><input type="text" name="form_data[label]" value="{{ @data.label }}" /></div><div class="gb-10" align="right"><a href="{{@BASE}}/adminCP/home/custompages/id={{@data.id}}<check if="{{ !@data.raw }}">/raw=1</check>"><check if="{{ @data.raw }}"><true>__SwitchEditor</true><false>__SwitchRaw</false></check></a></div>
 		<div class="gb-20">__TextblockPage</div><div class="gb-80"><input type="checkbox" name="form_data[page]"<check if="{{ @data.as_page }}">checked="checked"</check> /> (__TextblockExplainPage)</div>
 		<div class="gb-20">__TextblockTitle</div><div class="gb-80"><input type="text" name="form_data[title]" value="{{ @data.title }}" /></div>

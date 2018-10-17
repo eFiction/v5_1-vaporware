@@ -13,7 +13,7 @@ class Routines extends Base {
 		$this->config = \Base::instance()->get('CONFIG');
 	}
 
-	public function notification($type, $id)
+	public function notification(string $type, int $id): int
 	{
 		if ( FALSE===$this->config['mail_notifications'] )
 			return FALSE;

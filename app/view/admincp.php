@@ -122,6 +122,8 @@ class AdminCP extends Base
 
 	public function custompageList(array $data, array $sort)
 	{
+		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+
 		$this->f3->set('pages', $data);
 		$this->f3->set('sort', $sort);
 		return $this->render('home/custompage_list.html');
@@ -270,13 +272,14 @@ class AdminCP extends Base
 		return $this->render('home/shout_edit.html');
 	}
 	
-	public function shoutList(array $data, array $sort, array $changes)
+//	public function shoutList(array $data, array $sort, array $changes)
+	public function shoutList(array $data, array $sort)
 	{
 		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 
 		$this->f3->set('shoutEntries', $data);
 		$this->f3->set('sort', $sort);
-		$this->f3->set('changes', $changes);
+//		$this->f3->set('changes', $changes);
 		return $this->render('home/shout_list.html');
 	}
 	
@@ -313,7 +316,7 @@ class AdminCP extends Base
 		return $this->render('stories/edit_meta.html');
 	}
 
-	public static function storyChapterEdit(array $chapterData, array $chapterList, $editor = "plain")
+	public function storyChapterEdit(array $chapterData, array $chapterList, string $editor = "plain"): string
 	{
 		if ($editor == "plain")
 		{
@@ -327,10 +330,10 @@ class AdminCP extends Base
 			$chapterData['editmode']	= "visual";
 		}
 
-		\Base::instance()->set('data', $chapterData);
-		\Base::instance()->set('chapterList', $chapterList);
+		$this->f3->set('data', $chapterData);
+		$this->f3->set('chapterList', $chapterList);
 
-		return \Template::instance()->render('stories/edit_chapter.html');
+		return $this->render('stories/edit_chapter.html');
 	}
 
 	public function storyListPending(array $data, array $sort)

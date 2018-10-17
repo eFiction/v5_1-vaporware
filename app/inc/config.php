@@ -16,7 +16,6 @@ class Config extends \Prefab
 	{
 		if ( FALSE === self::$public = \Cache::instance()->get('config') OR !is_array(self::$public) )
 		{
-			//echo "cache not loaded";exit;
 			self::$public = self::cache();
 			\Cache::instance()->set('config', self::$public, 3600);
 		}

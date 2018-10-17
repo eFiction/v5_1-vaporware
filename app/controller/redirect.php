@@ -9,7 +9,7 @@ class Redirect extends Base
 		
 	}
 	
-	public function filter (\Base $f3, $params)
+	public function filter (\Base $f3, array $params): string
 	{
 		// This is only a visual move, but nevertheless
 		if ( empty($params['a']) )
@@ -23,6 +23,7 @@ class Redirect extends Base
 			{
 				$params['c'] = urldecode($params['c']);
 				$f3->reroute("/redirect/{$params['b']}/{$params['c']}", false);
+				exit;
 			}
 		}
 

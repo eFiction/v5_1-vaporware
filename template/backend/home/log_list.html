@@ -38,7 +38,12 @@
 					{*<pre>{{print_r(@row.action,TRUE)}}</pre>*}
 				</case>
 				<case value="RG" break="TRUE">
-					<td colspan="2"><check if="{{@row.action.uid==@row.uid}}"><true>reg</true><false>admreg</false></check></td>
+					<td colspan="2"><check if="{{@row.action.admin==1}}"><true>__hasRegistered {{@row.action.name}}</true><false>__registeredSelf</false></check></td>
+					{*<pre>{{print_r(@row.action,TRUE)}}</pre> *}
+				</case>
+				<case value="VS" break="TRUE">
+					<td>__storyValidate</td>
+					<td>{{@row.action.title}}</td>
 					{*<pre>{{print_r(@row.action,TRUE)}}</pre> *}
 				</case>
 				<default>

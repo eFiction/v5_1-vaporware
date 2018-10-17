@@ -65,7 +65,7 @@ class Base extends \Prefab {
 			$this->data[$section] .= $content;
 	}
 	
-	protected function parametric($params=NULL)
+	protected function parametric(string $params): array
 	{
 		list($params, $returnpath) = array_pad(explode(";returnpath=",$params), 2, '');
 
@@ -94,7 +94,7 @@ class Base extends \Prefab {
 		return $r;
 	}
 
-	public function mailman($subject, $mailText, $rcpt_mail, $rcpt_name=NULL)
+	public function mailman(string $subject, string $mailText, string $rcpt_mail, string $rcpt_name=NULL): bool
 	{
 		if ( $this->config['smtp_server']!="" )
 		{
@@ -110,7 +110,7 @@ class Base extends \Prefab {
 			$smtp->set('Subject', $subject);
 			$smtp->set('content_type', 'text/html; charset="utf-8"');
 			
-			$sent = $smtp->send($mailText, TRUE);
+			return $smtp->send($mailText, TRUE);
 		}
 		else
 		{
@@ -120,14 +120,13 @@ class Base extends \Prefab {
 			$headers[] = "From: {$this->config['page_title']} <{$this->config['page_mail']}>";
 			$headers[] = "X-Mailer: PHP/".phpversion();
 			
-			$sent = mail(
+			return mail(
 				"{$rcpt_name} <{$rcpt_mail}>",	// recipient
 				$subject,						// subject
 				$mailText,						// content
 				implode("\r\n", $headers)		// headers
 			);
 		}
-		return $sent;
 	}
 	
 	/**

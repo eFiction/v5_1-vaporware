@@ -1,8 +1,8 @@
 <form action="{{@BASE}}/adminCP/home/shoutbox/id={{@data.id}}/order={{@sort.order}},{{@sort.direction}}/page={{@page}}" method="post">
 	<div class="grid-wrapper">
 		<check if="{{ isset(@form_error) }}"><div class="gb-90 alert-box error">{{ @form_error }}</div></check>
-		<check if="{{ @data['changes'] }}"><div class="gb-90 alert-box success">{{ @LN__Status_Changes, @data['changes'] | format }}</div></check>
-		<div class="gb-full">__Message:<br /><textarea name="form_data[message]" id="tinymce" rows="4" cols="80">{{ @data.message }}</textarea><br /></div>
+		<check if="{{ isset(@form_changes) }}"><div class="gb-90 alert-box success">{{ @LN__Status_Changes, @form_changes | format }}</div></check>
+		<div class="gb-full">{{@LN__Message}}:<br /><textarea name="form_data[message]" id="tinymce" rows="4" cols="80">{{ @data.message |raw }}</textarea><br /></div>
 		<div class="gb-40" align="right"><input type="submit"></div><div class="gb-60"><input type="reset"></div>
 	</div>
 </form>

@@ -17,7 +17,8 @@ class UserCP extends Base
 		$this->response->addTitle( \Base::instance()->get('LN__UserCP') );
 	}
 
-	public function index(\Base $f3, $params)
+//	public function index(\Base $f3, array $params): void
+	public function index(\Base $f3, array $params)
 	{
 		$modules = [ "library", "messaging", "author", "feedback", "settings" ];
 
@@ -38,7 +39,8 @@ class UserCP extends Base
 			$this->showMenu();
 	}
 
-	public function ajax(\Base $f3, $params)
+//	public function ajax(\Base $f3, array $params): void
+	public function ajax(\Base $f3, array $params)
 	{
 		$data = [];
 		if ( empty($params['module']) ) return NULL;
@@ -71,7 +73,8 @@ class UserCP extends Base
 		exit;
 	}
 	
-	public function author(\Base $f3, $params)
+//	public function author(\Base $f3, array $params): void
+	public function author(\Base $f3, array $params)
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_MyLibrary') );
 		// Menu must be built at first because it also generates the list of allowed authors
@@ -111,7 +114,7 @@ class UserCP extends Base
 
 	}
 	
-	protected function authorCurator(\Base $f3, $params)
+	protected function authorCurator(\Base $f3, array $params): string
 	{
 		// Get the current curator and list of people being curated
 		$data = $this->model->authorCuratorGet();
@@ -132,7 +135,7 @@ class UserCP extends Base
 		return \View\UserCP::authorCurator($data);
 	}
 
-	protected function authorHome(\Base $f3, $params)
+	protected function authorHome(\Base $f3, array $params): string
 	{
 		// Future: load stuff, like to-do, open ends ...
 		if ( $_SESSION['groups']&5 )
@@ -144,7 +147,7 @@ class UserCP extends Base
 		return \View\UserCP::authorHome($data);
 	}
 	
-	protected function authorStoryAdd(\Base $f3, $uid)
+	protected function authorStoryAdd(\Base $f3, int $uid): string
 	{
 		// check for an attempt to impersonate a different author
 		if(FALSE===in_array($uid, $_SESSION['allowed_authors']))
@@ -157,14 +160,17 @@ class UserCP extends Base
 			if( "" != $data['new_title'] = $f3->get('POST.new_title') )
 			{
 				if ( $newID = $this->model->authorStoryAdd($data) )
+				{
 					$f3->reroute("/userCP/author/uid={$uid}/edit/sid={$newID};returnpath=/userCP/author/uid={$uid}/drafts", false);
+					exit;
+				}
 			}
 		}
 		
 		return $this->template->authorStoryAdd($data);
 	}
 	
-	protected function authorStorySelect($params)
+	protected function authorStorySelect(array $params): string
 	{
 		if ( empty($params['uid']) ) return FALSE;
 		
@@ -190,7 +196,7 @@ class UserCP extends Base
 		return $this->template->authorStoryList($data, $sort, $params);
 	}
 
-	protected function authorStoryEdit(\Base $f3, array $params)
+	protected function authorStoryEdit(\Base $f3, array $params): string
 	{
 		if(empty($params['sid'])) return "__Error";
 		//$uid = isset($params['uid']) ? $params['uid'] : $_SESSION['userID'];
@@ -279,7 +285,8 @@ class UserCP extends Base
 		else return "__ErrorFileEdit";
 	}
 	
-	public function feedback(\Base $f3, $params)
+//	public function feedback(\Base $f3, array $params): void
+	public function feedback(\Base $f3, array $params)
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Reviews') );
 
@@ -326,7 +333,8 @@ class UserCP extends Base
 
 	}
 	
-	protected function feedbackReviews(\Base $f3, $params)
+//	protected function feedbackReviews(\Base $f3, array $params): void
+	protected function feedbackReviews(\Base $f3, array $params)
 	{
 		if ( empty($params[1]) OR !in_array($params[1], [ "written","received" ]) )
 			$f3->reroute("/userCP/feedback/reviews/written", false);
@@ -384,7 +392,8 @@ class UserCP extends Base
 		}
 	}
 	
-	protected function feedbackReviewsEdit(\Base $f3, $params)
+//	protected function feedbackReviewsEdit(\Base $f3, array $params): void
+	protected function feedbackReviewsEdit(\Base $f3, array $params)
 	{
 		if ( FALSE === $data = $this->model->loadReview($params) )
 		{
@@ -395,9 +404,9 @@ class UserCP extends Base
 		$this->buffer ( $this->template->libraryFeedbackEdit($data, $params) );
 	}
 
-	protected function feedbackReviewsSave(\Base $f3, $params)
+//	protected function feedbackReviewsSave(\Base $f3, array $params): void
+	protected function feedbackReviewsSave(\Base $f3, array $params)
 	{
-		//print_r($_POST);exit;
 		if ( FALSE === $data = $this->model->loadReview($params) )
 		{
 			// test
@@ -407,7 +416,7 @@ class UserCP extends Base
 		$this->buffer ( $this->template->libraryFeedbackEdit($data, $params) );
 	}
 
-	protected function feedbackReviewsDelete(\Base $f3, $params)
+	protected function feedbackReviewsDelete(\Base $f3, array $params): bool
 	{
 		// check if user is allowed to delete the review
 		if ( FALSE )
@@ -440,14 +449,16 @@ class UserCP extends Base
 		return TRUE;
 	}
 	
-	protected function feedbackHome(\Base $f3, $params)
+//	protected function feedbackHome(\Base $f3, array $params): void
+	protected function feedbackHome(\Base $f3, array $params)
 	{
 		$stats = $this->model->feedbackHomeStats($this->counter);
 		$this->buffer ( \View\UserCP::feedbackHome($stats) );
 		//return "Noch nix";
 	}
 	
-	public function settings(\Base $f3, $params)
+//	public function settings(\Base $f3, array $params): void
+	public function settings(\Base $f3, array $params)
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Settings') );
 		$sub = [ "profile", "preferences", "changepw" ];
@@ -471,7 +482,8 @@ class UserCP extends Base
 		$this->showMenu("settings");
 	}
 	
-	protected function settingsProfile(\Base $f3, $params)
+//	protected function settingsProfile(\Base $f3, array $params): void
+	protected function settingsProfile(\Base $f3, array $params)
 	{
 		/*
 			1 = URL
@@ -490,7 +502,8 @@ class UserCP extends Base
 		$this->buffer ( \View\UserCP::settingsProfile($profile) );
 	}
 
-	protected function settingsPreferences(\Base $f3, $params)
+//	protected function settingsPreferences(\Base $f3, array $params): void
+	protected function settingsPreferences(\Base $f3, array $params)
 	{
 		if( NULL != $post = $f3->get('POST') )
 		{
@@ -505,7 +518,8 @@ class UserCP extends Base
 		$this->buffer ( \View\UserCP::settingsPreferences($preferences) );
 	}
 
-	protected function settingsChangePW(\Base $f3, $params)
+//	protected function settingsChangePW(\Base $f3, array $params): void
+	protected function settingsChangePW(\Base $f3, array $params)
 	{
 		$feedback ="";
 		if( NULL != $post = $f3->get('POST') )
@@ -525,12 +539,14 @@ class UserCP extends Base
 		$this->buffer ( \View\UserCP::settingsChangePW($feedback) );
 	}
 
-	protected function settingsUser(\Base $f3, $params)
+//	protected function settingsUser(\Base $f3, array $params): void
+	protected function settingsUser(\Base $f3, array $params)
 	{
 		$this->buffer ( \View\Base::stub("user") );
 	}
 
-	public function library(\Base $f3, $params)
+//	public function library(\Base $f3, array $params): void
+	public function library(\Base $f3, array $params)
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_MyLibrary') );
 
@@ -582,7 +598,8 @@ class UserCP extends Base
 		}
 	}
 	
-	private function libraryBookFav(\Base $f3, $params)
+//	private function libraryBookFav(\Base $f3, array $params): void
+	private function libraryBookFav(\Base $f3, array $params)
 	{
 		// Build upper micro-menu
 		$counter = $this->counter[$params[0]]['details'];
@@ -634,7 +651,8 @@ class UserCP extends Base
 		
 	}
 	
-	private function libraryBookFavEdit(\Base $f3, $params)
+//	private function libraryBookFavEdit(\Base $f3, array $params): void
+	private function libraryBookFavEdit(\Base $f3, array $params)
 	{
 		if ( FALSE !== $data = $this->model->loadBookFav($params) )
 		{
@@ -642,7 +660,8 @@ class UserCP extends Base
 		}
 	}
 	
-	public function messaging(\Base $f3, $params)
+//	public function messaging(\Base $f3, array $params): void
+	public function messaging(\Base $f3, array $params)
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Message') );
 		
@@ -664,16 +683,24 @@ class UserCP extends Base
 				$this->msgDelete($f3, $params);
 				break;
 			case "outbox":
-				$data = $this->model->msgOutbox();
-				$this->buffer ( $this->template->msgInOutbox($data, "outbox") );
+				$this->buffer
+				(
+					$this->template->msgInOutbox(
+						$this->model->msgOutbox(), "outbox"
+					)
+				);
 				break;
 			default:
-				$data = $this->model->msgInbox();
-				$this->buffer ( $this->template->msgInOutbox($data, "inbox") );
+				$this->buffer
+				(
+					$this->template->msgInOutbox(
+						$this->model->msgInbox(), "inbox"
+					)
+				);
 		}
 	}
 	
-	public function msgRead(\Base $f3, $params)
+	public function msgRead(\Base $f3, array $params)//: void
 	{
 		if ( $data = $this->model->msgRead($params['id']) )
 		{
@@ -683,22 +710,29 @@ class UserCP extends Base
 		else $this->buffer( "*** No such message or access violation!");
 	}
 	
-	public function msgDelete(\Base $f3, $params)
+	public function msgDelete(\Base $f3, array $params)//: void
 	{
 		$result = $this->model->msgDelete($params['message']);
 
 		$_SESSION['lastAction'] = [ "deleted" => $result===TRUE ? "success" : $result ];
 		$f3->reroute($params['returnpath'], false);
+		exit;
 	}
 	
-	public function msgWrite(\Base $f3, $params)
+	public function msgWrite(\Base $f3, array $params)//: void
 	{
 		if( isset($_POST['recipient']) )
 			$this->msgSave($f3);
 
 		$data = $this->model->msgReply(@$params['reply']);
 		
-		$this->buffer ( $this->template->msgWrite($data) );
+		$this->buffer
+		(
+			$this->template->msgWrite
+			(
+				$this->model->msgReply(@$params['reply'])
+			)
+		);
 	}
 	
 	// todo: add reroute based on the outcome of the model
@@ -718,7 +752,7 @@ class UserCP extends Base
 		}
 	}
 	
-	protected function shoutbox(\Base $f3, $params)
+	protected function shoutbox(\Base $f3, array $params)//: void
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Shoutbox',0) );
 		
@@ -737,6 +771,7 @@ class UserCP extends Base
 				// reroute
 				if ( $params['returnpath']=="" ) $params['returnpath'] = "/userCP/messaging/shoutbox";
 				$f3->reroute($params['returnpath'], false);
+				exit;
 			}
 			
 			// save changes - to come
@@ -745,6 +780,7 @@ class UserCP extends Base
 			// reroute
 			if ( $params['returnpath']=="" ) $params['returnpath'] = "/userCP/messaging/shoutbox";
 			$f3->reroute($params['returnpath'], false);
+			exit;
 		}
 		elseif( isset($params['edit']) )
 		{
@@ -758,7 +794,7 @@ class UserCP extends Base
 		$this->buffer( \View\UserCP::shoutboxList($data) );
 	}
 	
-	protected function showMenu($selected=FALSE, array $data=[])
+	protected function showMenu($selected=FALSE, array $data=[])//: void
 	{
 		$menu = $this->model->showMenu($selected, $data);
 

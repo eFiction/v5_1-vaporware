@@ -6,9 +6,6 @@ class Auth extends Base
 
 	public function userLoad($login, $password, $uid=-1)
 	{
-		// Load a compatibility wrapper for PHP versions prior to 5.5.0
-		if ( !function_exists("password_hash") ) include ( "app/inc/password_compat.php" );
-
 		$this->prepare("userQuery", "SELECT U.password, U.uid FROM `tbl_users` U where ( U.login = :login OR U.uid = :uid ) AND U.groups > 0");
 		$this->bindValue("userQuery", ":login", $login, \PDO::PARAM_STR);
 		$this->bindValue("userQuery", ":uid",	 $uid,	 \PDO::PARAM_INT);

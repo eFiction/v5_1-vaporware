@@ -32,8 +32,8 @@
 
  **/
 
-// Turn off strict return type declaration for PHP 7 - throws an error under PHP 5, trying to get rid of this
-//declare(strict_types=0);
+// Turn on strict return type declaration for functions 
+declare(strict_types=0);
 
 /** initialize the framework **/
 $f3 = @require('lib/f3/base.php');

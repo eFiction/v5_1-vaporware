@@ -16,7 +16,8 @@ class Story extends Base
 		$this->template->addTitle( \Base::instance()->get('LN__Stories') );
 	}
 
-	public function index(\Base $f3, $params)
+//	public function index(\Base $f3, array $params): void
+	public function index(\Base $f3, array $params)
 	{
 		switch(@$params['action'])
 		{
@@ -51,7 +52,7 @@ class Story extends Base
 		$this->buffer ($data);
 	}
 	
-	public function save(\Base $f3, $params)
+	public function save(\Base $f3, array $params)
 	{
 		list($requestpath, $returnpath) = array_pad(explode(";returnpath=",$params['*']), 2, '');
 		//@list($story, $view, $selected) = explode(",",$requestpath);
@@ -127,7 +128,8 @@ class Story extends Base
 		exit;
 	}
 	
-	public function ajax(\Base $f3, $params)
+//	public function ajax(\Base $f3, array $params): void
+	public function ajax(\Base $f3, array $params)
 	{
 		if ( isset($params['segment']) AND $params['segment']=="search" )
 		{
@@ -193,7 +195,7 @@ class Story extends Base
 		}
 	}
 	
-	protected function validateReview($data)
+	protected function validateReview(array $data): array
 	{
 		$errors = [];
 
@@ -219,7 +221,7 @@ class Story extends Base
 		return $errors;
 	}
 
-	protected function intro($params)
+	protected function intro(array $params): string
 	{
 		if ( isset($params['id']) ) $this->parametric($params['id']); // 3.6
 
@@ -228,7 +230,7 @@ class Story extends Base
 		return $this->template->viewList($data);
 	}
 	
-	public function author($id)
+	public function author(int $id): array
 	{
 		list($info, $data) = $this->model->author($id);
 
@@ -236,7 +238,7 @@ class Story extends Base
 		return [ $info[0], $stories];
 	}
 	
-	protected function updates($params)
+	protected function updates(array $params): string
 	{
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 		
@@ -252,7 +254,7 @@ class Story extends Base
 		else return $this->intro($params);
 	}
 	
-	protected function categories($params)
+	protected function categories(array $params): string
 	{
 		$id = empty($params['*']) ? 0 : $params['*'];
 		if(empty($params[3]))
@@ -268,10 +270,11 @@ class Story extends Base
 		}
 	}
 	
-	protected function printer($id)
+	protected function printer(string $id)
 	{
 		$id = explode(",",$id);
-		$printer = ($id[1]=="") ? "paper" : $id[1];
+		$printer = $id[1] ?? "paper";
+//		$printer = ($id[1]=="") ? "paper" : $id[1];
 		$id = $id[0];
 		
 		if ( $printer == "epub" )
@@ -310,14 +313,13 @@ class Story extends Base
 					echo $buffer;
 				}
 				fclose ($ebook);
-//unlink($file);
 				exit;
 			}
 		}
 		
 	}
 	
-	private function createEPub($sid)
+	private function createEPub(int $sid): array
 	{
 		$epubData = $this->model->epubData($sid)[0];
 		
@@ -441,7 +443,7 @@ class Story extends Base
 
 				}
 			}
-			else return "__StoryError";
+			else return [ FALSE, "__StoryError" ];
 
 			// root.opf
 		    $zip->addFromString('OEBPS/content.opf', $xml.$this->template->epubRoot( $chapterTOC ) );
@@ -458,13 +460,14 @@ class Story extends Base
 
 	}
 	
-	public function series($params)
+//	public function series(array $params): void
+	public function series(array $params)
 	{
 		
 		$this->buffer ( \View\Base::stub("Series") );
 	}
 
-	public function search(\Base $f3, $params)
+	public function search(\Base $f3, array $params)
 	{
 		$searchForm = strpos($params[0],"search");
 		$get = [];
@@ -549,7 +552,7 @@ class Story extends Base
 			//return $this->template->searchHead();
 	}
 	
-	protected function searchCleanInput(&$arr=array())
+	protected function searchCleanInput(&$arr=array()): array
 	{
 		$arr = is_array($arr) ? $arr : explode(",",$arr);
 		foreach( $arr as &$a ) $a = (int)$a;
@@ -557,7 +560,8 @@ class Story extends Base
 		return $arr;
 	}
 
-	protected function read($id)
+//	protected function read(string $id): void
+	protected function read(string $id)
 	{
 		@list($story, $view, $selected) = explode(",",$id['*']);
 		
@@ -601,7 +605,8 @@ class Story extends Base
 		else $this->buffer("Error, not found");
 	}
 	
-	protected function reviews($id)
+//	protected function reviews(string $id): void
+	protected function reviews(string $id)
 	{
 		@list($story, $chapter, $selected) = explode(",",$id);
 
@@ -617,7 +622,7 @@ class Story extends Base
 		else $this->buffer("Error, not found");
 	}
 	
-	public function storyBlocks($select)
+	public function storyBlocks(string $select): string
 	{
 		$select = explode(".",$select);
 
@@ -742,7 +747,8 @@ class Story extends Base
 	
 }
 
-function uuid_v5($namespace, $name) {
+function uuid_v5(string $namespace, string $name)
+{
   if(!uuid_validate($namespace)) return false;
 
   // Get hexadecimal components of namespace
@@ -781,7 +787,8 @@ function uuid_v5($namespace, $name) {
   );
 }
 
-function uuid_validate($uuid) {
+function uuid_validate(string $uuid): int
+{
   return preg_match('/^\{?[0-9a-f]{8}\-?[0-9a-f]{4}\-?[0-9a-f]{4}\-?'.
                     '[0-9a-f]{4}\-?[0-9a-f]{12}\}?$/i', $uuid) === 1;
 }

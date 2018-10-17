@@ -929,7 +929,10 @@ class AdminCP extends Controlpanel {
 				elseif ( $item['type']=="RG" AND preg_match('/(\w+[\s\w]*)\s+\((\d*)\).*/iU', $item['action'], $matches) )
 				// matching _LOG_REGISTER & _LOG_ADMIN_REG
 				{
-					$item['action'] = [ 'name'=>$matches[1], 'uid'=>$matches[2], 'admin'=>($matches[2]!=$item['uid_reg']) ];
+					$item['action'] = [ 
+							'name'=>$matches[1], 'uid'=>$matches[2], 
+							'admin'=>($matches[2]!=$item['uid_reg'])
+					];
 				}
 				elseif ( $item['type']=="VS" )
 				{

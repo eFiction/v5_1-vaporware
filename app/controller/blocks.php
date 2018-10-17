@@ -11,7 +11,8 @@ class Blocks extends Base
 		$this->template = new \View\Blocks();
 	}
 
-	public function shoutbox(\Base $f3, $params)
+//	public function shoutbox(\Base $f3, array $params): void
+	public function shoutbox(\Base $f3, array $params)
 	{
 		$params = $this->parametric( $params['*'] ); // 3.6
 
@@ -108,7 +109,8 @@ class Blocks extends Base
 		}
 	}
 
-	public function calendar(\Base $f3, $params)
+//	public function calendar(\Base $f3, array $params): void
+	public function calendar(\Base $f3, array $params)
 	{
 		$data = $this->model->ajaxCalendar($params);
 		
@@ -176,7 +178,7 @@ class Blocks extends Base
 		//exit;
 	}
 	
-	public function buildMenu($menuSelect)
+	public function buildMenu(string $menuSelect): string
 	{
 		$pageSelect	= explode("/",\Base::instance()->get('PARAMS.0'))[1];
 		$menuSelect	= explode(".",$menuSelect);
@@ -188,7 +190,7 @@ class Blocks extends Base
 		return \View\Blocks::pageMenu($main, $sub, isset($menuSelect[2]) );
 	}
 	
-	public function categories()
+	public function categories(): string
 	{
 		if ( NULL !== $data = $this->model->categories() )
 			return \View\Blocks::categories($data);

@@ -128,5 +128,9 @@ class Logging extends \DB\SQL\Mapper
 			];
 			return FALSE;
 		}
+		
+		// Whenever a story is validated, it is assumed to have changed in one way or another, so we delete the ePub cache
+		if ( FALSE !== $file = realpath("tmp/epub/s{$data[0]['sid']}.zip") )
+			unlink($file);
 	}
 }

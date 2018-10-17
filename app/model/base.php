@@ -26,6 +26,8 @@ class Base extends \Prefab {
 		return $this->db->log(TRUE);
 	}
 	
+	/*
+	foreign keys, currently not used
 	public function getFKeys()
 	{
 		$sql = "SELECT CONSTRAINT_NAME as fk, TABLE_NAME as tbl
@@ -36,6 +38,7 @@ class Base extends \Prefab {
 					AND information_schema.TABLE_CONSTRAINTS.TABLE_NAME LIKE '{$this->prefix}%';";
 		return $this->exec($sql);
 	}
+	*/
 
 	public function newPasswordQuality($password1, $password2)
 	{
@@ -56,9 +59,6 @@ class Base extends \Prefab {
 	
 	public function userChangePW($uid, $password)
 	{
-		// Load a compatibility wrapper for PHP versions prior to 5.5.0
-		if ( !function_exists("password_hash") ) include ( "app/inc/password_compat.php" );
-
 		$hash = password_hash( $password, PASSWORD_DEFAULT );
 		$this->prepare("updateUser", "UPDATE `tbl_users`U SET U.password = :password WHERE U.uid = :uid");
 		$this->bindValue("updateUser", "password", $hash, \PDO::PARAM_STR);

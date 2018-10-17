@@ -10,7 +10,8 @@ class Authors extends Base {
 		$this->template = new \View\Authors();
 	}
 
-	public function index(\Base $f3, $params)
+//	public function index(\Base $f3, array $params): void
+	public function index(\Base $f3, array $params)
 	{
 		if ( isset($params['*']) ) $this->parametric($params['*']);
 		

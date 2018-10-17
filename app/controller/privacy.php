@@ -18,7 +18,7 @@ class Privacy extends Base
 		\Registry::get('VIEW')->addTitle( \Base::instance()->get('LN__Privacy') );
 	}
 
-	public function index(\Base $f3, $params)
+	public function index(\Base $f3, array $params)
 	{
 		$params = $this->parametric($params['*']);
 		// Privacy page header

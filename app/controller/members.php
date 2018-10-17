@@ -16,6 +16,7 @@ class Members extends Base {
 		$this->template->addTitle( \Base::instance()->get('LN__AS_Members') );
 	}
 
+//	public function index(\Base $f3, array $params): void
 	public function index(\Base $f3, array $params)
 	{
 		// reroute /u/Membername type links to uid
@@ -41,8 +42,7 @@ class Members extends Base {
 		return "Listing";
 	}
 	
-//	protected function profile(int $uid) : string
-	protected function profile($uid)
+	protected function profile(int $uid) : string
 	{
 		// if the is no numeric id, fall back to listing
 		if ( FALSE === $data = $this->model->profileData($uid) )

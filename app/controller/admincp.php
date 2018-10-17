@@ -21,7 +21,7 @@ class AdminCP extends Base
 		$this->response->addTitle( \Base::instance()->get('LN__AdminCP') );
 	}
 
-	protected function menuShow($selected=FALSE)
+	protected function menuShow($selected=FALSE)//: void
 	{
 		$menu = $this->model->menuShow($selected);
 		$this->buffer
@@ -34,19 +34,27 @@ class AdminCP extends Base
 			\Base::instance()->set('accessSub', TRUE);
 	}
 	
-	protected function moduleInit( array $allowed, $submodule )
-	{
-		$submodule = in_array ( @$submodule, $allowed ) ? $submodule : NULL;
-		if ( $submodule )
-			$s = "/{$submodule}";
-		else
-			$submodule = "home";
+	// protected function moduleInit( array $allowed, string $submodule=NULL ): string
+	// {
+		// $submodule = in_array ( $submodule, $allowed ) ? $submodule : NULL;
+		// if ( $submodule )
+			// $s = "/{$submodule}";
+		// else
+			// $submodule = "home";
 
-		if ( TRUE === $this->model->checkAccess($this->moduleBase.@$s) )
+		// if ( TRUE === $this->model->checkAccess($this->moduleBase.@$s) )
+			// return $submodule;
+	// }
+
+	protected function moduleInit( array $allowed, string $submodule=NULL ): string
+	{
+		if ( in_array ( $submodule, $allowed ) AND TRUE === $this->model->checkAccess($this->moduleBase."/{$submodule}") )
 			return $submodule;
+		else
+			return "home";
 	}
 
-	protected function menuShowUpper($selected=FALSE)
+	protected function menuShowUpper(string $selected=NULL): string
 	{
 		$menu = $this->model->menuShowUpper($selected);
 		\Base::instance()->set('menu_upper', $menu);
@@ -54,12 +62,12 @@ class AdminCP extends Base
 		return $link;
 	}
 	
-	public function fallback(\Base $f3, $params)
+	public function fallback(\Base $f3, array $params)//: void
 	{
 		$f3->reroute('/adminCP/home', false);
 	}
 	
-	public function __archive(\Base $f3, $params, $feedback = [ NULL, NULL ] )
+	public function __archive(\Base $f3, array $params, array $feedback = [ NULL, NULL ] )//: void
 	{
 		// declare module
 		$this->moduleBase = "archive";
@@ -78,13 +86,13 @@ class AdminCP extends Base
 				$this->archiveSubmit($f3, $feedback);
 				break;
 			case "featured":
-				$this->archiveFeatured($f3, $params, $feedback);
+				$this->archiveFeatured($f3, $params);
 				break;
 			case "contests":
-				$this->buffer( $this->archiveContests($f3, $params, $feedback) );
+				$this->buffer( $this->archiveContests($f3, $params) );
 				break;
 			case "characters":
-				$this->buffer( $this->archiveCharacters($f3, $params, $feedback) );
+				$this->buffer( $this->archiveCharacters($f3, $params) );
 				break;
 			case "tags":
 				$this->archiveTagsIndex($f3, $params, $feedback);
@@ -100,7 +108,7 @@ class AdminCP extends Base
 		}
 	}
 	
-	public function archiveAjax(\Base $f3, $params)
+	public function archiveAjax(\Base $f3, array $params)//: void
 	{
 		$data = [];
 		if ( empty($params['module']) ) return NULL;
@@ -126,7 +134,7 @@ class AdminCP extends Base
 		exit;
 	}
 
-	protected function archiveHome(\Base $f3, $feedback = [ NULL, NULL ])
+	protected function archiveHome(\Base $f3, array $feedback = [ NULL, NULL ])//: void
 	{
 		if ( isset($_POST['form_data']) )
 		{
@@ -138,7 +146,7 @@ class AdminCP extends Base
 		$this->buffer( $this->template->settingsFields($data, "archive/home", $feedback) );
 	}
 	
-	protected function archiveSubmit(\Base $f3, $feedback = [ NULL, NULL ])
+	protected function archiveSubmit(\Base $f3, array $feedback = [ NULL, NULL ])//: void
 	{
 		if ( isset($_POST['form_data']) )
 		{
@@ -151,7 +159,7 @@ class AdminCP extends Base
 		$this->buffer( $this->template->settingsFields($data, "archive/submit", $feedback) );
 	}
 	
-	protected function archiveFeatured(\Base $f3, $params, $feedback)
+	protected function archiveFeatured(\Base $f3, array $params)//: void
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Featured') );
 		$allowedSubs = $this->menuShowUpper("archive/featured");
@@ -180,7 +188,7 @@ class AdminCP extends Base
 			$data = $this->model->featuredList($page, $sort, $params['select']);
 			$this->buffer( $this->template->featuredList($data, $sort, $params['select']) );
 			
-			return TRUE;
+			return;
 		}
 		elseif (isset($_POST['form_data']))
 		{
@@ -193,7 +201,6 @@ class AdminCP extends Base
 			$data['errors'] = @$errors;
 			$data['changes'] = @$changes;
 			$this->buffer( $this->template->featuredEdit($data) );
-			// return TRUE;
 		}
 		else
 		{
@@ -201,7 +208,7 @@ class AdminCP extends Base
 		}
 	}
 	
-	protected function archiveContests(\Base $f3, $params, $feedback)
+	protected function archiveContests(\Base $f3, array $params): string
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Contests') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Contests') );
@@ -212,6 +219,7 @@ class AdminCP extends Base
 		{
 			$this->model->contestDelete( (int)$params['delete'] );
 			$f3->reroute('/adminCP/archive/contests', false);
+			exit;
 		}
 		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
 		{
@@ -228,7 +236,10 @@ class AdminCP extends Base
 			elseif ( isset($_POST['newContest']) )
 			{
 				if ( NULL !== $newID = $this->model->contestAdd( $f3->get('POST.newContest') ) )
+				{
 					$f3->reroute('/adminCP/archive/contests/id='.$newID, false);
+					exit;
+				}
 				// Error handling
 			}
 			elseif ( isset($_POST['charid']) ) $params['id'] = $f3->get('POST.charid');
@@ -277,7 +288,7 @@ class AdminCP extends Base
 		return $this->template->contestsList($this->model->contestsList($page, $sort), $sort);
 	}
 
-	protected function archiveCharacters(\Base $f3, $params, $feedback)
+	protected function archiveCharacters(\Base $f3, array $params): string
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Characters') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Characters') );
@@ -327,13 +338,15 @@ class AdminCP extends Base
 		$sort["order"]		= $allow_order[$sort["link"]];
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="desc") ?	"desc" : "asc";
 		
-		$data = $this->model->characterList($page, $sort);
-		return $this->template->characterList($data, $sort);
+		return $this->template->characterList
+				(
+					$this->model->characterList($page, $sort),
+					$sort
+				);
 	}
 	
-	protected function archiveTagsIndex(\Base $f3, $params, $feedback)
+	protected function archiveTagsIndex(\Base $f3, array $params, $feedback)//: void
 	{
-		//$p = [];
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Tags') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Tags') );
 
@@ -357,7 +370,7 @@ class AdminCP extends Base
 			$this->archiveTagsEdit($f3, $params);
 	}
 	
-	protected function archiveTagsEdit(\Base $f3, $params)
+	protected function archiveTagsEdit(\Base $f3, $params)//: void
 	{
 
 		if ( isset($params['delete']) )
@@ -386,7 +399,7 @@ class AdminCP extends Base
 			$data['errors'] = @$errors;
 			$data['changes'] = @$changes;
 			$this->buffer( $this->template->tagEdit($data) );
-			return TRUE;
+			return;
 		}
 
 		// page will always be an integer > 0
@@ -409,7 +422,7 @@ class AdminCP extends Base
 		$this->buffer ( $this->template->tagList($data, $sort) );
 	}
 	
-	protected function archiveTagsGroups(\Base $f3, $params)
+	protected function archiveTagsGroups(\Base $f3, array $params)//: void
 	{
 		//$segment = "archive/tags/groups";
 		//if(!$this->model->checkAccess($segment)) return FALSE;
@@ -439,7 +452,7 @@ class AdminCP extends Base
 			$data['errors'] = @$errors;
 			$data['changes'] = @$changes;
 			$this->buffer( $this->template->tagGroupEdit($data) );
-			return TRUE;
+			return;
 		}
 
 		// page will always be an integer > 0
@@ -461,7 +474,7 @@ class AdminCP extends Base
 		$this->buffer ( $this->template->tagGroupList($data, $sort) );
 	}
 	
-	protected function archiveCategories(\Base $f3, $params)
+	protected function archiveCategories(\Base $f3, array $params)//: void
 	{
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 		
@@ -499,7 +512,7 @@ class AdminCP extends Base
 				$this->buffer( $this->template->categoryAdd( $f3, $data ) );
 				
 				// Leave function without creating further forms or mishap
-				return TRUE;
+				return;
 			}
 			else
 			{
@@ -547,7 +560,7 @@ class AdminCP extends Base
 			$data['errors'] = @$errors;
 			$data['changes'] = @$changes;
 			$this->buffer( $this->template->categoryEdit($data) );
-			return TRUE;
+			return;
 		}
 
 		$data = $this->model->categoryListFlat();
@@ -557,7 +570,7 @@ class AdminCP extends Base
 		$this->buffer ( $this->template->categoryList($data, $feedback) );
 	}
 
-	protected function archiveRatings(\Base $f3, $params)
+	protected function archiveRatings(\Base $f3, array $params)//: void
 	{
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 		
@@ -569,7 +582,7 @@ class AdminCP extends Base
 			$data = $this->model->ratingLoad($params['delete']);
 			$allRatings = $this->model->ratingList();
 			$this->buffer( $this->template->ratingDelete($data, $allRatings) );
-			return TRUE;
+			return;
 		}
 		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
 		{
@@ -581,11 +594,13 @@ class AdminCP extends Base
 			{
 				$newID = $this->model->ratingAdd( $f3->get('POST.newRating') );
 				$f3->reroute('/adminCP/archive/ratings/id='.$newID, false);
+				exit;
 			}
 			elseif ( isset($_POST['moveTo']) )
 			{
 				$this->model->ratingDelete( $params['id'], $f3->get('POST.moveTo') );
 				$f3->reroute('/adminCP/archive/ratings', false);
+				exit;
 			}
 		}
 		
@@ -593,14 +608,14 @@ class AdminCP extends Base
 		{
 			$data = $this->model->ratingLoad($params['id']);
 			$this->buffer( $this->template->ratingEdit($data) );
-			return TRUE;
+			return;
 		}
 
 		$data = $this->model->ratingList();
 		$this->buffer ( $this->template->ratingList($data) );
 	}
 
-	public function __home(\Base $f3, $params)
+	public function __home(\Base $f3, array $params)//: void
 	{
 		// declare module
 		$this->moduleBase = "home";
@@ -641,7 +656,7 @@ class AdminCP extends Base
 		}
 	}
 	
-	protected function homeIndex(\Base $f3)
+	protected function homeIndex(\Base $f3)//: void
 	{
 		// silently attempt to get version information
 		$ch = @curl_init("https://efiction.org/version.php");
@@ -662,12 +677,12 @@ class AdminCP extends Base
 		$this->buffer( $this->template->homeWelcome($version, $compare) );
 	}
 
-	protected function homeManual(\Base $f3)
+	protected function homeManual(\Base $f3)//: void
 	{
 		$this->buffer( "<a href='http://efiction.org/wiki/Main_Page'>http://efiction.org/wiki/Main_Page</a>" );
 	}
 	
-	protected function homeCustompages(\Base $f3, array $params)
+	protected function homeCustompages(\Base $f3, array $params)//: void
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_CustomPages') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_CustomPages') );
@@ -677,22 +692,35 @@ class AdminCP extends Base
 		if ( isset($params['delete']) )
 		{
 			if ( $this->model->deleteCustompage( (int)$params['delete'] ) )
+			{
 				$f3->reroute('/adminCP/home/custompages', false);
+				exit;
+			}
 			else $f3->set('form_error', "__failedDelete");
 		}
 		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
 		{
 			if ( isset($_POST['form_data']) )
 			{
-				$changes = $this->model->saveCustompage($params['id'], $f3->get('POST.form_data') );
+				$f3->set
+				(
+					'form_changes',
+					$this->model->saveCustompage
+					(
+						$params['id'],
+						$f3->get('POST.form_data')
+					)
+				);
 			}
 			elseif ( isset($_POST['newPage']) )
 			{
-				$newID = $this->model->addCustompage( $f3->get('POST.newPage') );
-				if ( $newID === FALSE )
+				if ( FALSE === $newID = $this->model->addCustompage( $f3->get('POST.newPage') ) )
 					$f3->set('form_error', "__DuplicateLabel ".$f3->get('POST.newPage') );
 				else
+				{
 					$f3->reroute('/adminCP/home/custompages/id='.$newID, false);
+					exit;
+				}
 			}
 		}
 		
@@ -700,16 +728,13 @@ class AdminCP extends Base
 		{
 			if ( NULL !== $data = $this->model->loadCustompage($params['id']) )
 			{
-				$data['raw'] = @$params['raw'];
-				$data['errors'] = @$errors;
-				$data['changes'] = @$changes;
+				$data['raw'] = $params['raw'] ?? NULL;
 				$this->buffer( $this->template->custompageEdit($data) );
-				return TRUE;
+				return;
 			}
 			else $f3->set('form_error', "__failedLoad");
 		}
 
-		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 		// page will always be an integer > 0
 		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
 
@@ -730,12 +755,12 @@ class AdminCP extends Base
 		$this->buffer ( $this->template->custompageList($data, $sort) );
 	}
 
-	protected function homeLogs(\Base $f3, array $params)
+	protected function homeLogs(\Base $f3, array $params)//: void
 	{
 		if ( !$this->model->checkAccess("home/logs") )
 		{
 			$this->buffer( "__NoAccess" );
-			return FALSE;
+			return;
 		}
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Logs') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Logs') );
@@ -760,13 +785,20 @@ class AdminCP extends Base
 		$sort["order"]		= $allow_order[$sort["link"]];
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
 
-		$data = $this->model->logGetData($sub, $page, $sort);
 		
-		
-		$this->buffer( $this->template->logList($data, $menuCount, [], $sub ) );
+		$this->buffer
+		(
+			$this->template->logList
+			(
+				$this->model->logGetData($sub, $page, $sort),
+				$menuCount,
+				[],
+				$sub
+			)
+		);
 	}
 	
-	protected function homeShoutbox(\Base $f3, array $params)
+	protected function homeShoutbox(\Base $f3, array $params)//: void
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Shoutbox') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Shoutbox') );
@@ -792,37 +824,53 @@ class AdminCP extends Base
 		if ( isset($params['delete']) )
 		{
 			if ( $this->model->deleteShout( (int)$params['delete'] ) )
+			{
 				$f3->reroute("/adminCP/home/shoutbox/order={$sort['order']},{$sort['direction']}/page={$page}", false);
+				exit;
+			}
 			else $f3->set('form_error', "__failedDelete");
 		}
 		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
 		{
 			if ( isset($_POST['form_data']) )
 			{
-				$changes = $this->model->saveShout($params['id'], $f3->get('POST.form_data') );
+				$f3->set
+				(
+					'form_changes',
+					[
+						$params['id'],
+						$this->model->saveShout
+						(
+							$params['id'],
+							$f3->get('POST.form_data')
+						)
+					]
+				);
 			}
 		}
 
-		if( isset ($params['id']) AND !isset($changes) )
+		if( isset ($params['id']) AND $f3->get('form_changes')=="" )
 		{
 			if ( NULL !== $data = $this->model->loadShoutbox($params['id']) )
 			{
-				$data['raw'] = @$params['raw'];
-				$data['errors'] = @$errors;
-				$data['changes'] = @$changes;
+				$data['raw'] = $params['raw'] ?? NULL;
 				$this->buffer( $this->template->shoutEdit($data, $sort, $page) );
-				return TRUE;
+				return;
 			}
 			else $f3->set('form_error', "__failedLoad");
 		}
 		
-		$data = $this->model->listShoutbox($page, $sort);
-		$changes = [ @$params['id'], @$changes ];
-
-		$this->buffer ( $this->template->shoutList($data, $sort, $changes) );
+		$this->buffer
+		(
+			$this->template->shoutList
+			(
+				$this->model->listShoutbox($page, $sort),
+				$sort
+			)
+		);
 	}
 	
-	protected function homeNews(\Base $f3, array $params)
+	protected function homeNews(\Base $f3, array $params)//: void
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_News') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_News') );
@@ -832,19 +880,29 @@ class AdminCP extends Base
 		if ( isset($params['delete']) )
 		{
 			if ( $this->model->deleteNews( (int)$params['delete'] ) )
+			{
 				$f3->reroute('/adminCP/home/news', false);
+				exit;
+			}
 			else $f3->set('form_error', "__failedDelete");
 		}
 		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
 		{
 			if ( isset($_POST['form_data']) )
 			{
-				$changes = $this->model->saveNews($params['id'], $f3->get('POST.form_data') );
+				$f3->set
+				(
+					'form_changes',
+					$this->model->saveNews
+					(
+						$params['id'],
+						$f3->get('POST.form_data')
+					)
+				);
 			}
 			elseif ( isset($_POST['newHeadline']) )
 			{
-				$newID = $this->model->addNews( $f3->get('POST.newHeadline') );
-				if ( $newID !== FALSE )
+				if ( FALSE !== $newID = $this->model->addNews( $f3->get('POST.newHeadline') ) )
 					$f3->reroute('/adminCP/home/news/id='.$newID, false);
 			}
 		}
@@ -853,11 +911,9 @@ class AdminCP extends Base
 		{
 			if ( NULL !== $data = $this->model->loadNews($params['id']) )
 			{
-				$data['raw'] = @$params['raw'];
-				$data['errors'] = @$errors;
-				$data['changes'] = @$changes;
+				$data['raw'] = $params['raw'] ?? NULL;
 				$this->buffer( $this->template->newsEdit($data, @$params['returnpath']) );
-				return TRUE;
+				return;
 			}
 			else $f3->set('form_error', "__failedLoad");
 		}
@@ -878,12 +934,17 @@ class AdminCP extends Base
 		$sort["order"]		= $allow_order[$sort["link"]];
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
 		
-		$data = $this->model->listNews($page, $sort);
-
-		$this->buffer ( $this->template->newsList($data, $sort) );
+		$this->buffer
+		(
+			$this->template->newsList
+			(
+				$this->model->listNews($page, $sort),
+				$sort
+			)
+		);
 	}
 
-	public function __members(\Base $f3, $params)
+	public function __members(\Base $f3, array $params)
 	{
 		// declare module
 		$this->moduleBase = "members";
@@ -917,7 +978,7 @@ class AdminCP extends Base
 		}
 	}
 
-	public function membersAjax(\Base $f3, $params)
+	public function membersAjax(\Base $f3, array $params)//: void
 	{
 		$data = [];
 		if ( empty($params['module']) ) return NULL;
@@ -931,7 +992,7 @@ class AdminCP extends Base
 		exit;
 	}
 
-	protected function membersEdit(\Base $f3, $params)
+	protected function membersEdit(\Base $f3, array $params): string
 	{
 		if( isset($_POST) ) $post = $f3->get('POST');
 		if( isset($params['*']) ) $params = $this->parametric($params['*']);
@@ -945,7 +1006,7 @@ class AdminCP extends Base
 		return $this->template->userEdit($memberdata, $params['returnpath']);
 	}
 			
-	protected function membersEditSearchForm(\Base $f3, $params)
+	protected function membersEditSearchForm(\Base $f3, array $params): string
 	{
 		if(!empty($params['term']))
 		{
@@ -993,7 +1054,7 @@ class AdminCP extends Base
 		return $this->template->userEditList($data, $sort, $search);
 	}
 
-	protected function membersHome(\Base $f3, $feedback = [ NULL, NULL ])
+	protected function membersHome(\Base $f3, array $feedback = [ NULL, NULL ])//: void
 	{
 		if ( isset($_POST['form_data']) )
 		{
@@ -1004,13 +1065,13 @@ class AdminCP extends Base
 		$this->buffer( $this->template->settingsFields($data, "members/home", $feedback) );
 	}
 
-	protected function membersTeam(\Base $f3)
+	protected function membersTeam(\Base $f3)//: void
 	{
 		$team = $this->model->listTeam();
 		$this->buffer( $this->template->userTeamList($team) );
 	}
 
-	protected function membersProfile(\Base $f3, $params)
+	protected function membersProfile(\Base $f3, array $params)
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Profile') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Profile') );
@@ -1033,7 +1094,7 @@ class AdminCP extends Base
 		$this->buffer ( $this->template->userFieldsList( $data ) );
 	}
 
-	public function __settings(\Base $f3, $params, $feedback = [ NULL, NULL ] )
+	public function __settings(\Base $f3, array $params, array $feedback = [ NULL, NULL ] )//: void
 	{
 		// declare module
 		$this->moduleBase = "settings";
@@ -1041,6 +1102,8 @@ class AdminCP extends Base
 		$this->menuShow($this->moduleBase);
 		// add module title
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Settings') );
+		// implement a Cache killswitch:
+		if(@$params['module']=="cachedrop") \Cache::instance()->clear('config');
 
 		switch( $this->moduleInit([ "datetime", "server", "registration", "security", "screening", "language", "layout" ], @$params['module']) )
 		{
@@ -1097,7 +1160,7 @@ class AdminCP extends Base
 		if (isset($extra)) $this->buffer( $extra );
 	}
 
-	public function __settingsSave(\Base $f3, $params)
+	public function __settingsSave(\Base $f3, array $params)//: void
 	{
 		if (empty($params['module']))
 		{
@@ -1115,12 +1178,12 @@ class AdminCP extends Base
 		$this->__settings($f3, $params, $results);
 	}
 
-	protected function settingsDateTime(\Base $f3, $params)
+	protected function settingsDateTime(\Base $f3, array $params): string
 	{
 		return $this->template->settingsDateTime();
 	}
 
- 	protected function settingsLanguage(\Base $f3, $params)
+ 	protected function settingsLanguage(\Base $f3, array $params): string
 	{
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Language') );
 
@@ -1137,7 +1200,7 @@ class AdminCP extends Base
 		return $this->template->language($languageFiles, $languageConfig);
 	}
 
- 	protected function settingsLayout(\Base $f3, $params)
+ 	protected function settingsLayout(\Base $f3, array $params): string
 	{
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Layout') );
 		
@@ -1161,7 +1224,7 @@ class AdminCP extends Base
 		return $this->template->layout($layoutFiles, $layoutConfig).$iconset;
 	}
 
-	protected function settingsSaveLLData(\Base $f3, $params)
+	protected function settingsSaveLLData(\Base $f3, array $params): array
 	{
 		if ( $params['module'] == "language" )
 			return $this->model->saveLanguage($f3->get('POST.form_special'));
@@ -1170,7 +1233,7 @@ class AdminCP extends Base
 			return $this->model->saveLayout($f3->get('POST.form_special'));
 	}
 
-	protected function settingsServer(\Base $f3, &$data)
+	protected function settingsServer(\Base $f3, array &$data)//: void
 	{
 		if ( !$this->model->checkAccess("settings/server") )
 		{
@@ -1183,7 +1246,7 @@ class AdminCP extends Base
 		$data['Report'] = $this->model->settingsFields('settings_report');
 	}
 
-	public function __stories(\Base $f3, $params)
+	public function __stories(\Base $f3, array $params)
 	{
 		// declare module
 		$this->moduleBase = "stories";
@@ -1211,7 +1274,7 @@ class AdminCP extends Base
 		}
 	}
 	
-	public function storiesAjax(\Base $f3, $params)
+	public function storiesAjax(\Base $f3, array $params)//: void
 	{
 		$data = [];
 		if ( empty($params['module']) ) return NULL;
@@ -1234,7 +1297,7 @@ class AdminCP extends Base
 		exit;
 	}
 
-	protected function storiesPending(\Base $f3, $params)
+	protected function storiesPending(\Base $f3, array $params): string
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Pending') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Pending') );
@@ -1334,11 +1397,18 @@ class AdminCP extends Base
 		$sort["order"]		= $allow_order[$sort["link"]];
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
 
-		$data = $this->model->storyListPending($page, $sort);
-		return $this->template->storyListPending($data, $sort);
+		return $this->template->storyListPending
+				(
+					$this->model->storyListPending
+					(
+						$page,
+						$sort
+					),
+					$sort
+				);
 	}
 	
-	protected function storiesEdit(\Base $f3, $params)
+	protected function storiesEdit(\Base $f3, array $params)
 	{
 		if ( isset($params['*']) )
 			$params = $this->parametric($params['*']);
@@ -1374,7 +1444,6 @@ class AdminCP extends Base
 			// Chapter list is always needed, load after POST to catch chapter name changes
 			$chapterList = $this->model->loadChapterList($storyInfo['sid']);
 
-
 			if ( isset($params['chapter']) )
 			{
 				if ( $params['chapter']=="new" )
@@ -1399,11 +1468,7 @@ class AdminCP extends Base
 						$editor = "visual";
 				}
 
-				$this->buffer( \View\AdminCP::storyChapterEdit($chapterInfo,$chapterList,$editor) );
-
-
-				//$storyInfo['returnpath'] = $params['returnpath'];
-				//$this->buffer ( $this->editChapter($f3, $params, $storyInfo) );
+				$this->buffer( $this->template->storyChapterEdit($chapterInfo,$chapterList,$editor) );
 			}
 			else
 			{
@@ -1419,7 +1484,7 @@ class AdminCP extends Base
 		}
 	}
 	
-	protected function storiesAdd(\Base $f3, $params)
+	protected function storiesAdd(\Base $f3, array $params)//: void
 	{
 		if ( isset($_POST['form']) )
 		{
@@ -1438,7 +1503,7 @@ class AdminCP extends Base
 		else $this->buffer( $this->template->storyAddForm() );
 	}
 	
-	protected function storiesHome(\Base $f3, $params)
+	protected function storiesHome(\Base $f3, array $params)
 	{
 		$this->buffer( \View\Base::stub() );
 	}

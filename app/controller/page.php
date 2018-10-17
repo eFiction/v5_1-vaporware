@@ -9,7 +9,8 @@ class Page extends Base {
 		$this->model = \Model\Page::instance();
 	}
 
-	public function getMain(\Base $f3, $params)
+//	public function getMain(\Base $f3, array $params): void
+	public function getMain(\Base $f3, array $params)
 	{
 		if ( !empty($params['*']) )
 		{

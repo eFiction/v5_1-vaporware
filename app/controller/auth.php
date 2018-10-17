@@ -17,7 +17,7 @@ class Auth extends Base {
      * check login state
      * @return bool
      */
-    static public function isLoggedIn(\Base $f3)
+    static public function isLoggedIn(\Base $f3): bool
 	{
 		/*
 		Session mask (bit-wise)
@@ -72,7 +72,8 @@ class Auth extends Base {
 		}
 	}
 	
-	public function login($f3,$params)
+//	public function login(\Base $f3, array $params): void
+	public function login(\Base $f3, array $params)
 	{
 		if ( isset($params['*']) ) $params = ($this->parametric($params['*']));  // 3.6
 		\Registry::get('VIEW')->addTitle( $f3->get('LN__Login') );
@@ -101,7 +102,6 @@ class Auth extends Base {
 			{
 				// bad
 				$this->buffer( "Bad token" );
-				return FALSE;
 			}
 			if ( TRUE === $this->model->newuserEmailLink($params['activate']) )
 				$this->buffer( "Activating" );
@@ -113,7 +113,7 @@ class Auth extends Base {
 			$this->buffer( \View\Auth::loginError($f3) );
 	}
 	
-	protected function recoveryMail(\Base $f3)
+	protected function recoveryMail(\Base $f3): bool
 	{
 		$recovery = $this->model->userRecovery($f3->get('POST.username'), $f3->get('POST.email'));
 		if ( $recovery )
@@ -129,6 +129,7 @@ class Auth extends Base {
 		return FALSE;
 	}
 	
+//	protected function recoveryForm(\Base $f3, $token): void
 	protected function recoveryForm(\Base $f3, $token)
 	{
 		if ( TRUE === $token OR $user = $this->model->getRecoveryToken($token) )
@@ -157,10 +158,10 @@ class Auth extends Base {
 			// some error message
 			$this->buffer( "__tokenInvalid" );
 		}
-	
 	}
 	
-	public function logout(\Base $f3,$params)
+//	public function logout(\Base $f3, array $params): void
+	public function logout(\Base $f3, array $params)
 	{
 		$return = explode("returnpath=",@$params['*']);
 		$returnpath = ( isset($return[1]) AND $return[1]!="") ? $return[1] : "/";
@@ -172,9 +173,11 @@ class Auth extends Base {
 		//session_destroy();
 		
 		$f3->reroute($returnpath, false);
+		exit;
 	}
 	
-	public function register(\Base $f3, $params)
+//	public function register(\Base $f3): void
+	public function register(\Base $f3)
 	{
 		// check if configuration is disabled
 		if( FALSE == \Config::getPublic('allow_registration') )
@@ -277,6 +280,7 @@ class Auth extends Base {
 		}
 	}
 
+//	public function captcha(\Base $f3): void
 	public function captcha(\Base $f3)
 	{
 		unset($_SESSION['captcha']);

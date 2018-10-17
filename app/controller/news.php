@@ -15,7 +15,7 @@ class News extends Base
 		\Registry::get('VIEW')->addTitle( \Base::instance()->get('LN__News') );
 	}
 	
-	public function blocks($select)
+	public function blocks(string $select): string
 	{
 		$select = explode(".",$select);
 		$items = (isset($select[2]) AND $select[2]<=3) ? $select[2] : 3;
@@ -25,7 +25,8 @@ class News extends Base
 		
 	}
 	
-	public function index(\Base $f3, $params)
+//	public function index(\Base $f3, array $params): void
+	public function index(\Base $f3, array $params)
 	{
 		$this->model->canAdmin('home/news');
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
@@ -45,7 +46,8 @@ class News extends Base
 		$this->buffer( \View\News::listNews($data) );
 	}
 
-	public function save(\Base $f3, $params)
+//	public function save(\Base $f3, array $params): void
+	public function save(\Base $f3, array $params)
 	{
 		$params = $this->parametric($params['*']);
 		if($_SESSION['userID']!=0 || \Config::getPublic('allow_guest_comment_news') )

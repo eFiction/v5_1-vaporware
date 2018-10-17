@@ -1123,9 +1123,6 @@ class UserCP extends Controlpanel
 	
 	public function settingsCheckPW($oldPW)
 	{
-		// Load a compatibility wrapper for PHP versions prior to 5.5.0
-		if ( !function_exists("password_hash") ) include ( "app/inc/password_compat.php" );
-
 		$password = $this->exec("SELECT U.password FROM `tbl_users` U where ( U.uid = {$_SESSION['userID']} )")[0]['password'];
 		
 		if ( password_verify ( $oldPW, $password ) )
