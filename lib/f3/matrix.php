@@ -2,7 +2,7 @@
 
 /*
 
-	Copyright (c) 2009-2016 F3::Factory/Bong Cosca, All rights reserved.
+	Copyright (c) 2009-2017 F3::Factory/Bong Cosca, All rights reserved.
 
 	This file is part of the Fat-Free Framework (http://fatfreeframework.com).
 
@@ -92,13 +92,15 @@ class Matrix extends Prefab {
 	*	Return month calendar of specified date, with optional setting for
 	*	first day of week (0 for Sunday)
 	*	@return array
-	*	@param $date string
+	*	@param $date string|int
 	*	@param $first int
 	**/
 	function calendar($date='now',$first=0) {
 		$out=FALSE;
 		if (extension_loaded('calendar')) {
-			$parts=getdate(strtotime($date));
+			if (is_string($date))
+				$date=strtotime($date);
+			$parts=getdate($date);
 			$days=cal_days_in_month(CAL_GREGORIAN,$parts['mon'],$parts['year']);
 			$ref=date('w',strtotime(date('Y-m',$parts[0]).'-01'))+(7-$first)%7;
 			$out=[];

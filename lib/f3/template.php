@@ -2,7 +2,7 @@
 
 /*
 
-	Copyright (c) 2009-2016 F3::Factory/Bong Cosca, All rights reserved.
+	Copyright (c) 2009-2017 F3::Factory/Bong Cosca, All rights reserved.
 
 	This file is part of the Fat-Free Framework (http://fatfreeframework.com).
 
@@ -65,8 +65,8 @@ class Template extends Preview {
 							return '\''.$pair[1].'\'=>'.
 								(preg_match('/^\'.*\'$/',$pair[2]) ||
 									preg_match('/\$/',$pair[2])?
-									$pair[2]:
-									\Base::instance()->stringify($pair[2]));
+									$pair[2]:Base::instance()->stringify(
+										Base::instance()->cast($pair[2])));
 						},$pairs)).']+get_defined_vars()'):
 					'get_defined_vars()';
 		$ttl=isset($attrib['ttl'])?(int)$attrib['ttl']:0;
@@ -77,7 +77,7 @@ class Template extends Preview {
 					(preg_match('/^\{\{(.+?)\}\}$/',$attrib['href'])?
 						$this->token($attrib['href']):
 						Base::instance()->stringify($attrib['href'])).','.
-					'$this->mime,'.$hive.','.$ttl.'); ?>');
+					'NULL,'.$hive.','.$ttl.'); ?>');
 	}
 
 	/**
@@ -252,7 +252,7 @@ class Template extends Preview {
 	/**
 	*	Call custom tag handler
 	*	@return string|FALSE
-	*	@param $func callback
+	*	@param $func string
 	*	@param $args array
 	**/
 	function __call($func,array $args) {
@@ -265,32 +265,35 @@ class Template extends Preview {
 
 	/**
 	*	Parse string for template directives and tokens
-	*	@return string|array
+	*	@return array
 	*	@param $text string
 	**/
 	function parse($text) {
+		$text=parent::parse($text);
 		// Build tree structure
 		for ($ptr=0,$w=5,$len=strlen($text),$tree=[],$tmp='';$ptr<$len;)
 			if (preg_match('/^(.{0,'.$w.'}?)<(\/?)(?:F3:)?'.
-				'('.$this->tags.')\b((?:\s+[\w-]+'.
+				'('.$this->tags.')\b((?:\s+[\w.:@!-]+'.
 				'(?:\h*=\h*(?:"(?:.*?)"|\'(?:.*?)\'))?|'.
 				'\h*\{\{.+?\}\})*)\h*(\/?)>/is',
 				substr($text,$ptr),$match)) {
-				if (strlen($tmp)||$match[1])
+				if (strlen($tmp) || $match[1])
 					$tree[]=$tmp.$match[1];
 				// Element node
 				if ($match[2]) {
 					// Find matching start tag
 					$stack=[];
 					for($i=count($tree)-1;$i>=0;$i--) {
-						$item = $tree[$i];
-						if (is_array($item) && array_key_exists($match[3],$item)
-						&& !isset($item[$match[3]][0])) {
+						$item=$tree[$i];
+						if (is_array($item) &&
+							array_key_exists($match[3],$item) &&
+							!isset($item[$match[3]][0])) {
 							// Start tag found
 							$tree[$i][$match[3]]+=array_reverse($stack);
 							$tree=array_slice($tree,0,$i+1);
 							break;
-						} else $stack[]=$item;
+						}
+						else $stack[]=$item;
 					}
 				}
 				else {
@@ -300,19 +303,18 @@ class Template extends Preview {
 					if ($match[4]) {
 						// Process attributes
 						preg_match_all(
-							'/(?:\b([\w-]+)\h*'.
-							'(?:=\h*(?:"(.*?)"|\'(.*?)\'))?|'.
-							'(\{\{.+?\}\}))/s',
+							'/(?:(\{\{.+?\}\})|([^\s\/"\'=]+))'.
+							'\h*(?:=\h*(?:"(.*?)"|\'(.*?)\'))?/s',
 							$match[4],$attr,PREG_SET_ORDER);
 						foreach ($attr as $kv)
-							if (isset($kv[4]))
-								$node['@attrib'][]=$kv[4];
+							if (!empty($kv[1]) && !isset($kv[3]) && !isset($kv[4]))
+								$node['@attrib'][]=$kv[1];
 							else
-								$node['@attrib'][$kv[1]]=
-									(isset($kv[2]) && $kv[2]!==''?
-										$kv[2]:
-										(isset($kv[3]) && $kv[3]!==''?
-											$kv[3]:NULL));
+								$node['@attrib'][$kv[1]?:$kv[2]]=
+									(isset($kv[3]) && $kv[3]!==''?
+										$kv[3]:
+										(isset($kv[4]) && $kv[4]!==''?
+											$kv[4]:NULL));
 					}
 				}
 				$tmp='';
@@ -339,12 +341,13 @@ class Template extends Preview {
 	*	return object
 	**/
 	function __construct() {
-		$ref=new ReflectionClass(__CLASS__);
+		$ref=new ReflectionClass(get_called_class());
 		$this->tags='';
 		foreach ($ref->getmethods() as $method)
 			if (preg_match('/^_(?=[[:alpha:]])/',$method->name))
 				$this->tags.=(strlen($this->tags)?'|':'').
 					substr($method->name,1);
+		parent::__construct();
 	}
 
 }

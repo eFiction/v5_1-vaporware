@@ -1096,6 +1096,7 @@ class AdminCP extends Base
 
 	public function __settings(\Base $f3, array $params, array $feedback = [ NULL, NULL ] )//: void
 	{
+		$data = [];
 		// declare module
 		$this->moduleBase = "settings";
 		// build menu and access list
@@ -1156,7 +1157,7 @@ class AdminCP extends Base
 			default:
 				$this->buffer(\Template::instance()->render('access.html'));
 		}
-		if (isset($data))  $this->buffer( $this->template->settingsFields($data, "settings/".$params['module'], $feedback) );
+		if (sizeof($data))  $this->buffer( $this->template->settingsFields($data, "settings/".$params['module'], $feedback) );
 		if (isset($extra)) $this->buffer( $extra );
 	}
 

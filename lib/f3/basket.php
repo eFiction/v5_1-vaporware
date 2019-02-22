@@ -2,7 +2,7 @@
 
 /*
 
-	Copyright (c) 2009-2016 F3::Factory/Bong Cosca, All rights reserved.
+	Copyright (c) 2009-2017 F3::Factory/Bong Cosca, All rights reserved.
 
 	This file is part of the Fat-Free Framework (http://fatfreeframework.com).
 
@@ -90,7 +90,8 @@ class Basket extends Magic {
 		if (isset($_SESSION[$this->key])) {
 			foreach ($_SESSION[$this->key] as $id=>$item)
 				if (!isset($key) ||
-					array_key_exists($key,$item) && $item[$key]==$val) {
+					array_key_exists($key,$item) && $item[$key]==$val ||
+					$key=='_id' && $id==$val) {
 					$obj=clone($this);
 					$obj->id=$id;
 					$obj->item=$item;
@@ -193,7 +194,7 @@ class Basket extends Magic {
 	**/
 	function copyfrom($var) {
 		if (is_string($var))
-			$var=\Base::instance()->get($var);
+			$var=\Base::instance()->$var;
 		foreach ($var as $key=>$val)
 			$this->set($key,$val);
 	}

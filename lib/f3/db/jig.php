@@ -2,7 +2,7 @@
 
 /*
 
-	Copyright (c) 2009-2016 F3::Factory/Bong Cosca, All rights reserved.
+	Copyright (c) 2009-2017 F3::Factory/Bong Cosca, All rights reserved.
 
 	This file is part of the Fat-Free Framework (http://fatfreeframework.com).
 
@@ -41,7 +41,9 @@ class Jig {
 		//! Jig log
 		$log,
 		//! Memory-held data
-		$data;
+		$data,
+		//! lazy load/save files
+		$lazy;
 
 	/**
 	*	Read data from memory/file
@@ -54,6 +56,8 @@ class Jig {
 				$this->data[$file]=[];
 			return $this->data[$file];
 		}
+		if ($this->lazy && isset($this->data[$file]))
+			return $this->data[$file];
 		$fw=\Base::instance();
 		$raw=$fw->read($dst);
 		switch ($this->format) {
@@ -75,12 +79,12 @@ class Jig {
 	*	@param $data array
 	**/
 	function write($file,array $data=NULL) {
-		if (!$this->dir)
+		if (!$this->dir || $this->lazy)
 			return count($this->data[$file]=$data);
 		$fw=\Base::instance();
 		switch ($this->format) {
 			case self::FORMAT_JSON:
-				$out=json_encode($data,@constant('JSON_PRETTY_PRINT'));
+				$out=json_encode($data,JSON_PRETTY_PRINT);
 				break;
 			case self::FORMAT_Serialized:
 				$out=$fw->serialize($data);
@@ -131,6 +135,8 @@ class Jig {
 	*	@return NULL
 	**/
 	function drop() {
+		if ($this->lazy) // intentional
+			$this->data=[];
 		if (!$this->dir)
 			$this->data=[];
 		elseif ($glob=@glob($this->dir.'/*',GLOB_NOSORT))
@@ -147,11 +153,23 @@ class Jig {
 	*	@param $dir string
 	*	@param $format int
 	**/
-	function __construct($dir=NULL,$format=self::FORMAT_JSON) {
+	function __construct($dir=NULL,$format=self::FORMAT_JSON,$lazy=FALSE) {
 		if ($dir && !is_dir($dir))
 			mkdir($dir,\Base::MODE,TRUE);
 		$this->uuid=\Base::instance()->hash($this->dir=$dir);
 		$this->format=$format;
+		$this->lazy=$lazy;
+	}
+
+	/**
+	*	save file on destruction
+	**/
+	function __destruct() {
+		if ($this->lazy) {
+			$this->lazy = FALSE;
+			foreach ($this->data?:[] as $file => $data)
+				$this->write($file,$data);
+		}
 	}
 
 }

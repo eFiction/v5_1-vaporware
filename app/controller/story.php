@@ -707,7 +707,7 @@ class Story extends Base
 		elseif ( $select[1] == "recommend" )
 		{
 			// break if module not enabled
-			if ( empty(\Config::getPublic('optional_modules')['recommendations']) ) return NULL;
+			if ( empty(\Config::getPublic('optional_modules')['recommendations']) ) return "";
 			/*
 				$items: 0 = all featured stories
 				$order: "random" or NULL
