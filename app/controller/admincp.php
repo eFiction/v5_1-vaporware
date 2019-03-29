@@ -4,6 +4,7 @@ namespace Controller;
 class AdminCP extends Base
 {
 	var $moduleBase = "home";
+	var $feedback = [ NULL, NULL ];
 	//var $hasSub		= FALSE;
 
 	public function __construct()
@@ -54,7 +55,7 @@ class AdminCP extends Base
 			return "home";
 	}
 
-	protected function menuShowUpper(string $selected=NULL): string
+	protected function menuShowUpper(string $selected=NULL): array
 	{
 		$menu = $this->model->menuShowUpper($selected);
 		\Base::instance()->set('menu_upper', $menu);
@@ -67,7 +68,7 @@ class AdminCP extends Base
 		$f3->reroute('/adminCP/home', false);
 	}
 	
-	public function __archive(\Base $f3, array $params, array $feedback = [ NULL, NULL ] )//: void
+	public function __archive(\Base $f3, array $params )//: void
 	{
 		// declare module
 		$this->moduleBase = "archive";
@@ -83,7 +84,7 @@ class AdminCP extends Base
 				$this->archiveHome($f3);
 				break;
 			case "submit":
-				$this->archiveSubmit($f3, $feedback);
+				$this->archiveSubmit($f3, $this->feedback);
 				break;
 			case "featured":
 				$this->archiveFeatured($f3, $params);
@@ -95,7 +96,7 @@ class AdminCP extends Base
 				$this->buffer( $this->archiveCharacters($f3, $params) );
 				break;
 			case "tags":
-				$this->archiveTagsIndex($f3, $params, $feedback);
+				$this->archiveTagsIndex($f3, $params, $this->feedback);
 				break;
 			case "categories":
 				$this->archiveCategories($f3, $params);
@@ -1094,7 +1095,7 @@ class AdminCP extends Base
 		$this->buffer ( $this->template->userFieldsList( $data ) );
 	}
 
-	public function __settings(\Base $f3, array $params, array $feedback = [ NULL, NULL ] )//: void
+	public function __settings(\Base $f3, array $params )//: void
 	{
 		$data = [];
 		// declare module
@@ -1157,7 +1158,7 @@ class AdminCP extends Base
 			default:
 				$this->buffer(\Template::instance()->render('access.html'));
 		}
-		if (sizeof($data))  $this->buffer( $this->template->settingsFields($data, "settings/".$params['module'], $feedback) );
+		if (sizeof($data))  $this->buffer( $this->template->settingsFields($data, "settings/".$params['module'], $this->feedback) );
 		if (isset($extra)) $this->buffer( $extra );
 	}
 
@@ -1171,12 +1172,12 @@ class AdminCP extends Base
 
 		if ( isset($_POST['form_data']) )
 			// Save data from the generic created forms
-			$results = $this->model->saveKeys($f3->get('POST.form_data'));
+			$this->feedback = $this->model->saveKeys($f3->get('POST.form_data'));
 		else
 			// Sava data from special forms (language, layout)
-			$results = $this->settingsSaveLLData($f3, $params);
+			$this->feedback = $this->settingsSaveLLData($f3, $params);
 		
-		$this->__settings($f3, $params, $results);
+		$this->__settings($f3, $params);
 	}
 
 	protected function settingsDateTime(\Base $f3, array $params): string
