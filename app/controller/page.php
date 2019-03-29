@@ -20,7 +20,7 @@ class Page extends Base {
 			}
 			// Workaround for ;returnpath not properly being handled by routes
 			elseif ( 0 === strpos($params['*'],"logout"))
-				Auth::instance()->logout($f3, $params['*']);
+				Auth::instance()->logout($f3, $params);
 		}
 		else
 			$this->buffer ( \Template::instance()->render('main/welcome.html') );

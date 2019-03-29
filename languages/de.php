@@ -12,6 +12,7 @@ return array(
 'no'		=>	'nein',
 'No'		=>	'Nein',
 'Cancel'	=>	'Abbrechen',
+'OK'		=>	'Okay',
 'Delete'	=>	'Delete',
 'Return'	=>	'Zurück',
 'Date'		=>	'Datum',
@@ -34,9 +35,11 @@ return array(
 'Title' 		=>	'Titel',
 'Author' 		=>	'Autor',
 'Privacy'		=> 	'Datenschutz',
-'total'			=>	'gesamt', //db
+'total'			=>	'gesamt',
 //'MoveUp'		=> 'Move upwards', //db
-//'MoveDown'		=> 'Move downwards', //db
+//'MoveDown'	=> 'Move downwards', //db
+'ShowDetails'	=> 'Details zeigen',
+'HideDetails'	=> 'Details verbergen',
 
 // [2] Global -- Login related
 'Login'			=> 'Anmelden',
@@ -48,7 +51,7 @@ return array(
 'Email'			=> 'E-Mail',
 'Registered'	=> 'Registriert',
 'Guest'			=> 'Gast',
-'DeletedUser'	=> 'Gelöschter Benutzer',//db
+'DeletedUser'	=> 'Gelöschter Benutzer',
 'ForgotPW'		=> 'Passwort vergessen',
 'ResetPW'		=> 'Passwort zurücksetzen',
 'ResetPWMail'	=> 'Falls ein Benutzer mit diesem Namen oder dieser E-Mail Adresse existiert, wurde eine E-Mail mit weiteren Anweisungen verschickt.',
@@ -116,12 +119,13 @@ return array(
 'CannotSave'		=> 'Daten konnten nicht gespeichert werden, bitte erneut versuchen',
 'FormErrors'		=> '{0, plural, zero {Keine Fehler}, one {Beim Verarbeiten des Formulars ist ein Fehler aufgetreten}, other	{Beim Verarbeiten des Formulars sind Fehler aufgetreten} }',
 'Submit'			=> 'Absenden',
-'YourCommentHere'	=> 'Schreibe hier deinen Kommentar',
+'YourCommentHere'	=> 'Hinterlasse hier deinen Kommentar',
 'GuestComment'		=> 'Kommentar als Gast',
 'CheckToDelete'		=> 'Markieren um zu löschen',
 
 // [7] Global -- Search
 'NoEntries'			=> 'Keine Einträge',
+'NoRecordsInList'	=> 'Keine Einträge in dieser Liste',
 
 // [8] Global -- Archiv Stats'
 'Stats_Archive' => 'Archiv Statistiken',
@@ -193,9 +197,7 @@ return array(
 'StoryNotesExplained'	=>	'Platz für Widmungen und Anmerkungen',
 // 'StorySummary'			=>
 // 'StorySummaryExplained'	=>
-// 'ChapterText'			=>
 // 'ChapterTextExplained' =>
-///DB
 'ReturnToOverview'		=> 'Zurück zur Übersicht',
 'StoryAddSimilar'		=> 'Eine ähnliche Story scheint bereits zu existieren, <a href="{0}">diese stattdessen bearbeiten</a>',
 'StoryConfirmSimilar'	=> 'Trotzdem anlegen',
@@ -204,10 +206,11 @@ return array(
 'ChapterText'	=>	'Text des Kapitels',
 'AddChapter'	=> 'Kapitel hinzufügen',
 'EditHeader'	=> 'Kopfdaten bearbeiten',
-'DragdropSort'	=> 'Ziehen um zu sortieren',
+'DragdropSort'	=> 'Ziehen, um zu sortieren',
 'SwitchPlainHTML'	=> 'Zum einfachen Modus wechseln',
 'SwitchVisual'		=> 'Zum Editor wechseln',
 
+///DB
 // [14] Authors
 'NoAuthorsListed'	=> 'Momentan gibt es keine Autoren, die angezeigt werden könnten',
 'Overview'			=> 'Übersicht',
@@ -231,7 +234,14 @@ return array(
 'PM_Recipient'			=> 'Empfänger',
 'PM_question_Delete'	=> 'Nachricht löschen?',
 'PM_confirm_Delete'		=> 'Nachricht wird gelöscht, sicher?',
+'PM_deletedSuccess'		=> 'Nachricht gelöscht!',
+'PM_revokeSuccess'		=> 'Nachricht wurde zurückgezogen',
+'PM_revokeRead'			=> 'Zurückziehen nicht möglich, Nachricht wurde vom Empfänger bereits gelesen.',
+'PM_deleteNotFound' 	=> 'Löschen nicht möglich, Nachricht wurde nicht gefunden oder kein Zugriff auf diese Nachricht.',
+'PM_alreadyDeleted'		=> 'Nachricht wurde bereits gelöscht',
 'PM_unread'				=> 'ungelesen',
+'PM_Forward'			=> 'Nachricht weiterleiten',
+'PM_Reply'				=> 'Antworten',
 'PM_ReplySubject'		=> 'Aw:',
 'PM_ReplyMessageHeader'	=> 'Am {0} schrieb {1}:',
 'PM_WritePM'			=> 'Nachricht verfassen',
@@ -267,10 +277,6 @@ return array(
 							'other	{Posteingang (# neu)} }',
 'UserMenu_PMOutbox' => 'Postausgang',
 'UserMenu_PMWrite' => 'Verfassen',
-	'MSG_deletedSuccess'	=> 'Nachricht gelöscht!',
-	'MSG_revokeSuccess'		=> 'Nachricht wurde zurückgezogen',
-	'MSG_revokeRead'	=> 'Zurückziehen nicht möglich, Nachricht wurde vom Empfänger bereits gelesen.',
-	'MSG_deleteNotFound' => 'Löschen nicht möglich, Nachricht wurde nicht gefunden oder kein Zugriff auf diese Nachricht.',
 'UserMenu_Shoutbox'			=> 'Shoutbox ({0})', 
 
 'UserMenu_Authoring' => 'Authoring',
@@ -611,6 +617,8 @@ return array(
 }',
 'by' => 'von',
 'translatedBy'	=> 'übersetzt von',
+//'translatedFrom'	=> 'translated from',
+//'translatedTo'		=> 'translated to',
 'Stories' => 'Geschichten',
 'NewStories' => 'Neue Geschichten',
 //'noNewStory'			=> 'No new Stories',
@@ -618,6 +626,8 @@ return array(
 	'one	{Zufällige Geschichte},'.
 	'other	{Zufällige Geschichten} }',
 //'noRandomStory'	=> 'No random stories yet',
+'NewRandomStoryEvery' => 'Neue zufällige Geschichte alle {0} Minuten',
+//'RandomStoryOfThe' => 'Zufällige Geschichte des {0}',
 //'RandomSpotlight' => 'Random Spotlight',
 'FeaturedStory' => '{0, plural,'.
 	'one	{Empfohlene Geschichte},'.
@@ -704,6 +714,10 @@ return array(
 	'other	{# comments.}
 }',
 
+// Redirect
+'RedirectedOldLink'		=> 'Du wirst von einem alten Link umgeleitet',
+'ClickHereToProceed'	=> 'Klicke hier, um zur neuen Seite zu gelangen',
+'NeverShowMessageAgain'	=> 'Zeige diesen Hinweis nicht mehr an',
 
 );
 

@@ -57,6 +57,7 @@ class Base extends \Prefab {
 		*/
 	}
 	
+	// Add data for use in regular output
 	protected function buffer(string $content, string $section="BODY", bool $destroy = FALSE)//:void
 	{
 		if ( $destroy )
@@ -65,6 +66,12 @@ class Base extends \Prefab {
 			$this->data[$section] .= $content;
 	}
 	
+	// Add data for use in JSON output
+	protected function jbuffer(array $content)//:void
+	{
+		$this->data["BODY"]  = $content;
+	}
+
 	protected function parametric(string $params): array
 	{
 		list($params, $returnpath) = array_pad(explode(";returnpath=",$params), 2, '');

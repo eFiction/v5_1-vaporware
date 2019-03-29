@@ -50,9 +50,9 @@
 					<check if="{{ @error.password == 'mismatch' }}">{{ @LN__Reg_PasswordMismatch }}</check>
 					<check if="{{ @error.password == 'criteria' }}">
 						{{ @LN__Reg_PasswordCriteria }}:<br/>
-						- {{ \CONFIG::getPublic('reg_min_password') }} _characters<br/>
+						- {{ \CONFIG::getPublic('reg_min_password') }} __characters<br/>
 						<check if="{{ 1 < \CONFIG::getPublic('reg_password_complexity') }}">
-							- {{ \CONFIG::getPublic('reg_password_complexity') }} _complex
+							- {{ \CONFIG::getPublic('reg_password_complexity') }} __complex
 						</check>
 					</check>
 				</div></div>
@@ -60,7 +60,7 @@
 			<div class="gb-1qrt">{{@LN__Password}}</div><div class="gb-3qrt"><input class="half" type="password" name="form[password1]" value=""></div>
 			<div class="gb-1qrt">{{@LN__Reg_PasswordRepeat}}</div><div class="gb-3qrt"><input class="half" type="password" name="form[password2]" value=""></div>
 			<div class="gb-1qrt"><div class="captchaBox">&nbsp;**cap**</div></div><div class="gb-3qrt"><input type="text" name="write[captcha]" class="half" placeholder="captcha" value=""></div>
-			<div class="gb-full"><input class="button" type="submit" value="__Register"></div>
+			<div class="gb-full"><input class="button" type="submit" value="{{@LN__RegisterNow}}"></div>
 		</div>
 	</fieldset>
 </form>

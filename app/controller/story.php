@@ -221,7 +221,7 @@ class Story extends Base
 
 	protected function intro(array $params): string
 	{
-		if ( isset($params['id']) ) $this->parametric($params['id']); // 3.6
+		if ( isset($params['*']) ) $get = $this->parametric($params['*']); // 3.6
 
 		$data = $this->model->intro();
 		
@@ -537,16 +537,13 @@ class Story extends Base
 			
 			// Show a header, the view will select browse or search template
 			$this->buffer ( $this->template->searchHead($searchData, $return, $searchForm) );
-			//return $this->template->searchHead($searchData, $return, $searchForm)
 
 			// append the stories
 			$this->buffer ( $this->template->viewList($data) );
-			//. $this->template->viewList($data);
 		}
 
 		else
 			$this->buffer ( $this->template->searchHead() );
-			//return $this->template->searchHead();
 	}
 	
 	protected function searchCleanInput(&$arr=array()): array

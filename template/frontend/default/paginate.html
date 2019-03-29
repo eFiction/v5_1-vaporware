@@ -1,17 +1,17 @@
 <ul class="pagination">
 	<F3:check if="{{@paginate.firstPage}}">
-        <li><a href="{{@BASE, @paginate.route, @paginate.prefix.@paginate.firstPage}}">{ICON:angle-double-left} First</a></li>
+        <li><a href="{{@BASE . @paginate.route . @paginate.prefix.@paginate.firstPage}}">{ICON:angle-double-left} First</a></li>
     </F3:check>
 	<F3:check if="{{@paginate.page>1}}">
-        <li><a href="{{@BASE, @paginate.route, @paginate.prefix.(@paginate.page-1)}}">{ICON:angle-left}</a></li>
+        <li><a href="{{@BASE . @paginate.route . @paginate.prefix.(@paginate.page-1)}}">{ICON:angle-left}</a></li>
     </F3:check>
 	<F3:repeat group="{{@paginate.rangePages}}" value="{{@page}}">
-        <li><a {{@page == @paginate.page ? 'class="disabled"':'' }} href="{{@BASE, @paginate.route, @paginate.prefix.@page}}">{{@page}}</a></li>
+        <li><a {{@page == @paginate.page ? 'class="disabled"':'' }} href="{{@BASE . @paginate.route . @paginate.prefix.@page}}">{{@page}}</a></li>
 	</F3:repeat>
 	<F3:check if="{{@paginate.page<@paginate.count}}">
-        <li><a href="{{@BASE, @paginate.route, @paginate.prefix.(@paginate.page+1)}}">{ICON:angle-right}</a></li>
+        <li><a href="{{@BASE . @paginate.route . @paginate.prefix.(@paginate.page+1)}}">{ICON:angle-right}</a></li>
     </F3:check>
 	<F3:check if="{{@paginate.lastPage}}">
-        <li><a href="{{@BASE, @paginate.route, @paginate.prefix.@paginate.count}}">Last [{{ @paginate.count }}] {ICON:angle-double-right}</a></li>
+        <li><a href="{{@BASE . @paginate.route . @paginate.prefix.@paginate.count}}">Last [{{ @paginate.count }}] {ICON:angle-double-right}</a></li>
     </F3:check>
 </ul>

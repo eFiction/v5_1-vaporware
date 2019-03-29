@@ -318,13 +318,13 @@ class UserCP extends Base
 		switch ( $params[0] )
 		{
 			case "reviews":
-				$this->buffer ( $this->feedbackReviews($f3, $params) );
+				$this->feedbackReviews($f3, $params);
 				break;
 			case "comments":
 				$this->buffer ( \View\Base::stub("reviews") );
 				break;
 			default:
-				$this->buffer ( $this->feedbackHome($f3, $params) );
+				$this->feedbackHome($f3, $params);
 		}
 
 	}

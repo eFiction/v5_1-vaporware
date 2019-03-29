@@ -1,22 +1,22 @@
 <check if="{{isset(@deleted)}}">
 	<switch expr="{{ @deleted }}">
 		<case value="success" break="TRUE">
-			<div class="alert-box half success">{{@LN__MSG_deletedSuccess}}</div>
+			<div class="alert-box half success">{{@LN__PM_deletedSuccess}}</div>
 		</case>
 		<case value="revoked" break="TRUE">
-			<div class="alert-box half success">{{@LN__MSG_revokeSuccess}}</div>
+			<div class="alert-box half success">{{@LN__PM_revokeSuccess}}</div>
 		</case>
 		<case value="msgread" break="TRUE">
-			<div class="alert-box half warning">{{@LN__MSG_revokeRead}}</div>
+			<div class="alert-box half warning">{{@LN__PM_revokeRead}}</div>
 		</case>
 		<case value="notfound" break="TRUE">
-			<div class="alert-box half warning">{{@LN__MSG_deleteNotFound}}</div>
+			<div class="alert-box half warning">{{@LN__PM_deleteNotFound}}</div>
 		</case>
 		<case value="unknown" break="TRUE">
 			<div class="alert-box half error">{{@LN__UnknowError}}</div>
 		</case>
 		<case value="alreadydeleted" break="TRUE">
-			<div class="alert-box half info">__alreadydeleted</div>
+			<div class="alert-box half info">{{@LN__PM_alreadyDeleted}}</div>
 		</case>
 	</switch>
 </check>

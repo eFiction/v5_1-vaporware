@@ -2,7 +2,7 @@
 @define('__transLocale', 'en_GB');
 
 return array(
-// [1] Global -- General 27
+// [1] Global -- General 36
 'Welcome' => 'Welcome',
 'Shoutbox' => 'Shoutbox',
 'UserCP'	=> 'User Panel',
@@ -12,6 +12,7 @@ return array(
 'no'		=>	'no',
 'No'		=>	'No',
 'Cancel'	=>	'Cancel',
+'OK'		=>	'Okay',
 'Delete'	=>	'Delete',
 'Return'	=>	'Return',
 'Date'		=>	'Date',
@@ -34,9 +35,11 @@ return array(
 'Title' 		=>	'Title',
 'Author' 		=>	'Author',
 'Privacy'		=> 	'Privacy',
-'total'			=>	'total', //db
-'MoveUp'		=> 'Move upwards', //db
-'MoveDown'		=> 'Move downwards', // db
+'total'			=>	'total',					
+'MoveUp'		=> 'Move upwards',
+'MoveDown'		=> 'Move downwards',
+'ShowDetails'	=> 'Show details',
+'HideDetails'	=> 'Hide details',
 
 // [2] Global -- Login related 20
 'Login'			=> 'Login',
@@ -48,7 +51,7 @@ return array(
 'Email'			=> 'e-Mail',
 'Registered'	=> 'Registered',
 'Guest'			=> 'Guest',
-'DeletedUser'	=> 'Deleted user',//db
+'DeletedUser'	=> 'Deleted user',
 'ForgotPW'		=> 'Forgot your password',
 'ResetPW'		=> 'Reset my password',
 'ResetPWMail'	=> 'If a user with this name or e-mail exists, a mail containing instructions on how to reset the password has been sent',
@@ -106,11 +109,11 @@ return array(
 'Month_Calendar' => '{0,date,custom,%B %Y}',	// using php strftime
 'Weekday' => '{0,date,custom,%A}',
 
-// [6] Global -- Forms 8
+// [6] Global -- Forms 12
 'CaptchaMismatch'	=> 'Captcha did not match',
 'GuestURL'			=> 'Guests are not allowed to post URLs',
 'GuestNameEmpty'	=> 'Name field cannot be empty',
-'GuestNoComment'	=> 'Gäste können keine Kommentare hinterlassen',//db
+'GuestNoComment'	=> 'Guests cannot leave a comment',
 'MessageEmpty'		=> 'No message entered',
 'CommentEmpty'		=> 'No comment entered',
 'CannotSave'		=> 'Could not save the data, please try again',
@@ -122,6 +125,7 @@ return array(
 
 // [7] Global -- Search 1
 'NoEntries'			=> 'No entries',
+'NoRecordsInList'	=> 'No records in this list',
 
 // [8] Global -- Archiv Stats 10
 'Stats_Archive' => 'Archive stats',
@@ -193,9 +197,7 @@ return array(
 'StoryNotesExplained'	=> 'Notes and dedications go here',
 'StorySummary'			=> 'Summary',
 'StorySummaryExplained'	=> 'Your story summary goes here',
-'ChapterText'			=> 'Chapter text',
 'ChapterTextExplained'	=> 'Your chapter\'s content goes here',
-///DB
 'ReturnToOverview'		=> 'Return to overview',
 'StoryAddSimilar'		=> 'A similar story already exist, <a href="{0}">edit story instead</a>',
 'StoryConfirmSimilar'	=> 'Insert nevertheless',
@@ -208,6 +210,7 @@ return array(
 'SwitchPlainHTML'	=> 'Switch to HTML mode',
 'SwitchVisual'		=> 'Switch to visual editor',
 
+///DB
 // [14] Authors
 'NoAuthorsListed'	=> 'Currently, there are no authors to be listed',
 'Overview'			=> 'Overview',
@@ -231,7 +234,14 @@ return array(
 'PM_Recipient'			=> 'Recipient',
 'PM_question_Delete'	=> 'Delete message',
 'PM_confirm_Delete'		=> 'Message will be deleted, sure?',
+'PM_deletedSuccess'		=> 'Message deleted',
+'PM_revokeSuccess'		=> 'Message revoked',
+'PM_revokeRead'			=> 'Unable to revoke, this message has already been read by the recipient',
+'PM_deleteNotFound' 	=> 'Unable to perform action, message not found or no access to it',
+'PM_alreadyDeleted'		=> 'Message has already been deleted',
 'PM_unread'				=> 'unread',
+'PM_Forward'			=> 'Forward message',
+'PM_Reply'				=> 'Reply',
 'PM_ReplySubject'		=> 'Re:',
 'PM_ReplyMessageHeader'	=> 'On {0}, {1} wrote:',
 'PM_WritePM'			=> 'Writing message',
@@ -267,10 +277,6 @@ return array(
 							'other	{Inbox (# new)} }',
 'UserMenu_PMOutbox' => 'Outbox',
 'UserMenu_PMWrite' => 'Write',
-	'MSG_deletedSuccess'	=> 'Message deleted',
-	'MSG_revokeSuccess'		=> 'Message revoked',
-	'MSG_revokeRead'		=> 'Unable to revoke, this message has already been read by the recipient',
-	'MSG_deleteNotFound' 	=> 'Unable to perform action, message not found or no access to it',
 'UserMenu_Shoutbox'			=> 'Shoutbox ({0})', 
 	
 'UserMenu_Authoring' => 'Authoring',
@@ -610,7 +616,9 @@ return array(
 	'other	{Authors}
 }',
 'by' => 'by',
-'translatedBy'	=> 'translated by',
+'translatedBy'		=> 'translated by',
+'translatedFrom'	=> 'translated from',
+'translatedTo'		=> 'translated to',
 'Stories'				=> 'Stories',
 'NewStories'			=> 'New Stories',
 'noNewStory'			=> 'No new Stories',
@@ -618,6 +626,8 @@ return array(
 	'one	{Random Story},'.
 	'other	{Random Stories} }',
 'noRandomStory'	=> 'No random stories yet',
+'NewRandomStoryEvery' => 'New random story every {0} minutes',
+'RandomStoryOfThe' => 'Random story of the {0}',	// needs more work, will grammar-fail
 'RandomSpotlight' => 'Random Spotlight',
 'FeaturedStory' => '{0, plural,'.
 	'one	{Featured Story},'.
@@ -704,6 +714,10 @@ return array(
 	'other	{# comments.}
 }',
 
+// Redirect
+'RedirectedOldLink'		=> 'You are being redirected from an old link',
+'ClickHereToProceed'	=> 'Click here to proceed to the new location',
+'NeverShowMessageAgain'	=> 'Never show this message again',
 
 );
 

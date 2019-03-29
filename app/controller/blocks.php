@@ -24,19 +24,19 @@ class Blocks extends Base
 			
 			$data = $this->model->shoutboxLines($offset);
 			$tpl = \View\Blocks::shoutboxLines($data);
-			$this->buffer( array ( $tpl, "", $offset, 0 ) , "BODY", TRUE );
+			$this->jbuffer( array ( $tpl, "", $offset, 0 ) );
 		}
 		elseif ( $params[0] == "form" )
 		{
 			if($_SESSION['userID']!=0 || $this->config['shoutbox_guest'] )
 			{
 				$form = \View\Blocks::shoutboxForm();
-				$this->buffer( array ( "", $form, 0, 0 ) , "BODY", TRUE );
+				$this->jbuffer( array ( "", $form, 0, 0 ) );
 			}
 			else
 			{
 				// Denied
-				$this->buffer( array ( "", "Denied", 0, 0 ) , "BODY", TRUE );
+				$this->jbuffer( array ( "", "Denied", 0, 0 ) );
 			}
 		}
 		elseif ( $params[0] == "shout" )
@@ -61,35 +61,35 @@ class Blocks extends Base
 				if ( "" == $data['message'] = trim($data['message']) )
 				{
 					// Don't accept empty message
-					$this->buffer( array ( "", $f3->get('LN__MessageEmpty'), 0, 2 ) , "BODY", TRUE );
+					$this->jbuffer( array ( "", $f3->get('LN__MessageEmpty'), 0, 2 ) );
 				}
 				elseif($_SESSION['userID'])
 				{
 					// Attempt to save data
 					if ( 1 == $this->model->addShout($data, TRUE) )
 						// tell the shoutbox to reload and go to top
-						$this->buffer( array ( "", "", 0, 1 ) , "BODY", TRUE );
+						$this->jbuffer( array ( "", "", 0, 1 ) );
 					// Drop error
 					else
-						$this->buffer( array ( "", "__saveError", 0, 2 ) , "BODY", TRUE );
+						$this->jbuffer( array ( "", "__saveError", 0, 2 ) );
 				}
 				else
 				{
 					if ( empty($_SESSION['captcha']) OR !password_verify(strtoupper($data['captcha']),$_SESSION['captcha']) )
 					{
 						// Drop error
-						$this->buffer( array ( "", $f3->get('LN__CaptchaMismatch'), 0, 2 ) , "BODY", TRUE );
+						$this->jbuffer( array ( "", $f3->get('LN__CaptchaMismatch'), 0, 2 ) );
 					}
 					else
 					{
 						// Don't accept empty guest name
 						if ( "" == $data['name'] = trim($data['name']) )
 						{
-							$this->buffer( array ( "", "__nameEmpty", 0, 2 ) , "BODY", TRUE );
+							$this->jbuffer( array ( "", "__nameEmpty", 0, 2 ) );
 						}
 						elseif (preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i",$data['message']))
 						{
-							$this->buffer( array ( "", "__guestURL", 0, 2 ) , "BODY", TRUE );
+							$this->jbuffer( array ( "", "__guestURL", 0, 2 ) );
 						}
 						// Attempt to save data
 						elseif ( 1 == $this->model->addShout($data) )
@@ -97,11 +97,11 @@ class Blocks extends Base
 							// destroy this session captcha
 							unset($_SESSION['captcha']);
 							// tell the shoutbox to reload and go to top
-							$this->buffer( array ( "", "", 0, 1 ) , "BODY", TRUE );
+							$this->jbuffer( array ( "", "", 0, 1 ) );
 						}
 						// Drop error
 						else
-							$this->buffer( array ( "", "__saveError", 0, 2 ) , "BODY", TRUE );
+							$this->jbuffer( array ( "", "__saveError", 0, 2 ) );
 					}
 				}
 			}

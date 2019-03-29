@@ -346,7 +346,7 @@ class UserCP extends Controlpanel
 				$sql .= "S.completed = 9";
 				break;
 			case "unfinished":
-				$sql .= "S.completed >= 2 AND Scompleted <= 6";
+				$sql .= "S.completed >= 2 AND S.completed <= 6";
 				break;
 			case "drafts":
 				$sql .= "S.completed = 1";
