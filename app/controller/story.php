@@ -314,7 +314,10 @@ class Story extends Base
 				exit;
 			}
 		}
-		
+		elseif ( $printer == "paper" )
+		{
+			//
+		}
 	}
 	
 	private function createEPub(int $sid): array
@@ -461,7 +464,7 @@ class Story extends Base
 	public function series(array $params)//: void
 	{
 		
-		$this->buffer ( \View\Base::stub("Series") );
+		return \View\Base::stub("Series");
 	}
 
 	public function search(\Base $f3, array $params)
@@ -554,7 +557,7 @@ class Story extends Base
 		return $arr;
 	}
 
-	protected function read(string $id)//: void
+	protected function read(array $id)//: void
 	{
 		@list($story, $view, $selected) = explode(",",$id['*']);
 		
@@ -592,10 +595,9 @@ class Story extends Base
 			}
 
 			$dropdown = $this->template->dropdown($tocData,$view);
-			$view = $this->template->buildStory($storyData,$content,$dropdown,$view);
-			$this->buffer($view);
+			return $this->template->buildStory($storyData,$content,$dropdown,$view);
 		}
-		else $this->buffer("Error, not found");
+		else return "__Error, not found";
 	}
 	
 	protected function reviews(string $id)//: void
@@ -608,10 +610,9 @@ class Story extends Base
 			$chapter = max ( 0, min ( $chapter, $storyData['chapters']) );
 			$reviewData = $this->model->loadReviews($story,$selected,$storyData['chapid']);
 
-			$view = $this->template->buildReviews($storyData, $reviewData, $chapter, $selected);
-			$this->buffer($view);
+			return $this->template->buildReviews($storyData, $reviewData, $chapter, $selected);
 		}
-		else $this->buffer("Error, not found");
+		else return "__Error, not found";
 	}
 	
 	public function storyBlocks(string $select): string
