@@ -158,8 +158,6 @@ class Blocks extends Base
 			$cells[] = [ FALSE ];
 		}
 		
-		setlocale(LC_ALL, __transLocale);
-		
 		$data = [
 			"CELLS"		=>	$cells,
 			"BACK"		=>	$back,
@@ -172,8 +170,6 @@ class Blocks extends Base
 		];		
 		
 		$this->template->calendar($data);
-		//echo \View\Blocks::calendar($data);
-		//exit;
 	}
 	
 	public function buildMenu(string $menuSelect): string

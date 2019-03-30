@@ -1,7 +1,7 @@
 <?php
-@define('__transLocale', 'de_DE');
-
 return array(
+'__transLocale' => [ 'de_DE.UTF8', 'de_DE@euro', 'de_DE', 'de', 'ge' ],
+
 // [1] Global -- General
 'Welcome' => 'Willkommen',
 'Shoutbox' => 'Shoutbox',

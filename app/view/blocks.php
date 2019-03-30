@@ -53,9 +53,10 @@ class Blocks extends Base
 
 	public function calendar($data)
 	{
-		\Base::instance()->set('data', $data);
+		$this->f3->set('data', $data);
 
-		echo utf8_encode($this->directrender('blocks/calendar.html'));
+		//echo utf8_encode($this->directrender('blocks/calendar.html'));
+		echo $this->directrender('blocks/calendar.html');
 		exit;
 	}
 	

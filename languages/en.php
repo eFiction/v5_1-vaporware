@@ -1,7 +1,7 @@
 <?php
-@define('__transLocale', 'en_GB');
-
 return array(
+'__transLocale' => 'en_GB',
+
 // [1] Global -- General 36
 'Welcome' => 'Welcome',
 'Shoutbox' => 'Shoutbox',
