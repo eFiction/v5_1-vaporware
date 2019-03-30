@@ -270,6 +270,7 @@ return array(
 
 // UserCP elements
 'ChangeTo'	=> 'Ändern in',
+'UserMenu_Start' => 'Start',
 'UserMenu_Profile' => 'Profil',
 'UserMenu_Message' => 'Nachrichten',
 'UserMenu_PMInbox' => '{0, plural,'.
@@ -285,7 +286,7 @@ return array(
 	'Authoring_Unfinished'	=> 'In Arbeit ({0})',
 	'Authoring_Drafts'		=> 'Entwürfe ({0})',
 	'Authoring_Deleted'		=> 'Gelöscht ({0})',
-'UserMenu_MyLibrary' => 'Beine Bibliothek',
+'UserMenu_MyLibrary' => 'Meine Bibliothek',
 	'Library_Favourites'	=> 'Favoriten ({0})',
 	'AddFavourite'			=> 'Favorit hinzufügen',
 	'Library_Bookmarks'		=> 'Lesezeichen ({0})',
@@ -314,7 +315,7 @@ return array(
 	'UCP_Pref_Language'	=> 'Sprache (Language)',
 //	'UCP_Pref_Layout'	=> 'Layout/Theme',
 	'UCP_Pref_Editor'	=> 'Erweiterten Editor benutzen.',
-//	'UCP_Pref_Age'		=> '***Age consent***',
+	'UCP_Pref_Age'		=> 'Zeige auch Geschichten mit Warnung (Sex/Gewalt o.ä.)',
 //	'UCP_Pref_hideTags'	=> '***Hide Tags***',
 
 'UCP_StoryStatus' => 'Story status',

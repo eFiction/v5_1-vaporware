@@ -163,7 +163,7 @@ class Story extends Base
 		
 		$replacements =
 		[
-			"ORDER"	=> "ORDER BY updated DESC" ,
+			"ORDER"	=> (1===$_SESSION['preferences']['sortNew']) ? "ORDER BY updated DESC" : "ORDER BY S.title ASC" ,
 			"LIMIT" => "LIMIT ".(max(0,$pos*$limit)).",".$limit,
 			"JOIN"	=> isset($join) ? implode("\n",$join) : "",
 			"WHERE"	=> implode(" ", $where),
@@ -322,7 +322,7 @@ class Story extends Base
 				S.count,GROUP_CONCAT(Ser.seriesid,',',rSS.inorder,',',Ser.title ORDER BY Ser.title DESC SEPARATOR '||') as in_series @EXTRA@,
 				".((isset($this->config['optional_modules']['contests']))?"GROUP_CONCAT(rSC.relid) as contests,":"")."
 				GROUP_CONCAT(Fav.bookmark,',',Fav.fid SEPARATOR '||') as is_favourite,
-				Ra.rating as rating_name, Edit.uid as can_edit,
+				Edit.uid as can_edit,
 				S.cache_authors, S.cache_tags, S.cache_characters, S.cache_categories, S.cache_rating, S.chapters, S.reviews,
 				S.translation, S.trans_from, S.trans_to
 			FROM `tbl_stories`S
@@ -345,7 +345,7 @@ class Story extends Base
 			"@EXTRA@"		=> "",
 			"@JOIN@"		=> "",
 			"@COMPLETED@"	=> ">=",
-			"@WHERE@"		=> "",
+			"@WHERE@"		=> ($_SESSION['userID']>0 AND $_SESSION['preferences']['ageconsent']==1)?"":"AND Ra.ratingwarning=0 ",
 			"@ORDER@"		=> "",
 			"@LIMIT@"		=> ""
 		];

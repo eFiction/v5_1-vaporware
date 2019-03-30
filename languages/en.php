@@ -270,6 +270,7 @@ return array(
 
 // UserCP elements
 'ChangeTo'	=> 'Change to',
+'UserMenu_Start' => 'Start',
 'UserMenu_Profile' => 'Profile',
 'UserMenu_Message' => 'Messaging',
 'UserMenu_PMInbox' => '{0, plural,'.
@@ -314,7 +315,7 @@ return array(
 	'UCP_Pref_Language'	=> 'Language',
 	'UCP_Pref_Layout'	=> 'Layout/Theme',
 	'UCP_Pref_Editor'	=> 'Use visual editor for stories.',
-	'UCP_Pref_Age'		=> '***Age consent***',
+	'UCP_Pref_Age'		=> 'Show stories with content warning (NSFW/violence)',
 	'UCP_Pref_hideTags'	=> '***Hide Tags***',
 
 'UCP_StoryStatus' => 'Story status',

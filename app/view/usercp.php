@@ -4,16 +4,21 @@ namespace View;
 class UserCP extends Base
 {
 
-	public static function showMenu($menu="")
+	public function showMenu($menu="")
 	{
-		\Base::instance()->set('panel_menu', $menu);
-		return \Template::instance()->render('usercp/menu.html');
+		$this->f3->set('panel_menu', $menu);
+		return $this->render('usercp/menu.html');
 	}
 	
-	public static function authorHome($data=[])
+	public function start ()
 	{
-		\Base::instance()->set('message', $data);
-		return \Template::instance()->render('usercp/author/home.html');
+		return $this->render('usercp/start.html');
+	}
+	
+	public function authorHome($data=[])
+	{
+		$this->f3->set('message', $data);
+		return $this->render('usercp/author/home.html');
 	}
 
 	public function authorStoryList(array $data, array $sort, array $params)
@@ -59,11 +64,11 @@ class UserCP extends Base
 		return $this->render('usercp/author/storyEditMeta.html');
 	}
 
-	public static function authorStoryChapterEdit(array $chapterData, array $chapterList, $editor="plain")
+	public function authorStoryChapterEdit(array $chapterData, array $chapterList, $editor="plain")
 	{
 		if ($editor=="visual")
 		{
-			\Registry::get('VIEW')->javascript( 'head', TRUE, "ckeditor/ckeditor.js" );
+			$this->javascript( 'head', TRUE, "ckeditor/ckeditor.js" );
 			$chapterData['editmode']	= "visual";
 		}
 		else
@@ -73,16 +78,16 @@ class UserCP extends Base
 			$chapterData['editmode']	= "plain";
 		}
 
-		\Base::instance()->set('data', $chapterData);
-		\Base::instance()->set('chapterList', $chapterList);
+		$this->f3->set('data', $chapterData);
+		$this->f3->set('chapterList', $chapterList);
 		
-		return \Template::instance()->render('usercp/author/storyEditChapter.html');
+		return $this->render('usercp/author/storyEditChapter.html');
 	}
 
-	public static function authorCurator(array $data=[])
+	public function authorCurator(array $data=[])
 	{
-		\Base::instance()->set('curator', $data);
-		return \Template::instance()->render('usercp/author/curator.html');
+		$this->f3->set('curator', $data);
+		return $this->render('usercp/author/curator.html');
 	}
 
 	public function msgInOutbox($data, $select="inbox")
@@ -111,7 +116,7 @@ class UserCP extends Base
 		$this->f3->set('PERSON_IS', $person_is);
 		$this->f3->set('DATE_MEANS', $date_means);
 
-		return $this->render('usercp/messaging.inout.html');
+		return $this->render('usercp/messaging/inout.html');
 	}
 
 	public function msgRead($data)
@@ -119,47 +124,47 @@ class UserCP extends Base
 		$this->f3->set('message', $data);
 		$this->f3->set('forward',($data['sender_id']==$_SESSION['userID']) );
 		
-		return $this->render('usercp/messaging.read.html');
+		return $this->render('usercp/messaging/read.html');
 	}
 
 	public function msgWrite($data)
 	{
 		$this->f3->set('write_data', $data);
-		return $this->render('usercp/messaging.write.html');
+		return $this->render('usercp/messaging/write.html');
 	}
 	
-	public static function shoutboxList($data)
+	public function shoutboxList($data)
 	{
 		//\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 
 		if( isset($_SESSION['lastAction']) )
 		{
-			\Base::instance()->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
+			$this->f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
 			unset($_SESSION['lastAction']);
 		}
 		
-		\Base::instance()->set('shouts', $data);
-		return \Template::instance()->render('usercp/shoutbox.list.html');
+		$this->f3->set('shouts', $data);
+		return $this->render('usercp/shoutbox.list.html');
 	}
 	
-	public static function libraryBookFavEdit($data, $params)
+	public function libraryBookFavEdit($data, $params)
 	{
-		\Base::instance()->set('data', $data);
-		\Base::instance()->set('block', $params[0]);
-		\Base::instance()->set('returnpath', $params['returnpath']);
-		\Base::instance()->set('saveError', @$params['error']);
+		$this->f3->set('data', $data);
+		$this->f3->set('block', $params[0]);
+		$this->f3->set('returnpath', $params['returnpath']);
+		$this->f3->set('saveError', @$params['error']);
 		
-		return \Template::instance()->render('usercp/library.editBookFav.html');
+		return $this->render('usercp/library.editBookFav.html');
 	}
 	
-	public static function libraryListBookFav(array $data, array $sort, array $extra)
+	public function libraryListBookFav(array $data, array $sort, array $extra)
 	{
-		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 
-		\Base::instance()->set('libraryEntries', $data);
-		\Base::instance()->set('sort', $sort);
-		\Base::instance()->set('extra', $extra);
-		return \Template::instance()->render('usercp/library.html');
+		$this->f3->set('libraryEntries', $data);
+		$this->f3->set('sort', $sort);
+		$this->f3->set('extra', $extra);
+		return $this->render('usercp/library.html');
 	}
 	
 	public function upperMenu(array $menu, $counter, $path, $sub)
@@ -172,12 +177,12 @@ class UserCP extends Base
 		return $this->render('usercp/menu.upper.html');
 	}
 	
-	public static function feedbackHome(array $data)
+	public function feedbackHome(array $data)
 	{
-		\Registry::get('VIEW')->javascript( 'head', TRUE, "piechart.js" );
+		$this->javascript( 'head', TRUE, "piechart.js" );
 		
-		\Base::instance()->set('stats', $data);
-		return \Template::instance()->render('usercp/feedback.home.html');
+		$this->f3->set('stats', $data);
+		return $this->render('usercp/feedback.home.html');
 	}
 
 	public function feedbackListReviews(array $data, array $sort, array $extra)
@@ -207,26 +212,26 @@ class UserCP extends Base
 		return $this->render('usercp/feedback.edit.html');
 	}
 	
-	public static function settingsChangePW($feedback)
+	public function settingsChangePW($feedback)
 	{
-		\Base::instance()->set('feedback', $feedback);
+		$this->f3->set('feedback', $feedback);
 		
-		return \Template::instance()->render('usercp/changepw.html');
+		return $this->render('usercp/changepw.html');
 	}
 	
-	public static function settingsProfile($fields)
+	public function settingsProfile($fields)
 	{
-		\Base::instance()->set('fields', $fields);
+		$this->f3->set('fields', $fields);
 		
-		return \Template::instance()->render('usercp/settings.profile.html');
+		return $this->render('usercp/settings.profile.html');
 	}
 	
-	public static function settingsPreferences($data)
+	public function settingsPreferences($data)
 	{
-		\Base::instance()->set('data', $data);
-		\Base::instance()->set('language_available', \Base::instance()->get('CONFIG.language_available'));
+		$this->f3->set('data', $data);
+		$this->f3->set('language_available', \Config::getPublic('language_available'));
 		
-		return \Template::instance()->render('usercp/settings.preferences.html');
+		return $this->render('usercp/settings.preferences.html');
 	}
 	
 }

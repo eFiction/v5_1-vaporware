@@ -570,7 +570,12 @@ class Story extends Base
 		elseif($storyData = $this->model->getStory($story,empty($view)?1:$view))
 		{
 			if ( empty($view) AND $storyData['chapters']>1 )
-				$view = (TRUE===\Config::getPublic('story_toc_default')) ? "toc" : 1;
+			{
+				if ( $_SESSION['userID']==0 )
+					$view = (TRUE===\Config::getPublic('story_toc_default')) ? "toc" : 1;
+				else
+					$view = (TRUE==$_SESSION['preferences']['showTOC']) ? "toc" : 1;
+			}
 
 			if ( $view == "toc" )
 			{

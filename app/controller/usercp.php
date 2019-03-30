@@ -25,17 +25,17 @@ class UserCP extends Base
 			$modules[] = "shoutbox";
 
 		// grab the first parameter
-		$p = array_pad(@explode("/",$params['*']),2,NULL); // 3.6
+		$p = array_pad(@explode("/",$params['*']),2,NULL);
 		$mod = array_shift($p);
 
+		$params = $this->parametric(implode("/",$p));
+
+		// run the module and let it show the module
 		if ( in_array($mod, $modules) )
-		{
-			$params = $this->parametric(implode("/",$p));
 			$this->{$mod}($f3, $params);
-		}
 		// Just show default menu
 		else
-			$this->showMenu();
+			$this->start($f3, $params);
 	}
 
 	public function ajax(\Base $f3, array $params)//: void
@@ -58,17 +58,17 @@ class UserCP extends Base
 				$data = $this->model->ajax("chaptersort", $post);
 				break;
 		}
-		/*
-		if ( $params['module']=="messaging" )
-		{
-			$data = $this->model->ajax("messaging", $post);
-		}
-		elseif ( $params['module']=="curator" )
-		{
-			$data = $this->model->ajax("curator", $post);
-		}*/
+
 		echo json_encode($data);
 		exit;
+	}
+	
+	public function start(\Base $f3, array $params)//: void
+	{
+		// no additional work required here
+		$this->showMenu();
+		
+		$this->buffer ( $this->template->start() );
 	}
 	
 	public function author(\Base $f3, array $params)//: void
@@ -129,7 +129,7 @@ class UserCP extends Base
 		// Strip all requests and reload data
 		if ($change) $f3->reroute("/userCP/author/curator", false);
 		
-		return \View\UserCP::authorCurator($data);
+		return $this->template->authorCurator($data);
 	}
 
 	protected function authorHome(\Base $f3, array $params): string
@@ -141,7 +141,7 @@ class UserCP extends Base
 		}
 		else $data = FALSE;
 		
-		return \View\UserCP::authorHome($data);
+		return $this->template->authorHome($data);
 	}
 	
 	protected function authorStoryAdd(\Base $f3, int $uid): string
@@ -269,7 +269,7 @@ class UserCP extends Base
 						$editor = "visual";
 				}
 
-				return \View\UserCP::authorStoryChapterEdit($chapterData,$chapterList,$editor);
+				return $this->template->authorStoryChapterEdit($chapterData,$chapterList,$editor);
 			}
 			else
 			{
@@ -445,14 +445,14 @@ class UserCP extends Base
 	protected function feedbackHome(\Base $f3, array $params)//: void
 	{
 		$stats = $this->model->feedbackHomeStats($this->counter);
-		$this->buffer ( \View\UserCP::feedbackHome($stats) );
+		$this->buffer ( $this->template->feedbackHome($stats) );
 		//return "Noch nix";
 	}
 	
 	public function settings(\Base $f3, array $params)//: void
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Settings') );
-		$sub = [ "profile", "preferences", "changepw" ];
+		$sub = [ "profile", "changepw" ];
 		if ( !in_array(@$params[0], $sub) ) $params[0] = "";
 
 		switch ( $params[0] )
@@ -460,14 +460,11 @@ class UserCP extends Base
 			case "profile":
 				$this->settingsProfile($f3, $params);
 				break;
-			case "preferences":
-				$this->settingsPreferences($f3, $params);
-				break;
 			case "changepw":
 				$this->settingsChangePW($f3, $params);
 				break;
 			default:
-				$this->settingsUser($f3, $params);
+				$this->settingsPreferences($f3, $params);
 		}
 
 		$this->showMenu("settings");
@@ -489,7 +486,7 @@ class UserCP extends Base
 		}
 		$profile = $this->model->settingsLoadProfile();
 		
-		$this->buffer ( \View\UserCP::settingsProfile($profile) );
+		$this->buffer ( $this->template->settingsProfile($profile) );
 	}
 
 	protected function settingsPreferences(\Base $f3, array $params)//: void
@@ -498,13 +495,13 @@ class UserCP extends Base
 		{
 			$this->model->settingsSavePreferences($post['form']);
 			// At this point, the view is already set up.
-			// We need to reload the page or the user will think, changes did not apply
+			// We need to reload the page or the user may think that changes did not apply
 			if ( $_SESSION['preferences']['layout'] != $post['form']['p']['layout'] OR $_SESSION['preferences']['language'] != $post['form']['p']['language'] )
 				$f3->reroute("/userCP/settings/preferences", false);
 		}
 		$preferences = $this->model->settingsLoadPreferences();
 		
-		$this->buffer ( \View\UserCP::settingsPreferences($preferences) );
+		$this->buffer ( $this->template->settingsPreferences($preferences) );
 	}
 
 	protected function settingsChangePW(\Base $f3, array $params)//: void
@@ -524,7 +521,7 @@ class UserCP extends Base
 			else $feedback = "error";
 		}
 		
-		$this->buffer ( \View\UserCP::settingsChangePW($feedback) );
+		$this->buffer ( $this->template->settingsChangePW($feedback) );
 	}
 
 	protected function settingsUser(\Base $f3, array $params)//: void
@@ -627,7 +624,7 @@ class UserCP extends Base
 			
 			$extra = [ "sub" => $params[0], "type" => $params[1] ];
 			
-			$this->buffer ( \View\UserCP::libraryListBookFav($data, $sort, $extra) );
+			$this->buffer ( $this->template->libraryListBookFav($data, $sort, $extra) );
 		}
 	}
 	
@@ -640,7 +637,7 @@ class UserCP extends Base
 	{
 		if ( FALSE !== $data = $this->model->loadBookFav($params) )
 		{
-			$this->buffer ( \View\UserCP::libraryBookFavEdit($data, $params) );
+			$this->buffer ( $this->template->libraryBookFavEdit($data, $params) );
 		}
 	}
 	
@@ -774,18 +771,14 @@ class UserCP extends Base
 		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
 		$data = $this->model->shoutboxList($page);
 		
-		$this->buffer( \View\UserCP::shoutboxList($data) );
+		$this->buffer( $this->template->shoutboxList($data) );
 	}
 	
 	protected function showMenu($selected=FALSE, array $data=[])//: void
 	{
 		$menu = $this->model->showMenu($selected, $data);
 
-		$this->buffer
-		( 
-			\View\UserCP::showMenu($menu), 
-			"LEFT"
-		);
+		$this->buffer ( $this->template->showMenu($menu), "LEFT" );
 		
 		if($selected) $this->counter = $this->model->getCounter($selected);
 	}
