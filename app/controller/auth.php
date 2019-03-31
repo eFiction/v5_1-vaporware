@@ -44,29 +44,40 @@ class Auth extends Base {
 
 		if ( isset($session_id) && $user = \Model\Auth::instance()->validateSession($session_id) AND $user['userID']>0 )
 		{
-			$_SESSION['groups'] 		= $user['groups'];
-			//$_SESSION['admin_active'] 	= $user['admin_active'];
-			//$_SESSION['userID']			= $user['userID'];
-			$_SESSION['username']		= $user['nickname'];
-			$_SESSION['mail']			= [ (int)@$user['cache_messaging']['inbox']['sum'], (int)@$user['cache_messaging']['unread']['sum'] ];
-			$_SESSION['allowed_authors']= explode(",",$user['allowed_authors']);
-			$_SESSION['preferences']	= $user['preferences'];
-			$_SESSION['tpl']			= [ "default", 1];
+			$_SESSION = array_merge (
+				$_SESSION,
+				[
+					'groups' 			=> 	$user['groups'],
+					'username'			=> 	$user['nickname'],
+					'mail'				=> 	[ 
+												(int)@$user['cache_messaging']['inbox']['sum'], 
+												(int)@$user['cache_messaging']['unread']['sum']
+											],
+					'allowed_authors'	=> 	explode(",",$user['allowed_authors']),
+					'preferences'		=> 	$user['preferences'],
+					'tpl'				=> 	[ "default", 1],
+				]
+			);
 
 			return TRUE;
 		}
 		else
 		{
-			//getStats();
-			//
-			$_SESSION['groups'] 		= bindec('0');
-			//$_SESSION['admin_active'] 	= FALSE;
-			//$_SESSION['userID']			= FALSE;
-			$_SESSION['username']		= "__Guest";
-			$_SESSION['mail']			= FALSE;
-			$_SESSION['allowed_authors']= [];
-			$_SESSION['preferences']	= ["language" => $f3->get('CONFIG.language_default')];
-			$_SESSION['tpl']			= [ "default", 1];
+			$_SESSION = array_merge (
+				$_SESSION,
+				[
+					'groups' 			=> 	bindec('0'),
+					'username'			=> 	$f3->get("LN__Guest"),
+					'userID'			=> 	0,
+					'mail'				=> 	FALSE,
+					'allowed_authors'	=>  [],
+					'preferences'		=>	[
+												'language' 		=> $f3->get('CONFIG.language_default'),
+												'ageconsent'	=> 0,
+											],
+					'tpl'				=> 	[ "default", 1]
+				]
+			);
 			
 			return FALSE;
 		}

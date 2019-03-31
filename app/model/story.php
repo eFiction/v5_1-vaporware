@@ -163,7 +163,7 @@ class Story extends Base
 		
 		$replacements =
 		[
-			"ORDER"	=> (1===$_SESSION['preferences']['sortNew']) ? "ORDER BY updated DESC" : "ORDER BY S.title ASC" ,
+			"ORDER"	=> ($_SESSION['userID']>0 AND 0===$_SESSION['preferences']['sortNew']) ? "ORDER BY S.title ASC" : "ORDER BY updated DESC",
 			"LIMIT" => "LIMIT ".(max(0,$pos*$limit)).",".$limit,
 			"JOIN"	=> isset($join) ? implode("\n",$join) : "",
 			"WHERE"	=> implode(" ", $where),
@@ -345,7 +345,7 @@ class Story extends Base
 			"@EXTRA@"		=> "",
 			"@JOIN@"		=> "",
 			"@COMPLETED@"	=> ">=",
-			"@WHERE@"		=> ($_SESSION['userID']>0 AND $_SESSION['preferences']['ageconsent']==1)?"":"AND Ra.ratingwarning=0 ",
+			"@WHERE@"		=> ($_SESSION['preferences']['ageconsent']==1)?"":"AND Ra.ratingwarning=0 ",
 			"@ORDER@"		=> "",
 			"@LIMIT@"		=> ""
 		];

@@ -1,4 +1,5 @@
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
+<F3:check if="{{@_SESSION['preferences']['ageconsent']==0}}"><div class="alert-box info">__storiesFiltered</div></check>
 <repeat group="{{ @stories }}" value="{{ @story }}" counter="{{ @ctr }}">
 	<div class="story-box">
 	<h5><check if="{{ isset(@story.inorder) }}">{{@item.inorder}}&nbsp;</check><a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a> {{@LN__by}} <repeat group="{{@story.cache_authors}}" value="{{@author}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check><a href="{{@BASE}}/members/uid={{@author.0}}">{{@author.1}}</a></repeat></h5>
