@@ -80,7 +80,7 @@ class AdminCP extends Base
 	
 	public function contestsList(array $data, array $sort)
 	{
-		\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 
 		while ( list($key, $value) = each($data) )
 			$this->dataProcess($data[$key], $key);
@@ -265,7 +265,19 @@ class AdminCP extends Base
 	
 	public function seriesList(array $data, array $sort, string $module) : string
 	{
-		return print_r($data,1);
+		while ( list($key, $value) = each($data) )
+			$this->dataProcess($data[$key], $key);
+
+		$this->f3->set('data', 		$data);
+		$this->f3->set('module', 	$module);
+		$this->f3->set('sort', $sort);
+		
+		return $this->render('stories/seriesList.html');
+	}
+	
+	public function seriesEdit(array $data, string $returnpath="" )
+	{
+		return "Edit";
 	}
 	
 	public function shoutEdit(array $data, array $sort, $page)

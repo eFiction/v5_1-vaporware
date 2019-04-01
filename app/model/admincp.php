@@ -1151,19 +1151,36 @@ class AdminCP extends Controlpanel {
 				(
 					"%TYPE%",
 					($module=="collections")?"C":"S",
-					"SELECT Ser.title, Ser.cache_authors,
-								COUNT(DISTINCT rSerS.sid) as stories
+					"SELECT SQL_CALC_FOUND_ROWS
+						Ser.seriesid, Ser.title, Ser.cache_authors,
+						COUNT(DISTINCT rSerS.sid) as stories
 							FROM `tbl_series`Ser
 								LEFT JOIN `tbl_series_stories`rSerS ON ( Ser.seriesid = rSerS.seriesid )
-							WHERE Ser.type = '%TYPE%'
-							GROUP BY Ser.seriesid
-							ORDER BY {$sort['order']} {$sort['direction']}
-							LIMIT ".(max(0,$pos*$limit)).",".$limit
+						WHERE Ser.type = '%TYPE%'
+						GROUP BY Ser.seriesid
+						ORDER BY {$sort['order']} {$sort['direction']}
+						LIMIT ".(max(0,$pos*$limit)).",".$limit
 				);
 		
 		$data = $this->exec( $sql );
+
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/adminCP/stories/".(($module=="collections")?"collections":"series")."/order={$sort['link']},{$sort['direction']}",
+			$limit
+		);
 		
 		return $data;
+	}
+	
+	public function seriesLoad(int $seriesid)
+	{
+		$sql = "SELECT * FROM `tbl_series`Ser WHERE `seriesid` = :seriesid";
+		$data = $this->exec($sql, [":seriesid" => $seriesid ]);
+		if (sizeof($data)!=1) 
+			return NULL;
+
+		return $data[0];
 	}
 
 	public function storyAdd(array $data)

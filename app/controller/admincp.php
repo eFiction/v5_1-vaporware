@@ -1516,15 +1516,33 @@ class AdminCP extends Base
 
 	protected function storiesSeries(\Base $f3, array $params)
 	{
-		$this->response->addTitle( $f3->get('LN__AdminMenu_Series') );
-		$f3->set('title_h3', $f3->get('LN__AdminMenu_Series') );
+		if ( $params['module']=="collections" )
+		{
+			$this->response->addTitle( $f3->get('LN__AdminMenu_Collections') );
+			$f3->set('title_h3', $f3->get('LN__AdminMenu_Collections') );
+			$module = "collections";
+		}
+		else
+		{
+			$this->response->addTitle( $f3->get('LN__AdminMenu_Series') );
+			$f3->set('title_h3', $f3->get('LN__AdminMenu_Series') );
+			$module = "series";
+		}
 
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
-		// $params['module'] 
-		
 		
 
 
+
+		if( isset ($params['id']) )
+		{
+			if ( NULL !== $data = $this->model->seriesLoad($params['id']) )
+			{
+				$this->buffer( $this->template->seriesEdit($data, @$params['returnpath']) );
+				return;
+			}
+			else $f3->set('form_error', "__failedLoad");
+		}
 
 		// page will always be an integer > 0
 		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
@@ -1546,9 +1564,9 @@ class AdminCP extends Base
 		(
 			$this->template->seriesList
 			(
-				$this->model->seriesList($page, $sort, $params['module']),
+				$this->model->seriesList($page, $sort, $module),
 				$sort,
-				$params['module']
+				$module
 			)
 		);
 	}
