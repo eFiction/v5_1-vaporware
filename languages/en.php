@@ -489,9 +489,11 @@ return array(
 'ContestDescription'	=> 'Contest description',
 
 'AdminMenu_Stories' => 'Stories',
-'AdminMenu_Pending' => 'Pending',
+'AdminMenu_Stories_Pending' => 'Pending',
 'AdminMenu_Edit' => 'Edit',
 'AdminMenu_Add' => 'Add',
+'AdminMenu_Series' => 'Series',
+'AdminMenu_Collections' => 'Collections',
 
 'CannotDeleteUsedElement'	=> 'Cannot delete an element that is currently being used.',
 'ElementDeleted'	=> 'Element deleted',

@@ -263,6 +263,11 @@ class AdminCP extends Base
 		return $this->render('archive/rating_list.html');
 	}
 	
+	public function seriesList(array $data, array $sort, string $module) : string
+	{
+		return print_r($data,1);
+	}
+	
 	public function shoutEdit(array $data, array $sort, $page)
 	{
 		$this->f3->set('data', $data);

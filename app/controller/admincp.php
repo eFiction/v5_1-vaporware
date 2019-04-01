@@ -1257,7 +1257,7 @@ class AdminCP extends Base
 		// add module title
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Stories') );
 
-		switch( $this->moduleInit([ "pending", "edit", "add" ], @$params['module']) )
+		switch( $this->moduleInit([ "pending", "edit", "add", "series", "collections" ], @$params['module']) )
 		{
 			case "pending":
 				$this->buffer( $this->storiesPending($f3, $params) );
@@ -1270,6 +1270,10 @@ class AdminCP extends Base
 				break;
 			case "home":
 				$this->storiesHome($f3, $params);
+				break;
+			case "series":
+			case "collections":
+				$this->storiesSeries($f3, $params);
 				break;
 			default:
 				$this->buffer(\Template::instance()->render('access.html'));
@@ -1301,8 +1305,8 @@ class AdminCP extends Base
 
 	protected function storiesPending(\Base $f3, array $params): string
 	{
-		$this->response->addTitle( $f3->get('LN__AdminMenu_Pending') );
-		$f3->set('title_h3', $f3->get('LN__AdminMenu_Pending') );
+		$this->response->addTitle( $f3->get('LN__AdminMenu_Stories_Pending') );
+		$f3->set('title_h3', $f3->get('LN__AdminMenu_Stories_Pending') );
 
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 		
@@ -1509,5 +1513,45 @@ class AdminCP extends Base
 	{
 		$this->buffer( \View\Base::stub() );
 	}
+
+	protected function storiesSeries(\Base $f3, array $params)
+	{
+		$this->response->addTitle( $f3->get('LN__AdminMenu_Series') );
+		$f3->set('title_h3', $f3->get('LN__AdminMenu_Series') );
+
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		// $params['module'] 
+		
+		
+
+
+
+		// page will always be an integer > 0
+		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
+
+		// search/browse
+		$allow_order = array (
+				"id"		=>	"Ser.seriesid",
+				"date"		=>	"date",
+				"title"		=>	"title",
+				"author"	=>	"author",
+		);
+
+		// sort order
+		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "id";
+		$sort["order"]		= $allow_order[$sort["link"]];
+		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
+
+		$this->buffer
+		(
+			$this->template->seriesList
+			(
+				$this->model->seriesList($page, $sort, $params['module']),
+				$sort,
+				$params['module']
+			)
+		);
+	}
+
 }
 

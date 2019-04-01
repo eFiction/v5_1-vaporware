@@ -484,8 +484,7 @@ class AdminCP extends Controlpanel {
 		return $data;
 	}
 
-//	public function characterLoad(int $tid)
-	public function characterLoad($charid)
+	public function characterLoad(int $charid)
 	{
 		$sql = "SELECT Ch.charid as id, Ch.charname, Ch.biography, Ch.count, Cat.cid, Cat.category 
 					FROM `tbl_characters`Ch
@@ -496,8 +495,7 @@ class AdminCP extends Controlpanel {
 		return NULL;
 	}
 	
-//	public function contestsList(int $page, array $sort) : array
-	public function contestsList($page, array $sort)
+	public function contestsList(int $page, array $sort) : array
 	{
 		$limit = 20;
 		$pos = $page - 1;
@@ -526,8 +524,7 @@ class AdminCP extends Controlpanel {
 		
 	}
 
-//	public function contestLoad(int $tid)
-	public function contestLoad($conid)
+	public function contestLoad(int $conid)
 	{
 		$sql = "SELECT C.conid as id, C.title, C.summary, C.concealed, C.date_open, C.date_close,
 					GROUP_CONCAT(T.tid,',',T.label SEPARATOR '||') as tag_list,
@@ -565,7 +562,6 @@ class AdminCP extends Controlpanel {
 		return NULL;
 	}
 
-//	public function contestLoad(int $tid)
 	public function contestLoadEntries($conid)
 	{
 		$sql = "SELECT S.sid, S.title
@@ -1139,6 +1135,35 @@ class AdminCP extends Controlpanel {
 			return json_encode(explode(",",$data[0]['rating']));
 		else
 			return "[]";
+	}
+	
+	public function seriesAdd()
+	{
+		
+	}
+	
+	public function seriesList(int $page, array $sort, string $module) : array
+	{
+		$limit = 20;
+		$pos = $page - 1;
+		
+		$sql = str_replace
+				(
+					"%TYPE%",
+					($module=="collections")?"C":"S",
+					"SELECT Ser.title, Ser.cache_authors,
+								COUNT(DISTINCT rSerS.sid) as stories
+							FROM `tbl_series`Ser
+								LEFT JOIN `tbl_series_stories`rSerS ON ( Ser.seriesid = rSerS.seriesid )
+							WHERE Ser.type = '%TYPE%'
+							GROUP BY Ser.seriesid
+							ORDER BY {$sort['order']} {$sort['direction']}
+							LIMIT ".(max(0,$pos*$limit)).",".$limit
+				);
+		
+		$data = $this->exec( $sql );
+		
+		return $data;
 	}
 
 	public function storyAdd(array $data)
