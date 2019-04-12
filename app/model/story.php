@@ -26,11 +26,10 @@ class Story extends Base
 		return $data;
 	}
 	
-//	public function author(int $id)
-	public function author($id)
+	public function author(int $id)
 	{
 		$limit = $this->config['stories_per_page'];
-		$author = "SELECT SQL_CALC_FOUND_ROWS U.uid, U.nickname as name, COUNT(rSA.sid) as counter FROM `tbl_stories_authors`rSA INNER JOIN `tbl_users`U ON ( rSA.aid = U.uid AND rSA.aid = :aid ) GROUP BY rSA.aid";
+		$author = "SELECT SQL_CALC_FOUND_ROWS U.uid, U.username as name, COUNT(rSA.sid) as counter FROM `tbl_stories_authors`rSA INNER JOIN `tbl_users`U ON ( rSA.aid = U.uid AND rSA.aid = :aid ) GROUP BY rSA.aid";
 		$info = $this->exec( $author, ["aid" => $id] );
 		
 		$pos = (int)\Base::instance()->get('paginate.page') - 1;
@@ -231,7 +230,7 @@ class Story extends Base
 	public function searchPrepopulate ($item, $id)
 	{
 		if ( $item == "author")
-			$sql = "SELECT `nickname` as name, `uid` as id FROM `tbl_users` WHERE `groups` & 4 AND `uid` IN ({$id})";
+			$sql = "SELECT `username` as name, `uid` as id FROM `tbl_users` WHERE `groups` & 4 AND `uid` IN ({$id})";
 
 		elseif ( $item == "category")
 			$sql = "SELECT `category` as name, `cid` as id FROM `tbl_categories` WHERE `cid` IN ({$id})";
@@ -255,8 +254,8 @@ class Story extends Base
 		}
 		elseif( $item=="author" )
 		{
-			$ajax_sql = "SELECT U.nickname as name, U.uid as id from `tbl_users`U WHERE U.nickname LIKE :nickname AND ( U.groups & 4 ) ORDER BY U.nickname ASC LIMIT 5";
-			$bind = [ "nickname" =>  "%{$bind}%" ];
+			$ajax_sql = "SELECT U.username as name, U.uid as id from `tbl_users`U WHERE U.username LIKE :username AND ( U.groups & 4 ) ORDER BY U.username ASC LIMIT 5";
+			$bind = [ "username" =>  "%{$bind}%" ];
 		}
 		elseif( $item=="category" )
 		{
@@ -294,70 +293,7 @@ class Story extends Base
 			return $data[0];
 		else return FALSE;
 	}
-	
-	public function storyData(array $replacements=[], array $bind=[])
-	{
-		$sql = $this->storySQL($replacements);
-		$data = $this->exec($sql, $bind);
-
-		if ( sizeof($data)>0 )
-		{
-			foreach ( $data as &$dat)
-			{
-				$favs = $this->cleanResult($dat['is_favourite']);
-				$dat['is_favourite'] = [];
-				if(!empty($favs))
-				foreach ( $favs as $value )
-					if ( isset($value[1]) ) $dat['is_favourite'][$value[0]] = $value[1];
-			}
-		}
-
-		return $data;
-	}
-	
-	public function storySQL(array $replacements=[])
-	{
-		$sql_StoryConstruct = "SELECT SQL_CALC_FOUND_ROWS
-				S.sid, S.title, S.summary, S.storynotes, S.completed, S.wordcount, UNIX_TIMESTAMP(S.date) as published, UNIX_TIMESTAMP(S.updated) as modified, 
-				S.count,GROUP_CONCAT(Ser.seriesid,',',rSS.inorder,',',Ser.title ORDER BY Ser.title DESC SEPARATOR '||') as in_series @EXTRA@,
-				".((isset($this->config['optional_modules']['contests']))?"GROUP_CONCAT(rSC.relid) as contests,":"")."
-				GROUP_CONCAT(Fav.bookmark,',',Fav.fid SEPARATOR '||') as is_favourite,
-				Edit.uid as can_edit,
-				S.cache_authors, S.cache_tags, S.cache_characters, S.cache_categories, S.cache_rating, S.chapters, S.reviews,
-				S.translation, S.trans_from, S.trans_to
-			FROM `tbl_stories`S
-				@JOIN@
-			".((isset($this->config['optional_modules']['contests']))?"LEFT JOIN `tbl_contest_relations`rSC ON ( rSC.relid = S.sid AND rSC.type = 'story' )":"")."
-				LEFT JOIN `tbl_series_stories`rSS ON ( rSS.sid = S.sid )
-					LEFT JOIN `tbl_series`Ser ON ( Ser.seriesid=rSS.seriesid )
-				LEFT JOIN `tbl_ratings`Ra ON ( Ra.rid = S.ratingid )
-				LEFT JOIN `tbl_stories_authors`rSAE ON ( S.sid = rSAE.sid )
-					LEFT JOIN `tbl_users`Edit ON ( ( rSAE.aid = Edit.uid ) AND ( ( Edit.uid = ".(int)$_SESSION['userID']." ) OR ( Edit.curator = ".(int)$_SESSION['userID']." ) ) )
-				LEFT JOIN `tbl_user_favourites`Fav ON ( Fav.item = S.sid AND Fav. TYPE = 'ST' AND Fav.uid = ".(int)$_SESSION['userID'].")
-			WHERE S.completed @COMPLETED@ 6 AND S.validated >= 30 @WHERE@
-			GROUP BY S.sid
-			@ORDER@
-			@LIMIT@";
-
-		// default replacements
-		$replace =
-		[
-			"@EXTRA@"		=> "",
-			"@JOIN@"		=> "",
-			"@COMPLETED@"	=> ">=",
-			"@WHERE@"		=> ($_SESSION['preferences']['ageconsent']==1)?"":"AND Ra.ratingwarning=0 ",
-			"@ORDER@"		=> "",
-			"@LIMIT@"		=> ""
-		];
 		
-		// insert custom replacements
-		foreach ( $replacements as $key => $value )
-		{
-			$replace["@{$key}@"] = $value;
-		}
-		return str_replace(array_keys($replace), array_values($replace), $sql_StoryConstruct);
-	}
-	
 	public function categories( $cid )
 	{
 		// $cid is safe
@@ -424,7 +360,7 @@ class Story extends Base
 					F.text as review_text, 
 					F.reference as review_story, 
 					F.reference_sub as review_chapter, 
-					IF(F.writer_uid>0,U.nickname,F.writer_name) as review_writer_name, 
+					IF(F.writer_uid>0,U.username,F.writer_name) as review_writer_name, 
 					F.writer_uid as review_writer_uid, 
 					UNIX_TIMESTAMP(F.datetime) as date_review
 				FROM `tbl_feedback`F 
@@ -492,7 +428,7 @@ class Story extends Base
 					F2.fid as comment_id, 
 					F2.text as comment_text, 
 					F2.reference_sub as parent_item, 
-					IF(F2.writer_uid>0,U2.nickname,F2.writer_name) as comment_writer_name, 
+					IF(F2.writer_uid>0,U2.username,F2.writer_name) as comment_writer_name, 
 					F2.writer_uid as comment_writer_uid,
 					F2.reference as review_id, 
 					UNIX_TIMESTAMP(F2.datetime) as date_comment
@@ -714,7 +650,7 @@ class Story extends Base
 			//"SET @words = (SELECT SUM(C.wordcount) FROM `tbl_chapters`C INNER JOIN `tbl_stories`S ON ( C.sid=S.sid AND S.validated >= 30 AND C.validated >= 30 ) );",
 			// Count words from validated stories that are at least w.i.p.
 			"SET @words = (SELECT SUM(S.wordcount) FROM `tbl_stories`S WHERE S.validated >= 30 AND S.completed >= 6 );",
-			"SET @newmember = (SELECT CONCAT_WS(',', U.uid, U.nickname) FROM `tbl_users`U WHERE U.groups>0 ORDER BY U.registered DESC LIMIT 1);",
+			"SET @newmember = (SELECT CONCAT_WS(',', U.uid, U.username) FROM `tbl_users`U WHERE U.groups>0 ORDER BY U.registered DESC LIMIT 1);",
 			"SELECT @users as users, @authors as authors, @reviews as reviews, @stories as stories, @chapters as chapters, @words as words, @newmember as newmember;",
 		];
 		$statsData = $this->exec($statSQL)[0];
@@ -760,7 +696,7 @@ class Story extends Base
 		$sort = ( $order == "random" ) ? 'RAND()' : 'Rec.date DESC';
 		
 		return $this->exec("SELECT Rec.recid, Rec.title, Rec.summary, Rec.author, Rec.url, Rec.cache_categories, Rec.cache_rating,
-					U.uid, U.nickname
+					U.uid, U.username
 						FROM `tbl_recommendations`Rec
 							LEFT JOIN `tbl_users`U ON ( Rec.uid = U.uid)
 						WHERE Rec.validated > 0
@@ -784,7 +720,7 @@ class Story extends Base
 	{
 		$epubSQL =	"SELECT 
 			S.sid, S.title,
-			GROUP_CONCAT(DISTINCT U.nickname ORDER BY U.nickname ASC SEPARATOR ', ') as authors,
+			GROUP_CONCAT(DISTINCT U.username ORDER BY U.username ASC SEPARATOR ', ') as authors,
 			'1' AS allow_ebook
 			FROM `tbl_stories`S
 				INNER JOIN `tbl_stories_authors`rSA ON ( S.sid=rSA.sid ) 
@@ -802,7 +738,7 @@ class Story extends Base
 	{
 		$epubSQL =	"SELECT 
 			S.sid, S.title, S.storynotes, S.summary, UNIX_TIMESTAMP(S.date) as written, UNIX_TIMESTAMP(S.date) as updated, 
-			GROUP_CONCAT(DISTINCT U.nickname ORDER BY U.nickname ASC SEPARATOR ', ') as authors,
+			GROUP_CONCAT(DISTINCT U.username ORDER BY U.username ASC SEPARATOR ', ') as authors,
 			GROUP_CONCAT(DISTINCT T.label ORDER BY T.tgid,T.label ASC SEPARATOR ', ') as tags
 			FROM `tbl_stories`S
 				INNER JOIN `tbl_stories_authors`rSA ON ( S.sid=rSA.sid ) 

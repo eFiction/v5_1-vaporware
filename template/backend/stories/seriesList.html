@@ -2,7 +2,8 @@
 	<true>
 <check if="{{ isset(@form_error) }}"><div class="gb-full alert-box error">{{ @form_error }}</div></check>
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
-<table class="tbody">
+<table class="table is-striped is-hoverable is-fullwidth">
+<thead>
 	<tr>
 		<th>&nbsp;</th>
 		<th><a href="{{@BASE}}/adminCP/stories/{{@module}}/order=id,
@@ -29,6 +30,8 @@
 		</th>
 		<th>&nbsp;</th>
 	</tr>
+</thead>
+<tbody>
 	<repeat group="{{ @data }}" value="{{ @row }}">
 	<tr>
 		<td><a href="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @row['seriesid'] }};returnpath=/adminCP/stories/{{@module}}/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
@@ -37,8 +40,9 @@
 		<td>{{ is_array(@row.authors)?implode(", ",@row.authors):"&nbsp;" }}</td>
 	</tr>
 	</repeat>
+</tbody>
 </table>
-<F3:check if="{{isset(@paginate.firstPage) AND ( @paginate.total > ( @paginate.limit*@paginate.pos + 5 ) )}}"><include href="paginate.html" /></F3:check>
+<F3:check if="{{ sizeof($data) > 5 }}"><include href="paginate.html" /></F3:check>
 	</true>
 	<false>
 		__noItems

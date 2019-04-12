@@ -1,23 +1,56 @@
-<form method="post" action="{{@BASE}}/adminCP/members/profile">
-	<div class="grid-wrapper">
-		<div class="gb-30"><input class="text-input" type="text" name="newMemberField"></div>
-		<div class="gb-70"><input class="button" type="submit" value="__newMemberField"></div>
+<!-- <form method="post" action="{{@BASE}}/adminCP/members/profile">
+		<input class="input" type="text" name="newMemberField">
+		<button class="button" type="submit">__newMemberField</button>
+</form> -->
+
+<div class="columns">
+	<div class="column is-half">
+	<!-- new tag form -->
+		<div class="notification">
+		<form method="post" action="{{@BASE}}/adminCP/members/profile">
+		<div class="field">
+			<label class="label">{{@LN__ACP_NewProfileField}}</label>
+				<div class="control">
+					<input class="input" type="text" name="newRating">
+				</div>
+		</div>
+		<div class="field">
+				<div class="control">
+					<button class="button is-link">{{@LN__Add}}</button>
+				</div>
+			</div>
+		</form>
+		</div>
 	</div>
-</form>
-<check if="{{ isset(@form_error) }}"><div class="gb-90 alert-box error">{{ @form_error }}</div></check>
+	<div class="column"></div>
+</div>
+
+<article class="message is-info">
+  <div class="message-header">
+    <p>Info</p>
+    <button class="delete" aria-label="delete"></button>
+  </div>
+  <div class="message-body">
+    **Bisher reine Ausgabe; Funktionen werden noch nicht unterstützt!
+  </div>
+</article>
+
+<check if="{{ isset(@form_error) }}"><div class="notification is-danger"><button class="delete"></button>{{ @form_error }}</div></check>
 
 <repeat group="{{ @data }}" key="{{ @group }}" value="{{ @fields }}">
-<fieldset>
-	<legend>{{ ${"LN__UserField_Type".@group} }}</legend>
+<table class="table is-striped is-narrow is-hoverable is-fullwidth">
+	<label>{{ ${"LN__UserField_Type".@group} }}</label>
 	<repeat group="{{ @fields }}" value="{{ @row }}">
-		<div class="grid-wrapper">
-			<div class="gb-05"><a href="{{@BASE}}/adminCP/members/profile/edit={{ @row['field_id'] }}">{ICON:edit}</a></div>
-			<div class="gb-05"><a href="{{@BASE}}/adminCP/members/profile/delete={{ @row['field_id'] }}" class="deleteItem" title="#{{ @row['field_id'] }}: {{ @row['field_name'] }}">{ICON:trash}</a></div>
-			<div class="gb-10">{{ @row['field_id'] }}</div>
-			<div class="gb-20">{{ @row['field_name'] }}</div>
-			<div class="gb-30">{{ @row['field_title'] }}</div>
-			<div class="gb-20"><check if="{{ @row.enabled == 1}}"><true>{ICON:plus}</true><false>{ICON:minus}</false></check></div>
-		</div>
+<tbody>
+		<tr>
+			<td><a href="{{@BASE}}/adminCP/members/profile/edit={{ @row['field_id'] }}">{ICON:edit}</a></td>
+			<td><a href="{{@BASE}}/adminCP/members/profile/delete={{ @row['field_id'] }}" class="deleteItem" title="#{{ @row['field_id'] }}: {{ @row['field_name'] }}">{ICON:trash}</a></td>
+			<td>{{ @row['field_id'] }}</td>
+			<td>{{ @row['field_name'] }}</td>
+			<td>{{ @row['field_title'] }}</td>
+			<td><check if="{{ @row.enabled == 1}}"><true>{ICON:plus}</true><false>{ICON:minus}</false></check></td>
+		</tr>
+	</tbody>
 	</repeat>
-</fieldset>
+</table>
 </repeat>

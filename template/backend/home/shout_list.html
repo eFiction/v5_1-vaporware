@@ -1,7 +1,8 @@
 <F3:check if="{{ sizeof(@shoutEntries) > 0}}">
 <true>
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
-<table class="tbody">
+<table class="table is-striped is-hoverable is-fullwidth">
+<thead>
 	<tr>
 		<th>&nbsp;</th>
 		<th>&nbsp;</th>
@@ -50,6 +51,8 @@
 			</check></a> {{@LN__Message}}
 		</th>
 	</tr>
+</thead>
+<tbody>
 	<repeat group="{{ @shoutEntries }}" value="{{ @row }}">
 	<tr>
 		<td><a href="{{@BASE}}/adminCP/home/shoutbox/id={{ @row['id'] }}/order={{@sort.order}},{{@sort.direction}}/page={{@paginate.page}}">{ICON:edit}</a></td>
@@ -77,6 +80,7 @@
 		</td>
 	</tr>
 	</repeat>
+</tbody>
 </table>
 </true>
 <false>

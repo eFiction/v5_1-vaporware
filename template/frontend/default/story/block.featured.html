@@ -1,5 +1,4 @@
-<div class="feature">
-<h3>{{@LN__FeaturedStory, sizeof(@renderData) | format}}</h3>
+<h5>{{@LN__FeaturedStory, sizeof(@renderData) | format}}</h5>
 <check if="{{sizeof(@renderData)>0}}">
 <true>
 	<repeat group="{{@renderData}}"  value="{{ @story }}" counter="{{ @ctr }}">
@@ -20,4 +19,3 @@
 	{{@LN__noFeaturedStory}}
 </false>
 </check>
-</div>

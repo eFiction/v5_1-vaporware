@@ -10,11 +10,11 @@ class News extends Base
 		
 		
 		$sql = "SELECT SQL_CALC_FOUND_ROWS N.nid, N.headline, N.newstext, N.comments, UNIX_TIMESTAMP(N.datetime) as timestamp, 
-			U.uid,U.nickname,
+			U.uid,U.username,
 			COUNT(DISTINCT F.fid) as comments
 			FROM `tbl_news`N
 				LEFT JOIN `tbl_users`U ON ( U.uid = N.uid )
-				LEFT JOIN `tbl_feedback`F ON ( N.nid = F.reference )
+				LEFT JOIN `tbl_feedback`F ON ( N.nid = F.reference AND F.type='N' )
 			WHERE N.datetime <= NOW()
 			GROUP BY N.nid
 			ORDER BY N.datetime DESC
@@ -37,7 +37,7 @@ class News extends Base
 	public function loadNews($id, $withComments=TRUE)
 	{
 		$sql = "SELECT N.nid, N.headline, N.newstext, N.comments, UNIX_TIMESTAMP(N.datetime) as timestamp, 
-			U.uid,U.nickname
+			U.uid,U.username
 			FROM `tbl_news`N
 				LEFT JOIN `tbl_users`U ON ( U.uid = N.uid )
 			WHERE N.nid = :nid";
@@ -45,7 +45,7 @@ class News extends Base
 		if( $data = $this->exec($sql, [ ":nid" => $id])[0] )
 		{
 			$sql = "SELECT F.fid, F.text, UNIX_TIMESTAMP(F.datetime) as timestamp, 
-						IF(F.writer_uid>0,U.nickname,F.writer_name) as comment_writer_name, F.writer_uid
+						IF(F.writer_uid>0,U.username,F.writer_name) as comment_writer_name, F.writer_uid
 						FROM `tbl_feedback`F
 							LEFT JOIN `tbl_users`U ON ( F.writer_uid = U.uid )
 						WHERE F.reference = {$data['nid']} AND F.type='N'

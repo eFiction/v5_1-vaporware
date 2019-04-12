@@ -1,39 +1,41 @@
 <form method="post" action="{{@BASE}}/adminCP/{{@form_target}}">
 	<check if="{{ @form_feedback.0 }}">
-		<div class="alert-box success">{{ @LN__Status_Changes, @form_feedback.0 | format }}</div>
+		<div class="notification is-success"><button class="delete"></button>{{ @LN__Status_Changes, @form_feedback.0 | format }}</div>
 	</check>
 	<check if="{{ @form_feedback.1 }}">
-		<div class="alert-box error">{{ @LN__Status_Errors, @form_feedback.0 | format }}.<br />__CheckData!</div>
+		<div class="notification is-warning"><button class="delete"></button>{{ @LN__Status_Errors, @form_feedback.0 | format }}.<br />__CheckData!</div>
 	</check>
 	
 	<repeat group="{{ @form_elements }}" key="{{@title }}" value="{{ @elements }}" counter="{{ @ctr }}">
 		<dl class="settings">
-		<dt class="settings_title">{{ ${'LN__AdminMenu_'.@title} }}</dt>
+		<dt class="settings-title">{{ ${'LN__AdminMenu_'.@title} }}</dt>
 		<repeat group="{{ @elements.fields }}" value="{{ @element }}" counter="{{ @ctr }}">
 			<dt>{{ nl2br(@element.comment) |raw}}<check if="{{ @element.comment_small }}"><br /><small>{{ nl2br(@element.comment_small) | raw }}</small></check></dt>
 			<switch expr="{{ @element['type'] }}">
 				{* -- TEXT (not TEXTAREA) -- *}
 				<case value="{{ 'text' }}" break="{{ TRUE }}">
 				<dd>
-					<input <check if="{{ @element.form_type.0!='' }}">class="half" </check>type="<check if="{{ @@element.form_type.0=='password' }}"><true>password</true><false>text</false></check>" value="{{ @element.value }}" name="form_data[{{@elements.section}}][{{@element.name}}]" />
+					<input class="input<check if="{{ @element.form_type.0!='' }}"> half</check>" type="<check if="{{ @@element.form_type.0=='password' }}"><true>password</true><false>text</false></check>" value="{{ @element.value }}" name="form_data[{{@elements.section}}][{{@element.name}}]" />
 				</dd>
 				</case>
 				{* -- END: TEXT -- *}
 				<!-- TEXTAREA -->
 				<case value="{{ 'textarea' }}" break="{{ TRUE }}">
 				<dd>
-					<textarea class="text-input" name="form_data[{{@elements.section}}][{{@element.name}}]">{{ @element.value }}</textarea>
+					<textarea class="textarea" name="form_data[{{@elements.section}}][{{@element.name}}]">{{ @element.value }}</textarea>
 				</dd>
 				</case>
 				<!-- END: TEXTAREA -->
 				<!-- SELECT -->
 				<case value="{{ 'select' }}" break="{{ TRUE }}">
 				<dd>
-					<select class="half" name="form_data[{{@elements.section}}][{{@element.name}}]" size="1"<check if="{{ @element['can_edit']!=1 }}"> disabled="true"</check>>
+					<div class="select">
+					<select name="form_data[{{@elements.section}}][{{@element.name}}]" size="1"<check if="{{ @element['can_edit']!=1 }}"> disabled="true"</check>>
 						<repeat group="{{ @element.form_type }}" value="{{ @option }}">
 							<option value="{{@option.1}}"<check if="{{ @element['value']==@option.1 }}"> selected="selected"</check>>{{ @option.0 }}</option>
 						</repeat>
 					</select>
+					</div>
 				</dd>
 				<!-- END: SELECT -->
 				</case>
@@ -43,5 +45,5 @@
 	</repeat>
 
 	<hr />
-	<input class="button" type="submit"> <input class="button" type="reset">
+	<input class="button is-success" type="submit"> <input class="button is-danger" type="reset">
 </form>

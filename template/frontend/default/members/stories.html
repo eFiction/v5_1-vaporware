@@ -1,0 +1,89 @@
+<include href="members/header.html" />
+
+<check if="{{ isset(@extradata.cat) }}">
+<div class="columns">
+	<div class="column">
+		<h5>{{@LN__Categories}}</h5>
+		<ol>
+		<repeat group="{{ @extradata.cat.0 }}" value="{{ @category }}">
+			<li><a href="{{@BASE}}/story/browse/author={{ @userdata.uid }};category={{ @category.cid }}">{{@category.name}}</a> ({{ @category.counted }})</li>
+		</repeat>
+		</ol>
+		<div class="button">{{ @extradata.cat.1 }} {{@LN__total}}</div>
+	</div>
+	<div class="column">
+		<h5>{{@LN__Tags}}</h5>
+		<ol>
+		<repeat group="{{ @extradata.tag.0 }}" value="{{ @tag }}">
+			<li><a href="{{@BASE}}/story/browse/author={{ @userdata.uid }};tagIn={{ @tag.tid }}">{{@tag.label}}</a> ({{ @tag.counted }})</li>
+		</repeat>
+		</ol>
+		<div class="button">{{ @extradata.tag.1 }} {{@LN__total}}</div>
+	</div>
+	<div class="column">
+		<h5>{{@LN__Characters}}</h5>
+		<ol>
+		<repeat group="{{ @extradata.char.0 }}" value="{{ @character }}">
+			<li><a href="{{@BASE}}/story/browse/author={{ @userdata.uid }};characters={{ @character.charid }}">{{@character.charname}}</a> ({{ @character.counted }})</li>
+		</repeat>
+		</ol>
+		<div class="button">{{ @extradata.char.1 }} {{@LN__total}}</div>
+	</div>
+</div>
+</check>
+
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
+
+<F3:check if="{{@_SESSION['preferences']['ageconsent']==0}}">
+<article class="message is-warning">
+  <div class="message-body">
+    {{@LN__Stories_filtered}}
+  </div>
+</article>
+</check>
+
+<div class="columns">
+	<div class="column">
+<repeat group="{{ @extradata.stories }}" value="{{ @story }}" counter="{{ @ctr }}">
+	<div class="story-box">
+	<div class="story-list-head"><check if="{{ isset(@story.inorder) }}">{{@item.inorder}}&nbsp;</check><a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a> {{@LN__by}} <repeat group="{{@story.cache_authors}}" value="{{@author}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check><a href="{{@BASE}}/authors/{{@author.0}}">{{@author.1}}</a></repeat></div>
+	<div class="story-list-actions">
+		&nbsp;
+		<check if="{{ @SESSION['userID']>0 }}">
+			<a href="{{@BASE}}/userCP/library/bookmark/edit/id=ST,{{@story.sid}};returnpath={{@PATH}}">
+				<check if="{{isset(@story.is_favourite.1)}}">
+					<true>{ICON:bookmark:{{@LN__BookmarkRemove, @story.title | format}}}</true>
+					<false>{ICON:bookmark-off:{{@LN__BookmarkAdd, @story.title | format}}}</false>
+				</check>
+			</a>&nbsp;
+			<check if="{{@@story.is_favourite.0>0}}">
+				<true>
+					<a href="{{@BASE}}/userCP/library/favourite/edit/id=ST,{{@story.sid}};returnpath={{@PATH}}" title="{{@LN__FavouriteRemove, @story.title | format}}">{ICON:favourite}
+				</true>
+				<false>
+					<a href="{{@BASE}}/userCP/library/favourite/edit/id=ST,{{@story.sid}};returnpath={{@PATH}}" title="{{@LN__FavouriteAdd, @story.title | format}}">{ICON:favourite-off}
+				</false>
+			</check>
+			</a>&nbsp;
+		</check>
+		<check if="{{@story.reviews>0}}">
+			<a href="{{@BASE}}/story/reviews/{{@story.sid}}" title="{{@LN__TitleReadReviews, @story.title | format}}">{ICON:comments} {{@story.reviews}}</a>
+		</check>
+	</div>
+	<check if="{{!empty(@story.cache_categories)}}">
+		<div class="story-list-category">{ICON:folder} <repeat group="{{@story.cache_categories}}" value="{{@category}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check>{{@category.1}}</repeat></div>
+	</check>
+	<div class="story-list-summary">{{@story.summary |raw}}</div>
+	<div class="tags">{ICON:tags}&nbsp;
+		<check if="{{isset(@story.cache_tags.simple.0)}}">
+			<true><repeat group="{{@story.cache_tags.simple}}" value="{{@tag}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}"> </check><span class="tag">{{@tag.1}}</span></repeat></true>
+			<false>{{@LN__NoTags}}</false>
+		</check>
+	</div>
+	<div class="story-list-info">{{@LN__Published}}: {{@story.published}} &bull; <check if="{{@story.modified}}">{{@LN__Updated}}: {{@story.modified}} &bull; </check>{{@LN__Chapters}}: {{@story.chapters}} &bull; {{@LN__Words}}: {{@story.wordcount}} &bull; {{@LN__Status}}: {{@story.completed==9 ? @LN__Completed : @LN__WIP}} &bull; <check if="{{!empty(@story.rating_name)}}">{{@LN__Rating}}: {{@story.rating_name}} &bull; </check>{{@LN__Clicks}}: {{@story.count}}</div>
+	</div>
+</repeat>
+
+</div></div>
+
+<F3:check if="{{isset(@paginate.firstPage) AND sizeof(@extradata.stories)>2}}"><include href="paginate.html" /></F3:check>

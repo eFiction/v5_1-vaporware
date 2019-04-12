@@ -2,27 +2,67 @@
 	__A_Category: <check if="{{isset(@data.info) }}">__creatingSubFor {{ @data.info.category }}</check>
 </check>
 <check if="{{ @data.job=='id' }}">{{@LN__ACP_EditCategory}}</check>
+
+<!-- error notification -->
+<check if="{{ isset(@form_error) }}">
+	<div class="notification is-warning">
+		<button class="delete"></button>
+		{{ @form_error }}
+	</div>
+</check>
+<!-- END: error notification -->
+<!-- success notification -->
+<check if="{{ isset(@form_changes) }}">
+	<div class="notification is-success">
+		<button class="delete"></button>
+		{{ @LN__Changes_saved }}
+	</div>
+</check>
+<!-- END: success notification -->
+
 <form action="{{@BASE}}/adminCP/archive/categories/{{ @data['job'] }}={{ @data['id'] }}" method="post">
-	<div class="grid-wrapper">
-		<check if="{{ @data['errors'] }}"><div class="gb-90 alert-box error">{{ @data['errors'] }}</div></check>
-		<check if="{{ @data['changes'] }}"><div class="gb-90 alert-box success">{{ @LN__Status_Changes, @data['changes'] | format }}</div></check>
-		<div class="gb-20">__A_CategoryName</div><div class="gb-80"><input type="text" size=80 name="form_data[category]" value="{{ @data['category'] }}" /></div>
-<!-- {*		<check if="{{ @data.parent_cid > 0 }}"><div class="gb-20">&nbsp;</div><div class="gb-80">__Category_MoveUp</div></check> *} -->
+<div class="field">
+	<div class="control">
+		<div class="columns">
+			<div class="column is-2">{{@LN__ACP_CategoryName}}</div>
+			<div class="column is-5"><input class="input" type="text" name="form_data[category]" value="{{ @data.category }}" /></div>
+		</div>
 		<check if="{{isset(@data.move)}}">
-		<div class="gb-20">__Location:</div><div class="gb-80">
-			<select name=form_data[parent_cid]>
-				<repeat group="{{@data.move}}"  value="{{ @move }}">
-					<option value="{{@move.cid}}" <check if="{{@move.cid == @data.parent_cid}}"> selected='selected'</check>> 
-						<check if="{{@move.leveldown == -1 AND @data.leveldown > 0 }}"><-- </check>
-						<check if="{{@move.leveldown == @data.leveldown}}">--> </check>
-						{{@move.category}}
-					</option>
-				</repeat>
-			</select>
+		<div class="columns">
+			<div class="column is-2">__Location:</div>
+			<div class="column is-5"><div class="select">
+				<select name="form_data[parent_cid]">
+					<repeat group="{{@data.move}}"  value="{{ @move }}">
+						<option value="{{@move.cid}}" <check if="{{@move.cid == @data.parent_cid}}"> selected='selected'</check>> 
+							<check if="{{@move.leveldown == -1 AND @data.leveldown > 0 }}"><-- </check>
+							<check if="{{@move.leveldown == @data.leveldown}}">--> </check>
+							{{@move.category}}
+						</option>
+					</repeat>
+				</select>
+			</div></div>
 		</div>
 		</check>
-		<div class="gb-20">__Locked?</div><div class="gb-80"><input type="checkbox" name="form_data[locked]" value="locked" <check if="{{ @data['locked'] }}">checked="checked"</check> ></div>
-		<div class="gb-full">__A_CategoryDescription:<br /><textarea name="form_data[description]" rows="30" cols="80">{{ @data['description'] }}</textarea><br /></div>
-		<div class="gb-40" align="right"><input type="submit"></div><div class="gb-60"><input type="reset"></div>
+		<div class="columns">
+			<div class="column">
+				<label class="checkbox">
+					<input type="checkbox" name="form_data[locked]" value="locked" <check if="{{ @data['locked'] }}">checked="checked"</check> >
+					__Locked
+				</label>
+			</div>
+		</div>
+		<div class="columns">
+			<div class="column is-2">{{@LN__ACP_CategoryDescription}}</div>
+			<div class="column"><textarea class="textarea" name="form_data[description]" rows="5" cols="40">{{ @data.description }}</textarea><br /></div>
+		</div>
+		<div class="columns">
+			<div class="column is-half">
+				<div class="buttons">
+					<input class="button is-success" type="submit">
+					<input class="button" type="reset">
+				</div>
+			</div>
+		</div>
 	</div>
+</div>
 </form>

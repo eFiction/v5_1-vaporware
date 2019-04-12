@@ -8,24 +8,35 @@
 		<meta name="keywords" content="{KEYWORDS}">
 		<meta name="description" content="">
 		<meta name="robots" content="INDEX,FOLLOW">
-		<link rel="shortcut icon" href="http://treknation.net/webpics/favicon.ico" type="image/x-icon" />
+		<link rel="shortcut icon" href="https://treknation.net/webpics/favicon.ico" type="image/x-icon" />
 		<title>{{@TITLE}}</title>
 		<link rel='stylesheet' type='text/css' href="{{@UI}}css/styles.css" />
 		<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
 		<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
+
 		<script src="{{ @BASE }}/app/js/jquery.tokeninput.js"></script>
 		<check if="{{ isset(@JS_HEAD)}}">{{ @JS_HEAD | raw }}</check>
 	</head>
+	
 <body>
-	<div class="grid-wrapper" id="container">
-	<div class="grid-wrapper" id="header"><h1><a href="{{@BASE}}">efiction 5.0</a> {{@LN__AdminCP}}</h1></div><!-- end header -->
+<section class="hero is-fullheight">
+	<div class="hero-head">
+		<header class="navbar">
+			<h1><a href="{{@BASE}}">efiction 5.0</a> {{@LN__AdminCP}}</h1><!-- end header -->
+		</header>
+	</div>
 
+	<div class="hero-body">
+	<div class="container is-fluid">
 	<!-- layout for system pages (admin panel, error pages, ...) -->
-			<div class="gb-20" id="sidebar">
-				<div class="cp-menu-wrapper">{{@LEFT|raw}}</div>
+		<div class="columns">
+			<div class="column is-one-fifth">
+				<div class="cp-menu-wrapper sidebar">{{@LEFT|raw}}</div>
 			</div>
-			<div class="gb-80" id="content">
+
+			<div class="column">
 
 			<check if="{{ isset(@title_h1) }}">
 				<h1>{{ @title_h1 }}</h1>
@@ -37,22 +48,38 @@
 
 			<check if="{{ isset(@menu_upper) }}">
 			<div>
-				<repeat group="{{ @menu_upper }}" value="{{ @menu_item }}"><span><span class='tinyicon'>{{ @menu_item['icon'] }}</span> <a href="{{@BASE}}/adminCP/{{ @menu_item['link'] }}">{{ ${'LN__AdminMenu_'.@menu_item['label']} }}</a></span></repeat>
+				<repeat group="{{ @menu_upper }}" value="{{ @menu_item }}"><div class="button"><span><span class='tinyicon'>{{ @menu_item['icon'] }}</span> <a href="{{@BASE}}/adminCP/{{ @menu_item['link'] }}">{{ ${'LN__AdminMenu_'.@menu_item['label']} }}</a></span></div> </repeat>
 			</div>
 			</check>
-
+				<br />
 				{{@BODY | raw }}
 			</div>
+		</div>
+	</div>
+	</div>
 
-		<div class="grid-wrapper" id="footer">
-			<div class="gb-full">
+	<!-- end container -->
+
+	
+	<div class="hero-foot">
 				{PAGE:footer}<br />
 				{{ \Base::instance()->format('eFiction v{0}, using {1}, page rendered in {2} msecs / Memory usage {3} KB',@APP_VERSION,@DBType,round(1e3*(microtime(TRUE)-$TIME),2),round(memory_get_usage(TRUE)/1e3,1)) }}
-			</div>
-		</div> <!-- end footer -->
-	</div> <!-- end container -->
 
 	<check if="{{ isset(@JS_BODY)}}">{{ @JS_BODY | raw }}</check>
-	<check if="{{ @CONFIG.debug > 0 OR isset(@DEBUGLOG) }}"><div><textarea cols=120 rows=30>{{ @DEBUGLOG }}</textarea></div></check>
+	<check if="{{ @CONFIG.debug > 0 OR isset(@DEBUGLOG) }}"><div><textarea cols=120 rows=3>{{ @DEBUGLOG }}</textarea></div></check>
+	</div>
+	<!-- end footer -->
+	
+</section>
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', () => {
+  (document.querySelectorAll('.notification .delete') || []).forEach(($delete) => {
+    $notification = $delete.parentNode;
+    $delete.addEventListener('click', () => {
+      $notification.parentNode.removeChild($notification);
+    });
+  });
+});
+</script>
 </body>
 </html>

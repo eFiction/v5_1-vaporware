@@ -93,7 +93,7 @@ class Logging extends \DB\SQL\Mapper
 		if ( $subtype == "c" )
 		// Log a validated chapter
 		{
-			$data = $model->exec("SELECT GROUP_CONCAT(aid) as aid, GROUP_CONCAT(nickname) as author, S.sid, S.title, Ch.chapid, Ch.inorder
+			$data = $model->exec("SELECT GROUP_CONCAT(aid) as aid, GROUP_CONCAT(username) as author, S.sid, S.title, Ch.chapid, Ch.inorder
 										FROM `tbl_stories_authors`rSA
 											LEFT JOIN `tbl_users`U ON ( rSA.aid = U.uid )
 											LEFT JOIN `tbl_stories`S ON ( rSA.sid = S.sid )
@@ -113,7 +113,7 @@ class Logging extends \DB\SQL\Mapper
 		else
 		// default is story validation
 		{
-			$data = $model->exec("SELECT GROUP_CONCAT(aid) as aid, GROUP_CONCAT(nickname) as author, S.sid, S.title
+			$data = $model->exec("SELECT GROUP_CONCAT(aid) as aid, GROUP_CONCAT(username) as author, S.sid, S.title
 											FROM `tbl_stories_authors`rSA
 												LEFT JOIN `tbl_stories`S ON ( rSA.sid = S.sid )
 												LEFT JOIN `tbl_users`U ON ( rSA.aid = U.uid )

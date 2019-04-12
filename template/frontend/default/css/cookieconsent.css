@@ -1,0 +1,20 @@
+/*
+cookie consent popup 
+https://silktide.com/tools/cookie-consent
+*/
+
+.cc-window
+{
+	background:#237afc;
+	border-radius:5px;
+	box-shadow:0px 5px 10px rgba(0,0,0,0.5)
+}
+.cc-message
+{
+	color:#000000
+}
+
+.cc-btn{background:#ffffff}
+a.cc-btn{color:#000000}
+
+a.cc-link {color:#ffffff}

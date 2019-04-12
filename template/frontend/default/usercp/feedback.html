@@ -18,7 +18,8 @@
 	</switch>
 </check>
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
-<table class="tbody">
+<table class="table table is-striped is-hoverable is-fullwidth">
+<tbody>
 	<tr>
 		<th>&nbsp;</th>
 		<th>&nbsp;</th>
@@ -93,5 +94,6 @@
 		<td>{{ @row.text | raw}}<check if="{{@extra.type=='RC'}}"><br /><small><a href="{{@row.url}}" target="_blank">{ICON:external-link} {{@row.url}}</a></small></check></td>
 	</tr>
 	</repeat>
+</tbody>
 </table>
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>

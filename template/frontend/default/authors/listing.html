@@ -4,11 +4,11 @@
 	<!-- BLOCK:CELL -->
 	<repeat group="{{ @listing }}" key="{{@letter}}" value="{{ @authors }}">
 	<div class="author-grid-wrapper">
-		<div class="author-grid-letter"><a href="{{@BASE}}/authors/{{@letter}}">{{@letter}}</a></div>
+		<div class="author-grid-letter"><a href="{{@BASE}}/authors/letter/{{@letter}}">{{@letter}}</a></div>
 		<ul class="author-grid">
 			<repeat group="{{ @authors }}" value="{{ @author }}">
 			<!-- BLOCK:NAMES -->
-				<li>({{ @author.stories }}) <a href="{{@BASE}}/authors/{{ @author.id }}">{{ @author.name }}</a></li>
+				<li><a href="{{@BASE}}/member/{{ @author.name }}">{{ @author.name }}</a> ({{ @author.stories }})</li>
 			<!-- END:NAMES -->
 			</repeat>
 		</ul>
@@ -18,15 +18,17 @@
 </div>
 </true>
 <false>
-<h2>{{@letter}}</h2>
-<div class="gb-full screen-micro">
+<h2>{{strtoupper(@letter)}}</h2>
 	<div class="columnize">
 		<ul class="alphabetical">
 		<repeat group="{{ @listing }}" value="{{ @author }}">
-			<li><a href="{{@BASE}}/members/id={{ @author.id }}">{ICON:member}</a> <a href="{{@BASE}}/authors/{{ @author.id }}">{ICON:text}</a> {{ @author.name }}({{ @author.stories }})</li>
+			<li>
+				<a href="{{@BASE}}/member/{{ @author.name }}">{ICON:member}</a>
+				<a href="{{@BASE}}/member/{{ @author.name }}/stories">{ICON:text}</a>
+				{{ @author.name }} ({{ @author.stories }})
+			</li>
 		</repeat>
 		</ul>
 	</div>
-</div>
 </false>
 </check>

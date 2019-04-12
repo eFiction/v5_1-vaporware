@@ -14,6 +14,7 @@ return array(
 'Cancel'	=>	'Cancel',
 'OK'		=>	'Okay',
 'Delete'	=>	'Delete',
+'Add'		=>	'Add',
 'Return'	=>	'Return',
 'Date'		=>	'Date',
 'Time'		=>	'Time',
@@ -26,6 +27,7 @@ return array(
 'daily'			=> 'daily',
 'disabled'		=> 'disabled',
 'enabled'		=> 'enabled',
+'hidden'		=> 'hidden',
 'ClickCont'		=> 'Click to continue',
 'Error'			=> 'Error',
 'Success'		=> 'Success',
@@ -46,7 +48,7 @@ return array(
 'LoginName'		=> 'Login',
 'VisibleName'	=> 'Visible name',
 'Logout'		=> 'Logout',
-'Username'		=> 'User name',
+'Username'		=> 'Username',
 'Password'		=> 'Password',
 'Email'			=> 'e-Mail',
 'Registered'	=> 'Registered',
@@ -71,6 +73,7 @@ return array(
 'Sort_Label'		=> 'Label',
 'Sort_Headline'		=> 'Headline',
 'Sort_Name'			=> 'Name',
+'Sort_Email'		=> 'Email',
 'Sort_Text'			=> 'Text',
 'Sort_Updated'		=> 'Updated',
 'Sort_Count'		=> 'Count',
@@ -153,6 +156,7 @@ return array(
 'Search_Fav'		=> 'Favourites',
 'Search_BM'			=> 'Bookmarks',
 'StoryExtent'		=> 'Extent of story',
+'Stories_filtered'	=> 'Stories filtered',
 'Size_SingleChapter'=> 'Single chapter',
 'Size_MultiChapter'	=> 'Multiple chapters',
 'Size_All'			=> 'Show all',
@@ -186,6 +190,8 @@ return array(
 'Review_Link_TOC'	=> '{0, plural, zero {No reviews}, one {One review}, other {# reviews} }',
 'DownloadEPub'		=> 'Download \'{0}\' as an ePub file',
 'PrintView'			=> 'Open \'{0}\' in print view',
+'next'				=> 'next',
+'back'				=> 'back',
 
 // [13] Story -- Edit 10
 'MainAuthor'	=> 'Main author',
@@ -210,11 +216,11 @@ return array(
 'SwitchPlainHTML'	=> 'Switch to HTML mode',
 'SwitchVisual'		=> 'Switch to visual editor',
 
-///DB
 // [14] Authors
 'NoAuthorsListed'	=> 'Currently, there are no authors to be listed',
 'Overview'			=> 'Overview',
 
+///DB
 // User panel - PM
 'PM_Inbox'				=> 'Inbox',
 'PM_Outbox'				=> 'Outbox',
@@ -292,6 +298,30 @@ return array(
 	'Library_Bookmarks'		=> 'Bookmarks ({0})',
 	'AddBookmark'			=> 'Add bookmark',
 	'Library_Recommendations' => 'Recommendations ({0})',
+	'FavType_FAV'		=> '{0, plural,'.
+			'zero	{No favourites},'.
+			'one	{One favourite},'.
+			'other	{# Favourites} }',
+	'FavType_BM'		=> '{0, plural,'.
+			'zero	{No bookmarks},'.
+			'one	{One bookmark},'.
+			'other	{# Bookmarks} }',
+	'FavType_AU'		=> '{0, plural,'.
+			'zero	{No authors},'.
+			'one	{One author},'.
+			'other	{# Authors} }',
+	'FavType_RC'		=> '{0, plural,'.
+			'zero	{No recommendations},'.
+			'one	{One recommendation},'.
+			'other	{# Recommendations} }',
+	'FavType_SE'		=> '{0, plural,'.
+			'zero	{No series},'.
+			'one	{One series},'.
+			'other	{# Series} }',
+	'FavType_ST'		=> '{0, plural,'.
+			'zero	{No stories},'.
+			'one	{One story},'.
+			'other	{# Stories} }',
 
 'UserMenu_Feedback' => 'Feedback',
 'UserMenu_Reviews' => 'Reviews',
@@ -425,9 +455,13 @@ return array(
 		'AdminMenu_Team_Group6' => 'Super Moderator',
 		'AdminMenu_Team_Group7' => 'Administrator',
 
+//AdminCP Profile elements
+'ACP_NewProfileField' => 'New Profile Field', //DB
+
 // AdminCP Archive elements
 'AdminMenu_Archive' => 'Archive',
 	'AdminMenu_Intro' => 'Intro',
+	'AdminMenu_Authors' => 'Author page',
 'AdminMenu_Submission' => 'Submissions',
 	'AdminMenu_Stories' => 'Stories',
 	'AdminMenu_Images' => 'Cover art',
@@ -449,22 +483,29 @@ return array(
 'ACP_Tags'				=> 'Tags',
 'ACP_NewTag'			=> 'Add new tag',
 'ACP_Character'			=> 'Character',
+	'ACP_NewCharacter'	=> 'Create new character',
+	'ACP_CharacterName'	=> 'Character name',
 'ACP_Biography'			=> 'Biography',
 'ACP_Contest'			=> 'Contest',
+	'ACP_EditContestEntries'	=> 'Edit contest entries',
+	'ACP_ContestDateRange'	=>	'Contest date range',
+	'ACP_NewContest'	=>	'Create new contest', //DB
 'ACP_Category'			=> 'Category',
-'ACP_EditCategory'		=> 'Edit category',
-'ACP_MainCategory'		=> 'Main category',
-'ACP_AddMainCategory'	=> 'Add main category',
-'ACP_AddSubCategory'	=> 'Add sub category to \'{0}\'',
+	'ACP_EditCategory'		=> 'Edit category',
+	'ACP_MainCategory'		=> 'Main category',
+	'ACP_AddMainCategory'	=> 'Add main category',
+	'ACP_AddSubCategory'	=> 'Add sub category to \'{0}\'',
+	'ACP_CategoryName'		=> 'Category name',
+	'ACP_CategoryDescription'	=> 'Category description',
 'ACP_TagName'			=> 'Tag name',
-'ACP_TagLabel'			=> 'Tag label',
-'ACP_TagDescription'	=> 'Tag description',
-'ACP_TagLabel_Advice'	=> 'Only change when required',
-'ACP_TagGroupLabel'		=> 'Tag group label',
-'ACP_TagGroup'			=> 'Tag group',
-'ACP_TagGroupAdvice'	=> 'eFiction 5 requires at least one tag group, do not attempt to delete all tag groups or it will break the output.',
-'ACP_NewTagGroup'		=> 'Add new tag group',
-'ACP_TagGroups'			=> 'Tag groups',
+	'ACP_TagLabel'			=> 'Tag label',
+	'ACP_TagDescription'	=> 'Tag description',
+	'ACP_TagLabel_Advice'	=> 'Only change when required',
+	'ACP_TagGroupLabel'		=> 'Tag group label',
+	'ACP_TagGroup'			=> 'Tag group',
+	'ACP_TagGroupAdvice'	=> 'eFiction 5 requires at least one tag group, do not attempt to delete all tag groups or it will break the output.',
+	'ACP_NewTagGroup'		=> 'Add new tag group',
+	'ACP_TagGroups'			=> 'Tag groups',
 'ACP_NewRating'			=> 'Add new rating',
 'ACP_RatingLabel'		=> 'Rating label',
 'ACP_RatingAge'			=> 'Rating age',
@@ -474,14 +515,22 @@ return array(
 'ACP_RatingCount'		=> 'Number of stories with this rating',
 'ACP_RatingMove'		=> 'Move stories to this rating',
 
+'ACP_CreateNews'		=> 'Create a news entry',
+'ACP_NewsHeadline'		=> 'Enter the headline',
+
+'ACP_CanLinkPage'		=> 'Can link to this',
+'ACP_Custom_LabelOnly'	=> 'Enter a short and unique label',
+'CreateNewPage'			=> 'Create new page or textblock',
+'DuplicateLabel'		=> 'Label already exists',
+
 // Admin - Archive - Featured
 'AdminMenu_Featured' => 'Featured',
-	'AdminMenu_Future' => 'Future',
+	'AdminMenu_Upcoming' => 'Upcoming',
 	'AdminMenu_Current' => 'Current',
 	'AdminMenu_Past' => 'Past',
 'Feat_Current'			=> 'Currently featured',
 'Feat_Past'				=> 'Past feature',
-'Feat_Future'			=> 'Future feature (not active yet, merely a note)',
+'Feat_Upcoming'			=> 'Upcoming feature (not active yet, merely a note)',
 'SelectedBy'			=> 'Selected by',
 
 // Admin - Archive - Contest
@@ -514,6 +563,9 @@ return array(
 // archive_intro
 	'CFG_story_intro_items' 	=> 'Stories to show on the archive entry page.',
 	'CFG_story_intro_order' 	=> 'Order in which stories appear on the archive entry page.',
+// archive_authors
+	'CFG_author_overview_columns' 	=> 'Columns to show on the overview.',
+	'CFG_author_letter_columns' 	=> 'Maximum column count when selecting a letter.',
 // archive_reviews
 	'CFG_allow_reviews'			=> 'Allow reviews',
 	'CFG_allow_guest_reviews'	=> 'Allow guests to write reviews',
@@ -663,6 +715,8 @@ return array(
 'Characters' => 'Characters',
 'Clicks' => 'Clicks',
 'Author_Notes' => 'Author notes',
+'Friend'	=> 'Friend',
+'Contact'	=> 'Contact',
 
 'SearchUsername'=> 'Search in usernames',
 'SearchUserAll' => 'Search in all user fields',
@@ -696,6 +750,7 @@ return array(
 	'one	{One element changed.},'.
 	'other	{# elements changed.}
 }',
+'Changes_saved' => 'Changes were saved',
 'Status_Errors' => '{0, plural,'.
 	'zero	{No errors.},'.
 	'one	{An error occurred while saving data.},'.

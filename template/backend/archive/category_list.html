@@ -1,11 +1,11 @@
-<check if="{{ isset(@feedback.errors) }}"><div class="gb-90 alert-box error">{{ @feedback.errors }}</div></check>
-<check if="{{ isset(@feedback.changes) }}"><div class="gb-90 alert-box success">{{ @feedback.changes }}</div></check>
+<check if="{{ isset(@feedback.errors) }}"><div class="notification is-warning"><button class="delete"></button>{{ @feedback.errors }}</div></check>
+<check if="{{ isset(@feedback.changes) }}"><div class="notification is-success"><button class="delete"></button>{{ @feedback.changes }}</div></check>
 <check if="{{sizeof(@categories)>0}}">
 	<set level="1" />
-	<div><table style="border: 1px solid blue;">
+	<div><table class="table is-striped is-hoverable">
 	<repeat group="{{ @categories }}" value="{{ @row }}">
 		<loop from="{{ @i=@level }}" to="{{ @i > (@row['leveldown']+1) }}" step="{{ @i-- }}"></table></div></td></tr></loop>
-		<loop from="{{ @i=@level }}" to="{{ @i < (@row['leveldown']+1) }}" step="{{ @i++ }}"><tr><td colspan=8><div style="padding: 3px 3px 3px 40px;" class="level{{@row['leveldown']}}"><table width="100%" style="border: 1px solid red;"></loop>
+		<loop from="{{ @i=@level }}" to="{{ @i < (@row['leveldown']+1) }}" step="{{ @i++ }}"><tr><td colspan=8><div style="padding: 3px 3px 3px 40px;" class="level{{@row['leveldown']}}"><table width="100%"></loop>
 		<tr>
 			<td style="padding: 1px 10px 1px 10px;"><a href="{{@BASE}}/adminCP/archive/categories/id={{ @row['cid'] }}">{ICON:edit}</a></td>
 			<td style="padding: 1px 10px 1px 10px;"><check if="{{@row['inorder']>1}}"><a href="{{@BASE}}/adminCP/archive/categories/move=up,{{ @row['cid'] }}" title="{{@LN__MoveUp}} {{@row['category']}}">{ICON:arrow-up}</a></check>&nbsp;</td>
@@ -25,5 +25,5 @@
 	</repeat>
 	<loop from="{{ @i=@level }}" to="{{ @i > 0 }}" step="{{ @i-- }}"></table></div></loop>
 </check>
-<br/>
+<br />
 <a href="{{@BASE}}/adminCP/archive/categories/add" title="{{@LN__ACP_AddMainCategory}}">{ICON:plus} {{@LN__ACP_AddMainCategory}}</a>

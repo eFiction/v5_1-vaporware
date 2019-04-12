@@ -37,8 +37,8 @@ class AdminCP extends Controlpanel {
 			}
 			elseif(isset($data['author']))
 			{
-				$ajax_sql = "SELECT U.nickname as name, U.uid as id from `tbl_users`U WHERE U.nickname LIKE :nickname AND ( U.groups & 5 ) ORDER BY U.nickname ASC LIMIT 5";
-				$bind = [ ":nickname" =>  "%{$data['author']}%" ];
+				$ajax_sql = "SELECT U.username as name, U.uid as id from `tbl_users`U WHERE U.username LIKE :username AND ( U.groups & 5 ) ORDER BY U.username ASC LIMIT 5";
+				$bind = [ ":username" =>  "%{$data['author']}%" ];
 			}
 			elseif(isset($data['tag']))
 			{
@@ -63,7 +63,7 @@ class AdminCP extends Controlpanel {
 		{
 			if(isset($data['userID']))
 			{
-				$ajax_sql = "SELECT U.nickname as name,U.uid as id from `tbl_users`U WHERE ( U.nickname LIKE :user OR U.uid = :uid ) AND U.uid > 0 ORDER BY U.nickname ASC LIMIT 5";
+				$ajax_sql = "SELECT U.username as name,U.uid as id from `tbl_users`U WHERE ( U.username LIKE :user OR U.uid = :uid ) AND U.uid > 0 ORDER BY U.username ASC LIMIT 5";
 				$bind = [ ":user" =>  "%{$data['userID']}%", ":uid" =>  $data['userID'] ];
 			}
 		}
@@ -155,14 +155,14 @@ class AdminCP extends Controlpanel {
 		return json_encode( $data );	
 	}
 
-	public function checkAccess($link, $exists = FALSE)
+	//public function checkAccess($link, $exists = FALSE)
+	public function checkAccess(string $link) :bool
 	{
-		if ( $exists ) return isset($this->access[$link]);
+		//if ( $exists ) return isset($this->access[$link]);
 		return ( isset($this->access[$link]) AND (int)$this->access[$link]&(int)$_SESSION['groups'] );
 	}
 
-//	public function menuShow($selected=FALSE)
-	public function menuShow($selected=FALSE)
+	public function menuShow(string $selected, string $module="") :array
 	{
 		$sql = "SELECT M.label, M.link, M.icon, M.child_of, M.link, M.evaluate, ";
 		if ( !($_SESSION['groups']&128) )
@@ -192,13 +192,21 @@ class AdminCP extends Controlpanel {
 			if( empty($item['evaluate']) OR 1 == eval("return (isset(\$this->config{$item['evaluate']})) ? \$this->config{$item['evaluate']} : 0;") )
 			{
 				if ( isset($menu[$item['child_of']]) )
+				{
 					$menu[$item['child_of']]['sub'][$item["link"]] = [ "label" => $item["label"], "icon" => $item["icon"], "requires" => $item["requires"] ];
+					if ( $item["link"] == "{$selected}/{$module}" )
+					{
+						$menu[$item['child_of']]['sub'][$item["link"]]["selected"] = 1;
+						$has_selected = 1;
+					}
+				}
 
 				else $menu[$item["link"]] = [ "label" => $item["label"], "icon" => $item["icon"], "requires" => $item["requires"] ];
 
 				$this->access[$item['link']] = $item["requires"];
 			}
 		}
+		if ( (empty($module) OR empty($has_selected)) and $selected ) $menu[$selected]["selected"] = 1;
 
 		/**
 			If menu is created for a moderator, traverse the menu and clear branches that can't be accessed
@@ -495,6 +503,38 @@ class AdminCP extends Controlpanel {
 		return NULL;
 	}
 	
+	public function characterAdd(string $name)
+	{
+		$character=new \DB\SQL\Mapper($this->db, $this->prefix.'characters');
+		$character->charname = $name;
+		$character->count = 0;
+		$character->save();
+		return $character->get('_id');
+	}
+	
+	public function characterSave(int $charid, array $data)
+	{
+		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'characters');
+		$tag->load(array('charid=?',$charid));
+		$tag->copyfrom( [ "catid" => $data['catid'], "charname" => $data['charname'], "biography" => $data['biography'] ]);
+
+		//if ( TRUE === $i = $tag->changed("tgid") ) $this->tagGroupRecount();
+		$i = $tag->changed("catid");
+		$i += $tag->changed("charname");
+		$i += $tag->changed("biography");
+
+		$tag->save();
+		return $i;
+	}
+
+	public function characterDelete(int $charid)
+	{
+		$character=new \DB\SQL\Mapper($this->db, $this->prefix.'characters');
+		$character->load(array('charid=? and (count=0 OR count IS NULL)',$charid));
+		
+		$_SESSION['lastAction'] = [ "deleteResult" => $character->erase() ];
+	}
+	
 	public function contestsList(int $page, array $sort) : array
 	{
 		$limit = 20;
@@ -504,7 +544,7 @@ class AdminCP extends Controlpanel {
 					C.conid, C.title, 
 					UNIX_TIMESTAMP(C.date_open) as date_open, UNIX_TIMESTAMP(C.date_close) as date_close, UNIX_TIMESTAMP(C.vote_closed) as vote_closed, 
 					C.cache_tags, C.cache_characters, 
-					U.nickname, COUNT(R.lid) as count
+					U.username, COUNT(R.lid) as count
 				FROM `tbl_contests`C
 					LEFT JOIN `tbl_users`U ON ( C.uid = U.uid )
 					LEFT JOIN `tbl_contest_relations`R ON ( C.conid = R.conid AND R.type='ST' )
@@ -530,7 +570,7 @@ class AdminCP extends Controlpanel {
 					GROUP_CONCAT(T.tid,',',T.label SEPARATOR '||') as tag_list,
 					GROUP_CONCAT(Ch.charid,',',Ch.charname SEPARATOR '||') as character_list, 
 					GROUP_CONCAT(Cat.cid,',',Cat.category SEPARATOR '||') as category_list, 
-					U.uid, U.nickname
+					U.uid, U.username
 					FROM `tbl_contests`C
 					LEFT JOIN `tbl_users`U ON ( C.uid=U.uid )
 					LEFT JOIN `tbl_contest_relations`RelC ON ( C.conid=RelC.conid )
@@ -671,14 +711,13 @@ class AdminCP extends Controlpanel {
 		$_SESSION['lastAction'] = [ "deleteResult" => $contest->erase() ];
 	}
 
-//	public function featuredList ( int $page, array $sort, string &$status )
-	public function featuredList( $page, array $sort, &$status )
+	public function featuredList ( int $page, array $sort, string &$status )
 	{
 		/*
 		int status = 
 			1: active
 			2: past
-			3: future
+			3: upcoming
 		*/
 
 		/*
@@ -690,7 +729,7 @@ class AdminCP extends Controlpanel {
 		SELECT * FROM `tbl_featured` WHERE status=2 OR end < NOW()
 		*/
 		/*
-		future:
+		upcoming:
 		SELECT * FROM `tbl_featured` WHERE start > NOW()
 		*/
 
@@ -699,7 +738,7 @@ class AdminCP extends Controlpanel {
 		
 		switch( $status )
 		{
-			case "future":
+			case "upcoming":
 				$join = "F.status=3 OR ( F.status IS NULL AND F.start > NOW() )";
 				break;
 			case "past":
@@ -735,7 +774,7 @@ class AdminCP extends Controlpanel {
 //	public function featuredLoad ( int $sid )
 	public function featuredLoad( $sid )
 	{
-		$sql = "SELECT SQL_CALC_FOUND_ROWS S.title, S.sid, S.summary, F.status, F.start, F.end, F.uid, U.nickname, S.cache_authors, S.cache_rating
+		$sql = "SELECT SQL_CALC_FOUND_ROWS S.title, S.sid, S.summary, F.status, F.start, F.end, F.uid, U.username, S.cache_authors, S.cache_rating
 					FROM `tbl_stories`S
 						LEFT JOIN `tbl_featured`F ON ( F.type='ST' AND F.id = S.sid )
 						LEFT JOIN `tbl_users`U ON ( F.uid = U.uid )
@@ -800,7 +839,7 @@ class AdminCP extends Controlpanel {
 		$limit = 50;
 		$pos = $page - 1;
 
-		$sql = "SELECT SQL_CALC_FOUND_ROWS U.uid, U.nickname, 
+		$sql = "SELECT SQL_CALC_FOUND_ROWS U.uid, U.username, 
 					L.uid as uid_reg, L.id, L.action, L.ip, UNIX_TIMESTAMP(L.timestamp) as timestamp, L.type, L.subtype, L.version, L.new
 				FROM `tbl_log`L LEFT JOIN `tbl_users`U ON L.uid=U.uid ";
 
@@ -1236,7 +1275,7 @@ class AdminCP extends Controlpanel {
 		if ( sizeof($similarExists) == 0 ) return NULL;
 		
 		// might be an existing title up for dual entry, let's notify the mod/admin
-		$sqlAuthors = "SELECT U.uid as id, U.nickname as name FROM `tbl_users`U WHERE FIND_IN_SET(U.uid,:uid);";
+		$sqlAuthors = "SELECT U.uid as id, U.username as name FROM `tbl_users`U WHERE FIND_IN_SET(U.uid,:uid);";
 		$authors = $this->exec($sqlAuthors,  [ ':uid' => $formData['new_author'] ] );
 		
 		return [ "storyInfo" => $similarExists[0], "preAuthor" => json_encode($authors) ];
@@ -1319,8 +1358,8 @@ class AdminCP extends Controlpanel {
 						)
 					,1,0) as blocked,
 					UNIX_TIMESTAMP(IF(Ch.chapid IS NULL,S.updated,Ch.created)) as lastdate,
-                    GROUP_CONCAT(DISTINCT U.uid ORDER BY U.nickname ASC SEPARATOR ', ') as aid,
-					GROUP_CONCAT(DISTINCT U.nickname ORDER BY U.nickname ASC SEPARATOR ', ') as authors
+                    GROUP_CONCAT(DISTINCT U.uid ORDER BY U.username ASC SEPARATOR ', ') as aid,
+					GROUP_CONCAT(DISTINCT U.username ORDER BY U.username ASC SEPARATOR ', ') as authors
 				FROM `tbl_stories`S
 					LEFT JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid AND Ch.validated >= 20 AND Ch.validated <= 30 )
 						LEFT JOIN `tbl_chapters`Ch2 ON
@@ -1474,6 +1513,7 @@ class AdminCP extends Controlpanel {
 	{
 		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'tags');
 		$tag->label = $name;
+		$tag->tgid = 1;
 		$tag->save();
 		return $tag->get('_id');
 	}
@@ -1623,7 +1663,7 @@ class AdminCP extends Controlpanel {
 
 	public function listTeam()
 	{
-		$sql = "SELECT SQL_CALC_FOUND_ROWS `uid`, `nickname`, `realname`, `groups` FROM `tbl_users` WHERE `groups` > 16 ORDER BY groups,nickname ASC";
+		$sql = "SELECT SQL_CALC_FOUND_ROWS `uid`, `username`, `realname`, `groups` FROM `tbl_users` WHERE `groups` > 16 ORDER BY groups,username ASC";
 		return $this->exec($sql);
 	}
 	
@@ -1639,7 +1679,7 @@ class AdminCP extends Controlpanel {
 		$pos = $page - 1;
 		$bind = [];
 
-		$sql = "SELECT SQL_CALC_FOUND_ROWS `uid`, `nickname`, `login`, `email`, UNIX_TIMESTAMP(registered) as registered, `groups`
+		$sql = "SELECT SQL_CALC_FOUND_ROWS `uid`, `username`, `login`, `email`, UNIX_TIMESTAMP(registered) as registered, `groups`
 					FROM `tbl_users`
 					WHERE `uid`>0";
 
@@ -1654,7 +1694,7 @@ class AdminCP extends Controlpanel {
 		if($search['term'])
 		{
 			$sql .="	AND (`login` LIKE :term1
-							or `nickname` LIKE :term2
+							or `username` LIKE :term2
 							or `realname` LIKE :term3
 							or `email` LIKE :term4
 							or `about` LIKE :term5) ";
@@ -1677,7 +1717,7 @@ class AdminCP extends Controlpanel {
 	//public function loadUser(int $uid)
 	public function loadUser($uid)
 	{
-		$sql = "SELECT uid, login, nickname, realname, email, UNIX_TIMESTAMP(registered) as registered, groups, curator, about
+		$sql = "SELECT uid, login, username, realname, email, UNIX_TIMESTAMP(registered) as registered, groups, curator, about
 					FROM `tbl_users`
 					WHERE uid = :uid;";
 		$data = $this->exec( $sql, [ ":uid" => $uid ] );
@@ -1699,40 +1739,6 @@ class AdminCP extends Controlpanel {
 		}
 		
 		return $user;
-	}
-	
-//	public function addTag(string $name) : int
-	public function addCharacter($name)
-	{
-		$character=new \DB\SQL\Mapper($this->db, $this->prefix.'characters');
-		$character->charname = $name;
-		$character->save();
-		return $character->get('_id');
-	}
-	
-//	public function saveCharacter(int $charid, array $data)
-	public function saveCharacter($charid, array $data)
-	{
-		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'characters');
-		$tag->load(array('charid=?',$charid));
-		$tag->copyfrom( [ "catid" => $data['catid'], "charname" => $data['charname'], "biography" => $data['biography'] ]);
-
-		//if ( TRUE === $i = $tag->changed("tgid") ) $this->tagGroupRecount();
-		$i = $tag->changed("catid");
-		$i += $tag->changed("charname");
-		$i += $tag->changed("biography");
-
-		$tag->save();
-		return $i;
-	}
-
-//	public function deleteCharacter(int $tid)
-	public function deleteCharacter($charid)
-	{
-		$character=new \DB\SQL\Mapper($this->db, $this->prefix.'characters');
-		$character->load(array('charid=? and count=0',$charid));
-		
-		$_SESSION['lastAction'] = [ "deleteResult" => $character->erase() ];
 	}
 	
 //	public function listCustompages(int $page, array $sort)
@@ -1820,8 +1826,7 @@ class AdminCP extends Controlpanel {
 		return TRUE;
 	}
 
-//	public function listNews(int $page, array $sort)
-	public function listNews($page, array $sort)
+	public function newsList(int $page, array $sort)
 	{
 		/*
 		$tags = new \DB\SQL\Mapper($this->db, $this->prefix.'tags' );
@@ -1830,7 +1835,7 @@ class AdminCP extends Controlpanel {
 		$limit = 20;
 		$pos = $page - 1;
 
-		$sql = "SELECT SQL_CALC_FOUND_ROWS N.nid, N.headline, U.nickname AS author, DATE(N.datetime) as date, UNIX_TIMESTAMP(N.datetime) as timestamp
+		$sql = "SELECT SQL_CALC_FOUND_ROWS N.nid, N.headline, U.username AS author, DATE(N.datetime) as date, UNIX_TIMESTAMP(N.datetime) as timestamp
 				FROM `tbl_news`N
 				LEFT JOIN `tbl_users`U ON (N.uid=U.uid)
 				ORDER BY {$sort['order']} {$sort['direction']}
@@ -1848,7 +1853,7 @@ class AdminCP extends Controlpanel {
 	}
 
 //	public function loadNews(int $id)
-	public function loadNews($id)
+	public function newsLoad(int $id)
 	{
 		$sql = "SELECT N.nid as id, N.headline, N.newstext, N.datetime, UNIX_TIMESTAMP(N.datetime) as timestamp FROM `tbl_news`N WHERE `nid` = :nid";
 		$data = $this->exec($sql, [":nid" => $id ]);
@@ -1862,7 +1867,7 @@ class AdminCP extends Controlpanel {
 	}
 
 //	public function addNews( string $headline )
-	public function addNews( $headline )
+	public function newsAdd( string $headline )
 	{
 		$news=new \DB\SQL\Mapper($this->db, $this->prefix.'news');
 		$news->uid = $_SESSION['userID'];
@@ -1873,7 +1878,7 @@ class AdminCP extends Controlpanel {
 	}
 
 //	public function saveNews(int $id, array $data)
-	public function saveNews($id, array $data)
+	public function newsSave(int $id, array $data)
 	{
 		if( empty($data['headline']) )
 		{
@@ -1906,7 +1911,7 @@ class AdminCP extends Controlpanel {
 	}
 	
 //	public function deleteNews( int $id )
-	public function deleteNews( $id )
+	public function newsDelete( int $id )
 	{
 		$delete = new \DB\SQL\Mapper($this->db, $this->prefix.'news');
 		if ( $delete->count( ["nid = ?", $id ] ) == 0 ) return FALSE;
@@ -1997,13 +2002,12 @@ class AdminCP extends Controlpanel {
 		return parent::addChapterText( $chapterData );
 	}
 	
-	//public function listShoutbox(int $page, array $sort)
-	public function listShoutbox($page, array $sort)
+	public function shoutList(int $page, array $sort)
 	{
 		$limit = 20;
 		$pos = $page - 1;
 
-		$sql = "SELECT SQL_CALC_FOUND_ROWS S.id, S.message, IF(S.guest_name IS NULL,U.nickname,S.guest_name) AS author, S.uid, DATE(S.date) as date, UNIX_TIMESTAMP(S.date) as timestamp
+		$sql = "SELECT SQL_CALC_FOUND_ROWS S.id, S.message, IF(S.guest_name IS NULL,U.username,S.guest_name) AS author, S.uid, DATE(S.date) as date, UNIX_TIMESTAMP(S.date) as timestamp
 				FROM `tbl_shoutbox`S
 				LEFT JOIN `tbl_users`U ON (S.uid=U.uid)
 				ORDER BY {$sort['order']} {$sort['direction']}
@@ -2020,7 +2024,7 @@ class AdminCP extends Controlpanel {
 		return $data;
 	}
 	
-	public function deleteShout($id)
+	public function shoutDelete(int $id)
 	{
 		$delete = new \DB\SQL\Mapper($this->db, $this->prefix.'shoutbox');
 		if ( $delete->count( ["id = ?", $id ] ) == 0 ) return FALSE;
@@ -2028,7 +2032,7 @@ class AdminCP extends Controlpanel {
 		return TRUE;
 	}
 
-	public function loadShoutbox($id)
+	public function shoutLoad(int $id)
 	{
 		$sql = "SELECT S.id, S.message FROM `tbl_shoutbox`S WHERE `id` = :id";
 		$data = $this->exec($sql, [":id" => $id ]);
@@ -2038,7 +2042,7 @@ class AdminCP extends Controlpanel {
 		return $data[0];
 	}
 
-	public function saveShout($id, array $data)
+	public function shoutSave(int $id, array $data)
 	{
 		$shout=new \DB\SQL\Mapper($this->db, $this->prefix.'shoutbox');
 		$shout->load(array('id=?',$id));

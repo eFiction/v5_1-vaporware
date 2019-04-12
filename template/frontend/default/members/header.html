@@ -1,0 +1,92 @@
+<h2>{{@userdata.username}}</h2>
+
+	<div class="navbar-brand">
+		<div id="navbarBurger" class="navbar-burger burger" data-target="memberMenu">
+			<span></span>
+			<span></span>
+			<span></span>
+		</div>
+	</div>
+
+	<div id="memberMenu" class="navbar-menu">
+		<div class="navbar-start">
+		<check if="{{ @userdata.extras.stories>0 }}">
+			<a class="navbar-item button navmenu" href="{{@BASE}}/member/{{ @userdata.username }}/stories">
+				<span class="icon">{ICON:reader}</span>
+				<span>{{ @userdata.extras.stories }} {{@LN__Stories}}</span>
+			</a> 
+		</check>
+		<check if="{{ @userdata.extras.favourites_count>0 }}">
+			<div class="navbar-item has-dropdown is-hoverable">
+				<a class="navbar-link button navmenu">
+					<span class="icon">{ICON:favourite}</span>
+					<span>{{ @LN__FavType_FAV, @userdata.extras.favourites_count | format }}</span>
+				</a> 
+				<div class="navbar-dropdown">
+				<repeat group="{{ @userdata.extras.favourites }}" value="{{ @favs }}">
+					<a class="navbar-item" href="{{@BASE}}/member/{{ @userdata.username }}/favourites/{{ @favs.1 }}">
+						<span class="icon">{ICON:favourite}</span>
+						<span>{{ ${"LN__FavType_".@favs[1]}, @favs.0 | format }}</span>
+					</a> 
+				</repeat>
+				</div>
+			</div>
+		</check>
+		<check if="{{ @userdata.extras.bookmarks_count>0 }}">
+			<div class="navbar-item has-dropdown is-hoverable">
+				<a class="navbar-link button navmenu">
+					<span class="icon">{ICON:bookmark}</span>
+					<span>{{ @LN__FavType_BM, @userdata.extras.bookmarks_count | format }}</span>
+				</a> 
+				<div class="navbar-dropdown">
+				<repeat group="{{ @userdata.extras.bookmarks }}" value="{{ @books }}">
+					<a class="navbar-item" href="{{@BASE}}/member/{{ @userdata.username }}/favourites/{{ @books.1 }}">
+						<span class="icon">{ICON:bookmark}</span>
+						<span>{{ ${"LN__FavType_".@books[1]}, @books.0 | format }}</span>
+					</a> 
+				</repeat>
+				</div>
+			</div>
+		</check>
+		</div>
+	
+		<div class="navbar-end">
+			<a class="navbar-item button navmenu" href="#">
+				<span class="icon">{ICON:user-friend}</span>
+				<span>{{@LN__Friend}}</span>
+			</a>
+			<a class="navbar-item button navmenu" href="#">
+				<span class="icon">{ICON:mail}</span>
+				<span>{{@LN__Contact}}</span>
+			</a>
+		</div>
+
+	</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+
+  // Get all "navbar-burger" elements
+  const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
+
+  // Check if there are any navbar burgers
+  if ($navbarBurgers.length > 0) {
+
+    // Add a click event on each of them
+    $navbarBurgers.forEach( el => {
+      el.addEventListener('click', () => {
+
+        // Get the target from the "data-target" attribute
+        const target = el.dataset.target;
+        const $target = document.getElementById(target);
+
+        // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
+        el.classList.toggle('is-active');
+        $target.classList.toggle('is-active');
+
+      });
+    });
+  }
+
+});
+</script>

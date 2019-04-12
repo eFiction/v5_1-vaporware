@@ -1,5 +1,6 @@
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
-<table class="tbody">
+<table class="table table is-striped is-hoverable is-fullwidth">
+<tbody>
 	<tr>
 		<th>&nbsp;</th>
 		<th>&nbsp;</th>
@@ -67,5 +68,6 @@
 		<td>{{ @row['comments'] }}</td>
 	</tr>
 	</repeat>
+</tbody>
 </table>
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>

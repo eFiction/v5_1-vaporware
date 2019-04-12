@@ -1,18 +1,17 @@
-<h1>{{@LN__NewStories}}</h1>
-<div class="index-box">
+<h5>{{@LN__NewStories}}</h5>
 <check if="{{sizeof(@renderData)>0}}">
 <true>
 	<repeat group="{{@renderData}}"  value="{{ @story }}" counter="{{ @ctr }}">
 		<check if="{{@extra=='large'}}">
 			<true>
-					<div class="listing">
+					<div class="updated-stories-box">
 						<div class="updated-title"><a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a> {{@LN__by}} 
 						<repeat group="{{@story.cache_authors}}" value="{{ @author }}" counter="{{ @ctr }}"><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/members/id={{@author.0}}">{{@author.1}}</a></repeat></div>
 						<div class="updated-summary">{{@story.summary | raw}}</div>
 					</div>
 			</true>
 			<false>
-					<div class="listing">
+					<div class="updated-stories-box">
 						<div class="updated-title">
 							<span class="toggle">
 								<span class="toggle_more">{ICON:square-down}</span>
@@ -31,4 +30,3 @@
 	{{@LN__noNewStory}}
 </false>
 </check>
-</div>

@@ -1,17 +1,34 @@
-<ul class="pagination">
-	<F3:check if="{{@paginate.firstPage}}">
-        <li><a href="{{@BASE . @paginate.route . @paginate.prefix.@paginate.firstPage}}">{ICON:angle-double-left} First</a></li>
-    </F3:check>
-	<F3:check if="{{@paginate.page>1}}">
-        <li><a href="{{@BASE . @paginate.route . @paginate.prefix.(@paginate.page-1)}}">{ICON:angle-left}</a></li>
-    </F3:check>
-	<F3:repeat group="{{@paginate.rangePages}}" value="{{@page}}">
-        <li><a {{@page == @paginate.page ? 'class="disabled"':'' }} href="{{@BASE . @paginate.route . @paginate.prefix.@page}}">{{@page}}</a></li>
-	</F3:repeat>
-	<F3:check if="{{@paginate.page<@paginate.count}}">
-        <li><a href="{{@BASE . @paginate.route . @paginate.prefix.(@paginate.page+1)}}">{ICON:angle-right}</a></li>
-    </F3:check>
-	<F3:check if="{{@paginate.lastPage}}">
-        <li><a href="{{@BASE . @paginate.route . @paginate.prefix.@paginate.count}}">Last [{{ @paginate.count }}] {ICON:angle-double-right}</a></li>
-    </F3:check>
-</ul>
+<br />
+<nav class="pagination is-centered" role="navigation" aria-label="pagination">
+  <a class="pagination-previous" {{(@paginate.page==1) ? 'disabled' : 'href='.@BASE . @paginate.route . @paginate.prefix.(@paginate.page-1)}}>{ICON:angle-double-left} Previous</a>
+  <a class="pagination-next" {{(@paginate.page==@paginate.count) ? 'disabled' : 'href='.@BASE . @paginate.route . @paginate.prefix.(@paginate.page+1)}}>Next page{ICON:angle-double-right}</a>
+  <!-- inner link list -->
+  <ul class="pagination-list">
+
+	<!-- show link to first page -->
+	<check if="{{(@paginate.firstPage > 1)}}">
+		<li><a class="pagination-link" href="{{@BASE . @paginate.route . @paginate.prefix}}1" aria-label="__GotoPage 1">1</a></li>
+	</check>
+
+	<!-- separator between first page and current range -->
+	<check if="{{(@paginate.firstPage > 2)}}">
+		<li><span class="pagination-ellipsis">&hellip;</span></li>
+	</check>
+	
+	<!-- current range -->
+	<loop from="{{ @i=@paginate.firstPage }}" to="{{ @i<(@paginate.lastPage+1)	}}" step="{{ @i++ }}">
+		<li><a class="pagination-link{{@i == @paginate.page ? ' is-current':'' }}" aria-label="__GotoPage {{@i}}" href="{{@BASE . @paginate.route . @paginate.prefix.@i}}">{{@i}}</a></li>
+	</loop>
+
+	<!-- separator between last page and current range -->
+	<check if="{{(@paginate.lastPage+1 < @paginate.count)}}">
+		<li><span class="pagination-ellipsis">&hellip;</span></li>
+	</check>
+
+	<!-- show link to last page -->
+	<check if="{{(@paginate.lastPage < @paginate.count)}}">
+		<li><a class="pagination-link{{@paginate.count == @paginate.page ? ' is-current':'' }}" href="{{@BASE . @paginate.route . @paginate.prefix.@paginate.count}}" aria-label="__GotoPage {{ @paginate.count }}">{{ @paginate.count }}</a></li>
+	</check>
+  </ul>
+</nav>
+<br />

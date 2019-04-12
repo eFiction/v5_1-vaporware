@@ -1,13 +1,16 @@
 <br />
 <br />
 <form method="post" action="{{@BASE}}/adminCP/settings/layout">
-<table class="tbody">
+<table class="table table is-striped is-hoverable is-fullwidth">
+<thead>
 	<tr>
 		<th>__default</th>
 		<th>__folder</th>
 		<th colspan="2">__available</th>
 		<th>__name</th>
 	</tr>
+</thead>
+<tbody>
 	<repeat group="{{ @data }}" value="{{ @row }}">
 	<tr>
 		<td>
@@ -36,9 +39,10 @@
 				<check if="{{ !array_key_exists(@row.folder, @config.layout_available) }}">checked="checked"</check> 
 			/>
 		</td>
-		<td><input class="text-input" type="text" value="{{ @row.name }}" name="form_special[{{ @row.folder }}][name]" readonly="readonly" /></td>
+		<td><input class="input" type="text" value="{{ @row.name }}" name="form_special[{{ @row.folder }}][name]" readonly="readonly" /></td>
 	</tr>
 	</repeat>
+</tbody>
 </table>
 <input class="button" type="submit"> <input class="button" type="reset">
 </form>

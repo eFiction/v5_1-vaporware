@@ -27,7 +27,7 @@
 		<td><check if="{{@row['uid']==@_SESSION['userID']}}"><true><a href="{{@BASE}}/userCP/shoutbox/edit/message={{ @row['id'] }};returnpath=/userCP/shoutbox/page={{@@paginate.page}}">{ICON:edit}</a></true><false>&nbsp;</false></check></td>
 		<td><check if="{{@row['uid']==@_SESSION['userID']}}"><true><a href="{{@BASE}}/userCP/shoutbox/delete/message={{ @row['id'] }};returnpath=/userCP/shoutbox/page={{@@paginate.page}}" class="deleteItem" title="Shout #{{ @row['id'] }}" id="{{ @row['id'] }}">{ICON:trash}</a></true><false>&nbsp;</false></check></td>
 		<td>{{ date(@CONFIG.datetime_format,@row.timestamp) }}</td>
-		<td>{{ @row.nickname | raw }}: {{ @row.message | raw }}</td>
+		<td>{{ @row.username | raw }}: {{ @row.message | raw }}</td>
 	</tr>
 	</repeat>
 </table>

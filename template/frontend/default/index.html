@@ -8,27 +8,42 @@
 		<meta name="keywords" content="{KEYWORDS}">
 		<meta name="description" content="">
 		<meta name="robots" content="INDEX,FOLLOW">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<title>{{@TITLE}}</title>
 		<link rel="shortcut icon" href="https://treknation.net/webpics/favicon.ico" type="image/x-icon" />
 		<link rel='stylesheet' type='text/css' href="{{@CSS_UI}}css/styles.css" />
 		<script src="https://code.jquery.com/jquery-3.3.1.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8=" crossorigin="anonymous"></script>
 		<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js" integrity="sha256-VazP97ZCwtekAsvgPBSUwPFKdrwD3unUfSGVYrahUqU=" crossorigin="anonymous"></script>
 		<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/themes/smoothness/jquery-ui.css">
+		<link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.8.1/css/all.css" integrity="sha384-50oBUHEmvpQ+1lW4y57PTFmhCaXp0ML5d60M1M7uH2+nqUivzIebhndOJK28anvf" crossorigin="anonymous">
 		<script src="{{ @BASE }}/app/js/jquery.tokeninput.js"></script>
-<check if="{{empty(@_COOKIE['cookieconsent_dismissed']) }}">
-		<!-- Begin Cookie Consent plugin by Silktide - http://silktide.com/cookieconsent -->
-			<script type="text/javascript">
-				window.cookieconsent_options = {"message":"{{@LN__CookieText}}","dismiss":"{{@LN__CookieAccept}}","learnMore":"{{@LN__CookieInfo}}","link":"{{@BASE}}/page/eucookie","theme":false};
-			</script>
-			<script type="text/javascript" src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/1.0.10/cookieconsent.min.js"></script>
-		<!-- End Cookie Consent plugin -->
-</check>
+	<check if="{{empty(@_COOKIE['cookieconsent_status']) }}">
+		<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.css" />
+		<script src="//cdnjs.cloudflare.com/ajax/libs/cookieconsent2/3.1.0/cookieconsent.min.js"></script>
+		<script>
+		window.addEventListener("load", function(){
+		window.cookieconsent.initialise({
+		  "theme": "classic",
+		  "position": "bottom-right",
+		  "content": {
+			"message": "{{@LN__CookieText}}",
+			"dismiss": "{{@LN__CookieAccept}}",
+			"link": "{{@LN__CookieInfo}}",
+			"href": "{{@BASE}}/page/eucookie"
+		  }
+		})});
+		</script>
+	</check>
 		{{ @JS_HEAD | raw }}
 		<check if="{{ isset(@bb2_javascript)}}">{{ @bb2_javascript | raw }}</check>
 	</head>
-<body>
-	{{ @BODY | raw }}
+<body class="has-navbar-fixed-top">
+<section class="is-fullheight">
+
+{{ @BODY | raw }}
+
+</section>
 	<check if="{{ isset(@JS_BODY)}}">{{ @JS_BODY | raw }}</check>
-	<check if="{{ isset(@DEBUGLOG) AND @_SESSION['groups']&64 }}"><div><textarea cols='120' rows='30'>{{ @DEBUGLOG }}</textarea></div></check>
+	<check if="{{ isset(@DEBUGLOG) AND @_SESSION['groups']&64 }}"><div><textarea cols='120' rows='3'>{{ @DEBUGLOG }}</textarea></div></check>
 </body>
 </html>

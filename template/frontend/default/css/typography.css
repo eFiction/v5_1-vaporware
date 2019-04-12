@@ -1,131 +1,41 @@
-/* import fonts */
-@import url(https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300|Maven+Pro:400,700|Bree+Serif|Overlock:400,400italic,700,900);
-@import url(font-awesome.min.css);
+@import url(https://fonts.googleapis.com/css?family=Open+Sans|Quicksand|Love+Ya+Like+A+Sister|Fauna+One);
+@import url(https://use.fontawesome.com/releases/v5.8.1/css/all.css);
 
 body, p {
-	font-family: 'Maven Pro', sans-serif;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: 300;
 	font-size: 11pt;
-	color: #141516;
-	}
+}
 
 code, kbd, pre, tt {
-  font-family: Consolas, monospace;
+	font-family: 'Consolas', monospace;
 	}
-	
-b, strong {
-	font-weight: 600;
-}
-
-/*-----------------  LINKS  -----------------*/
-a, a:active, a:visited {
-	font-weight: normal;
-	text-decoration: none;
-	text-transform: none;
-	color: #48779f;
-	-webkit-transition: 1s;
-	-moz-transition: 1s;
-	transition: 1s;
-	}
-
-a:hover { color: #efefef; }
-
-a.disabled { color: #141516; }
-
-
-a.button, a.button:active, a.button:visited {
-    margin: 0 auto;
-    padding: 6px 12px;
-    background-color: #2e2e2e;
-    border: none;
-    color: white !important;
-    text-decoration: none;
-    text-align: center;
-	cursor: pointer;
-    font-family: 'Open Sans', sans-serif;
-}
-a.button:hover {
-    -webkit-transition-duration: 0.4s; /* Safari */
-    transition-duration: 0.4s;
-	background-color: #dddddd;
-}
-
-/*-----------------  HEADLINES  -----------------*/
 
 h1, h2, h3, h4, h5, h6 {
-	font-family: 'Overlock', cursive;
+	font-family: 'Quicksand', sans-serif;
+	font-weight: 300;
 	}
 
-/* i.e. major headlines */
 h1 {
-	font-size: 24pt;
-	color: #32383e;
-	text-align: center;
-	font-weight: 300;
-	text-transform: uppercase;
-	letter-spacing: 0;
-	margin: 10px;
-	}
-
-/* i.e. news headlines */
+	font-size: 26pt;
+}
 h2 {
-	font-size: 20pt;
-	font-weight: 300;
-	}
-
-/* i.e. sidebar headlines */
+	text-align: center;
+	font-size: 24pt;
+}
 h3 {
-	font-size: 18pt;
 	text-align: center;
-	margin:  0 0 10px 0;
-	padding: 0; 
-	color: #32383e;
-	border-bottom: 1px dashed #dcdcdc;
-	font-weight: 300;
-	text-transform: none;
-	}
-
-/* i.e. updated & recent stories */
+	font-size: 20pt;
+	border-bottom: 1px solid #efefef;
+}
 h4 {
-	font-size: 16pt;
-	font-weight: 300;
-	font-style: normal;
 	text-align: center;
-	text-shadow: 0 1px 0 #fff;
-	text-transform: none;
-	border-width: 1px 1px 0 1px;
-	border-style: solid;
-	border-color: #e6e6e6;
-	margin: 5px 0 0 0;
-	padding: 0 0 0 15px;
-	}
-	
-/* i.e. story listing */
+	font-size: 18pt;
+}
 h5 {
-	font-size: 14pt;
-	font-weight: 300;
-	font-style: normal;
-	text-align: left;
-	text-shadow: 0 1px 0 #fff;
-	text-transform: none;
-	border-width: 0 0 1px 0;
-	border-style: solid;
-	border-color: #dcdcdc;
-	margin: 0;
-	padding: 5px 10px;
-	}
-	
-	/* i.e. add story form */
+	font-size: 16pt;
+	border-bottom: 1px solid #efefef;
+}
 h6 {
-	font-size: 11pt;
-	font-weight: normal;
-	font-style: normal;
-	text-align: left;
-	text-shadow: 0 1px 0 #fff;
-	text-transform: uppercase;
-	letter-spacing: 3px;
-	border-width: 0 0 0 0;
-	border-style: solid;
-	border-color: #dcdcdc;
-	margin: 0;
-	padding: 0 0 0 5px;
-	}
+	font-size: 14pt;
+}

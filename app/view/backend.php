@@ -34,7 +34,7 @@ class Backend extends Template
 								{
 									return Iconset::parse($icon);
 								}
-								, \Template::instance()->render('layout.html')
+								, \Template::instance()->render('index.html')
 							);
 
 		return $body;

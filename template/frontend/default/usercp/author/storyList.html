@@ -26,7 +26,8 @@
 *}
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
 <br/>
-<table class="tbody">
+<table class="table table is-striped is-hoverable is-fullwidth">
+<tbody>
 	<tr>
 		<th>&nbsp;</th>
 		<th><a href="{{@BASE}}/userCP/author/uid={{@author}}/{{@select}}/order=sid,
@@ -95,8 +96,9 @@
 		<td>{{ ${"LN__UCP_statusValidated_".@row.chapter_validated.0} }}</td>
 	</tr>
 	</repeat>
+</tbody>
 </table>
 </false>
 </check>
-<br/>
+<br />
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>

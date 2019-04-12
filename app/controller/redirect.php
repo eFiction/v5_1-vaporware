@@ -6,10 +6,10 @@ class Redirect extends Base
 
 	public function __construct()
 	{
-		
+		$this->template = new \View\Redirect();
 	}
 	
-	public function filter (\Base $f3, array $params): string
+	public function filter (\Base $f3, array $params)
 	{
 		// This is only a visual move, but nevertheless
 		if ( empty($params['a']) )
@@ -105,7 +105,7 @@ class Redirect extends Base
 		}
 		
 		if ( isset($COOKIE['redirect_seen'] ) ) $f3->reroute($redirect, false);
-		else $this->buffer( \View\Redirect::inform($redirect) );
+		else $this->buffer( $this->template->inform($redirect) );
 	}
 
 }

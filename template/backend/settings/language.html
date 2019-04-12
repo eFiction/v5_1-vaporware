@@ -1,7 +1,8 @@
 <br />
 <br />
 <form method="post" action="{{@BASE}}/adminCP/settings/language">
-<table class="tbody">
+<table class="table table is-striped is-hoverable is-fullwidth">
+<thead>
 	<tr>
 		<th>__default</th>
 		<th>__locale</th>
@@ -9,6 +10,8 @@
 		<th>__name</th>
 		<th>__localName</th>
 	</tr>
+</thead>
+<tbody>
 	<repeat group="{{ @data }}" value="{{ @row }}">
 	<tr>
 		<td>
@@ -41,6 +44,7 @@
 		<td><input class="text-input" type="text" value="{{ @row.localname }}" name="form_special[{{ @row.locale }}][localname]" readonly="readonly" /></td>
 	</tr>
 	</repeat>
+</tbody>
 </table>
 <input class="button" type="submit"> <input class="button" type="reset">
 </form>

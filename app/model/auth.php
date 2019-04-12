@@ -36,7 +36,7 @@ class Auth extends Base
 	public function userRecovery($username, $email)
 	{
 		$data = $this->exec(
-					"SELECT U.uid, U.nickname, U.email FROM `tbl_users`U WHERE ( U.email = :email AND U.email != '' ) OR ( U.login = :login );",
+					"SELECT U.uid, U.username, U.email FROM `tbl_users`U WHERE ( U.email = :email AND U.email != '' ) OR ( U.login = :login );",
 					[ ':email' => $email, ':login' => $username ]
 				);
 		if ( sizeof($data)>0 )
@@ -127,7 +127,7 @@ class Auth extends Base
 		$sql[] = "UPDATE `tbl_sessions`S SET lastvisited = CURRENT_TIMESTAMP WHERE S.session = '{$session_id}' AND S.ip = INET_ATON('{$_SERVER['REMOTE_ADDR']}');";
 
 		$sql[] = "SELECT S.session, UNIX_TIMESTAMP(S.lastvisited) as time, S.ip, IF(S.user,S.user,0) as userID, 
-						U.nickname, U.groups, U.preferences, U.cache_messaging, 
+						U.username, U.groups, U.preferences, U.cache_messaging, 
 						GROUP_CONCAT(DISTINCT U2.uid) as allowed_authors, 
 						@guests, @members
 							FROM `tbl_sessions`S 
@@ -410,7 +410,7 @@ class Auth extends Base
 	{
 		$newUser = new \DB\SQL\Mapper($this->db, $this->prefix."users");
 		$newUser->login			= $register['login'];
-		$newUser->nickname		= $register['login'];
+		$newUser->username		= $register['login'];
 		$newUser->email			= $register['email'];
 		$newUser->registered	= date("Y-m-d H:i:s",time());
 		$newUser->groups		= $register['groups'];

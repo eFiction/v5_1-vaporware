@@ -1,6 +1,5 @@
-<div class="sbarstats">
-	<h3>{{@LN__Stats_Archive}}</h3>
-	<table>
+<h4>{{@LN__Stats_Archive}}</h4>
+	<table class="stats-table">
 		<tr><td>{{@LN__Stats_Members}}:</td><td>{{@archiveStats.users}}</td></tr>
 		<tr><td>{{@LN__Stats_Authors}}:</td><td>{{@archiveStats.authors}}</td></tr>
 		<tr><td colspan="2">&nbsp;</td></tr>
@@ -12,6 +11,6 @@
 		<tr><td>{{@LN__Stats_Guests}}:</td><td>{{ @usercount['guest'] }}</td></tr>
 		<tr><td>{{@LN__Stats_Users}}:</td><td>{{ @usercount['member'] }}</td></tr>
 	</table>
-	<br />
-	{{@LN__Stats_LatestMember}}: <a href="{{@BASE}}/members/id={{@archiveStats.newmember.0}}">{{@archiveStats.newmember.1}}</a>.<br />
-</div>
+<br />
+{{@LN__Stats_LatestMember}}: <a href="{{@BASE}}/members/id={{@archiveStats.newmember.0}}">{{@archiveStats.newmember.1}}</a>.
+<br />

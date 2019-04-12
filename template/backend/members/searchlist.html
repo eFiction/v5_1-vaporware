@@ -38,7 +38,8 @@
 	</div>
 <div class="gb-full">
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
-<table class="tbody">
+<table class="table table is-striped is-hoverable is-fullwidth">
+<thead>
 	<tr>
 		<th>&nbsp;</th>
 		<th>G</th>
@@ -62,7 +63,7 @@
 						<false>desc">{ICON:sort-alpha-asc}</false>
 					</check>
 				</false>
-			</check></a> __Name
+			</check></a> {{@LN__Sort_Name}}
 		</th>
 		<th><a href="{{@BASE}}/adminCP/members/edit/{{@search.follow}}order=email,
 			<check if="{{ @sort['link']!='email' }}">
@@ -73,7 +74,7 @@
 						<false>desc">{ICON:sort-alpha-asc}</false>
 					</check>
 				</false>
-			</check></a> __Name
+			</check></a> {{@LN__Sort_Email}}
 		</th>
 		<th><a href="{{@BASE}}/adminCP/members/edit/{{@search.follow}}order=date,
 			<check if="{{ @sort['link']!='date' }}">
@@ -84,20 +85,23 @@
 						<false>desc">{ICON:sort-numeric-asc}</false>
 					</check>
 				</false>
-			</check></a> __Date
+			</check></a> {{@LN__Sort_Date}}
 		</th>
 		</th>
 	</tr>
+</thead>
+<tbody>
 	<repeat group="{{ @data }}" value="{{ @row }}">
 	<tr>
 		<td><a href="{{@BASE}}/adminCP/members/edit/uid={{ @row['uid'] }};returnpath=/adminCP/members/edit/{{@search.follow}}order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
 		<td>{{ floor(log(@row.groups, 2))  }}</td>
 		<td>{{ @row['uid'] }}</td>
-		<td>{{ @row['nickname'] }}</td>
+		<td>{{ @row['username'] }}</td>
 		<td>{{ @row['email'] }}</td>
 		<td>{{ date( \Config::getPublic('date_format'), $row['registered']) }}</td>
 	</tr>
 	</repeat>
+</tbody>
 </table>
 <F3:check if="{{isset(@paginate.firstPage) AND sizeof(@data)>5}}"><include href="paginate.html" /></F3:check>
 </div>

@@ -1,16 +1,20 @@
-<div class="menu">
-	<ul>
-	<repeat group="{{ @menuMain }}" value="{{ @item }}">
-		<li class='active'><a href='{{@BASE}}/{{@item.link}}'>{{@item.label}}</a></li>
+<!-- https://bulma.io/documentation/components/navbar/ -->
+
+<div class="navbar-menu">
+	 <repeat group="{{ @menuMain }}" value="{{ @item }}">
+		<a class="navbar-item" href='{{@BASE}}/{{@item.link}}'>{{@item.label}}</a>
 	</repeat>
-	</ul>
-	<check if="{{ ( @menuSub )}}">
-		<div class="submenu">
-			<ul>
+ 
+ 	<check if="{{ ( @menuSub )}}">
+    <div class="navbar-item has-dropdown">
+		<repeat group="{{ @menuMain }}" value="{{ @item }}">
+			<a class="navbar-link" href='{{@BASE}}/{{@item.link}}'>{{@item.label}}</a>
+		</repeat>
+	</div>
+		<div class="navbar-dropdown">
 			<repeat group="{{ @menuSub }}" value="{{ @item }}">
-				<li class='active'><a href='{{@BASE}}/{{@item.link}}'>{{@item.label}}</a></li>
+				<a class="navbar-item" href='{{@BASE}}/{{@item.link}}'>{{@item.label}}</a>
 			</repeat>
-			</ul>
 		</div>
 	</check>
 </div>

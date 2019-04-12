@@ -1,3 +1,78 @@
+<!-- https://bulma.io/documentation/form/
+
+<form method="post" action="{{@BASE}}/story/search/">
+	<fieldset><legend>{{@LN__AdvancedSearch}}</legend>
+<div class="field is-horizontal">
+  <div class="field-label is-normal">
+    <label class="label">{{@LN__Title}}</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <p class="control">
+        <input class="input" type="text" placeholder="Story title" name="story_title" value="<check if="{{isset(@searchForm.story_title)}}">{{@searchForm.story_title}}</check>">
+      </p>
+    </div>
+  </div>
+<br />
+  <div class="field-label is-normal">
+    <label class="label">{{@LN__Author}}</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <p class="control">
+        <input class="input" type="text" id="author-select" name="author" placeholder="Author">
+      </p>
+    </div>
+  </div>
+  <div class="field-label is-normal">
+    <label class="label">{{@LN__Categories}}</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <p class="control">
+        <input class="input" type="text" placeholder="category">
+      </p>
+    </div>
+  </div>
+<br />
+  <div class="field-label is-normal">
+    <label class="label">{{@LN__Characters}}</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <p class="control">
+        <input class="input" type="text" placeholder="category">
+      </p>
+    </div>
+  </div>
+<br />
+  <div class="field-label is-normal">
+    <label class="label">{{@LN__TagsInclude}}</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <p class="control">
+        <input class="input" type="text" placeholder="category">
+      </p>
+    </div>
+  </div>
+<br />
+  <div class="field-label is-normal">
+    <label class="label">{{@LN__TagsExclude}}</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <p class="control">
+        <input class="input" type="text" placeholder="category">
+      </p>
+    </div>
+  </div>
+</div>
+
+	</fieldset>
+</form>
+-->
+
 <form method="post" action="{{@BASE}}/story/search/">
 	<fieldset><legend>{{@LN__AdvancedSearch}}</legend>
 	<div class="grid-wrapper">
@@ -104,4 +179,5 @@ $(document).ready(function() {
     });
 });
 </script>
-<br />
+
+<br /><hr><br />

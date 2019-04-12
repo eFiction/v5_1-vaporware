@@ -1,19 +1,49 @@
 <check if="{{ isset(@deleteResult) }}">
-	<check if="{{ @deleteResult===0 }}"><div class="gb-90 alert-box error">{{@LN__FailedDelete}}</div></check>
-	<check if="{{ @deleteResult===1 }}"><div class="gb-90 alert-box success">{{@LN__ElementDeleted}}</div></check>
+	<!-- error notification -->
+	<check if="{{ @deleteResult===0 }}">
+		<div class="notification is-warning">
+			<button class="delete"></button>
+			{{@LN__FailedDelete}}
+		</div>
+	</check>
+	<!-- END: error notification -->
+	<!-- success notification -->
+	<check if="{{ @deleteResult===1 }}">
+		<div class="notification is-success">
+			<button class="delete"></button>
+			{{@LN__ElementDeleted}}
+		</div>
+	</check>
+	<!-- END: success notification -->
 </check>
 
-<form method="post" action="{{@BASE}}/adminCP/archive/tags/groups">
-	<div class="grid-wrapper">
-		<div class="gb-30"><input class="text-input" type="text" name="newTagGroup"></div>
-		<div class="gb-70"><input class="button" type="submit" value="{{@LN__ACP_NewTagGroup}}"></div>
+<div class="columns">
+	<div class="column is-half">
+	<!-- new tag form -->
+		<div class="notification">
+		<form method="post" action="{{@BASE}}/adminCP/archive/tags/groups">
+			<div class="field">
+				<label class="label">{{@LN__ACP_NewTagGroup}}</label>
+				<div class="control">
+					<input class="input" type="text" name="newTagGroup">
+				</div>
+			</div>
+			<div class="field">
+				<div class="control">
+					<button class="button is-link">{{@LN__Add}}</button>
+				</div>
+			</div>
+		</form>
+		</div>
+	<!-- END: new tag form -->
 	</div>
-</form>
+</div>
 
-<div class="alert-box info">{{@LN__ACP_TagGroupAdvice}}</div>
+<div class="notification">{{@LN__ACP_TagGroupAdvice}}</div>
 
 <check if="{{ isset(@form_error) }}"><div class="gb-90 alert-box error">{{ @form_error }}</div></check>
-<table class="tbody" id="textblockForm">
+<table class="table is-striped is-hoverable is-fullwidth" id="textblockForm">
+<thead>
 	<tr>
 		<th>&nbsp;</th>
 		<th>&nbsp;</th>
@@ -51,6 +81,8 @@
 			</check></a> {{@LN__Sort_Count}}
 		</th>
 	</tr>
+</thead>
+<tbody>
 	<repeat group="{{ @grouplist }}" value="{{ @row }}">
 	<tr>
 		<td><a href="{{@BASE}}/adminCP/archive/tags/groups/id={{ @row['tgid'] }}">{ICON:edit}</a></td>
@@ -69,4 +101,5 @@
 		<td>{{ @row['count'] }}</td>
 	</tr>
 	</repeat>
+</tbody>
 </table>

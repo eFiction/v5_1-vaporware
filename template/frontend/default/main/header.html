@@ -1,0 +1,45 @@
+<form method="post" action="{{ @BASE }}/login">
+<nav class="navbar is-fixed-top has-shadow" role="navigation" aria-label="main navigation">
+	<div class="navbar-menu">
+	<check if="{{ @SESSION['userID']==0 }}">
+		<true>
+			<div class="navbar-start">
+				<div class="navbar-item">{{@LN__Welcome }}&nbsp;{{@LN__Guest}}</div>
+			</div>	
+			<div class="navbar-end">
+				<div class="navbar-item">
+					<p class="control has-icons-left">
+						<input class="input" type="text" placeholder="{{@LN__Username}}" name="login">
+						<span class="icon is-small is-left">{ICON:member}</span>
+					</p>
+				</div>
+				<div class="navbar-item">
+					<p class="control has-icons-left">
+						<input class="input" type="password" placeholder="{{@LN__Password}}" name="password">
+						<span class="icon is-small is-left">{ICON:sign-in}</span>
+					</p>
+				</div>
+				<div class="navbar-item field"><input class="input" type="submit" value="{{@LN__Login}}"></div>
+				<check if="{{ @CONFIG.allow_registration AND @CONFIG.maintenance==FALSE}}"> <a class="navbar-item" href="{{ @BASE }}/register">{{@LN__RegisterNow}}</a></check>
+			</div>
+		</true>
+		<false>
+			<div class="navbar-start">
+				<div class="navbar-item">{{ @LN__Welcome }} {{ @SESSION['username'] }}</div>
+				<check if="{{ @CONFIG.maintenance==FALSE OR @SESSION['groups'] & 128 }}">
+					<a class="navbar-item" href="{{ @BASE }}/userCP/messaging/inbox">{{ @SESSION['mail'][0] }}&nbsp;{ICON:mail}&nbsp;({{ @SESSION['mail'][1] }} {{@LN__PM_unread}})</a>
+					<a class="navbar-item" href="{{ @BASE }}/userCP">{{@LN__UserCP}}</a>
+				</check>
+				<check if="{{ @SESSION['groups'] & 32 }}">
+					<a class="navbar-item" href="{{ @BASE }}/adminCP">{{@LN__AdminCP}}</a>
+				</check>
+			</div>
+			<div class="navbar-end">
+				<a class="navbar-item" href="{{ @BASE }}/logout;returnpath={{ @PATH }}">{ICON:sign-out}&nbsp;{{@LN__Logout}}</a>
+			</div>
+		</false>
+	</check>
+	</div>
+</nav>
+<input type="hidden" name="returnpath" value="{{ @PATH }}">
+</form>

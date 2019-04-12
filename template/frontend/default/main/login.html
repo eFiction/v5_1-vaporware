@@ -1,13 +1,13 @@
 <check if="{{ isset(@lostpw) }}">
 <div class="alert-box info">
-{{@LN__ResetPWMail}}.<br/>
-<br/>
-<a href="{{ @BASE }}{{ @returnpath}}">{{@LN__ClickCont}}</a>
-	</div>
+	{{@LN__ResetPWMail}}.<br/>
+	<br/>
+	<a href="{{ @BASE }}{{ @returnpath}}">{{@LN__ClickCont}}</a>
+</div>
 </check>
 <check if ="{{ isset(@tokenform)}}">
-<div class="grid-wrapper">
-	<div class="gb-half">
+<div class="columns">
+	<div class="columns is-half">
 			<fieldset>
 				<legend>{{ @LN__PWRecovery }}</legend>
 				<form method="post" action="{{ @BASE }}/login/token">
@@ -35,8 +35,8 @@ Good!
 <check if ="{{ isset(@loginform)}}">
 	<check if="{{ isset(@error) }}"><div class="gb-full"><div class="alert-box error">{{ ${'LN__'.@error} }}</div></div></check>
 	<check if="{{ isset(@login.info) }}"><div class="gb-full"><div class="alert-box info">{{@login.info}}</div></div></check>
-<div class="grid-wrapper">
-	<div class="gb-half">
+<div class="columns">
+	<div class="column is-half">
 			<fieldset>
 				<legend>{{ @LN__Login }}</legend>
 				<form method="post" action="{{ @BASE }}/login">
@@ -46,7 +46,7 @@ Good!
 				</form>
 			</fieldset>
 	</div>
-	<div class="gb-half">
+	<div class="column is-half">
 			<fieldset>
 				<legend>{{@LN__ForgotPW}}?</legend>
 				<form method="post" action="{{ @BASE }}/login">
@@ -57,8 +57,10 @@ Good!
 				</form>
 			</fieldset>
 	</div>
-	<check if="{{ @CONFIG.allow_registration }}">
-	<div class="gb-full"><a href="{{ @BASE }}/register">{{@LN__RegisterNow}}</a></div>
-	</check>
 </div>
+<check if="{{ @CONFIG.allow_registration }}">
+<div class="columns">
+	<div class="columns"><a href="{{ @BASE }}/register">{{@LN__RegisterNow}}</a></div>
+</div>
+</check>
 </check>

@@ -1,0 +1,23 @@
+<footer class="footer">
+  <div class="container">
+    <div class="columns">
+      <div class="column is-3">
+        <p id="tsp">
+            <img width="128" height="24" alt="Made with Bulma" src="https://bulma.io/images/made-with-bulma.png">
+          <small>
+            <br>
+            Source code licensed <a href="http://opensource.org/licenses/mit-license.php">MIT</a>.
+            <br>
+            Website content licensed <a href="http://creativecommons.org/licenses/by-nc-sa/4.0/" rel="license">CC BY-NC-SA 4.0</a>.
+          </small>
+        </p>
+      </div>
+		<div class="column is-9">
+			{PAGE:footer}<br />
+				{{ \Base::instance()->format('eFiction v{0}, using {1}, page rendered in {2} msecs / Memory usage {3} KB',@APP_VERSION,@DBType,round(1e3*(microtime(TRUE)-$TIME),2),round(memory_get_usage(TRUE)/1e3,1)) }}
+				<check if="{{isset(@bb2_stats)}}"><small><br/>BB block {{@bb2_stats}}</small></check>
+		</div>
+    </div>
+  </div>
+</footer>
+{BLOCK:HONEYPOT}

@@ -48,7 +48,7 @@ class Auth extends Base {
 				$_SESSION,
 				[
 					'groups' 			=> 	$user['groups'],
-					'username'			=> 	$user['nickname'],
+					'username'			=> 	$user['username'],
 					'mail'				=> 	[ 
 												(int)@$user['cache_messaging']['inbox']['sum'], 
 												(int)@$user['cache_messaging']['unread']['sum']
@@ -134,7 +134,7 @@ class Auth extends Base {
 			
 			$mailText = \View\Auth::lostPWMail($f3, $recovery, $token);
 			
-			return $this->mailman($f3->get('LN__PWRecovery'), $mailText, $recovery['email'], $recovery['nickname']);
+			return $this->mailman($f3->get('LN__PWRecovery'), $mailText, $recovery['email'], $recovery['username']);
 		}
 		return FALSE;
 	}

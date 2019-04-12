@@ -1,11 +1,10 @@
-<div class="feature">
-<h3>{{@LN__RecommendedStory, sizeof(@renderData) | format}}</h3>
+<h5>{{@LN__RecommendedStory, sizeof(@renderData) | format}}</h5>
 <check if="{{sizeof(@renderData)>0}}">
 <true>
 	<repeat group="{{@renderData}}"  value="{{ @story }}">
-		<div class='feature'>
+		<div class='recommended'>
 			<a href="{{@story.url}}" target="_blank">{{@story.title}}</a> {ICON:external-link} {{@LN__by}} {{@story.author}}<br />
-			{{@LN__RecommBy}} <a href="{{@BASE}}/members/id={{@story.uid}}">{{@story.nickname}}</a><br />
+			{{@LN__RecommBy}} <a href="{{@BASE}}/members/id={{@story.uid}}">{{@story.username}}</a><br />
 			<check if="{{isset(@story.cache_categories.0.1)}}">
 				<repeat group='@story.cache_categories' value='@category' counter='{{ @ctr }}'><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/story/browse/catIn={{@category.0}}">{{@category.1}}</a></repeat><br />
 			</check>
@@ -22,4 +21,3 @@
 	{{@LN__noRecommendedStory}}
 </false>
 </check>
-</div>

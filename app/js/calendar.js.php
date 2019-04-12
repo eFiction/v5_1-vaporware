@@ -1,3 +1,4 @@
+<?php header('Content-type: text/javascript'); ?>
 // calendar boot function
 $(document).ready(function ()
 { getCalendar("current"); });

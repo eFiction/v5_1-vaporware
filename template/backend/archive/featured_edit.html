@@ -7,14 +7,14 @@
 		<div class="gb-20">{{@LN__by}}:</div><div class="gb-80"><repeat group="{{ @data['cache_authors'] }}" value="{{ @author }}" counter="{{ @count }}"><check if="{{@count >1}}">, </check>{{ @author.1 }}</repeat></div>
 		<check if="{{ @data.status == NULL AND @data.start == NULL }}">
 			<true><div class="gb-90 alert-box warning">__No featured data yet</div></true>
-			<false><div class="gb-20">{{@LN__SelectedBy}}:</div><div class="gb-80">{{ @data['nickname'] }}&nbsp;</div></false>
+			<false><div class="gb-20">{{@LN__SelectedBy}}:</div><div class="gb-80">{{ @data['username'] }}&nbsp;</div></false>
 		</check>
 		<div class="gb-20">{{@LN__Status}}:</div>
 			<div class="gb-80"><input type="radio" id="curr" name="form_data[status]" value="1" <check if="{{@data.status==1}}">checked="checked" </check>/><label for="curr"> {{@LN__Feat_Current}}</label></div>
 		<div class="gb-20">&nbsp;</div>
 			<div class="gb-80"><input type="radio" id="past" name="form_data[status]" value="2" <check if="{{@data.status==2}}">checked="checked" </check>/><label for="past"> {{@LN__Feat_Past}}</label></div>
 		<div class="gb-20">&nbsp;</div>
-			<div class="gb-80"><input type="radio" id="futu" name="form_data[status]" value="3" <check if="{{@data.status==3}}">checked="checked" </check>/><label for="futu"> {{@LN__Feat_Future}}</label></div>
+			<div class="gb-80"><input type="radio" id="futu" name="form_data[status]" value="3" <check if="{{@data.status==3}}">checked="checked" </check>/><label for="futu"> {{@LN__Feat_Upcoming}}</label></div>
 {*
 		<div class="gb-20">&nbsp;</div>
 			<div class="gb-80"><input type="radio" id="auto" name="form_data[status]" value="-1" <check if="{{@data.status==NULL}}">checked="checked" </check>/><label for="auto"> Auto</label></div>

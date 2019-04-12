@@ -1,1 +1,11 @@
-Hello!
+<article class="message">
+  <div class="message-body">
+    {{ @LN__Welcome }} {{ @SESSION['username'] }} 
+  </div>
+</article>
+
+<article class="message is-info">
+  <div class="message-body">
+    You have <a href="{{ @BASE }}/userCP/messaging/inbox">{{ @SESSION['mail'][1] }} {{@LN__PM_unread}}</a> messages in your inbox.
+  </div>
+</article>

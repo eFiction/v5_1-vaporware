@@ -22,9 +22,9 @@ class AdminCP extends Base
 		$this->response->addTitle( \Base::instance()->get('LN__AdminCP') );
 	}
 
-	protected function menuShow($selected=FALSE)//: void
+	protected function menuShow($selected=FALSE, $module="")//: void
 	{
-		$menu = $this->model->menuShow($selected);
+		$menu = $this->model->menuShow($selected,(string)$module);
 		$this->buffer
 		( 
 			$this->template->menuShow($menu), 
@@ -73,7 +73,7 @@ class AdminCP extends Base
 		// declare module
 		$this->moduleBase = "archive";
 		// build menu and access list
-		$this->menuShow($this->moduleBase);
+		$this->menuShow($this->moduleBase, @$params['module']);
 		// add module title
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Archive') );
 		$f3->set('title_h1', $f3->get('LN__AdminMenu_Archive') );
@@ -144,6 +144,7 @@ class AdminCP extends Base
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Archive') );
 		$data['General'] = $this->model->settingsFields('archive_general');
 		$data['Intro'] = $this->model->settingsFields('archive_intro');
+		$data['Authors'] = $this->model->settingsFields('archive_authors');
 		$this->buffer( $this->template->settingsFields($data, "archive/home", $feedback) );
 	}
 	
@@ -226,9 +227,16 @@ class AdminCP extends Base
 		{
 			if ( isset($_POST['form_data']) )
 			{
-				if ( FALSE === $changes = $this->model->contestSave($params['id'], $f3->get('POST.form_data') ) )
-					$errors = $f3->get('form_error');
-			}
+				$f3->set
+				(
+					'form_changes',
+					$this->model->contestSave
+					(
+						$params['id'],
+						$f3->get('POST.form_data')
+					)
+				);
+			}			
 			elseif ( isset($_POST['entries_data']) )
 			{
 				//if ( FALSE === $changes = $this->model->contestSave($params['id'], $f3->get('POST.form_data') ) )
@@ -243,7 +251,7 @@ class AdminCP extends Base
 				}
 				// Error handling
 			}
-			elseif ( isset($_POST['charid']) ) $params['id'] = $f3->get('POST.charid');
+			elseif ( isset($_POST['conid']) ) $params['id'] = $f3->get('POST.conid');
 		}
 
 		if( isset ($params['id']) )
@@ -263,8 +271,6 @@ class AdminCP extends Base
 				//$data['categories'] = $this->model->getCategories();
 				//$data['tags']
 				$data['raw'] = @$params['raw'];
-				$data['errors'] = @$errors;
-				$data['changes'] = @$changes;
 				return $this->template->contestEdit($data, @$params['returnpath']);
 			}
 		}
@@ -298,18 +304,26 @@ class AdminCP extends Base
 
 		if ( isset($params['delete']) )
 		{
-			$this->model->deleteCharacter( (int)$params['delete'] );
+			$this->model->characterDelete( (int)$params['delete'] );
 			$f3->reroute('/adminCP/archive/characters', false);
 		}
 		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
 		{
 			if ( isset($_POST['form_data']) )
 			{
-				$changes = $this->model->saveCharacter($params['id'], $f3->get('POST.form_data') );
+				$f3->set
+				(
+					'form_changes',
+					$this->model->characterSave
+					(
+						$params['id'],
+						$f3->get('POST.form_data')
+					)
+				);
 			}
 			elseif ( isset($_POST['newCharacter']) )
 			{
-				$newID = $this->model->addCharacter( $f3->get('POST.newCharacter') );
+				$newID = $this->model->characterAdd( $f3->get('POST.newCharacter') );
 				$f3->reroute('/adminCP/archive/characters/id='.$newID, false);
 			}
 			elseif ( isset($_POST['charid']) ) $params['id'] = $f3->get('POST.charid');
@@ -319,8 +333,6 @@ class AdminCP extends Base
 		{
 			$data = $this->model->characterLoad($params['id']);
 			$data['categories'] = $this->model->categories();
-			$data['errors'] = @$errors;
-			$data['changes'] = @$changes;
 			return $this->template->characterEdit($data, @$params['returnpath']);
 		}
 
@@ -383,7 +395,15 @@ class AdminCP extends Base
 		{
 			if ( isset($_POST['form_data']) )
 			{
-				$changes = $this->model->tagSave($params['id'], $f3->get('POST.form_data') );
+				$f3->set
+				(
+					'form_changes',
+					$this->model->tagSave
+					(
+						$params['id'],
+						$f3->get('POST.form_data')
+					)
+				);
 			}
 			elseif ( isset($_POST['newTag']) )
 			{
@@ -393,13 +413,11 @@ class AdminCP extends Base
 			elseif ( isset($_POST['tid']) ) $params['id'] = $f3->get('POST.tid');
 		}
 		
-		if( isset ($params['id']) )
+		if( isset ($params['id']) AND is_numeric($params['id']) )
 		{
 			$data = $this->model->tagLoad($params['id']);
 			$data['groups'] = $this->model->tagGroups();
-			$data['errors'] = @$errors;
-			$data['changes'] = @$changes;
-			$this->buffer( $this->template->tagEdit($data) );
+			$this->buffer( $this->template->tagEdit($data, @$params['returnpath']) );
 			return;
 		}
 
@@ -544,7 +562,17 @@ class AdminCP extends Base
 		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
 		{
 			if ( isset($_POST['form_data']) )
-				$changes = $this->model->categorySave($params['id'], $f3->get('POST.form_data') );
+			{
+				$f3->set
+				(
+					'form_changes',
+					$this->model->categorySave
+					(
+						$params['id'],
+						$f3->get('POST.form_data')
+					)
+				);
+			}
 		}
 
 		if ( isset($params['id']) )
@@ -559,7 +587,6 @@ class AdminCP extends Base
 			$data['move'] = array_merge([ [ "cid" => 0, "parent_cid" => 0, "leveldown" => -1, "category" => $f3->get('LN__ACP_MainCategory')] ], $data['move'] );
 			$data['stats'] = json_decode($data['stats'],TRUE);
 			$data['errors'] = @$errors;
-			$data['changes'] = @$changes;
 			$this->buffer( $this->template->categoryEdit($data) );
 			return;
 		}
@@ -621,7 +648,7 @@ class AdminCP extends Base
 		// declare module
 		$this->moduleBase = "home";
 		// build menu and access list
-		$this->menuShow($this->moduleBase);
+		$this->menuShow($this->moduleBase, @$params['module']);
 		// add module title
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Home') );
 		$f3->set('title_h1', $f3->get('LN__AdminMenu_Home') );
@@ -716,7 +743,7 @@ class AdminCP extends Base
 			elseif ( isset($_POST['newPage']) )
 			{
 				if ( FALSE === $newID = $this->model->addCustompage( $f3->get('POST.newPage') ) )
-					$f3->set('form_error', "__DuplicateLabel ".$f3->get('POST.newPage') );
+					$f3->set('form_error', [ $f3->get('LN__DuplicateLabel'), $f3->get('POST.newPage') ] );
 				else
 				{
 					$f3->reroute('/adminCP/home/custompages/id='.$newID, false);
@@ -730,7 +757,7 @@ class AdminCP extends Base
 			if ( NULL !== $data = $this->model->loadCustompage($params['id']) )
 			{
 				$data['raw'] = $params['raw'] ?? NULL;
-				$this->buffer( $this->template->custompageEdit($data) );
+				$this->buffer( $this->template->custompageEdit($data, @$params['returnpath']) );
 				return;
 			}
 			else $f3->set('form_error', "__failedLoad");
@@ -824,7 +851,7 @@ class AdminCP extends Base
 
 		if ( isset($params['delete']) )
 		{
-			if ( $this->model->deleteShout( (int)$params['delete'] ) )
+			if ( $this->model->shoutDelete( (int)$params['delete'] ) )
 			{
 				$f3->reroute("/adminCP/home/shoutbox/order={$sort['order']},{$sort['direction']}/page={$page}", false);
 				exit;
@@ -840,7 +867,7 @@ class AdminCP extends Base
 					'form_changes',
 					[
 						$params['id'],
-						$this->model->saveShout
+						$this->model->shoutSave
 						(
 							$params['id'],
 							$f3->get('POST.form_data')
@@ -852,7 +879,7 @@ class AdminCP extends Base
 
 		if( isset ($params['id']) AND $f3->get('form_changes')=="" )
 		{
-			if ( NULL !== $data = $this->model->loadShoutbox($params['id']) )
+			if ( NULL !== $data = $this->model->shoutLoad($params['id']) )
 			{
 				$data['raw'] = $params['raw'] ?? NULL;
 				$this->buffer( $this->template->shoutEdit($data, $sort, $page) );
@@ -865,7 +892,7 @@ class AdminCP extends Base
 		(
 			$this->template->shoutList
 			(
-				$this->model->listShoutbox($page, $sort),
+				$this->model->shoutList($page, $sort),
 				$sort
 			)
 		);
@@ -880,7 +907,7 @@ class AdminCP extends Base
 
 		if ( isset($params['delete']) )
 		{
-			if ( $this->model->deleteNews( (int)$params['delete'] ) )
+			if ( $this->model->newsDelete( (int)$params['delete'] ) )
 			{
 				$f3->reroute('/adminCP/home/news', false);
 				exit;
@@ -894,7 +921,7 @@ class AdminCP extends Base
 				$f3->set
 				(
 					'form_changes',
-					$this->model->saveNews
+					$this->model->newsSave
 					(
 						$params['id'],
 						$f3->get('POST.form_data')
@@ -903,14 +930,14 @@ class AdminCP extends Base
 			}
 			elseif ( isset($_POST['newHeadline']) )
 			{
-				if ( FALSE !== $newID = $this->model->addNews( $f3->get('POST.newHeadline') ) )
+				if ( FALSE !== $newID = $this->model->newsAdd( $f3->get('POST.newHeadline') ) )
 					$f3->reroute('/adminCP/home/news/id='.$newID, false);
 			}
 		}
 		
 		if( isset ($params['id']) )
 		{
-			if ( NULL !== $data = $this->model->loadNews($params['id']) )
+			if ( NULL !== $data = $this->model->newsLoad($params['id']) )
 			{
 				$data['raw'] = $params['raw'] ?? NULL;
 				$this->buffer( $this->template->newsEdit($data, @$params['returnpath']) );
@@ -939,7 +966,7 @@ class AdminCP extends Base
 		(
 			$this->template->newsList
 			(
-				$this->model->listNews($page, $sort),
+				$this->model->newsList($page, $sort),
 				$sort
 			)
 		);
@@ -950,7 +977,7 @@ class AdminCP extends Base
 		// declare module
 		$this->moduleBase = "members";
 		// build menu and access list
-		$this->menuShow($this->moduleBase);
+		$this->menuShow($this->moduleBase, @$params['module']);
 		// add module title
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Members') );
 
@@ -1038,7 +1065,7 @@ class AdminCP extends Base
 		// search/browse
 		$allow_order = array (
 				"id"		=>	"uid",
-				"name"		=>	"nickname",
+				"name"		=>	"username",
 				"date"		=>	"registered",
 				"email"		=>	"email",
 		);
@@ -1101,7 +1128,7 @@ class AdminCP extends Base
 		// declare module
 		$this->moduleBase = "settings";
 		// build menu and access list
-		$this->menuShow($this->moduleBase);
+		$this->menuShow($this->moduleBase, @$params['module']);
 		// add module title
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Settings') );
 		// implement a Cache killswitch:
@@ -1253,7 +1280,7 @@ class AdminCP extends Base
 		// declare module
 		$this->moduleBase = "stories";
 		// build menu and access list
-		$this->menuShow($this->moduleBase);
+		$this->menuShow($this->moduleBase, @$params['module']);
 		// add module title
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Stories') );
 

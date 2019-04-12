@@ -52,16 +52,16 @@ class Frontend extends Template
 
 	public function tagWork($tpl)
 	{
-		$expression = "/{(BLOCK|PAGE|LINK):([a-z][\w]*)([\.\w]*)}/is";
+		$expression = "/{(BLOCK|PAGE|LINK):([a-z][\w]*)(?:\.([\.\w]*))*}/is";
 
 		if( preg_match($expression,$tpl,$match) )
 		{
 			/*
 				$match = array
-					[0] => {BLOCK:menu.main}
+					[0] => {BLOCK:menu.main.1}
 					[1] => BLOCK
 					[2] => menu
-					[3] => .main
+					[3] => main.1
 			*/
 			if ( $match[1] == "BLOCK" AND $match[2] == "HONEYPOT" )
 			{
@@ -73,16 +73,16 @@ class Frontend extends Template
 				// call or recall block module
 				$qq = $this->modules[$match[2]][1];
 				if ( isset($this->modules[$match[2]][2]) )
-					$tpl = str_replace ( $match[0], $call::{$this->modules[$match[2]][1]}($match[3]), $tpl );
+					$tpl = str_replace ( $match[0], $call::{$this->modules[$match[2]][1]}(@$match[3]), $tpl );
 				else
-					$tpl = str_replace ( $match[0], $call::instance()->{$this->modules[$match[2]][1]}($match[3]), $tpl );
+					$tpl = str_replace ( $match[0], $call::instance()->{$this->modules[$match[2]][1]}(@$match[3]), $tpl );
 			}
 			elseif ( $match[1] == "PAGE" )
 			{
 				$page = \View\Page::load($match[2]);
 				$tpl = str_replace ( $match[0], $page, $tpl );
 			}
-			else $tpl = str_replace ( $match[0], "*{$match[2]}*", $tpl );
+			else $tpl = str_replace ( $match[0], "*missing block: {$match[2]}*", $tpl );
 			return $this->tagWork ( $tpl );
 		}
 		else return $tpl;

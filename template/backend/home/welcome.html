@@ -1,50 +1,56 @@
 <h2>Welcome to the admin panel!</h2>
 <br />
 <h3>Version check:</h3><br />
-<div class="grid-wrapper">
-<div class="gb-50">Your local version:</div><div class="gb-20"><span class="alert-box blank">{{@versions_compare.base}}</span></div><div class="gb-20">&nbsp;</div>
+<!-- local version -->
+<div class="columns">
+	<div class="column is-one-quarter">Your local version:</div>
+	<div class="column is-one-quarter"><div class="notification">{{@versions_compare.base}}</div></div>
+</div>
+
+<div class="columns">
 <check if="{{@script_versions}}">
 	<true>
-		<div class="gb-50">Current stable version:</div>
+		<!-- stable release -->
+		<div class="column is-one-quarter">Current stable version:</div>
 		<check if="{{@script_versions.stable}}">
 			<true>
+				<div class="column is-one-quarter"><div class="notification">{{@script_versions.stable}}</div></div>
 				<check if="{{(int)@versions_compare.stable===1}}">
-					<div class="gb-20"><span class="alert-box info">{{@script_versions.stable}}</span></div>
-					<div class="gb-30">newer version available</div>
+					<div class="column is-one-quarter">newer version available</div>
 				</check>
 				<check if="{{(int)@versions_compare.stable===0}}">
-					<div class="gb-20"><span class="alert-box success">{{@script_versions.stable}}</span></div>
-					<div class="gb-30">same as server</div>
+					<div class="column is-one-quarter">same as server</div>
 				</check>
 				<check if="{{(int)@versions_compare.stable===-1}}">
-					<div class="gb-20"><span class="alert-box warning">{{@script_versions.stable}}</span></div>
-					<div class="gb-30">newer than server version</div>
+					<div class="column is-one-quarter">newer than server version</div>
 				</check>
 			</true>
 			<false>
-				<div class="gb-20"><span class="alert-box warning">N/A</span></div>
-				<div class="gb-30">no download available</div>
+				<div class="column is-one-quarter"><div class="notification">N/A</div></div>
+				<div class="column is-one-quarter"><div class="notification is-warning">no download available</div></div>
 			</false>
 		</check>
-		<div class="gb-50">Current development version:</div>
+		</div>
+		<div class="columns">
+
+		<!-- development release -->
+		<div class="column is-one-quarter">Current development version:</div>
 		<check if="{{@script_versions.dev}}">
 			<true>
+				<div class="column is-one-quarter"><div class="notification">{{@script_versions.dev}}</div></div>
 				<check if="{{(int)@versions_compare.dev===1}}">
-					<div class="gb-20"><span class="alert-box info">{{@script_versions.dev}}</span></div>
-					<div class="gb-30">newer version available</div>
+					<div class="column is-one-quarter"><div class="notification is-info">newer version available</div></div>
 				</check>
 				<check if="{{(int)@versions_compare.dev===0}}">
-					<div class="gb-20"><span class="alert-box success">{{@script_versions.dev}}</span></div>
-					<div class="gb-30">same as server</div>
+					<div class="column is-one-quarter"><div class="notification is-success">same as server</div></div>
 				</check>
 				<check if="{{(int)@versions_compare.dev===-1}}">
-					<div class="gb-20"><span class="alert-box warning">{{@script_versions.dev}}</span></div>
-					<div class="gb-30">newer than server version</div>
+					<div class="column is-one-quarter"><div class="notification is-warning">newer than server version</div></div>
 				</check>
 			</true>
-			<false><div class="gb-50">N/A</div></false>
+			<false><div class="column is-half">N/A</div></false>
 		</check>
 	</true>
-	<false><div class="gb-full"><span class="alert-box error">Could not get version information from server!</span></div></false>
+	<false><div class="column is-half"><div class="notification is-warning">Could not get version information from server!</div></div></false>
 </check>
 </div>

@@ -1,42 +1,13 @@
-<h1>{{@data.user.nickname}}</h1>
-<div class="buttons-alignment"><a class="button" href="{{@BASE}}/story/browse/author={{ @data.user.uid }}">{ICON:reader} __Stories</a> <a class="button" href="#">{ICON:user-friend} __Friend</a> <a class="button" href="#">{ICON:mail} __Contact</a> <a class="button" href="#">{ICON:favourite} __Favorites</a> <a class="button" href="#">{ICON:bookmark} __Bookmarks</a></div>
-<div class="grid-wrapper">
-	<div class="gb-half">{{ nl2br (@data.user.about) | raw }}</div>
-	<div class="gb-half">
-		<div class="grid-wrapper">
-			<div class="gb-1qrt">{{@LN__Nickname}}:</div><div class="gb-3qrt">{{ @data.user.nickname }}</div>
-			<check if="{{!empty(@data.user.realname)}}"><div class="gb-1qrt">{{@LN__Realname}}:</div><div class="gb-3qrt">{{ @data.user.realname }}</div></check>
-			<div class="gb-1qrt">{{@LN__Registered}}:</div><div class="gb-3qrt">{{ date(@CONFIG.date_format, @data.user.registered) }}</div>
-			<div class="gb-1qrt">{{@LN__UserGroup}}:</div><div class="gb-3qrt">{{ floor(log(@data.user.groups, 2)) }}</div>
-		</div>
-	</div>
+<!-- https://bulma.io/documentation/columns/sizes/ -->
 
-	<div class="grid-wrapper">
-		<div class="gb-1thrd">
-		<h5>{{@LN__Categories}}</h5>
-		<ol>
-		<repeat group="{{ @data.cat.0 }}" value="{{ @category }}">
-			<li><a href="{{@BASE}}/story/browse/author={{ @data.user.uid }};category={{ @category.cid }}">{{@category.name}}</a> ({{ @category.counted }})</li>
-		</repeat>
-		</ol>
-		{{ @data.cat.1 }} {{@LN__total}}
-		</div><div class="gb-1thrd">
-		<h5>{{@LN__Tags}}</h5>
-		<ol>
-		<repeat group="{{ @data.tag.0 }}" value="{{ @tag }}">
-			<li><a href="{{@BASE}}/story/browse/author={{ @data.user.uid }};tagIn={{ @tag.tid }}">{{@tag.label}}</a> ({{ @tag.counted }})</li>
-		</repeat>
-		</ol>
-		{{ @data.tag.1 }} {{@LN__total}}
-		</div><div class="gb-1thrd">
-		<h5>{{@LN__Characters}}</h5>
-		<ol>
-		<repeat group="{{ @data.char.0 }}" value="{{ @character }}">
-			<li><a href="{{@BASE}}/story/browse/author={{ @data.user.uid }};characters={{ @character.charid }}">{{@character.charname}}</a> ({{ @character.counted }})</li>
-		</repeat>
-		</ol>
-		{{ @data.char.1 }} {{@LN__total}}
-		</div>
-	</div>
+<include href="members/header.html" />
 
+<div class="columns is-multiline is-mobile">
+	<div class="column is-one-quarter">{{@LN__Username}}:</div> <div class="column is-one-quarter">{{ @data.user.username }}</div>
+	<check if="{{!empty(@data.user.realname)}}"><div class="column is-one-quarter">{{@LN__Realname}}:</div> <div class="column is-one-quarter">{{ @data.user.realname }}</div></check>
+	<div class="column is-one-quarter">{{@LN__Registered}}:</div> <div class="column is-one-quarter">{{ date(@CONFIG.date_format, @data.user.registered) }}</div>
+	<div class="column is-one-quarter">{{@LN__UserGroup}}:</div> <div class="column is-one-quarter">{{ floor(log(@data.user.groups, 2)) }}</div>
+	<div class="column is-full">{{ nl2br (@data.user.about) | raw }}</div>
 </div>
+
+

@@ -1,11 +1,23 @@
+<div class="notification is-transparent has-border">
 <form method="post" action="{{@BASE}}/adminCP/home/news">
-	<div class="grid-wrapper">
-		<div class="gb-30"><input class="text-input" type="text" name="newHeadline"></div>
-		<div class="gb-70"><input class="button" type="submit" value="__NewHeadline"></div>
+	<div class="field">
+		<label class="label">{{@LN__ACP_CreateNews}}</label>
+		<div class="control">
+			<input class="input half" type="text" placeholder="{{@LN__ACP_NewsHeadline}}" name="newHeadline">
+		</div>
+	</div>
+	<div class="field">
+		<div class="control">
+			<button class="button is-link">Submit</button>
+			<input class="button is-link" type="submit">
+		</div>
 	</div>
 </form>
+</div>
+
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
-<table class="tbody">
+<table class="table table is-striped is-hoverable is-fullwidth">
+<thead>
 	<tr>
 		<th>&nbsp;</th>
 		<th>&nbsp;</th>
@@ -53,9 +65,11 @@
 			</check></a> {{@LN__Sort_Name}}
 		</th>
 	</tr>
+</thead>
+<tbody>
 	<repeat group="{{ @newsEntries }}" value="{{ @row }}">
 	<tr>
-		<td><a href="{{@BASE}}/adminCP/home/news/id={{ @row['nid'] }};returnpath=/adminCP/home/news/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
+		<td><a href="{{@BASE}}/adminCP/home/news/id={{ @row['nid'] }};returnpath=/adminCP/home/news/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
 		<td><a href="{{@BASE}}/adminCP/home/news/delete={{ @row['nid'] }}" class="deleteItem" title="#{{ @row['nid'] }}: {{ @row['headline'] }}">{ICON:trash}</a></td>
 		<td>
 			<check if="{{ @row['timestamp'] == NULL }}">
@@ -68,10 +82,12 @@
 				</false>
 			</check>
 		</td>
-		<td>{{ @row['nid'] }}</td>
+		<th>{{ @row['nid'] }}</td>
 		<td>{{ date(\Config::getPublic("datetime_format"), @row['timestamp']) }}</td>
 		<td>{{ @row['headline'] }}</td>
 		<td>{{ @row['author'] }}</td>
 	</tr>
 	</repeat>
+</tbody>
 </table>
+<F3:check if="{{isset(@paginate.firstPage) AND sizeof(@newsEntries)>4}}"><include href="paginate.html" /></F3:check>

@@ -1,38 +1,63 @@
 <check if="{{ isset(@deleteResult) }}">
-	<check if="{{ @deleteResult===0 }}"><div class="gb-90 alert-box error">{{@LN__FailedDelete}}</div></check>
-	<check if="{{ @deleteResult===1 }}"><div class="gb-90 alert-box success">{{@LN__ElementDeleted}}</div></check>
+	<check if="{{ @deleteResult===0 }}"><div class="notification is-warning"><button class="delete"></button>{{@LN__FailedDelete}}</div></check>
+	<check if="{{ @deleteResult===1 }}"><div class="notification is-success"><button class="delete"></button>{{@LN__ElementDeleted}}</div></check>
 </check>
 
-<form method="post" action="{{@BASE}}/adminCP/archive/characters">
-	<div class="grid-wrapper">
-		<div class="gb-30"><input class="text-input" type="text" name="newCharacter"></div>
-		<div class="gb-70"><input class="button" type="submit" value="__NewCharacter"></div>
+
+<div class="columns">
+	<div class="column">
+	<!-- new tag form -->
+		<div class="notification">
+		<form method="post" action="{{@BASE}}/adminCP/archive/characters">
+			<div class="field">
+				<label class="label">{{@LN__ACP_NewCharacter}}</label>
+				<div class="control">
+					<input class="input" type="text" name="newCharacter">
+				</div>
+			</div>
+			<div class="field">
+				<div class="control">
+					<button class="button is-link">{{@LN__Add}}</button>
+				</div>
+			</div>
+		</form>
+		</div>
+	<!-- END: new tag form -->
 	</div>
-</form>
-<form method="post" action="{{@BASE}}/adminCP/archive/characters">
-	<fieldset><legend>{{@LN__SearchCharacter}}:</legend>
-	<table>
-	<tr><td><input type="text" id="char-select" name="charid" />
-        <script type="text/javascript">
-        $(document).ready(function() {
-            $("#char-select").tokenInput("{{$BASE}}/adminCP/ajax/archive/search",{
-            	method: "post",
-            	queryParam: "charname",
-            	hintText: "{{@LN__Token_StartTyping}} ...",
-				noResultsText: "{{@LN__Token_NoMatches}}.",
-            	tokenLimit: 1
-            });
-        });
-        </script>
-		</td>
-	</tr>
-	<tr><td><input class="button" type="submit"> <input class="button" type="reset"></td></tr>
-	</table>
-	</fieldset>
-</form>
+	<div class="column">
+		<div class="notification">
+		<form method="post" action="{{@BASE}}/adminCP/archive/characters/;returnpath=/adminCP/archive/characters/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}"">
+			<div class="field">
+				<label class="label">{{@LN__SearchCharacter}}</label>
+				<div class="control">
+					<input type="text" id="char-select" name="charid" />
+					<script type="text/javascript">
+					$(document).ready(function() {
+						$("#char-select").tokenInput("{{$BASE}}/adminCP/ajax/archive/search",{
+							method: "post",
+							queryParam: "charname",
+							hintText: "{{@LN__Token_StartTyping}} ...",
+							noResultsText: "{{@LN__Token_NoMatches}}.",
+							tokenLimit: 1
+						});
+					});
+					</script>
+				</div>
+			</div>
+			<div class="field">
+				<div class="control">
+					<button class="button is-link">{{@LN__Edit}}</button>
+				</div>
+			</div>
+		</form>
+		</div>
+	</div>
+</div>
+
 <check if="{{ sizeof(@characterlist)>0 }}"><true>
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
-<table class="tbody" id="textblockForm">
+<table class="table is-striped is-hoverable is-fullwidth" id="textblockForm">
+<thead>
 	<tr>
 		<th>&nbsp;</th>
 		<th>&nbsp;</th>
@@ -81,6 +106,8 @@
 			</check></a> {{@LN__Sort_Count}}
 		</th>
 	</tr>
+</thead>
+<tbody>
 	<repeat group="{{ @characterlist }}" value="{{ @row }}">
 	<tr>
 		<td><a href="{{@BASE}}/adminCP/archive/characters/id={{ @row['charid'] }};returnpath=/adminCP/archive/characters/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
@@ -100,7 +127,9 @@
 		<td>{{ @row['count'] }}</td>
 	</tr>
 	</repeat>
+</tbody>
 </table>
+<F3:check if="{{isset(@paginate.firstPage) AND sizeof(@characterlist)>4}}"><include href="paginate.html" /></F3:check>
 </true><false>
 {{@LN__NoEntries}}
 </false></check>

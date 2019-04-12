@@ -1,84 +1,51 @@
-/*-----------------  MAIN MENU  -----------------*/
-.menu {
-	text-align: center;
-	z-index: 15;
-	}
-.menu ul {
-	background: #2e2e2e;
-	margin: 0;
-	padding: 10px;
-	}
-.menu li {
-	list-style-type: none;
-	display: inline;
-	white-space: nowrap;
-	padding: 0 5px;
-	margin: 0;
-	}
-.menu li:hover {
-	padding: 5px;
-	margin: 0;
-	}
-.menu a, .menu a:active, .menu a:visited {
-	font-family: 'Open Sans Condensed', sans-serif;
-	font-size: 18pt;
-	color: #fafafa;
-	text-transform: uppercase;
-	text-decoration: none;
-	text-shadow: 0 0 2px #fafafa;
-}
-.menu a:hover {
-	color: #48779f;
-	text-shadow: 0 0 2px #292929;
-	}
-
 /*-----------------  UCP/ACP MENU  -----------------*/
-
-.cp-menu-wrapper { 
-	background-color: #f4f4f4;
-	border: 1px solid #dcdcdc;
-	padding: 6px;
-	}
 
 .tinyicon {
 	padding: 10px;
 	vertical-align: middle;
-	color: #141516;
+	color: #e3e3e3;
 }
+
+.cp-menu-wrapper { 
+	background-color: #1b1b1b;
+	padding: 6px;
+	}
+
 .cp-main-menu li {
 	padding: 6px;
-	margin: 2px 0;
-	border-bottom: 1px solid #dcdcdc;
+	border-bottom: 1px solid #272727;
 	text-align: left;
 	text-transform: uppercase;
 	list-style: none;
-	list-style-position: inside !important;
+	list-style-position: inside;
+}
+
+.cp-main-menu li:hover {
+	background: #272727;
 }
 .cp-main-menu li:last-child {
 	padding: 6px;
-	margin: 2px 0;
-	border-bottom: 0;
 	text-align: left;
 	text-transform: uppercase;
 	list-style: none;
 	list-style-position: inside;
 }
 .cp-main-menu li a {
-	color: #141516;
-}	
+	color: #e3e3e3;
+}
+
 .cp-sub-menu li {
-	background-color: #efefef;
 	padding: 4px 4px 4px 30px;
-	margin: 2px 0;
+	margin: 0;
 	text-align: left;
 	text-transform: uppercase;
 	list-style: none;
 	list-style-position: inside;
 }
 .cp-sub-menu li:last-child {
-	background-color: #efefef;
 	padding: 4px 4px 4px 30px;
-	margin: 2px 0;
+	margin: 0;
+	border-bottom: 1px solid #272727;
 	text-align: left;
 	text-transform: uppercase;
 	list-style: none;

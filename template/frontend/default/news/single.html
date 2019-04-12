@@ -1,13 +1,13 @@
-<h1>{{@LN__News_Box}}</h1>
-<check if="{{isset(@formError)}}"><div class="note alert-box-half error">{{ @LN__FormErrors, sizeof(@formError) | format }}:<br><repeat group="{{@formError}}" value="{{@error}}">{ICON:close} {{ ${'LN__'.@error} }}<br /></repeat></div></check>
+<h2>{{@LN__News_Box}}</h2>
+<check if="{{isset(@formError)}}"><article class="message is-danger"><div class="message-body">{{ @LN__FormErrors, sizeof(@formError) | format }}:<br /><repeat group="{{@formError}}" value="{{@error}}">{ICON:close} {{ ${'LN__'.@error} }}<br /></repeat></div></article></check>
 <div class="news-box">
-	<h2><a href='{{@BASE}}/news/id={{ @news.nid }}'>{{ @news.headline }}</a></h2>
-	<div class="news-dateauthor">{{@LN__News_writtenby}} <a href='{{@BASE}}/members/id={{ @news.uid }}'>{{ @news.nickname }}</a> @ {{ date(@CONFIG.datetime_format, @news.timestamp) }} <check if="{{@canAdmin['home/news']}}"><a href="{{@BASE}}/adminCP/home/news/id={{@news.nid}}" target="_blank">{ICON:edit}</a></check></div>
+	<h3><a href='{{@BASE}}/news/id={{ @news.nid }}'>{{ @news.headline }}</a></h3>
+	<div class="news-date-author">{{@LN__News_writtenby}} <a href='{{@BASE}}/members/id={{ @news.uid }}'>{{ @news.username }}</a> @ {{ date(@CONFIG.datetime_format, @news.timestamp) }} <check if="{{@canAdmin['home/news']}}"><a href="{{@BASE}}/adminCP/home/news/id={{@news.nid}}" target="_blank">{ICON:edit}</a></check></div>
 	{{ @news.newstext | raw}}
 </div>
-<span id="comments">
+
 <repeat group="{{ @news.comments }}" value="{{ @comment }}" counter="{{ @ctr }}">
-<div class="comment">
+<div class="news-comments">
 	<check if="{{@comment.writer_uid}}">
 	<true>
 		&nbsp;{ICON:member} <a href="{{@BASE}}/members/id={{@comment.writer_uid}}">{{@comment.comment_writer_name}}</a> <check if="{{@comment.writer_uid==$_SESSION['userID']}}">{ICON:edit}</check>
@@ -20,20 +20,19 @@
 	{{@comment.text|raw}}
 </div>
 </repeat>
-</span>
-<check if="{{isset(@formError)}}"><div class="note alert-box-half error">{{ @LN__FormErrors, sizeof(@formError) | format }}:<br><repeat group="{{@formError}}" value="{{@error}}">{ICON:close} {{ ${'LN__'.@error} }}<br /></repeat></div></check>
+
+<check if="{{isset(@formError)}}"><article class="message is-danger"><div class="message-body">{{ @LN__FormErrors, sizeof(@formError) | format }}:<br /><repeat group="{{@formError}}" value="{{@error}}">{ICON:close} {{ ${'LN__'.@error} }}<br /></repeat></div></article></check>
 <check if="{{@_SESSION['userID'] OR @CONFIG.allow_guest_comment_news}}">
 	<true>
-		<fieldset><legend>{{@LN__Comment}}</legend>
-		<form class="write_review" method="post" action="{{@BASE}}/news/id={{@news.nid}}">
+		<h5>{{@LN__YourCommentHere}}</h5><br />
+		<form method="post" action="{{@BASE}}/news/id={{@news.nid}}">
 			<check if="{{@_SESSION['userID']}}">
 				<true>
-					
 					<div>&nbsp;{ICON:member} {{@_SESSION['username']}}</div>
-					<div class="field textarea"><textarea class="message" name="comment[text]" placeholder="{{@LN__YourCommentHere}}"></textarea></div>
+					<div><textarea class="textarea" name="comment[text]" placeholder="{{@LN__YourCommentHere}}"></textarea></div>
 				</true>
 				<false>
-					<legend>{{@LN__GuestComment}}:</legend>
+					<h5>{{@LN__GuestComment}}</h5>
 					<div class="field">{ICON:member} __yourName: <input type="text" name="comment[name]" placeholder="__yourName" value="{{@@POST.comment.name}}"></div>
 					<div class="field">{ICON:keyboard} __yourComment: <textarea id="shout" rows="10" cols="29" name="comment[text]" placeholder="{{@LN__YourCommentHere}}">{{@@POST.comment.text}}</textarea></div>
 					<div>{ICON:key}
@@ -41,12 +40,10 @@
 					</div>
 				</false>
 			</check>
-			<input class="button" value="{{@LN__Submit}}" type="submit">
+			<br /><input class="button is-light" value="{{@LN__Submit}}" type="submit">
 		</form>
-		</fieldset>
 	</true>
 	<false>
 		{{@LN__GuestNoComment}}
 	</false>
 </check>
-

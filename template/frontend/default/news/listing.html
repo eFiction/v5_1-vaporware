@@ -1,11 +1,11 @@
-<h1>{{@LN__News_Box}}</h1>
+<h2>{{@LN__News_Box}}</h2>
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
 <repeat group="{{ @newsItems }}" value="{{ @news }}" counter="{{ @ctr }}">
 	<div class="news-box">
-		<h2><a href='{{@BASE}}/news/id={{ @news.nid }}'>{{ @news.headline }}</a></h2>
-		<div class="news-dateauthor">{{@LN__News_writtenby}} <a href='{{@BASE}}/members/id={{ @news.uid }}'>{{ @news.nickname }}</a> @ {{ date(@CONFIG.datetime_format, @news.timestamp) }}</div>
+		<h3><a href='{{@BASE}}/news/id={{ @news.nid }}'>{{ @news.headline }}</a></h3>
+		<div class="news-date-author">{{@LN__News_writtenby}} <a href='{{@BASE}}/members/id={{ @news.uid }}'>{{ @news.username }}</a> @ {{ date(@CONFIG.datetime_format, @news.timestamp) }}</div>
 		{{ @news.newstext | raw}}
-		<div class="news-comment"><a href='{{@BASE}}/news/id={{@news.nid}}#comments'><input class="button" type="submit" value="{{ @LN__CommentsC, @news.comments | format }}"></a></div>
+		<div align="right"><a href='{{@BASE}}/news/id={{@news.nid}}#comments'><input class="button" type="submit" value="{{ @LN__CommentsC, @news.comments | format }}"></a></div>
 	</div>
 </repeat>
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>

@@ -1,7 +1,8 @@
 <div class="sbarbox">
-	<h3>{{@LN__Tagcloud}}</h3>
+	<h4>{{@LN__Tagcloud}}</h4>
 	<repeat group="{{@renderData}}"  value="{{ @tag }}" counter="{{ @ctr }}">
-		<span style='padding:0;position:relative;z-index:{{@tag.z_index}}'>
+{*		<span style='padding:0;position:relative;z-index:{{@tag.z_index}}'>	*}
+		<span style='padding:0;position:relative'>
 			<a title='{{@tag.label}} ({{@tag.count}})' href='{{@BASE}}/story/browse/tagIn={{@tag.tid}}' style='font-size: {{@tag.percent}}%;'>{{@tag.label}}</a>
 		</span>
 	</repeat>

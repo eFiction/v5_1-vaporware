@@ -14,6 +14,7 @@ $this->modules =
 						"story"			=> [ "\\Controller\Story", "storyBlocks" ],
 						"news"			=> [ "\\Controller\News", "blocks" ],
 						"categories"	=> [ "\\Controller\Blocks", "categories" ],
+						"profile"		=> [ "\\Controller\Blocks", "authorProfile" ],
 					];
 
 

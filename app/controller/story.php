@@ -624,7 +624,7 @@ class Story extends Base
 	{
 		$select = explode(".",$select);
 
-		if ( $select[1] == "stats" )
+		if ( $select[0] == "stats" )
 		{
 			if ( FALSE === $data = \Cache::instance()->get('stats') )
 			{
@@ -634,17 +634,17 @@ class Story extends Base
 
 			return $this->template->archiveStats($data);
 		}
-		elseif ( $select[1] == "new" )
+		elseif ( $select[0] == "new" )
 		{
-			$items = (isset($select[2]) AND is_numeric($select[2])) ? $select[2] : 5;
+			$items = (isset($select[1]) AND is_numeric($select[1])) ? $select[1] : 5;
 			$data = $this->model->blockNewStories($items);
-			$size = isset($select[3]) ? $select[3] : 'large';
+			$size = isset($select[2]) ? $select[2] : 'large';
 			
 			return $this->template->blockStory("new", $data, $size);
 		}
-		elseif ( $select[1] == "random" )
+		elseif ( $select[0] == "random" )
 		{
-			$items = (isset($select[2]) AND is_numeric($select[2])) ? $select[2] : 1;
+			$items = (isset($select[1]) AND is_numeric($select[1])) ? $select[1] : 1;
 			$data = $this->model->blockRandomStory($items);
 			
 			return $this->template->blockStory("random", $data);

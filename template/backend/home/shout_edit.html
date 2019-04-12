@@ -1,8 +1,33 @@
-<form action="{{@BASE}}/adminCP/home/shoutbox/id={{@data.id}}/order={{@sort.order}},{{@sort.direction}}/page={{@page}}" method="post">
-	<div class="grid-wrapper">
-		<check if="{{ isset(@form_error) }}"><div class="gb-90 alert-box error">{{ @form_error }}</div></check>
-		<check if="{{ isset(@form_changes) }}"><div class="gb-90 alert-box success">{{ @LN__Status_Changes, @form_changes | format }}</div></check>
-		<div class="gb-full">{{@LN__Message}}:<br /><textarea name="form_data[message]" id="tinymce" rows="4" cols="80">{{ @data.message |raw }}</textarea><br /></div>
-		<div class="gb-40" align="right"><input type="submit"></div><div class="gb-60"><input type="reset"></div>
+<!-- error notification -->
+<check if="{{ isset(@form_error) }}">
+	<div class="notification is-warning">
+		<button class="delete"></button>
+		{{ @form_error }}
 	</div>
+</check>
+<!-- END: error notification -->
+<!-- success notification -->
+<check if="{{ isset(@form_changes) }}">
+	<div class="notification is-success">
+		<button class="delete"></button>
+		{{ @LN__Changes_saved }}
+	</div>
+</check>
+<!-- END: success notification -->
+
+<form action="{{@BASE}}/adminCP/home/shoutbox/id={{@data.id}}/order={{@sort.order}},{{@sort.direction}}/page={{@page}}" method="post">
+<div class="field">
+  <label class="label">{{@LN__Message}}</label>
+  <div class="control">
+    <textarea class="textarea" name="form_data[message]" rows="5" cols="40">{{ @data.message |raw }}</textarea>
+  </div>
+</div>
+<div class="field is-grouped">
+  <div class="control">
+    <input class="button is-success" type="submit">
+  </div>
+  <div class="control">
+   <input class="button" type="reset">
+  </div>
+</div>
 </form>

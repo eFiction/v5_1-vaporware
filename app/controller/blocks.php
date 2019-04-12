@@ -181,7 +181,7 @@ class Blocks extends Base
 		$main = $data['main'];
 		$sub = empty($data['sub'])?FALSE:$data['sub'];
 
-		return \View\Blocks::pageMenu($main, $sub, isset($menuSelect[2]) );
+		return \View\Blocks::pageMenu($main, $sub, isset($menuSelect[1]) );
 	}
 	
 	public function categories(): string
@@ -192,4 +192,10 @@ class Blocks extends Base
 		// Return empty if no data retrieved
 		return "";
 	}
+	
+	public function authorProfile(int $aid): string
+	{
+		return "Profile!".$aid;
+	}
+	
 }

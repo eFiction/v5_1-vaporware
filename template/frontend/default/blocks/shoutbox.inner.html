@@ -9,11 +9,11 @@
 </check>
 <check if="{{isset(@shoutboxMember)}}">
 {*			<div id="sBoxEmoticons">%emoticons%</div> *}
-			<div class="field">{ICON:keyboard}<textarea id="shout" rows="10" cols="29" name="message" placeholder="__yourTextHere"></textarea></div>
+			<div class="field"><textarea id="shout" rows="10" cols="29" name="message" placeholder="__yourTextHere"></textarea></div>
 </check>
 <check if="{{isset(@shoutboxGuest)}}">
 			<div class="field">{ICON:member}<input type="text" name="name" placeholder="your name" value=""></div>
-			<div class="field">{ICON:keyboard}<textarea id="shout" rows="10" cols="29" name="message" placeholder="__yourTextHere"></textarea></div>
+			<div class="field"><textarea id="shout" rows="10" cols="29" name="message" placeholder="__yourTextHere"></textarea></div>
 			<div class="captchaBox">&nbsp;</div>
 			<div class="field"><input type="text" name="captcha" placeholder="captcha"></div>
 	<script type="text/javascript">

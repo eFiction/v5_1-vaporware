@@ -5,28 +5,36 @@ class Blocks extends Base
 {
 	public function shoutboxLines($offset)
 	{
-		$shoutSQL = "SELECT B.id, B.uid, IF(B.uid=0,B.guest_name,U.nickname) as name, B.message, UNIX_TIMESTAMP(B.date) as date
-									FROM `tbl_shoutbox`B 
-									LEFT JOIN `tbl_users`U ON ( U.uid = B.uid )
-								ORDER BY date DESC
-								LIMIT :offset,5" ;
-
-		return $this->exec($shoutSQL,[ ":offset" => $offset]);
+		return $this->exec
+		(
+			"SELECT B.id, B.uid, IF(B.uid=0,B.guest_name,U.username) as name, B.message, UNIX_TIMESTAMP(B.date) as date
+					FROM `tbl_shoutbox`B 
+					LEFT JOIN `tbl_users`U ON ( U.uid = B.uid )
+				ORDER BY date DESC
+				LIMIT :offset,:items",
+			[
+				":offset" => $offset,
+				":items" => \Config::getPublic('shoutbox_entries')
+			]
+		);
 	}
 	
 	public function addShout($data, $member=FALSE)
 	{
-		$sql = "INSERT INTO `tbl_shoutbox`
-					(`uid`, `guest_name`, `message`, `date`) VALUES 
-					(:uid, :guest_name, :message, CURRENT_TIMESTAMP)";
-		$bind =
-		[
-			":uid"			=> ( $member ) ? $_SESSION['userID'] : 0,
-			":guest_name"	=> ( $member ) ? NULL : $data['name'],
-			":message"		=> $data['message'],
-		];
 		if ($member) \Model\Routines::dropUserCache("messaging");
-		return $this->exec($sql, $bind);
+
+		return $this->exec
+		(
+			"INSERT INTO `tbl_shoutbox`
+				(`uid`, `guest_name`, `message`, `date`)
+			VALUES 
+				(:uid, :guest_name, :message, CURRENT_TIMESTAMP)",
+			[
+				":uid"			=> ( $member ) ? $_SESSION['userID'] : 0,
+				":guest_name"	=> ( $member ) ? NULL : $data['name'],
+				":message"		=> $data['message'],
+			]
+		);
 	}
 
 	function ajaxCalendar($params)

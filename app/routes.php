@@ -22,9 +22,13 @@ if ( FALSE == $config->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
 		'Controller\Story->index' );
 
 	$f3->route(
-	  [ 'GET /members', 'GET /members/*', 
-		'GET /u/@membername' ],
-		'Controller\Members->index' );
+	  [ 'GET|POST /members', 'GET /members/*' ], 'Controller\Members->index' );
+
+	$f3->route(
+	  [ 'GET /member/@user', 
+		'GET /member/@user/@selection', 'GET /member/@user/@selection/*' ],
+		'Controller\Members->profile' );
+	$f3->route([ 'GET|POST /member' ] , function($f3) { $f3->reroute('/members', false); } );
 
 	$f3->route(
 	  [ 'POST /story/@action' , 'POST /story/@action/*' ],

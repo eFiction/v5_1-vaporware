@@ -1,0 +1,101 @@
+input[type=text], input[type=password] {
+    width: 100%;
+    padding: 6px;
+    display: inline-block;
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif;
+		outline: none;
+}
+input.readonly {
+    width: 100%;
+    padding: 6px;
+    display: inline-block;
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    font-family: 'Open Sans', sans-serif;
+		outline: none;
+}
+
+
+input[type=text].navbar, input[type=password].navbar {
+		width: 100px;
+		padding: 5px;
+		box-sizing: border-box;
+}
+
+select {
+    width: 100%;
+    padding: 5px;
+    border: none;
+    border-radius: 4px;
+    background-color: #fff;
+    border: 1px solid #dcdcdc;
+    font-family: 'Open Sans', sans-serif;
+}
+
+input[type=button], .button {
+    background-color: #2e2e2e;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    margin: 4px 2px;
+    cursor: pointer;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.button {
+    margin: 4px 2px;
+    padding: 6px 12px;
+    background-color: #2e2e2e;
+    border: none;
+    color: white;
+    text-decoration: none;
+	  cursor: pointer;
+    font-family: 'Open Sans', sans-serif;
+}
+
+input[type=submit], input[type=reset] {
+    background-color: #2e2e2e;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    margin: 4px 2px;
+    cursor: pointer;
+    font-family: 'Open Sans', sans-serif;
+}
+
+input[type=submit].navbar {
+		background-color: #fafafa;
+		color: #2e2e2e;
+   	padding: 6px 12px;
+   	margin: 0 0 0 6px;
+   	border-radius: 4px;
+}
+
+.delete {
+	  background-color: #cd2323;
+    border: none;
+    color: white !important;
+    padding: 9px 20px;
+    text-decoration: none;
+    margin: 4px 2px;
+    cursor: pointer;
+    font-family: 'Open Sans', sans-serif;
+}
+
+textarea {
+    width: 100%;
+    height: 150px;
+    padding: 12px 20px;
+    box-sizing: border-box;
+    border: 1px solid #dcdcdc;
+    border-radius: 4px;
+    background-color: #fff;
+    resize: none;
+    font-family: 'Open Sans', sans-serif;
+}

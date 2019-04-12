@@ -15,13 +15,14 @@
         </script>
 		</td>
 	</tr>
-	<tr><td><input class="button" type="submit"> <input class="button" type="reset"></td></tr>
+	<tr><td><input class="button is-success" type="submit"> <input class="button is-danger" type="reset"></td></tr>
 	</table>
 	</fieldset>
 </form>
 <check if="{{ sizeof(@featured)>0 }}"><true>
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
-<table class="tbody" id="textblockForm">
+<table class="table is-striped is-narrow is-hoverable is-fullwidth" id="textblockForm">
+<thead>
 	<tr>
 		<th>&nbsp;</th>
 		<th>&nbsp;</th>
@@ -72,6 +73,8 @@
 		</th>
 		*}
 	</tr>
+</thead>
+<tbody>
 	<repeat group="{{ @featured }}" value="{{ @row }}">
 	<tr>
 		<td><a href="{{@BASE}}/adminCP/archive/featured/sid={{ @row['sid'] }};returnpath=/adminCP/archive/contests/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
@@ -84,6 +87,7 @@
 		*}
 	</tr>
 	</repeat>
+</tbody>
 </table>
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
 </true><false>

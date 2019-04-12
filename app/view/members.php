@@ -10,4 +10,15 @@ class Members extends Base
 		//return "<pre>".print_r($data,TRUE)."</pre>";
 	}
 
+	public function stories(array $userdata, array $extradata)
+	{
+		$this->f3->set('userdata', $userdata);
+		
+		while ( list($key, $value) = each($extradata['stories']) )
+			$this->dataProcess($extradata['stories'][$key], $key);
+
+		$this->f3->set('extradata', $extradata);
+		return $this->render('members/stories.html');
+	}
+
 }

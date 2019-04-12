@@ -2,9 +2,9 @@
 namespace View;
 class Redirect extends Base
 {
-	public static function inform($redirect)
+	public function inform($redirect)
 	{
-		//
-		return  \Template::instance()->render('main/redirect.html', 'text/html', [ "BASE" => \Base::instance()->get('BASE'), "redirect" => $redirect ]);
+		$this->f3->set('redirect', $redirect);
+		return $this->render('main/redirect.html');
 	}
 }

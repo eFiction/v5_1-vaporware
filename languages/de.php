@@ -14,6 +14,7 @@ return array(
 'Cancel'	=>	'Abbrechen',
 'OK'		=>	'Okay',
 'Delete'	=>	'Delete',
+'Add'		=>	'Hinzufügen',
 'Return'	=>	'Zurück',
 'Date'		=>	'Datum',
 'Time'		=>	'Uhrzeit',
@@ -26,6 +27,7 @@ return array(
 'daily'			=> 'daily',
 'disabled'		=> 'disabled',
 'enabled'		=> 'enabled',
+'hidden'		=> 'versteckt',
 'ClickCont'		=> 'Anklicken um fortzufahren',
 'Error'			=> 'Fehler',
 'Success'		=> 'Erfolg',
@@ -65,21 +67,22 @@ return array(
 'newPWrepeat'	=> 'neues Passwort wiederholen',
 
 // [3] Global -- Sort
-'Sort_Date'		=> 'Datum',
-'Sort_ID'		=> 'ID',
-'Sort_Title'	=> 'Titel',
-'Sort_Label'	=> 'Bezeichnung',
-'Sort_Headline'	=> 'Schlagzeile',
-'Sort_Name'		=> 'Name',
-'Sort_Text'		=> 'Text',
-'Sort_Updated'	=> 'Aktualisiert',
-'Sort_Count'	=> 'Anzahl',
-'Sort_COpen'	=> 'Öffnet',
-'Sort_CClose'	=> 'Schließt',
-'Sort_Category' => 'Kategorie',
+'Sort_Date'			=> 'Datum',
+'Sort_ID'			=> 'ID',
+'Sort_Title'		=> 'Titel',
+'Sort_Label'		=> 'Bezeichnung',
+'Sort_Headline'		=> 'Schlagzeile',
+'Sort_Name'			=> 'Name',
+'Sort_Email'		=> 'Email',
+'Sort_Text'			=> 'Text',
+'Sort_Updated'		=> 'Aktualisiert',
+'Sort_Count'		=> 'Anzahl',
+'Sort_COpen'		=> 'Öffnet',
+'Sort_CClose'		=> 'Schließt',
+'Sort_Category' 	=> 'Kategorie',
 //'Sort_TagGroup'	=> 'Tag group',
-'Sort_Visibility' => 'Visibility',
-'Sort_Comment'	=> 'Kommentar',
+'Sort_Visibility' 	=> 'Visibility',
+'Sort_Comment'		=> 'Kommentar',
 
 // [4] Registrierung
 'Registration'			=> 'Registrierung',
@@ -153,6 +156,7 @@ return array(
 'Search_Fav'		=> 'Favoriten',
 'Search_BM'			=> 'Lesezeichen',
 'StoryExtent'		=> 'Umfang der Geschichte',
+'Stories_filtered'	=> 'Geschichten gefiltert',
 'Size_SingleChapter'=> 'Einzelnes Kapitel',
 'Size_MultiChapter'	=> 'Mehrere Kapitel',
 'Size_All'			=> 'Show all',
@@ -186,6 +190,8 @@ return array(
 'Review_Link_TOC'	=> '{0, plural, zero {Keine Reviews}, one {Eine Review}, other {# Reviews} }',
 'DownloadEPub'		=> '\'{0}\' als ePub-Datei herunterladen',
 'PrintView'			=> '\'{0}\' in Druckvorschau öffnen',
+'next'				=> 'nächstes',
+'back'				=> 'zurück',
 
 // [13] Story -- Edit
 'MainAuthor'	=> 'Autor',
@@ -210,11 +216,11 @@ return array(
 'SwitchPlainHTML'	=> 'Zum einfachen Modus wechseln',
 'SwitchVisual'		=> 'Zum Editor wechseln',
 
-///DB
 // [14] Authors
 'NoAuthorsListed'	=> 'Momentan gibt es keine Autoren, die angezeigt werden könnten',
 'Overview'			=> 'Übersicht',
 
+///DB
 // User panel - PM
 'PM_Inbox'				=> 'Posteingang',
 'PM_Outbox'				=> 'Postausgang',
@@ -233,11 +239,11 @@ return array(
 'PM_Received'			=> 'Empfangen',
 'PM_Recipient'			=> 'Empfänger',
 'PM_question_Delete'	=> 'Nachricht löschen?',
-'PM_confirm_Delete'		=> 'Nachricht wird gelöscht, sicher?',
+'PM_confirm_Delete'		=> 'Nachricht sicher löschen?',
 'PM_deletedSuccess'		=> 'Nachricht gelöscht!',
 'PM_revokeSuccess'		=> 'Nachricht wurde zurückgezogen',
 'PM_revokeRead'			=> 'Zurückziehen nicht möglich, Nachricht wurde vom Empfänger bereits gelesen.',
-'PM_deleteNotFound' 	=> 'Löschen nicht möglich, Nachricht wurde nicht gefunden oder kein Zugriff auf diese Nachricht.',
+'PM_deleteNotFound' 	=> 'Löschen nicht möglich, Nachricht wurde nicht gefunden oder Zugriff wird verweigert.',
 'PM_alreadyDeleted'		=> 'Nachricht wurde bereits gelöscht',
 'PM_unread'				=> 'ungelesen',
 'PM_Forward'			=> 'Nachricht weiterleiten',
@@ -292,7 +298,31 @@ return array(
 	'Library_Bookmarks'		=> 'Lesezeichen ({0})',
 	'AddBookmark'			=> 'Lesezeichen hinzufügen',
 	'Library_Recommendations' => 'Empfehlungen ({0})',
-
+/*	'FavType_FAV'		=> '{0, plural,'.
+			'zero	{No favourites},'.
+			'one	{One favourite},'.
+			'other	{# Favourites} }',
+	'FavType_BM'		=> '{0, plural,'.
+			'zero	{No bookmarks},'.
+			'one	{One bookmark},'.
+			'other	{# Bookmarks} }',
+	'FavType_AU'		=> '{0, plural,'.
+			'zero	{No authors},'.
+			'one	{One author},'.
+			'other	{# Authors} }',
+	'FavType_RC'		=> '{0, plural,'.
+			'zero	{No recommendations},'.
+			'one	{One recommendation},'.
+			'other	{# Recommendations} }',
+	'FavType_SE'		=> '{0, plural,'.
+			'zero	{No series},'.
+			'one	{One series},'.
+			'other	{# Series} }',
+	'FavType_ST'		=> '{0, plural,'.
+			'zero	{No stories},'.
+			'one	{One story},'.
+			'other	{# Stories} }',*/
+			
 'UserMenu_Feedback' => 'Feedback',
 'UserMenu_Reviews' => 'Bewertungen',
 	'UserMenu_ReviewsWritten'	=> 'Bewertungen geschrieben ({0})',
@@ -308,20 +338,20 @@ return array(
 	'UCP_Pref_AlertComment'		=> '... ich einen Kommentar erhalte.',
 	'UCP_Pref_AlertFavourite'	=> '... ein Favorit aktiv ist.',
 'UCP_Pref_View'		=>	'Ansicht und Bedienung',
-	'UCP_Pref_TOC'		=> 'Bei Geschichten mit mehreren Kapiteln standardmäßig das Inhaltsverzeichnis zeigen.',
+	'UCP_Pref_TOC'		=> 'Bei Geschichten mit mehreren Kapiteln standardmäßig das Inhaltsverzeichnis anzeigen.',
 	'UCP_Pref_Sort'		=> 'Geschichten sortieren nach ...',
 	'UCP_Pref_sortAZ'	=> 'alphabetisch',
 	'UCP_Pref_sortNew'	=> 'nach Datum',
 	'UCP_Pref_Language'	=> 'Sprache (Language)',
-//	'UCP_Pref_Layout'	=> 'Layout/Theme',
+//	'UCP_Pref_Layout'	=> 'Theme',
 	'UCP_Pref_Editor'	=> 'Erweiterten Editor benutzen.',
 	'UCP_Pref_Age'		=> 'Zeige auch Geschichten mit Warnung (Sex/Gewalt o.ä.)',
-//	'UCP_Pref_hideTags'	=> '***Hide Tags***',
+//	'UCP_Pref_hideTags'	=> 'Tags verbergen',
 
-'UCP_StoryStatus' => 'Story status',
-'UCP_ChapterStatus' => 'Chapter status',
-'UCP_statusValidated' => 'Freigabe',
-        'UCP_statusValidated_'  => 'No data',
+'UCP_StoryStatus' 			=> 'Status Geschichte',
+'UCP_ChapterStatus' 		=> 'Status Kapitel',
+'UCP_statusValidated' 		=> 'Freigabe',
+    'UCP_statusValidated_'  => 'Keine Daten',
 	'UCP_statusValidated_0'	=> 'Geschlossen',
 	'UCP_statusValidated_1'	=> 'Autor arbeitet, steht nicht zur Validierung an',
 	'UCP_statusValidated_2'	=> 'Autor fertig, erwarte Validierung',
@@ -347,15 +377,15 @@ return array(
 	'UCP_statusCompleted_6'	=> 'Unvollendet',
 	'UCP_statusCompleted_9'	=> 'Abgeschlossen',
 'UCP_RequestValidation'	=> 'Validierung beantragen',
-//'UCP_NotValidatedS'		=> 'This story requires validation but is not queued yet',
-//'UCP_BeingValidatedS'	=> 'This story has been queued for validation',
-//'UCP_NotFinishedS'		=> 'This story has not yet been marked as validated',
-//'UCP_FinishStory'		=> 'Mark this story as validated',
-//'UCP_CannotValidateNoChapter'	=> 'This story cannot be validated as it has no validated chapters',
-//'UCP_NotValidatedC'		=> 'This chapter requires validation but is not queued yet',
-//'UCP_BeingValidatedC'	=> 'This chapter has been queued for validation',
-//'UCP_NotFinishedC'		=> 'This chapter has not yet been marked as validated',
-//'UCP_FinishChapter'		=> 'Mark this chapter as validated',
+//'UCP_NotValidatedS'		=> 'Geschichte braucht Validierung, ist jedoch noch nicht eingereiht',
+//'UCP_BeingValidatedS'	=> 'Geschichte wurde zur Validierung eingereiht',
+//'UCP_NotFinishedS'		=> 'Geschichte wurde noch nicht als validiert markiert',
+//'UCP_FinishStory'		=> 'Geschichte als validiert markieren',
+//'UCP_CannotValidateNoChapter'	=> 'Geschichte kann nicht validiert werden, da sie keine validierten Kapitel enthält',
+//'UCP_NotValidatedC'		=> 'Kapitel braucht Validierung, ist jedoch noch nicht eingereiht',
+//'UCP_BeingValidatedC'	=> 'Kapitel wurde zur Validierung eingereiht',
+//'UCP_NotFinishedC'		=> 'Kapitel wurde noch nicht als validiert markiert',
+//'UCP_FinishChapter'		=> 'Kapitel als validiert markieren',
 'UserMenu_Curator' => 'Betreuer',
 'UCP_ExplainMainAuthor'	=> 'Alle (Haupt)Autoren können die Geschichte bearbeiten',
 'UCP_ExplainSupAuthor'	=> 'Nebenautoren werden in der Geschichte aufgeführt, können sie aber nicht bearbeiten',
@@ -363,7 +393,7 @@ return array(
 'FB_Stats'					=> 'Feedback Statistik',
 'FB_ReviewRatio'			=> 'Review-Quote',
 'FB_ReviewsPerStory' => '{0, plural,'.
-					'one	{Das ist eine Reviews je Geschichte},'.
+					'one	{Das ist eine Review je Geschichte},'.
 					'other	{Das sind # Reviews je Geschichte}
 					}',
 'FB_orReviewsPerChapter' => '{0, plural,'.
@@ -371,16 +401,16 @@ return array(
 					'other	{oder # Reviews je Kapitel}
 					}',
 'FB_ReviewsPerChapter' => '{0, plural,'.
-					'one	{Das ist eine Reviews je Kapitel},'.
+					'one	{Das ist eine Review je Kapitel},'.
 					'other	{Das sind # Reviews je Kapitel}
 					}',
 
 // AdminCP Home elements
 'AdminMenu_General' => 'Allgemeine Einstellungen',
 
-'AdminMenu_Home' => 'Home',
+'AdminMenu_Home' => 'Start',
 'AdminMenu_Manual' => 'Handbuch',
-'AdminMenu_CustomPages' => 'Custom Pages',
+'AdminMenu_CustomPages' => 'Benutzerdefinierte Seiten',
 'AdminMenu_News' => 'News',
 'AdminMenu_Modules' => 'Module',
 'AdminMenu_Logs' => 'Logs',
@@ -414,9 +444,9 @@ return array(
 'AdminMenu_Icons' => 'Icons',
 'AdminMenu_Language' => 'Sprachen',
 
-'AdminMenu_Members' => 'Members',
+'AdminMenu_Members' => 'Mitglieder',
 	'AdminMenu_Search' => 'Suchen',
-	'AdminMenu_Pending' => 'Pending',
+	'AdminMenu_Pending' => 'Ausstehend',
 	'AdminMenu_Groups' => 'Gruppen',
 	'AdminMenu_Profile' => 'Profil',
 	'AdminMenu_Team' => 'Team',
@@ -425,9 +455,13 @@ return array(
 		'AdminMenu_Team_Group6' => 'Super Moderator',
 		'AdminMenu_Team_Group7' => 'Administrator',
 
+//AdminCP Profile elements
+'ACP_NewProfileField' => 'Neues Profil-Feld anlegen', //DB
+
 // AdminCP Archive elements
 'AdminMenu_Archive' => 'Archive',
 	'AdminMenu_Intro' => 'Intro',
+	'AdminMenu_Authors' => 'Autorenseite',
 'AdminMenu_Submission' => 'Einsendungen',
 	'AdminMenu_Stories' => 'Geschichten',
 	'AdminMenu_Images' => 'Cover Grafik',
@@ -449,24 +483,31 @@ return array(
 // 'ACP_Tags'				=> 'Tags',
 'ACP_NewTag'			=> 'Neuen Tag hinzufügen',
 'ACP_Character'			=> 'Charakter',
-//'ACP_Biography'			=> 'Biography',
-//'ACP_Contest'			=> 'Contest',
+	'ACP_NewCharacter'	=> 'Neuen Charakter anlegen',
+//	'ACP_CharacterName'	=> 'Character name',
+//'ACP_Biography'			=> 'Biografie',
+'ACP_Contest'			=> 'Wettbewerb',
+//	'ACP_EditContestEntries'	=> 'Wettbewerb-Einträge editieren',
+	'ACP_ContestDateRange'	=>	'Zeitraum des Wettbewerbs',
+	'ACP_NewContest'		=>	'Neuen Wettbewerb erstellen', //DB
 'ACP_Category'			=> 'Kategorie',
-'ACP_EditCategory'		=> 'Kategorie bearbeiten',
-'ACP_MainCategory'		=> 'Main category',
-'ACP_AddMainCategory'	=> 'Hauptkategorie hinzufügen',
-'ACP_AddSubCategory'	=> 'Unterkategorie zu \'{0}\' hinzufügen',
-// 'ACP_TagName'			=> 'Tag name',
-// 'ACP_TagLabel'			=> 'Tag label',
-// 'ACP_TagDescription'	=> 'Tag description',
-// 'ACP_TagLabel_Advice'	=> 'Only change when required',
-// 'ACP_TagGroupLabel'		=> 'Tag group label',
-// 'ACP_TagGroup'			=> 'Tag group',
-// 'ACP_TagGroupAdvice'	=> 'eFiction 5 requires at least one tag group, do not attempt to delete all tag groups or it will break the output.',
-'ACP_NewTagGroup'		=> 'Neue Taggruppe hinzufügen',
-// 'ACP_TagGroups'			=> 'Tag groups',
+	'ACP_EditCategory'		=> 'Kategorie bearbeiten',
+	'ACP_MainCategory'		=> 'Hauptkategorie',
+	'ACP_AddMainCategory'	=> 'Hauptkategorie hinzufügen',
+	'ACP_AddSubCategory'	=> 'Unterkategorie zu \'{0}\' hinzufügen',
+	'ACP_CategoryName'		=> 'Name der Kategorie',
+//	'ACP_CategoryDescription'	=> 'Beschreibung der Kategorie',
+// 'ACP_TagName'			=> 'Name des Tags',
+// 'ACP_TagLabel'			=> 'Label des Tags',
+// 'ACP_TagDescription'	=> 'Beschreibung des Tags',
+// 'ACP_TagLabel_Advice'	=> 'Nur ändern, wenn nötig',
+// 'ACP_TagGroupLabel'		=> 'Label der Tag-Gruppe',
+// 'ACP_TagGroup'			=> 'Tag-Gruppe',
+// 'ACP_TagGroupAdvice'	=> 'eFiction 5 benötigt wenigstens eine Tag-Gruppe; versuche nicht alle zu löschen, das führt zu massiven Fehlern im Skript.',
+'ACP_NewTagGroup'		=> 'Neue Tag-Gruppe hinzufügen',
+// 'ACP_TagGroups'			=> 'Tag-Gruppen',
 'ACP_NewRating'			=> 'Neues Rating hinzufügen',
-'ACP_RatingLabel'		=> 'Name des Ratings',
+'ACP_RatingLabel'		=> 'Label des Ratings',
 'ACP_RatingAge'			=> 'Alter',
 'ACP_RatingWarning'		=> 'Warnung anzeigen',
 'ACP_RatingWarningText' => 'Warnhinweis',
@@ -474,28 +515,36 @@ return array(
 'ACP_RatingCount'		=> 'Anzahl der Geschichten mit diesem Rating',
 'ACP_RatingMove'		=> 'Neues Rating für diese Geschichten',
 
+'ACP_CreateNews'		=> 'News-Eintrag anlegen',
+'ACP_NewsHeadline'		=> 'Schlagzeile eingeben',
+
+'ACP_CanLinkPage'		=> 'Kann verlinkt werden',
+//'ACP_Custom_LabelOnly'	=> 'Enter a short and unique label',
+'CreateNewPage'			=> 'Neue Seite oder neuen Textblock anlegen',
+'DuplicateLabel'		=> 'Bezeichner existiert bereits',
+
 // Admin - Archive - Featured
-'AdminMenu_Featured' => 'Featured',
-	'AdminMenu_Future' => 'Zukünftige',
+'AdminMenu_Featured' => 'Feature',
+	'AdminMenu_Upcoming' => 'Zukünftige',
 	'AdminMenu_Current' => 'Aktuell',
 	'AdminMenu_Past' => 'Vergangenheit',
-//'Feat_Current'			=> 'Currently featured',
-//'Feat_Past'				=> 'Past feature',
-//'Feat_Future'			=> 'Future feature (not active yet, merely a note)',
-//'SelectedBy'			=> 'Selected by',
+//'Feat_Current'			=> 'Aktuelles Feature',
+//'Feat_Past'				=> 'Ehemaliges Feature',
+//'Feat_Upcoming'			=> 'Zukünftiges Feature (noch nicht aktiv, nur eine Notiz)',
+//'SelectedBy'			=> 'Ausgewählt von',
 
 // Admin - Archive - Contest
-//'AdminMenu_Contests'	=> 'Contests',
-//'ContestDescription'	=> 'Contest description',
+//'AdminMenu_Contests'	=> 'Wettbewerb',
+//'ContestDescription'	=> 'Beschreibung des Wettbewerbs',
 
-'AdminMenu_Stories' => 'Stories',
-'AdminMenu_Stories_Pending' => 'Pending',
+'AdminMenu_Stories' => 'Geschichten',
+'AdminMenu_Stories_Pending' => 'Ausstehend',
 'AdminMenu_Edit' => 'Editieren',
 'AdminMenu_Add' => 'Hinzufügen',
 'AdminMenu_Series' => 'Serien',
 'AdminMenu_Collections' => 'Sammlungen',
 
-'CannotDeleteUsedElement'	=> 'Kann ein Element, dass zur Zeit verwendet wird, nicht löschen.',
+'CannotDeleteUsedElement'	=> 'Kann ein Element, dass zurzeit verwendet wird, nicht löschen.',
 'ElementDeleted'	=> 'Element gelöscht',
 'FailedDelete'		=> 'Element konnte nicht gelöscht werden',
 
@@ -508,31 +557,34 @@ return array(
 	'CFG_story_toc_default'		=> 'Zeige immer das Inhaltsverzeichnis bei Geschichten mit mehreren Kapiteln.',
 	// 'CFG_epub_domain'			=> 'ePub Domain@SMALL@Used to calculate your epub UUID v5. Leave blank for default (Archive URL)',
 // archive_images
-	// 'CFG_images_allowed' 		=> 'Allow posting of story images (cover art)',
+	// 'CFG_images_allowed' 		=> 'Erlaube Veröffentlichung von Cover-Grafiken.',
 	'CFG_images_height'			=> 'Maximale Höhe für Bilder',
 	'CFG_images_width'			=> 'Maximale Breite für Bilder',
 // archive_intro
 	'CFG_story_intro_items' => 'Anzahl der Stories auf der Startseite des Archivs.',
 	'CFG_story_intro_order' => 'Sortierung der Stories auf der Startseite des Archivs.',
+// archive_authors
+//	'CFG_author_overview_columns' 	=> 'Columns to show on the overview.',
+//	'CFG_author_letter_columns' 	=> 'Columns to show when selecting a letter.',
 // archive_reviews
 	'CFG_allow_reviews'			=> 'Reviews erlauben',
 	'CFG_allow_guest_reviews'	=> 'Gäste können Reviews schreiben',
 	'CFG_allow_review_delete'	=> 'Autoren können Reviews ihrer Geschichten löschen',
-	// 'CFG_allow_rateonly'		=> 'Allow ratings without review (including kudos)',
+	// 'CFG_allow_rateonly'		=> 'Erlaube Ratings ohne Reviews (einschließlich Kudos)',
 // archive_submit
 	// 'CFG_author_self' 			=> 'Every member can post stories@SMALL@If set to no, members must be added to group Authors to allow them to post stories',
 	// 'CFG_story_validation'	 	=> 'Stories require validation@SMALL@This does not apply to trusted authors.',
-	// 'CFG_stories_min_words'		=> 'Minimum amount of words for a chapter',
-	// 'CFG_stories_max_words'		=> 'Maximum amount of words for a chapter@SMALL@(0 = unlimited)',
-	// 'CFG_advanced_editor' 		=> 'Allow use of graphical editor',
-	// 'CFG_allow_co_author' 		=> 'Allow addition of other authors to stories',
-	// 'CFG_stories_min_tags'		=> 'Minimum amount of tags required',
+	// 'CFG_stories_min_words'		=> 'Minimale Anzahl von Wörtern je Kapitel',
+	// 'CFG_stories_max_words'		=> 'Maximale Anzahl von Wörtern je Kapitel@SMALL@(0 = unlimited)',
+	// 'CFG_advanced_editor' 		=> 'Erlaube grafischen Editor',
+	// 'CFG_allow_co_author' 		=> 'Erlaube weitere Autoren zu Geschichten hinzufügen',
+	// 'CFG_stories_min_tags'		=> 'Minimale verlangte Anzahl an Tags',
 	// 'CFG_allow_series'	 		=> 'Allow authors to create series@SMALL@Member series are now collections',
-	// 'CFG_allow_roundrobin'	 	=> 'Allow roundrobins',
+	// 'CFG_allow_roundrobin'	 	=> 'Erlaube Round Robins',
 // archive_tags_cloud
-	// 'CFG_tagcloud_basesize'		=> 'Base size in percent relative to normal font size.',
-	// 'CFG_tagcloud_elements'		=> 'Maximum number of elements in the tag cloud@SMALL@Elements are ordered by count.',
-	// 'CFG_tagcloud_minimum_elements'	=>  'Minimum amount of elements required to show tag cloud@SMALL@0 = always show',
+	// 'CFG_tagcloud_basesize'		=> 'Relative Basisgröße in Prozent zur normalen Fontgröße.',
+	// 'CFG_tagcloud_elements'		=> 'Maximale Anzahl von Elementen in der Tag-Cloud@SMALL@Elemente sortiert nach Menge.',
+	// 'CFG_tagcloud_minimum_elements'	=>  'Minimal benötigte Anzahl von Elementen, um Tag-Cloud anzuzeigen@SMALL@0 = immer anzeigen',
 	// 'CFG_tagcloud_spread'		=> 'Maximum size spread:@SMALL@spread*100 is the maximum percentage for the most used tag.<br>2.5 would convert to 250%.<br>(Realistic values are somewhere between 3 and 5)',
 // bad_behaviour
 	// 'CFG_bb2_enabled' 			=> 'Screen access\n<a href="http://bad-behavior.ioerror.us/support/configuration/" target="_blank">Bad Behaviour manual</a>@SMALL@(default <b>"{{@LN__yes}}"</b>)',
@@ -550,21 +602,21 @@ return array(
 	// 'CFG_bb2__reverse_proxy_header' 	=> 'Reverse Proxy Header@SMALL@(default "X-Forwarded-For")\r\nOnly required when using reverse proxy!',
 	// 'CFG_bb2__reverse_proxy_addresses'	=> 'Reverse Proxy Addresses@SMALL@(no default)\r\nOnly required when using reverse proxy!',
 // members_general
-	// 'CFG_agestatement'		=>	'Have members set their age to show rating warnings',
+	// 'CFG_agestatement'		=>	'Mitglieder müssen ihr Alter angeben, um Rating-Warnungen zu erhalten',
 // settings_datetime
 	'CFG_datetime_preset_explain'	=> 'Voreingestellte Formate, die unten angepasst werden können.@SMALL@Diese Formate werden dann trotzdem in gewissen Steuerelementen verwendet.',
-//	'CFG_time_preset'				=> 'Time format presets.',
-//	'CFG_date_preset'				=> 'Date format presets.',
+//	'CFG_time_preset'				=> 'Voreinstellung des Zeitformats.',
+//	'CFG_date_preset'				=> 'Voreinstellung des Datumsformats.',
 	'CFG_monday_first_day'			=> 'Erster Wochentag im Kalender:',
 	'CFG_datetime_custom_explain'	=> 'Leer lassen, um die Vorgaben von oben zu verwenden.@SMALL@Weitere Zeichen und Buchstaben sind möglich, siehe <a href="http://de.php.net/manual/de/function.date.php" target="_blank">php.net dokumentation</a> zur Erklärung.',
-//	'CFG_date_format'				=> 'Custom date format.',
-//	'CFG_time_format'				=> 'Custom time format.',
-//	'CFG_datetime_format'			=> 'Date and time format.',
+//	'CFG_date_format'				=> 'Benutzerdefiniertes Datumsformat.',
+//	'CFG_time_format'				=> 'Benutzerdefiniertes Zeitformat.',
+//	'CFG_datetime_format'			=> 'Datum- und Zeitformat.',
 // settings_language
 	'CFG_language_forced'		=> 'Deaktiviere persönliche Sprachwahl: @SMALL@Standard ist <b>nein</b>',
-	// 'CFG_language_available'	=> 'List all languages that are available to common members.',
+	// 'CFG_language_available'	=> 'Liste alle Sprachen, die für gewöhnliche Mitglieder verfügbar sind.',
 // settings_layout
-	// 'CFG_layout_forced'			=> 'Disable custom layout selection:@SMALL@Standard ist <b>nein</b>',
+	// 'CFG_layout_forced'			=> 'Deaktiviere benutzerdefinierte Theme-Auswahl:@SMALL@Standard ist <b>nein</b>',
 	// 'CFG_layout_available'		=> '',
 // settings_general
 	'CFG_page_title'			=> 'Website-Titel',
@@ -573,7 +625,7 @@ return array(
 	'CFG_page_title_add'		=> 'Zeige Seitenpfad oder Slogan im Titel',
 	'CFG_page_title_reverse'	=> 'Kehre Sortierung der Seiten-Titel Elemente um @SMALL@(Standard ist <b>nein</b>)',
 	'CFG_page_title_separator'	=> 'Trenner für Seiten-Titel Elemente',
-	'CFG_adjacent_paginations' 	=> 'Anzeige zusammenhängender Page-Links @SMALL@"1" für: 1 ... 4 [5] 6 ... 9<br />"2" für: 1 ... 3 4 [5] 6 7 ... 9<br>"0" um alle Links anzuzeigen',
+	'CFG_adjacent_paginations' 	=> 'Anzeige zusammenhängender Page-Links @SMALL@"1" für: 1 ... 4 [5] 6 ... 9<br />"2" für: 1 ... 3 4 [5] 6 7 ... 9<br />"0" um alle Links anzuzeigen',
 	'CFG_shoutbox_entries'		=> 'Anzahl der anzuzeigenden Shoutbox-Einträge',
 	'CFG_shoutbox_guest'		=> 'Erlaube Gästen die Shoutbox zu benutzen',
 	'CFG_allow_comment_news'	=> 'Erlaube News-Kommentare',
@@ -624,14 +676,14 @@ return array(
 //'translatedTo'		=> 'translated to',
 'Stories' => 'Geschichten',
 'NewStories' => 'Neue Geschichten',
-//'noNewStory'			=> 'No new Stories',
+//'noNewStory'			=> 'Keine neuen Geschichten',
 'RandomStory' => '{0, plural,'.
 	'one	{Zufällige Geschichte},'.
 	'other	{Zufällige Geschichten} }',
-//'noRandomStory'	=> 'No random stories yet',
+//'noRandomStory'	=> 'Keine zufälligen Geschichten',
 'NewRandomStoryEvery' => 'Neue zufällige Geschichte alle {0} Minuten',
 //'RandomStoryOfThe' => 'Zufällige Geschichte des {0}',
-//'RandomSpotlight' => 'Random Spotlight',
+//'RandomSpotlight' => 'Zufälliges Spotlight',
 'FeaturedStory' => '{0, plural,'.
 	'one	{Empfohlene Geschichte},'.
 	'other	{Empfohlene Geschichten} }',
@@ -639,13 +691,13 @@ return array(
 'RecommendedStory'	=> '{0, plural,'.
 	'one	{Externe Empfehlung},'.
 	'other	{Externe Empfehlungen} }',
-//'noRecommendedStory'	=> 'No recommended stories yet',
+//'noRecommendedStory'	=> 'Bisher keine Empfehlungen',
 'Notification'	=> 'Benachrichtigung',
 'Visibility'	=> 'Sichtbarkeit',
 'VisPrivate'	=> 'Private',
-'VisFriends'	=> 'Friends',
-'VisMembers'	=> 'Members',
-'VisEverybody'	=> 'Everybody',
+'VisFriends'	=> 'Freunde',
+'VisMembers'	=> 'Mitglieder',
+'VisEverybody'	=> 'Jeder',
 
 'NoElements'	=> 'Für diese Ansicht gibt es keine Elemente',
 
@@ -663,11 +715,13 @@ return array(
 'Characters' => 'Charaktere',
 'Clicks' => 'Klicks',
 'Author_Notes' => 'Anmerkungen des Autors',
+'Friend'	=> 'Friend',
+'Contact'	=> 'Contact',
 
-//'SearchUsername'=> 'Search in usernames',
-//'SearchUserAll' => 'Search in all user fields',
-'Tagcloud' => 'Tagcloud',
-'noTagcloud' => 'No tag cloud',
+//'SearchUsername'=> 'Suche in Benutzernamen',
+//'SearchUserAll' => 'Suche in allen Benutzerfeldern',
+'Tagcloud' => 'Tag-Cloud',
+'noTagcloud' => 'Keine Tag-Cloud',
 
 
 // Feedback
@@ -696,10 +750,11 @@ return array(
 	'one	{Ein Element geändert.},'.
 	'other	{# Elemente geändert.}
 }',
+'Changes_saved' => 'Änderungen wurden gespeichert',
 // 'Status_Errors' => '{0, plural,'.
-	// 'zero	{No errors.},'.
-	// 'one	{An error occurred while saving data.},'.
-	// 'other	{# errors occurred while saving data.}
+	// 'zero	{Keine Fehler.},'.
+	// 'one	{Während des Speicherns ist ein Fehler aufgetreten.},'.
+	// 'other	{# Fehler sind beim Speichern aufgetreten.}
 // }',
 
 'Review'	=> 'Review',
@@ -713,8 +768,8 @@ return array(
 'ReplyHeadline_noDate' => '{0} antwortete:',
 'ReplyHeadline' => 'Am {1} um {2} Uhr antwortete {0}:',
 'ReviewCommentsLink' => '{0, plural,'.
-	'one	{One comment.},'.
-	'other	{# comments.}
+	'one	{Ein Kommentar.},'.
+	'other	{# Kommentare.}
 }',
 
 // Redirect

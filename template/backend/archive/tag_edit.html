@@ -1,17 +1,52 @@
-<h1>{{@LN__ACP_Tags}}:</h1>
-<form action="{{@BASE}}/adminCP/archive/tags/edit/id={{ @data['id'] }}" method="post">
-	<div class="grid-wrapper">
-		<check if="{{ @data['errors'] }}"><div class="gb-90 alert-box error">{{ @LN__Status_Errors, @data['errors'] | format }}</div></check>
-		<check if="{{ @data['changes'] }}"><div class="gb-90 alert-box success">{{ @LN__Status_Changes, @data['changes'] |format }}</div></check>
-		<div class="gb-20">{{@LN__ACP_TagName}}</div><div class="gb-80"><input type="text" size=80 name="form_data[label]" value="{{ @data['label'] }}" /></div>
-		<div class="gb-20">{{@LN__ACP_TagGroup}}</div><div class="gb-80">
-			<select name="form_data[taggroup]" size="1">
-				<repeat group="{{ @data['groups'] }}" value="{{ @group }}">
-					<option value="{{@group['id'] }}"<check if="{{ @data['tgid']==@group['id'] }}"> selected="selected"</check>>{{ @group['description'] }}</option>
-				</repeat>
-			</select>
-		</div>
-		<div class="gb-full">{{@LN__ACP_TagDescription}}:<br /><textarea name="form_data[description]" rows="30" cols="80">{{ @data['description'] }}</textarea><br /></div>
-		<div class="gb-40" align="right"><input type="submit"></div><div class="gb-60"><input type="reset"></div>
+<check if="{{!empty(@returnpath)}}"><a href="{{@BASE}}{{@returnpath}}">{ICON:arrow-left} {{@LN__ReturnToOverview}}</a></check>
+<!-- error notification -->
+<check if="{{ isset(@form_error) }}">
+	<div class="notification is-warning">
+		<button class="delete"></button>
+		{{ @form_error }}
 	</div>
+</check>
+<!-- END: error notification -->
+<!-- success notification -->
+<check if="{{ isset(@form_changes) }}">
+	<div class="notification is-success">
+		<button class="delete"></button>
+		{{ @LN__Changes_saved }}
+	</div>
+</check>
+<!-- END: success notification -->
+
+<form action="{{@BASE}}/adminCP/archive/tags/edit/id={{ @data['id'] }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
+<div class="field">
+  <div class="control">
+	<div class="columns">
+		<div class="column is-2">{{@LN__ACP_TagName}}</div>
+		<div class="column is-5"><input class="input" type="text" name="form_data[label]" value="{{ @data.label }}" /></div>
+	</div>
+	<div class="columns">
+		<div class="column is-2">{{@LN__ACP_TagGroup}}</div>
+		<div class="column is-5">
+			<div class="select">
+				<select name="form_data[taggroup]" size="1">
+					<repeat group="{{ @data.groups }}" value="{{ @group }}">
+					<option value="{{@group.id }}"<check if="{{ @data.tgid==@group.id }}"> selected="selected"</check>>{{ @group.description }}</option>
+					</repeat>
+				</select>
+			</div>
+		</div>
+	</div>
+	<div class="columns">
+		<div class="column is-2">{{@LN__ACP_TagDescription}}</div>
+		<div class="column"><textarea class="textarea" name="form_data[description]" rows="5" cols="40">{{ @data.description }}</textarea><br /></div>
+	</div>
+	<div class="columns">
+		<div class="column is-half">
+			<div class="buttons">
+				<input class="button is-success" type="submit">
+				<input class="button" type="reset">
+			</div>
+		</div>
+		</div>
+	</div>
+</div>
 </form>

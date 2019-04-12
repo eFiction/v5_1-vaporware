@@ -24,12 +24,12 @@
 	clear: both;
 }
 
-[class*='gb-'] {
+[class*='gb-'], [class*='col-'] {
 	float: left;
 	padding: 6px;
 }
 
-[class*='gb-']:last-of-type {
+[class*='gb-']:last-of-type, [class*='col-']:last-of-type {
 	padding-right: 0;
 }
 
@@ -93,6 +93,43 @@
 .gb-3qrt {
 	width: 75%;
 }
+
+.col-1 {
+	width: 6.5%;
+	}
+.col-2 {
+	width: 15.0%;
+	}
+.col-3 {
+	width: 23.5%;
+	}
+.col-4 {
+	width: 32.0%;
+	}
+.col-5 {
+	width: 40.5%;
+	}
+.col-6 {
+	width: 49.0%;
+	}
+.col-7 {
+	width: 57.5%;
+	}
+.col-8 {
+	width: 66.0%;
+	}
+.col-9 {
+	width: 74.5%;
+	}
+.col-10 {
+	width: 83.0%;
+	}
+.col-11 {
+	width: 91.5%;
+	}
+.col-12 {
+	width: 100%;
+	}
 
 /* golden ratio: http://en.wikipedia.org/wiki/Golden_ratio */
 .gb-golden1 {

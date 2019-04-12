@@ -45,7 +45,7 @@ class Auth extends Base
 
 	public static function lostPWMail(\Base $f3, $user, $token)
 	{
-		\Base::instance()->set('username', $user['nickname']);
+		\Base::instance()->set('username', $user['username']);
 		\Base::instance()->set('token', $token);
 		
 		return \Template::instance()->render('email/lostpw.html','text/html');

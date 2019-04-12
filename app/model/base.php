@@ -174,8 +174,70 @@ class Base extends \Prefab {
 		return count(preg_split("/\p{L}[\p{L}\p{Mn}\p{Pd}'\x{2019}]{1,}/u",$str));
 	}
 
-//	protected function paginate(int $total, $route, int $limit=10)
-	protected function paginate($total, $route, $limit=10)
+	public function storyData(array $replacements=[], array $bind=[])
+	{
+		$sql = $this->storySQL($replacements);
+		$data = $this->exec($sql, $bind);
+
+		if ( sizeof($data)>0 )
+		{
+			foreach ( $data as &$dat)
+			{
+				$favs = $this->cleanResult($dat['is_favourite']);
+				$dat['is_favourite'] = [];
+				if(!empty($favs))
+				foreach ( $favs as $value )
+					if ( isset($value[1]) ) $dat['is_favourite'][$value[0]] = $value[1];
+			}
+		}
+
+		return $data;
+	}
+	
+	public function storySQL(array $replacements=[])
+	{
+		$sql_StoryConstruct = "SELECT SQL_CALC_FOUND_ROWS
+				S.sid, S.title, S.summary, S.storynotes, S.completed, S.wordcount, UNIX_TIMESTAMP(S.date) as published, UNIX_TIMESTAMP(S.updated) as modified, 
+				S.count,GROUP_CONCAT(Ser.seriesid,',',rSS.inorder,',',Ser.title ORDER BY Ser.title DESC SEPARATOR '||') as in_series @EXTRA@,
+				".((isset($this->config['optional_modules']['contests']))?"GROUP_CONCAT(rSC.relid) as contests,":"")."
+				GROUP_CONCAT(Fav.bookmark,',',Fav.fid SEPARATOR '||') as is_favourite,
+				Edit.uid as can_edit,
+				S.cache_authors, S.cache_tags, S.cache_characters, S.cache_categories, S.cache_rating, S.chapters, S.reviews,
+				S.translation, S.trans_from, S.trans_to
+			FROM `tbl_stories`S
+				@JOIN@
+			".((isset($this->config['optional_modules']['contests']))?"LEFT JOIN `tbl_contest_relations`rSC ON ( rSC.relid = S.sid AND rSC.type = 'story' )":"")."
+				LEFT JOIN `tbl_series_stories`rSS ON ( rSS.sid = S.sid )
+					LEFT JOIN `tbl_series`Ser ON ( Ser.seriesid=rSS.seriesid )
+				LEFT JOIN `tbl_ratings`Ra ON ( Ra.rid = S.ratingid )
+				LEFT JOIN `tbl_stories_authors`rSAE ON ( S.sid = rSAE.sid )
+					LEFT JOIN `tbl_users`Edit ON ( ( rSAE.aid = Edit.uid ) AND ( ( Edit.uid = ".(int)$_SESSION['userID']." ) OR ( Edit.curator = ".(int)$_SESSION['userID']." ) ) )
+				LEFT JOIN `tbl_user_favourites`Fav ON ( Fav.item = S.sid AND Fav. TYPE = 'ST' AND Fav.uid = ".(int)$_SESSION['userID'].")
+			WHERE S.completed @COMPLETED@ 6 AND S.validated >= 30 @WHERE@
+			GROUP BY S.sid
+			@ORDER@
+			@LIMIT@";
+
+		// default replacements
+		$replace =
+		[
+			"@EXTRA@"		=> "",
+			"@JOIN@"		=> "",
+			"@COMPLETED@"	=> ">=",
+			"@WHERE@"		=> ($_SESSION['preferences']['ageconsent']==1)?"":"AND Ra.ratingwarning=0 ",
+			"@ORDER@"		=> "",
+			"@LIMIT@"		=> ""
+		];
+		
+		// insert custom replacements
+		foreach ( $replacements as $key => $value )
+		{
+			$replace["@{$key}@"] = $value;
+		}
+		return str_replace(array_keys($replace), array_values($replace), $sql_StoryConstruct);
+	}
+
+	protected function paginate(int $total, string $route, int $limit=10)
 	{
 		/**
 			Implementing parts of the
@@ -205,32 +267,23 @@ class Base extends \Prefab {
 			exit;
 		}
 
-		// really needed? must check
-		$pos = (int)max(0,min($page-1,$count-1));
-		
 		// page link range, from config
 		$range = $this->config['adjacent_paginations'];
-		// build range link array
-		$current_range = array( ($page-$range < 1 ? 1 : $page-$range),
-            ($page+$range > $count ? $count : $page+$range));
-        $rangeIDs = array();
-        for($x = $current_range[0]; $x <= $current_range[1]; ++$x) {
-            $rangeIDs[] = $x;
-		}
+		// set up page range
+		$first_page = $page-$range < 1 ? 1 : $page-$range;
+		$last_page	= $page+$range > $count ? $count : $page+$range;
 
 		// add data to the global scope
 		$f3->set('paginate',
 		[
-			'total' => $total, // Elements
-			'limit' => $limit, // per page
-			'count' => $count, // pages
-			'pos'   => $pos, // current position
+			'total' => $total,	// Elements
+			'limit' => $limit,	// per page
+			'count' => $count,	// pages
 			'page'	=> $page,
 			'route' => $route,
 			'prefix' => $prefix,
-			'firstPage' => ($page > 3) ? 1 : false,
-			'lastPage'  => ( ($pos+3) < $count ) ? 1 : false,
-			'rangePages' => $rangeIDs,
+			'firstPage' => $first_page,
+			'lastPage'  => $last_page,
 		]);
 	}
 

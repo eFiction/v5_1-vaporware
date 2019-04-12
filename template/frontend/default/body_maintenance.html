@@ -1,21 +1,19 @@
-<div id="top-navbar"><include href="main/navbar.html" /></div>
+<include href="main/header.html" />
+
+<div class="hero-body">
 <!-- begin container -->
-<div class="grid-wrapper" id="container">
-	<div class="grid-wrapper header"><a href="{{@BASE}}"><h1>{{@CONFIG.page_title}}</h1></a>
-	{{@CONFIG.page_slogan}}
+	<div class="grid-wrapper header"><h1>efiction 5.0</h1>
 		<div class="gb-full screen-micro">
 			<a href="{{@BASE}}"><div class="header_img"></div></a>
 		</div>
-		<div class="gb-full">
-			{BLOCK:menu.main}
-		</div>
 	</div><!-- end header -->
 
-	<div class="gb-20 screen-micro">
+<div class="columns">
+	<div class="column is-2">
 		&nbsp;
 	</div>
-	<div class="gb-60" id="content">
-		<div class="alert-box warning">{{@LN__MaintenanceMode}}!</div>
+	<div class="column is-8">
+		<p class="is-warning">{{@LN__MaintenanceMode}}!</p>
 
 		<check if="{{ isset(@title_h1) }}">
 			<h1>{{ @title_h1 }}</h1>
@@ -28,14 +26,11 @@
 		{{@BODY | raw }}
 	</div><!-- end content -->
 
-	<div class="gb-20">
+	<div class="column is-2">
 		&nbsp;
 	</div>
-
-	<div class="grid-wrapper footer">
-		<div class="gb-full">
-			{PAGE:footer}<br />
-		</div>
-	</div> <!-- end footer -->
 </div>
 <!-- end container -->
+</div>
+
+<include href="main/footer.html" />

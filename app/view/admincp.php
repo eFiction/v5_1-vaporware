@@ -69,12 +69,10 @@ class AdminCP extends Base
 		return $this->render('archive/character_list.html');
 	}
 
-//	public function characterEdit(array $data, str $returnpath)
-	public function characterEdit(array $data, $returnpath)
+	public function characterEdit(array $data, string $returnpath)
 	{
 		$this->f3->set('data', $data);
 		$this->f3->set('returnpath', $returnpath);
-
 		return $this->render('archive/character_edit.html');
 	}
 	
@@ -129,14 +127,16 @@ class AdminCP extends Base
 		return $this->render('home/custompage_list.html');
 	}
 
-	public function custompageEdit(array $data)
+	public function custompageEdit(array $data, string $returnpath)
 	{
 		if(!isset($data['raw']))
 		{
 			$this->javascript( 'head', TRUE, "//cdn.tinymce.com/4/tinymce.min.js" );
 			$this->javascript( 'head', TRUE, "editor.js" );
 		}
+
 		$this->f3->set('data', $data);
+		$this->f3->set('returnpath', $returnpath);
 		return $this->render('home/custompage_edit.html');
 	}
 
@@ -206,7 +206,7 @@ class AdminCP extends Base
 		
 	}
 
-	public function newsEdit(array $data, $returnpath)
+	public function newsEdit(array $data, string $returnpath)
 	{
 		if(!isset($data['raw']))
 		{
@@ -419,9 +419,10 @@ class AdminCP extends Base
 		return $this->render('archive/tagGroup_list.html');
 	}
 	
-	public function tagEdit(array $data)
+	public function tagEdit(array $data, string $returnpath)
 	{
 		$this->f3->set('data', $data);
+		$this->f3->set('returnpath', $returnpath);
 		return $this->render('archive/tag_edit.html');
 	}
 

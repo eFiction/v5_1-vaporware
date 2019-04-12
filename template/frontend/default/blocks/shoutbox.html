@@ -1,19 +1,20 @@
-<div class="sbarbox" id="sb_cell_shoutbox">
-	<h3>{{@LN__Shoutbox}}</h3>
-{*	<div id="sboxContainer"> *}
-		<div id="sboxContent" data-offset=0>
-			<div class="sboxInfo">
-				<span class="shoutButton" data-direction="top"><a href="#">Top</a></span> <span class="shoutButton" data-direction="up"><a href="#">Up</a></span> <span class="shoutButton" data-direction="down"><a href="#">Down</a></span><check if="{{@_SESSION['userID']>0 OR TRUE==\Config::getPublic('shoutbox_guest')}}"> <span class="shoutButton" data-action="shout"><a href="#">Shout!</a></span></check>
-			</div>
-			<span id="sboxError" style="display: none"></span>
-			<form id="sboxInput" style="display: none">
-				<div class="sboxInfo">
-					<span id="sboxForm"></span>
-					<span class="shoutButton" data-action="reset"><a href="#">{{@LN__Cancel}}</a></span>
-					<span class="shoutButton" data-action="submit"><a href="#">{{@LN__Submit}}</a></span>
-				</div>
-			</form>
-			<div id="sboxLines"></div>
+<div class="sbox sbarbox">
+	<h4>{{@LN__Shoutbox}}</h4>
+	<div id="sboxContent" data-offset=0>
+		<div class="buttons are-small">
+			<span class="shoutButton button" data-direction="top"><a href="#">{ICON:angle-double-up}</a></span>
+			<span class="shoutButton button" data-direction="up"><a href="#">{ICON:angle-up}</a></span>
+			<span class="shoutButton button" data-direction="down"><a href="#">{ICON:angle-down}</a></span>
+			<check if="{{@_SESSION['userID']>0 OR TRUE==\Config::getPublic('shoutbox_guest')}}"><span class="shoutButton button" data-action="shout"><a href="#">{ICON:comment}</a></span></check>
 		</div>
-{*	</div> *}
+		<span id="sboxError" style="display: none"></span>
+		<form id="sboxInput" style="display: none">
+			<span id="sboxForm"></span>
+			<div class="buttons are-small">
+				<span class="shoutButton button is-success" data-action="submit"><a href="#">{{@LN__Submit}}</a></span>
+				<span class="shoutButton button is-danger" data-action="reset"><a href="#">{{@LN__Cancel}}</a></span>
+			</div>
+		</form>
+		<div id="sboxLines"></div>
+	</div>
 </div>

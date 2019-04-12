@@ -1,5 +1,5 @@
 <div class="sbarbox" id="{{ @cell.ID }}">
-	<h3>{{ @cell.TITLE }}</h3>
+	<h4>{{ @cell.TITLE }}</h4>
 	<repeat group="{{ @cell.CONTENT }}" value="{{ @cell }}" counter="{{ @ctr }}">
 		<a href="{{@BASE}}/story/categories/{{@cell.id }}">{{@cell.name }}</a> ({{@cell.stats.count}})<br />
 	</repeat>

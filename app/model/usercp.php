@@ -19,7 +19,7 @@ class UserCP extends Controlpanel
 			{
 				$allowed=[];
 				// get associated author and curator data
-				$authorData = $this->exec("SELECT U.uid, CONCAT(U.nickname, ' (',COUNT(DISTINCT SA.lid), ')') as label, IF(U.uid={$_SESSION['userID']},1,0) as curator
+				$authorData = $this->exec("SELECT U.uid, CONCAT(U.username, ' (',COUNT(DISTINCT SA.lid), ')') as label, IF(U.uid={$_SESSION['userID']},1,0) as curator
 												FROM `tbl_users`U 
 													LEFT JOIN `tbl_stories_authors`SA ON ( U.uid = SA.aid AND SA.type='M' ) 
 												WHERE U.uid = {$_SESSION['userID']} OR U.curator = {$_SESSION['userID']} 
@@ -485,14 +485,14 @@ class UserCP extends Controlpanel
 	
 	public function authorCuratorGet()
 	{
-		$data = $this->exec("SELECT C.nickname, C.uid
+		$data = $this->exec("SELECT C.username, C.uid
 								FROM `tbl_users`U 
 									INNER JOIN `tbl_users`C ON ( U.curator = C.uid AND U.uid = {$_SESSION['userID']} )
 							");
 
-		$return['self'] = ( sizeof($data) ) ? json_encode ( array ( "name"	=> $data[0]['nickname'], "id" => $data[0]['uid'] ) ) : "";
+		$return['self'] = ( sizeof($data) ) ? json_encode ( array ( "name"	=> $data[0]['username'], "id" => $data[0]['uid'] ) ) : "";
 		
-		$return['others'] = $this->exec("SELECT U.nickname, U.uid
+		$return['others'] = $this->exec("SELECT U.username, U.uid
 											FROM `tbl_users`U
 												INNER JOIN `tbl_users`C ON ( U.curator = C.uid AND C.uid = {$_SESSION['userID']} )
 											");
@@ -601,16 +601,16 @@ class UserCP extends Controlpanel
 		{
 			if(isset($data['namestring']))
 			{
-				$ajax_sql = "SELECT U.nickname as name, U.uid as id from `tbl_users`U WHERE U.nickname LIKE :nickname AND U.groups > 0 AND U.uid != {$_SESSION['userID']} ORDER BY U.nickname ASC LIMIT 10";
-				$bind = [ ":nickname" =>  "%{$data['namestring']}%" ];
+				$ajax_sql = "SELECT U.username as name, U.uid as id from `tbl_users`U WHERE U.username LIKE :username AND U.groups > 0 AND U.uid != {$_SESSION['userID']} ORDER BY U.username ASC LIMIT 10";
+				$bind = [ ":username" =>  "%{$data['namestring']}%" ];
 			}
 		}
 		elseif ( $key == "stories" )
 		{
 			if(isset($data['author']))
 			{
-				$ajax_sql = "SELECT U.nickname as name, U.uid as id from `tbl_users`U WHERE U.nickname LIKE :nickname AND (U.groups&5) ORDER BY U.nickname ASC LIMIT 10";
-				$bind = [ ":nickname" =>  "%{$data['author']}%" ];
+				$ajax_sql = "SELECT U.username as name, U.uid as id from `tbl_users`U WHERE U.username LIKE :username AND (U.groups&5) ORDER BY U.username ASC LIMIT 10";
+				$bind = [ ":username" =>  "%{$data['author']}%" ];
 			}
 			elseif(isset($data['category']))
 			{
@@ -672,7 +672,7 @@ class UserCP extends Controlpanel
 	
 	public function msgInbox($offset=0)
 	{
-		$sql = "SELECT M.mid,UNIX_TIMESTAMP(M.date_sent) as date_sent, UNIX_TIMESTAMP(M.date_read) as date_read,M.subject,M.sender as name_id,U.nickname as name, FALSE as can_revoke
+		$sql = "SELECT M.mid,UNIX_TIMESTAMP(M.date_sent) as date_sent, UNIX_TIMESTAMP(M.date_read) as date_read,M.subject,M.sender as name_id,U.username as name, FALSE as can_revoke
 						FROM `tbl_messaging`M
 							INNER JOIN `tbl_users`U ON ( M.sender = U.uid ) 
 						WHERE M.recipient = ".$_SESSION['userID']." AND M.sent IS NULL
@@ -682,7 +682,7 @@ class UserCP extends Controlpanel
 
 	public function msgOutbox($offset=0)
 	{
-		$sql = "SELECT M.mid,UNIX_TIMESTAMP(M.date_sent) as date_sent, M2.mid as mid_read, UNIX_TIMESTAMP(M2.date_read) as date_read,M.subject,M.recipient as name_id,U.nickname as name, IF((M2.date_read IS NULL AND M2.mid IS NOT NULL),TRUE,FALSE) as can_revoke
+		$sql = "SELECT M.mid,UNIX_TIMESTAMP(M.date_sent) as date_sent, M2.mid as mid_read, UNIX_TIMESTAMP(M2.date_read) as date_read,M.subject,M.recipient as name_id,U.username as name, IF((M2.date_read IS NULL AND M2.mid IS NOT NULL),TRUE,FALSE) as can_revoke
 						FROM `tbl_messaging`M 
 							LEFT JOIN `tbl_messaging`M2 ON ( M.sent = M2.mid )
 							INNER JOIN `tbl_users`U ON ( M.recipient = U.uid ) 
@@ -694,8 +694,8 @@ class UserCP extends Controlpanel
 	public function msgRead($msgID)
 	{
 		$sql = "SELECT M.mid,UNIX_TIMESTAMP(M.date_sent) as date_sent,UNIX_TIMESTAMP(M.date_read) as date_read,M.subject,M.message,
-								M.sender as sender_id, u1.nickname as sender,
-								M.recipient as recipient_id, u2.nickname as recipient 
+								M.sender as sender_id, u1.username as sender,
+								M.recipient as recipient_id, u2.username as recipient 
 						FROM `tbl_messaging`M 
 							INNER JOIN `tbl_users`u1 ON ( M.sender = u1.uid ) 
 							INNER JOIN `tbl_users`u2 ON ( M.recipient = u2.uid ) 
@@ -721,8 +721,8 @@ class UserCP extends Controlpanel
 		{
 			$sql = "SELECT M.mid,UNIX_TIMESTAMP(M.date_sent) as date_sent,UNIX_TIMESTAMP(M.date_read) as date_read,M.subject,M.message,
 									IF(M.recipient = {$_SESSION['userID']},M.sender,NULL) as recipient_id,
-									IF(M.recipient = {$_SESSION['userID']},u1.nickname,NULL) as recipient,
-									u1.nickname as sender
+									IF(M.recipient = {$_SESSION['userID']},u1.username,NULL) as recipient,
+									u1.username as sender
 									FROM `tbl_messaging`M
 									INNER JOIN `tbl_users`u1 ON ( M.sender = u1.uid ) 
 									INNER JOIN `tbl_users`u2 ON ( M.recipient = u2.uid ) 
@@ -842,7 +842,7 @@ class UserCP extends Controlpanel
 		$limit = 25;
 		$pos = $page - 1;
 
-		$sql = "SELECT SQL_CALC_FOUND_ROWS S.id, S.uid, U.nickname, S.message, UNIX_TIMESTAMP(S.date) as timestamp
+		$sql = "SELECT SQL_CALC_FOUND_ROWS S.id, S.uid, U.username, S.message, UNIX_TIMESTAMP(S.date) as timestamp
 					FROM `tbl_shoutbox`S 
 						LEFT JOIN `tbl_users`U ON ( S.uid = U.uid )
 					".
@@ -1014,7 +1014,7 @@ class UserCP extends Controlpanel
 		$sql['bookfav'] =
 		[
 			"AU"
-				=>	"SELECT SQL_CALC_FOUND_ROWS 'AU' as type, U.uid as id, U.nickname as name, Fav.comments, Fav.visibility, Fav.notify, Fav.fid
+				=>	"SELECT SQL_CALC_FOUND_ROWS 'AU' as type, U.uid as id, U.username as name, Fav.comments, Fav.visibility, Fav.notify, Fav.fid
 						FROM `tbl_users`U 
 						{$join} JOIN `tbl_user_favourites`Fav ON ( U.uid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='AU' AND Fav.bookmark = :bookmark ) ",
 			"ST"
@@ -1034,7 +1034,7 @@ class UserCP extends Controlpanel
 		$sql['feedbackwritten'] =
 		[
 			"ST"
-				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, SA.sid as id, Ch.inorder as chapter, GROUP_CONCAT(DISTINCT U.nickname SEPARATOR ', ') as name, U.uid, F.text, S.title, UNIX_TIMESTAMP(F.datetime) as date 
+				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, SA.sid as id, Ch.inorder as chapter, GROUP_CONCAT(DISTINCT U.username SEPARATOR ', ') as name, U.uid, F.text, S.title, UNIX_TIMESTAMP(F.datetime) as date 
 						FROM `tbl_feedback`F
 						INNER JOIN `tbl_stories`S ON ( F.reference = S.sid )
 							{$join} JOIN `tbl_stories_authors`SA ON ( S.sid = SA.sid )
@@ -1047,7 +1047,7 @@ class UserCP extends Controlpanel
 							F2.text as reviewtext, 
 							SA.sid as id, 
 							Ch.inorder as chapter, 
-							GROUP_CONCAT(DISTINCT U.nickname SEPARATOR ', ') as name, U.uid, S.title
+							GROUP_CONCAT(DISTINCT U.username SEPARATOR ', ') as name, U.uid, S.title
 						FROM `tbl_feedback`F 
 							INNER JOIN `tbl_feedback`F2 ON ( F.reference = F2.fid )
 							INNER JOIN `tbl_stories`S ON ( F2.reference = S.sid ) 
@@ -1056,7 +1056,7 @@ class UserCP extends Controlpanel
 							LEFT JOIN `tbl_chapters`Ch ON ( F2.reference_sub = Ch.chapid ) 
 						WHERE F.writer_uid = {$_SESSION['userID']} AND F.type='C' ",
 			"SE"
-				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Ser.seriesid as id, GROUP_CONCAT(DISTINCT U.nickname SEPARATOR ', ') as name, U.uid, F.text, Ser.title, UNIX_TIMESTAMP(F.datetime) as date 
+				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Ser.seriesid as id, GROUP_CONCAT(DISTINCT U.username SEPARATOR ', ') as name, U.uid, F.text, Ser.title, UNIX_TIMESTAMP(F.datetime) as date 
 						FROM `tbl_feedback`F
 						INNER JOIN `tbl_series`Ser ON ( F.reference = Ser.seriesid )
 							INNER JOIN `tbl_users`U ON ( U.uid = Ser.uid )
@@ -1071,7 +1071,7 @@ class UserCP extends Controlpanel
 		$sql['feedbackreceived'] =
 		[
 			"ST"
-				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, SA.sid as id, Ch.inorder as chapter, IF(F.writer_uid>0,U.nickname,F.writer_name) as name, U.uid, F.text, S.title, UNIX_TIMESTAMP(F.datetime) as date 
+				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, SA.sid as id, Ch.inorder as chapter, IF(F.writer_uid>0,U.username,F.writer_name) as name, U.uid, F.text, S.title, UNIX_TIMESTAMP(F.datetime) as date 
 						FROM `tbl_feedback`F
 							LEFT JOIN `tbl_users`U ON ( F.writer_uid = U.uid )
 							INNER JOIN `tbl_stories_authors`SA ON ( F.reference = SA.sid AND SA.aid = {$_SESSION['userID']} )
@@ -1079,13 +1079,13 @@ class UserCP extends Controlpanel
 								LEFT JOIN `tbl_chapters`Ch ON ( F.reference_sub = Ch.chapid )
 						WHERE F.type='ST' ",
 			"SE"
-				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Ser.seriesid as id, IF(F.writer_uid>0,U.nickname,F.writer_name) as name, U.uid, F.text, Ser.title, UNIX_TIMESTAMP(F.datetime) as date 
+				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Ser.seriesid as id, IF(F.writer_uid>0,U.username,F.writer_name) as name, U.uid, F.text, Ser.title, UNIX_TIMESTAMP(F.datetime) as date 
 						FROM `tbl_feedback`F
 							INNER JOIN `tbl_series`Ser ON ( F.reference = Ser.seriesid AND Ser.uid = {$_SESSION['userID']} )
 							LEFT JOIN `tbl_users`U ON ( F.writer_uid = U.uid )
 						WHERE F.type='SE' ",
 			"RC"
-				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Rec.recid as id, IF(F.writer_uid>0,U.nickname,F.writer_name) as name, U.uid, F.text, Rec.title, Rec.url, UNIX_TIMESTAMP(F.datetime) as date 
+				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Rec.recid as id, IF(F.writer_uid>0,U.username,F.writer_name) as name, U.uid, F.text, Rec.title, Rec.url, UNIX_TIMESTAMP(F.datetime) as date 
 						FROM `tbl_feedback`F
 							INNER JOIN `tbl_recommendations`Rec ON ( F.reference = Rec.recid AND Rec.uid = {$_SESSION['userID']} )
 							LEFT JOIN `tbl_users`U ON ( F.writer_uid = U.uid )
@@ -1210,7 +1210,7 @@ class UserCP extends Controlpanel
 											"showTOC"		=> $data['p']['showTOC'],
 											"language"		=> $data['p']['language'],
 											"layout"		=> $data['p']['layout'],
-											"hideTags"		=> $data['p']['hideTags'],
+											"hideTags"		=> @$data['p']['hideTags'],
 										]);
 		$mapper->save();
 	}

@@ -1,70 +1,76 @@
-<div id="top-navbar"><include href="main/navbar.html" /></div>
-<!-- begin container -->
-<div class="grid-wrapper" id="container">
-	<div class="grid-wrapper header"><a href="{{@BASE}}"><h1>{{@CONFIG.page_title}}</h1></a>
-	{{@CONFIG.page_slogan}}
-		<div class="gb-full screen-micro">
-			<a href="{{@BASE}}"><div class="header_img"></div></a>
-		</div>
-		<div class="gb-full">
-			{BLOCK:menu.main}
-		</div>
-	</div><!-- end header -->
+<include href="main/header.html" />
 
-	<check if="{{TRUE==@CONFIG.maintenance}}"><div class="alert-box warning">{{@LN__MaintenanceMode}}!<br/><a href="{{@BASE}}/adminCP/settings/server">__settings</a></div></check>
+{*
+<!-- Hero content: will be in the middle -->
+<div class="hero-body">
+<div class="container"><!-- end hero container -->
+*}
+ 	<check if="{{TRUE==\Config::getPublic('maintenance')}}">
+		<section class="hero is-warning is-small"><div class="hero-body"><div class="container"><h2 class="subtitle">{{@LN__MaintenanceMode}}!</h2></div></div></section>
+	</check>
+
+	
+	<section class="hero">
+	<div class="container"><!-- start container -->
+	<div class="columns">
+		<div class="column"><a href="{{@BASE}}"><h1>{{@CONFIG.page_title}}</h1></a> {{@CONFIG.page_slogan}}</div>
+	</div>
+	<div class="columns">
+		<div class="column">{BLOCK:menu.main}</div>
+	</div>
+	
+	<div class="columns"><!-- start columns -->
 	<check if="{{ @@systempage }}">
+		<true>
 	<!-- layout for system pages (admin panel, error pages, ...) -->
 		<true>
-			<div class="gb-20 screen-micro">
-				<div class="cp-menu-wrapper">{{@LEFT|raw}}</div>
-			</div>
-			<div class="gb-80" id="content">
+		<div class="column is-2">{{@LEFT|raw}}</div>
+		<div class="column is-10"><!-- start content -->
 		</true>
-
+		
 	<!-- regular pages -->
 		<false>
-			<div class="gb-20 screen-micro">
-				<div class="sidebar">{BLOCK:story.tagcloud.20}{BLOCK:shoutbox}</div>
-				{{@LEFT}}
-			</div>
+		<div class="column is-2">
+			{BLOCK:story.tagcloud.20}{BLOCK:shoutbox}
+			{{@LEFT}}
+		</div>
 			<!-- select width for main section -->
 			<check if="{{ isset(@bigscreen) }}">
 				<true>
-					<div class="gb-80" id="content">
+		<div class="column is-10"><!-- start content -->
 				</true>
 				<false>
-					<div class="gb-60" id="content">
+		<div class="column is-8"><!-- start content -->
 				</false>
 			</check>
 		</false>
 	</check>
 
 	<check if="{{ isset(@title_h1) }}">
-		<h1>{{ @title_h1 }}</h1>
+			<h1>{{ @title_h1 }}</h1>
 	</check>
 		
 	<check if="{{ isset(@title_h3) }}">
-		<h3>{{ @title_h3 }}</h3>
+			<h3>{{ @title_h3 }}</h3>
 	</check>
 
 		{{@BODY | raw }}
-	</div><!-- end content -->
+		</div><!-- end content -->
 
 	<!-- drop right bar for system  -->
 	<check if="{{ empty(@bigscreen) and empty(@systempage) }}">
-		<div class="gb-20">
-		{BLOCK:categories}{BLOCK:calendar}{BLOCK:story.stats}
+		<div class="column is-2">
+		{BLOCK:story.stats}{BLOCK:categories}{BLOCK:calendar}
 			{{@RIGHT|raw}}
 		</div>
 	</check>
+	</div><!-- end columns -->
+	
+	</div><!-- end container -->
+	</section>
+{*	
+</div><!-- end hero container -->
+</div><!-- END Hero content: will be in the middle -->
+*}
 
-	<div class="grid-wrapper footer">
-		<div class="gb-full">
-			{PAGE:footer}<br />
-			{{ \Base::instance()->format('eFiction v{0}, using {1}, page rendered in {2} msecs / Memory usage {3} KB',@APP_VERSION,@DBType,round(1e3*(microtime(TRUE)-$TIME),2),round(memory_get_usage(TRUE)/1e3,1)) }}
-			<check if="{{isset(@bb2_stats)}}"><div>BB block {{@bb2_stats}}</div></check>
-		</div>
-	</div> <!-- end footer -->
-</div>
-<!-- end container -->
-{BLOCK:HONEYPOT}
+<include href="main/footer.html" />
