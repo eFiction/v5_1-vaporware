@@ -1011,6 +1011,7 @@ class UserCP extends Controlpanel
 	protected function sqlMaker($module, $type, $inner = TRUE)
 	{
 		$join = $inner ? "INNER" : "LEFT";
+		/*
 		$sql['bookfav'] =
 		[
 			"AU"
@@ -1030,6 +1031,39 @@ class UserCP extends Controlpanel
 						FROM `tbl_recommendations`Rec
 						{$join} JOIN `tbl_user_favourites`Fav ON ( Rec.recid = Fav.item AND Fav.uid = {$_SESSION['userID']} AND Fav.type='RC' AND Fav.bookmark = :bookmark ) ",
 		];
+*/
+		$select_bookfav =
+		[
+			"AU"	=>
+			[
+				"fields"	=> "'AU' as type, U.uid as id, U.username as name",
+				"from"		=> "`tbl_users`U",
+				"join"		=> "U.uid = Fav.item AND Fav.type='AU'"
+			],
+			"ST"	=>
+			[
+				"fields"	=> "'ST' as type, S.sid as id, S.title as name, S.cache_authors as authorblock",
+				"from"		=> "`tbl_stories`S",
+				"join"		=> "S.sid = Fav.item AND Fav.type='ST'"
+			],
+			"SE"	=>
+			[
+				"fields"	=> "'SE' as type, Ser.seriesid as id, Ser.title as name, Ser.cache_authors",
+				"from"		=> "`tbl_series`Ser",
+				"join"		=> "Ser.seriesid = Fav.item AND Fav.type='SE'"
+			],
+			"RC"	=>
+			[
+				"fields"	=> "'RC' as type, Rec.recid as id, Rec.title as name, Rec.author as cache_authors",
+				"from"		=> "`tbl_recommendations`Rec",
+				"join"		=> "Rec.recid = Fav.item AND Fav.type='RC'"
+			]
+		];
+		$sql['bookfav'][$type] = "SELECT SQL_CALC_FOUND_ROWS {$select_bookfav[$type]['fields']}, 
+						Fav.comments, Fav.visibility, Fav.notify, Fav.fid, Fav.bookmark
+						FROM {$select_bookfav[$type]['from']} 
+						{$join} JOIN `tbl_user_favourites`Fav ON
+					( {$select_bookfav[$type]['join']} AND Fav.uid = {$_SESSION['userID']} AND Fav.bookmark = :bookmark ) ";		
 
 		$sql['feedbackwritten'] =
 		[

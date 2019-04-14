@@ -1,0 +1,33 @@
+<include href="members/header.html" />
+
+<F3:check if="{{isset(@paginate.firstPage)}}">
+	<true>
+		<include href="paginate.html" />
+		<h3>{{  ${"LN__FavType_".@extradata.0.type}, @paginate.total | format }}</h3>
+	</true>
+	<false>
+		<h3>{{  ${"LN__FavType_".@extradata.0.type}, sizeof(@extradata) | format }}</h3>
+	</false>
+</F3:check>
+
+
+<table class="table table is-striped is-hoverable is-fullwidth">
+<tbody>
+	<tr>
+		<th>{{@LN__Sort_Name}}/{{@LN__Sort_Title}}</th>
+		<th>{{@LN__Sort_Comment}}</th>
+	</tr>
+	<repeat group="{{ @extradata }}" value="{{ @data }}">
+	<tr>
+		<td><a href="{{@BASE}}/
+			<check if="{{ @data.type == 'AU' }}">members/id={{ @data.id }}"></check>
+			<check if="{{ @data.type == 'RC' }}">story/read/{{ @data.id }}"></check>
+			<check if="{{ @data.type == 'SE' }}">story/read/{{ @data.id }}"></check>
+			<check if="{{ @data.type == 'ST' }}">story/read/{{ @data.id }}"></check>
+			{{ @data.name }}</a></td>
+		<td>{{ @data.comments }}</td>
+	</tr>
+	</repeat>
+</tbody>
+</table>
+<F3:check if="{{isset(@paginate.firstPage) AND sizeof(@extradata)>4 }}"><include href="paginate.html" /></F3:check>

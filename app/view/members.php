@@ -20,5 +20,13 @@ class Members extends Base
 		$this->f3->set('extradata', $extradata);
 		return $this->render('members/stories.html');
 	}
+	
+	public function listBookFav(array $userdata, array $extradata)
+	{
+		$this->f3->set('userdata', $userdata);
+
+		$this->f3->set('extradata', $extradata);
+		return $this->render('members/bookfav.html');
+	}
 
 }

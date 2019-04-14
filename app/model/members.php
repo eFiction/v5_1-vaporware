@@ -33,17 +33,21 @@ class Members extends Base
 		$sql2[] = "SELECT @stories as stories, @favourites as favourites, @bookmarks as bookmarks;";
 		$user[0]['extras'] = $this->exec($sql2)[0];
 		// parse and count favourites
-		$user[0]['extras']['favourites'] = $this->cleanResult( $user[0]['extras']['favourites'] );
 		$user[0]['extras']['favourites_count'] = 0;
-		foreach ( $user[0]['extras']['favourites'] as $fav )
+		if ( sizeof($user[0]['extras']['favourites']) )
+		{
+			$user[0]['extras']['favourites'] = $this->cleanResult( $user[0]['extras']['favourites'] );
+			foreach ( $user[0]['extras']['favourites'] as $fav )
 				$user[0]['extras']['favourites_count'] += $fav[0];
+		}
 		// parse and count bookmarks
-		$user[0]['extras']['bookmarks'] = $this->cleanResult( $user[0]['extras']['bookmarks'] );
 		$user[0]['extras']['bookmarks_count'] = 0;
-		if ( isset($user[0]['extras']['bookmarks'][0]) )
-		foreach ( $user[0]['extras']['bookmarks'] as $book )
+		if ( sizeof($user[0]['extras']['bookmarks']) )
+		{
+			$user[0]['extras']['bookmarks'] = $this->cleanResult( $user[0]['extras']['bookmarks'] );
+			foreach ( $user[0]['extras']['bookmarks'] as $book )
 				$user[0]['extras']['bookmarks_count'] += $book[0];
-
+		}
 		$user[0]['fields'] = $this->cleanResult($user[0]['fields']);
 
 		return $user[0];
@@ -130,12 +134,67 @@ class Members extends Base
 		return [ $data, $this->exec("SELECT FOUND_ROWS() as found")[0]['found'] ];
 	}
 	
-	public function loadFavourites(array $author, array $options): array
+	public function loadBookmarks(array $author, array $options, int $page ): array
 	{
-		print_r( $options );
-		//$sql = "SELECT ";
+		$data = $this->loadFavourites($author, $options, $page, TRUE);
+		return $data;
+	}
+	
+	public function loadFavourites(array $author, array $options, int $page, bool $bookmarks=FALSE): array
+	{
+		// visibility scope required
+		$visibility = 2;
+		// selection parameters
+		$select =
+		[
+			"AU"	=>
+			[
+				"fields"	=> "'AU' as type, U.uid as id, U.username as name",
+				"from"		=> "`tbl_users`U",
+				"join"		=> "U.uid = Fav.item AND Fav.type='AU'"
+			],
+			"ST"	=>
+			[
+				"fields"	=> "'ST' as type, S.sid as id, S.title as name, S.cache_authors as authorblock",
+				"from"		=> "`tbl_stories`S",
+				"join"		=> "S.sid = Fav.item AND Fav.type='ST'"
+			],
+			"SE"	=>
+			[
+				"fields"	=> "'SE' as type, Ser.seriesid as id, Ser.title as name, Ser.cache_authors",
+				"from"		=> "`tbl_series`Ser",
+				"join"		=> "Ser.seriesid = Fav.item AND Fav.type='SE'"
+			],
+			"RC"	=>
+			[
+				"fields"	=> "'RC' as type, Rec.recid as id, Rec.title as name, Rec.author as cache_authors",
+				"from"		=> "`tbl_recommendations`Rec",
+				"join"		=> "Rec.recid = Fav.item AND Fav.type='RC'"
+			]
+		];
 		
-		return [];
+		if( empty($select[$options[0]]) )
+			return [];
+		
+		$limit = 10;
+		$pos = $page - 1;
+
+		$sql = "SELECT SQL_CALC_FOUND_ROWS {$select[$options[0]]['fields']}, 
+						Fav.comments, Fav.visibility, Fav.notify, Fav.fid, Fav.bookmark
+						FROM {$select[$options[0]]['from']} 
+						INNER JOIN `tbl_user_favourites`Fav ON
+					( {$select[$options[0]]['join']} AND Fav.uid = {$author['uid']} AND Fav.visibility = '{$visibility}' AND Fav.bookmark = ".(int)$bookmarks." )
+					LIMIT ".(max(0,$pos*$limit)).",".$limit;		
+
+		$data = $this->exec( $sql );
+		
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/member/{$author['username']}/".(($bookmarks)?"bookmarks":"favourites")."/{$options[0]}",
+			$limit
+		);
+
+		return $data;
 	}
 	
 /*

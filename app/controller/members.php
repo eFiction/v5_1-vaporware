@@ -8,6 +8,7 @@ class Members extends Base {
 	{
 		$this->model = \Model\Members::instance();
 		$this->template = new \View\Members();
+		$this->f3 = \Base::instance();
 	}
 
 	public function beforeroute()
@@ -50,8 +51,9 @@ class Members extends Base {
 			case "profile":
 				$this->buffer ( $this->template->profile($user_data) );
 				break;
+			case "bookmarks":
 			case "favourites":
-				$data = $this->model->loadFavourites($user_data, $options);
+				$this->memberBookFav( $params['selection'], $user_data, $options );
 				break;
 			case "stories":
 			default:
@@ -59,6 +61,29 @@ class Members extends Base {
 				$this->buffer( $this->template->stories($user_data, $story_data) );
 		}
 
+	}
+	
+	protected function memberBookFav( string $selection, array $user_data, array $params )
+	{
+		// get the page
+		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
+
+		// load data from the proper model
+		$data = ( $selection == "bookmarks" ) ?
+			$this->model->loadBookmarks($user_data, $params, $page)
+			:
+			$this->model->loadFavourites($user_data, $params, $page);
+
+		if ( sizeof($data) == 0 )
+		{
+			// return to member page on empty data
+			$this->f3->reroute("/member/".$user_data['username'], false);
+			exit;
+		}
+
+
+		$this->buffer ( $this->template->listBookFav( $user_data, $data ) );
+		
 	}
 	
 	protected function listing()

@@ -40,7 +40,7 @@
 				</a> 
 				<div class="navbar-dropdown">
 				<repeat group="{{ @userdata.extras.bookmarks }}" value="{{ @books }}">
-					<a class="navbar-item" href="{{@BASE}}/member/{{ @userdata.username }}/favourites/{{ @books.1 }}">
+					<a class="navbar-item" href="{{@BASE}}/member/{{ @userdata.username }}/bookmarks/{{ @books.1 }}">
 						<span class="icon">{ICON:bookmark}</span>
 						<span>{{ ${"LN__FavType_".@books[1]}, @books.0 | format }}</span>
 					</a> 
