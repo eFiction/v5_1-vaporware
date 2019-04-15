@@ -51,11 +51,23 @@
 		</div>
 	
 		<div class="navbar-end">
-			<a class="navbar-item button navmenu" href="#">
-				<span class="icon">{ICON:user-friend}</span>
-				<span>{{@LN__Friend}}</span>
-			</a>
-			<a class="navbar-item button navmenu" href="#">
+			<check if="{{ @userdata.uid != @_SESSION['userID'] }}">
+				<check if="{{ @userdata.extras.friend==NULL }}">
+				<true>
+				<a class="navbar-item button navmenu" href="{{@BASE}}/userCP/friends/update/add={{@userdata.username}};returnpath={{@current_path}}">
+					<span class="icon">{ICON:user-friend}</span>
+					<span>{{@LN__Friend}}</span>
+				</a>
+				</true>
+				<false>
+				<a class="navbar-item button navmenu" href="{{@BASE}}/userCP/friends/update/remove={{@userdata.username}};returnpath={{@current_path}}">
+					<span class="icon">{ICON:user-friend-remove}</span>
+					<span>{{@LN__Friend}}</span>
+				</a>
+				</false>
+				</check>
+			</check>
+			<a class="navbar-item button navmenu">
 				<span class="icon">{ICON:mail}</span>
 				<span>{{@LN__Contact}}</span>
 			</a>
@@ -90,3 +102,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
 });
 </script>
+
+	<check if="{{ isset(@removed) }}">
+		<check if="{{ @removed=='success' }}">
+			<true>
+			<div class="notification is-success"><button class="delete"></button>**__removed</div>
+			</true>
+			<false>
+			<div class="notification is-warning"><button class="delete"></button>**__notRemoved</div>
+			</false>
+		</check>
+	</check>
+
+	<check if="{{ isset(@added) }}">
+		<check if="{{ @added=='success' }}">
+			<true>
+			<div class="notification is-success"><button class="delete"></button>**__added</div>
+			</true>
+			<false>
+			<div class="notification is-warning"><button class="delete"></button>**__notAdded</div>
+			</false>
+		</check>
+	</check>

@@ -83,7 +83,6 @@ class Members extends Base {
 
 
 		$this->buffer ( $this->template->listBookFav( $user_data, $data ) );
-		
 	}
 	
 	protected function listing()

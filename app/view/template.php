@@ -41,12 +41,12 @@ class Template extends Base
 		$this->f3->set('UI', $UI);
 		
 		$this->f3->set('SELF', rawurlencode($_SERVER["QUERY_STRING"]));
-
+/*
 		$this->f3->JS = [ 
 							"head" => [],
 							"body" => []
 						];
-
+*/
 		\View\Base::javascript('body', TRUE, 'global.js' );
 		\View\Base::javascript('body', FALSE, "var base='{$this->f3->get('BASE')}'" );
 	}

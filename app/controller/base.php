@@ -22,6 +22,7 @@ class Base extends \Prefab {
 	public function beforeroute()//:void
 	{
 		$f3 = \Base::instance();
+		$f3->set('current_path', $f3->get('PARAMS')[0]);
 		
 		if($f3->get('AJAX')===TRUE)
 			$this->response = new \View\JSON();

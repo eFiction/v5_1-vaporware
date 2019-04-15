@@ -19,7 +19,7 @@ class UserCP extends Base
 
 	public function index(\Base $f3, array $params)//: void
 	{
-		$modules = [ "library", "messaging", "author", "feedback", "settings" ];
+		$modules = [ "library", "messaging", "author", "feedback", "friends", "settings" ];
 
 		if ( TRUE == @$this->config->optional_modules['shoutbox'] )
 			$modules[] = "shoutbox";
@@ -449,6 +449,46 @@ class UserCP extends Base
 		//return "Noch nix";
 	}
 	
+	public function friends(\Base $f3, array $params)//: void
+	{
+		//$this->response->addTitle( $f3->get('LN__UserMenu_Settings') );
+
+		switch ( $params[0] )
+		{
+			case "update":
+				$this->friendsUpdate($f3, $params);
+				break;
+			default:
+				$this->friendsList($f3, $params);
+		}
+
+		$this->showMenu("friends");
+	}
+	
+	public function friendsList(\Base $f3, array $params)//: void
+	{
+		
+	}
+	
+	protected function friendsUpdate(\Base $f3, array $params)//: void
+	{
+		if ( isset($params['add']) )
+			$this->model->friendsAdd($params['add']);
+		if ( isset($params['remove']) )
+			$this->model->friendsRemove($params['remove']);
+		//print_r($params);exit;
+		
+		
+		// return to member page on empty data
+		$f3->reroute
+		(
+			isset($params['returnpath']) ? $params['returnpath'] : "/userCP/friends",
+			false
+		);
+		exit;
+	}
+		
+
 	public function settings(\Base $f3, array $params)//: void
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Settings') );

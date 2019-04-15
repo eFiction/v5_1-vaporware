@@ -24,7 +24,6 @@
 		<repeat group="{{ @listing }}" value="{{ @author }}">
 			<li>
 				<a href="{{@BASE}}/member/{{ @author.name }}">{ICON:member}</a>
-				<a href="{{@BASE}}/member/{{ @author.name }}/stories">{ICON:text}</a>
 				{{ @author.name }} ({{ @author.stories }})
 			</li>
 		</repeat>

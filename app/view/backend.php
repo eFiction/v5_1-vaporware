@@ -20,8 +20,8 @@ class Backend extends Template
 		if($this->data)
             $this->f3->mset($this->data);
 
-		$this->f3->set( 'JS_HEAD', implode("\n", @$this->f3->JS['head']) );
-		$this->f3->set( 'JS_BODY', implode("\n", @$this->f3->JS['body']) );
+		$this->f3->set( 'JS_HEAD', @implode("\n", @$this->f3->JS['head']) );
+		$this->f3->set( 'JS_BODY', @implode("\n", @$this->f3->JS['body']) );
 		
 		$this->f3->set('TITLE', $this->config['page_title'].$this->config['page_title_separator'].$this->config['page_slogan']);
 

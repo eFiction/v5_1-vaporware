@@ -1,5 +1,5 @@
 {
-    "5cafaad8f3a4c5.82531466": {
+    "5cb4c7f6892788.88629636": {
         "_name": "Font Awesome CSS Icons",
         "_data": {
             "alert": "<i class=\"fas fa-exclamation-triangle\"@T@><\/i>",
@@ -107,6 +107,7 @@
             "unlock": "<i class=\"fas fa-unlock\"@T@><\/i>",
             "user-edit": "<i class=\"fas fa-user-edit\"@T@><\/i>",
             "user-friend": "<i class=\"fas fa-user-plus\"@T@><\/i>",
+            "user-friend-remove": "<i class=\"fas fa-user-minus\"@T@><\/i>",
             "visible": "<i class=\"far fa-eye\"@T@><\/i>",
             "waiting": "<i class=\"fas fa-spinner fa-spin\"@T@><\/i>",
             "wrench": "<i class=\"fas fa-wrench\"@T@><\/i>"

@@ -559,7 +559,43 @@ class UserCP extends Controlpanel
 		\Model\Routines::dropUserCache("feedback");
 		// purce stats cache, forcing re-cache
 		\Cache::instance()->clear('stats');
-}
+	}
+	
+	public function friendsAdd($username)
+	{
+		$sql = "INSERT INTO `tbl_user_friends` (`user_id`, `friend_id`)
+					SELECT '{$_SESSION['userID']}', U.uid 
+				FROM `tbl_users`U WHERE U.username = :friend;
+				ON DUPLICATE KEY UPDATE `active`= 1";
+
+		$_SESSION['lastAction']['friend']
+		=
+		( 1 === $this->exec( $sql, [":friend" => $username ] ) )
+		?
+		$_SESSION['lastAction']['added'] = "success"
+		:
+		$_SESSION['lastAction']['added'] = "failed";
+	}
+
+	public function friendsRemove($username, $permanent = TRUE)
+	{
+		if ( $permanent )
+		{
+			$sql = "DELETE Fr
+						FROM `tbl_user_friends`Fr
+							INNER JOIN `tbl_users`U ON ( Fr.friend_id = U.uid )
+					WHERE U.username = :friend AND Fr.user_id = {$_SESSION['userID']};";
+
+		}
+
+		$_SESSION['lastAction']['friend']
+		=
+		( 1 === $this->exec( $sql, [":friend" => $username ] ) )
+		?
+		$_SESSION['lastAction']['removed'] = "success"
+		:
+		$_SESSION['lastAction']['removed'] = "failed";
+	}
 
 	public function reviewHasChildren($reference)
 	{

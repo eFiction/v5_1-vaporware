@@ -3,6 +3,29 @@ namespace View;
 
 class Members extends Base
 {
+	public function __construct()
+	{
+		// invoke parent constructor
+		parent::__construct();
+
+		if( isset($_SESSION['lastAction']) )
+		{
+			foreach( $_SESSION['lastAction'] as $key => $value )
+				$this->f3->set($key,$value);
+			unset($_SESSION['lastAction']);
+		}
+		
+		$this->javascript( 'body', FALSE, 'document.addEventListener(\'DOMContentLoaded\', () => {
+								  (document.querySelectorAll(\'.notification .delete\') || []).forEach(($delete) => {
+									$notification = $delete.parentNode;
+									$delete.addEventListener(\'click\', () => {
+									  $notification.parentNode.removeChild($notification);
+									});
+								  });
+								});'
+		);
+	}
+	
 	public function profile(array $data)
 	{
 		$this->f3->set('data', $data);

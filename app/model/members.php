@@ -29,8 +29,9 @@ class Members extends Base
 									WHERE rSA.aid = {$user[0]['uid']} );";
 		$sql2[] = "SET @favourites := (SELECT GROUP_CONCAT(V SEPARATOR '||') FROM (SELECT CONCAT(COUNT(DISTINCT F.fid),',',F.type) as V  FROM `tbl_user_favourites`F WHERE `uid` = {$user[0]['uid']} AND `bookmark` = 0 AND `visibility` = '2' GROUP BY `type`) AS T);";
 		$sql2[] = "SET @bookmarks := (SELECT GROUP_CONCAT(V SEPARATOR '||') FROM (SELECT CONCAT(COUNT(DISTINCT F.fid),',',F.type) as V  FROM `tbl_user_favourites`F WHERE `uid` = {$user[0]['uid']} AND `bookmark` = 1 AND `visibility` = '2' GROUP BY `type`) AS T);";
+		$sql2[] = "SET @friend := ( SELECT Fr.link_id FROM `tbl_user_friends`Fr WHERE Fr.user_id = {$_SESSION['userID']} AND Fr.friend_id = {$user[0]['uid']} AND active = 1 );";
 
-		$sql2[] = "SELECT @stories as stories, @favourites as favourites, @bookmarks as bookmarks;";
+		$sql2[] = "SELECT @stories as stories, @favourites as favourites, @bookmarks as bookmarks, @friend as friend;";
 		$user[0]['extras'] = $this->exec($sql2)[0];
 		// parse and count favourites
 		$user[0]['extras']['favourites_count'] = 0;
