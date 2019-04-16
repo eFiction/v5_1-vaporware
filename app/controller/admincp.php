@@ -1490,22 +1490,17 @@ class AdminCP extends Base
 				$chapterInfo = $this->model->loadChapter($storyInfo['sid'],(int)$params['chapter']);
 				// abusing $chapterData to carry a few more details
 				$chapterInfo['storytitle'] = $storyInfo['title'];
-				
-				if ( isset($params['plain']) ) $editor = "plain";
-				elseif ( isset($params['visual']) ) $editor = "visual";
-				else
-				{
-					if (empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0)
-						$editor = "plain";
-					else
-						$editor = "visual";
-				}
+				// figure out if we want a visual editor
+				$chapterInfo['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
 
-				$this->buffer( $this->template->storyChapterEdit($chapterInfo,$chapterList,$editor) );
+				$this->buffer( $this->template->storyChapterEdit($chapterInfo,$chapterList) );
 			}
 			else
 			{
 				$storyInfo['returnpath'] = $params['returnpath'];
+				// figure out if we want a visual editor
+				$storyInfo['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
+
 				$chapterList = $this->model->loadChapterList($storyInfo['sid']);
 				$prePopulate = $this->model->storyEditPrePop($storyInfo);
 				$this->buffer( $this->template->storyMetaEdit($storyInfo,$chapterList,$prePopulate) );

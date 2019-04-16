@@ -258,25 +258,18 @@ class UserCP extends Base
 				$chapterData = $this->model->loadChapter($storyData['sid'],(int)$params['chapter']);
 				// abusing $chapterData to carry a few more details
 				$chapterData['form'] = [ "uid" => $params['uid'], "returnpath" => $params['returnpath'], "storytitle" => $storyData['title'] ];
+				// figure out if we want a visual editor
+				$chapterData['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
 
-				if ( isset($params['plain']) ) $editor = "plain";
-				elseif ( isset($params['visual']) ) $editor = "visual";
-				else
-				{
-					if (empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0)
-						$editor = "plain";
-					else
-						$editor = "visual";
-				}
-
-				return $this->template->authorStoryChapterEdit($chapterData,$chapterList,$editor);
+				return $this->template->authorStoryChapterEdit($chapterData,$chapterList);
 			}
 			else
 			{
 				// abusing $storyData to carry a few more details
 				$storyData['form'] = [ "uid" => $params['uid'], "returnpath" => $params['returnpath'] ];
+				$storyData['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
 				$prePopulate = $this->model->storyEditPrePop($storyData);
-				return $this->template->authorStoryMetaEdit($storyData,$chapterList,$prePopulate);
+				return $this->template->authorStoryHeaderEdit($storyData,$chapterList,$prePopulate);
 			}
 		}
 		else return "__ErrorFileEdit";

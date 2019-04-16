@@ -1,4 +1,4 @@
-<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="main/paginate.html" /></F3:check>
 
 <F3:check if="{{@_SESSION['preferences']['ageconsent']==0}}">
 <article class="message is-warning">
@@ -52,4 +52,4 @@
 
 </div></div>
 
-<F3:check if="{{isset(@paginate.firstPage) AND sizeof(@stories)>2}}"><include href="paginate.html" /></F3:check>
+<F3:check if="{{isset(@paginate.firstPage) AND sizeof(@stories)>2}}"><include href="main/paginate.html" /></F3:check>

@@ -1,0 +1,85 @@
+<a href="{{@BASE}}{{@data.form.returnpath}}">{{@LN__Return}}</a>
+<check if="{{@_SESSION.groups&8}}">
+	<true>
+		<check if="{{@data.validated.0<3}}"><div class="alert-box info">{{@LN__UCP_NotFinishedC}}</div></check>
+	</true>
+	<false>
+		<check if="{{@data.validated.0==1}}"><div class="alert-box warning">{{@LN__UCP_NotValidatedC}}</div></check>
+		<check if="{{@data.validated.0==2}}"><div class="alert-box info">{{@LN__UCP_BeingValidatedC}}</div></check>
+	</false>
+</check>
+<div class="columns">
+	<div class="column is-three-quarters">
+		<form method="post" action="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}}/chapter={{@data.chapid}};returnpath={{@data.form.returnpath}}">
+  			<div class="columns is-multiline">
+				<div class="column is-full"><h6>{{@LN__StoryTitle}}:</h6>{{@data.form.storytitle}}</div>
+
+				<div class="column is-full"><h6>{{@LN__ChapterTitle}}:</h6><input class="input" placeholder="Your chapter title goes here" type="text" name="form[chapter_title]" value="{{@data.title}}"></div>
+
+				<div class="column is-one-third"><h6>{{@LN__StoryNotes}}</h6><textarea class="textarea" placeholder="Notes and dedications go here" name="form[chapter_notes]">{{@data.notes}}</textarea></div>
+{*		<!-- story status fields -->	*}
+				<div class="column is-one-third">
+					<h6>{{@LN__UCP_statusValidated}}:<br/>
+					<strong>{{ ${"LN__UCP_statusValidated_".@data.validated.0} }}</strong></h6>
+					<check if="{{@data.validated.0<3}}">
+						<check if="{{@_SESSION.groups&8}}">
+							<true>
+										<input type="checkbox" name="form[mark_validated]" />{{@LN__UCP_FinishChapter}}
+							</true>
+							<false>					
+										<input type="checkbox" name="form[request_validation]" <check if="{{@data.validated.0==2}}">checked="checked" </check>/>{{@LN__UCP_RequestValidation}}
+							</false>
+						</check>
+					</check>
+				</div>
+				<div class="column is-one-third">
+					<h6>{{@LN__UCP_statusValidatedReason}}:<br/>
+					<strong>{{ ${"LN__UCP_statusValReason_".@data.validated.1} }}</strong></h6>
+				</div>
+{*		<!-- end: story status fields -->	*}
+
+				<div class="column is-full">
+					<span class="level">
+						<span class="level-left">
+							<h6>{{@LN__ChapterText}}</h6>
+						</span>
+						<span class="level-right">
+							<check if="{{@data.editor=='visual'}}">
+								<true><a href="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}}/chapter={{@data.chapid}}/editor=plain;returnpath={{@data.form.returnpath}}">{{@LN__SwitchPlainHTML}}</a></true>
+								<false><a href="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}}/chapter={{@data.chapid}}/editor=visual;returnpath={{@data.form.returnpath}}">{{@LN__SwitchVisual}}</a></false>
+							</check>
+						</span>
+					</span>
+					<textarea class="textarea" placeholder="{{@LN__ChapterTextExplained}}" name="form[chapter_text]" id="tinymce" rows="10">{{@data.chaptertext}}</textarea>
+				</div>
+
+				<div class="column is-full" align="right">
+				<div class="field is-grouped">
+{*					<p class="control">
+						<a class="button is-danger" href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}}">
+							<span class="icon">{ICON:remove}</span>
+							<span>__Delete</span>
+						</a>
+					</p>				*}
+					<p class="control">
+						<button class="button is-primary" type="submit">
+							<span class="icon"><i class="fas fa-save"></i></span>
+							<span>__Submit</span>
+						</button>
+					</p>
+					<p class="control">
+						<button class="button is-light" type="reset">
+							<span class="icon"><i class="fas fa-undo-alt"></i></span>
+							<span>__Reset</span>
+						</button>
+					</p>
+					</div>
+				</div>
+
+			</div>
+		</form>
+	</div>
+	<div class="column is-one-quarter">
+		<include href="usercp/author/chapterlist.html" />
+	</div>
+</div>

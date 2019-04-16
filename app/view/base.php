@@ -53,7 +53,7 @@ abstract class Base {
 
 	public static function stub($text="")
 	{
-		return \Template::instance()->render('stub.html');
+		return \Template::instance()->render('main/stub.html');
 	}
 
 	protected function dataProcess(&$item, $key=NULL)
@@ -85,7 +85,7 @@ abstract class Base {
 		$this->f3->set('structure', $structure);
 		$this->f3->set('data', $data );
 
-		return $this->render('main/feedback_form.html');
+		return $this->render('main/feedback.html');
 	}
 	
 }

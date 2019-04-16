@@ -36,17 +36,17 @@ class UserCP extends Base
 		$this->f3->set('sort', $sort);
 		$this->f3->set('author', $params['uid']);
 		$this->f3->set('select', $params[1]);
-		return $this->render('usercp/author/storyList.html');
+		return $this->render('usercp/author/story.list.html');
 	}
 	
 	public function authorStoryAdd(array $data)
 	{
 		$this->f3->set('storyAdd', $data);
 		
-		return $this->render('usercp/author/storyAdd.html');
+		return $this->render('usercp/author/story.add.html');
 	}
 
-	public function authorStoryMetaEdit(array $storyData, array $chapterList, array $prePop)
+	public function authorStoryHeaderEdit(array $storyData, array $chapterList, array $prePop)
 	{
 		$storyData['storynotes'] = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $storyData['storynotes']);
 		$storyData['summary'] = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $storyData['summary']);
@@ -61,27 +61,21 @@ class UserCP extends Base
 		$this->f3->set('data', $storyData);
 		$this->f3->set('chapterList', $chapterList);
 		
-		return $this->render('usercp/author/storyEditMeta.html');
+		return $this->render('usercp/author/story.editheader.html');
 	}
 
-	public function authorStoryChapterEdit(array $chapterData, array $chapterList, $editor="plain")
+	public function authorStoryChapterEdit(array $chapterData, array $chapterList)
 	{
-		if ($editor=="visual")
+		if($chapterData['editor']=="visual")
 		{
-			$this->javascript( 'head', TRUE, "ckeditor/ckeditor.js" );
-			$chapterData['editmode']	= "visual";
-		}
-		else
-		{
-			$chapterData['notes']		= preg_replace("/<br\\s*\\/>\\s*/i", "\n", $chapterData['notes']);
-			$chapterData['chaptertext']	= html_entity_decode(preg_replace("/<br\\s*\\/>\\s*/i", "\n", $chapterData['chaptertext']));
-			$chapterData['editmode']	= "plain";
+			$this->javascript( 'head', TRUE, "//cdn.tinymce.com/5/tinymce.min.js" );
+			$this->javascript( 'head', TRUE, "editor.js" );
 		}
 
 		$this->f3->set('data', $chapterData);
 		$this->f3->set('chapterList', $chapterList);
 		
-		return $this->render('usercp/author/storyEditChapter.html');
+		return $this->render('usercp/author/story.editchapter.html');
 	}
 
 	public function authorCurator(array $data=[])

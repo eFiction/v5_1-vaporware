@@ -5,7 +5,7 @@
 		<ul id="chapter-sort">
 		<repeat group="{{ @chapterList }}" value="{{ @row }}" counter="{{ @ctr }}">
 			<li id="{{ @row.chapid }}">
-				{ICON:arrow-vert} {{ @ctr }}: <a href="{{@BASE}}/adminCP/stories/edit/story={{ @row.sid }}/chapter={{ @row.chapid }}">{ICON:edit}</a>{{ @row.title }} <check if="{{20 < @row.validated AND @row.validated < 30}}">{ICON:waiting}</check>
+				{ICON:arrow-vert} {{ @ctr }}: <a href="{{@BASE}}/adminCP/stories/edit/story={{ @row.sid }}/chapter={{ @row.chapid }}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}">{ICON:edit}</a>{{ @row.title }} <check if="{{20 < @row.validated AND @row.validated < 30}}">{ICON:waiting}</check>
 			</li>
 		</repeat>
 		</ul>

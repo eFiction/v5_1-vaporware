@@ -1,83 +1,10 @@
-<!-- https://bulma.io/documentation/form/
-
-<form method="post" action="{{@BASE}}/story/search/">
-	<fieldset><legend>{{@LN__AdvancedSearch}}</legend>
-<div class="field is-horizontal">
-  <div class="field-label is-normal">
-    <label class="label">{{@LN__Title}}</label>
-  </div>
-  <div class="field-body">
-    <div class="field">
-      <p class="control">
-        <input class="input" type="text" placeholder="Story title" name="story_title" value="<check if="{{isset(@searchForm.story_title)}}">{{@searchForm.story_title}}</check>">
-      </p>
-    </div>
-  </div>
-<br />
-  <div class="field-label is-normal">
-    <label class="label">{{@LN__Author}}</label>
-  </div>
-  <div class="field-body">
-    <div class="field">
-      <p class="control">
-        <input class="input" type="text" id="author-select" name="author" placeholder="Author">
-      </p>
-    </div>
-  </div>
-  <div class="field-label is-normal">
-    <label class="label">{{@LN__Categories}}</label>
-  </div>
-  <div class="field-body">
-    <div class="field">
-      <p class="control">
-        <input class="input" type="text" placeholder="category">
-      </p>
-    </div>
-  </div>
-<br />
-  <div class="field-label is-normal">
-    <label class="label">{{@LN__Characters}}</label>
-  </div>
-  <div class="field-body">
-    <div class="field">
-      <p class="control">
-        <input class="input" type="text" placeholder="category">
-      </p>
-    </div>
-  </div>
-<br />
-  <div class="field-label is-normal">
-    <label class="label">{{@LN__TagsInclude}}</label>
-  </div>
-  <div class="field-body">
-    <div class="field">
-      <p class="control">
-        <input class="input" type="text" placeholder="category">
-      </p>
-    </div>
-  </div>
-<br />
-  <div class="field-label is-normal">
-    <label class="label">{{@LN__TagsExclude}}</label>
-  </div>
-  <div class="field-body">
-    <div class="field">
-      <p class="control">
-        <input class="input" type="text" placeholder="category">
-      </p>
-    </div>
-  </div>
-</div>
-
-	</fieldset>
-</form>
--->
+<!-- https://bulma.io/documentation/form/ -->
 
 <form method="post" action="{{@BASE}}/story/search/">
 	<fieldset><legend>{{@LN__AdvancedSearch}}</legend>
 	<div class="grid-wrapper">
 	<!-- row #1 -->
-		<div class="gb-half">{{@LN__Title}}<br /><input placeholder="" type="text" name="story_title" value="<check if="{{isset(@searchForm.story_title)}}">{{@searchForm.story_title}}</check>"></div>
+		<div class="gb-half">{{@LN__Title}}<br /><input class="input" placeholder="" type="text" name="story_title" value="<check if="{{isset(@searchForm.story_title)}}">{{@searchForm.story_title}}</check>"></div>
 		<div class="gb-half">{{@LN__Author}}<br /><input type="text" id="author-select" name="author" /></div>
 	<!-- row #2 -->
 		<div class="gb-half">{{@LN__Categories}}<br /><input type="text" id="category-select" name="category" /></div>
@@ -116,7 +43,7 @@
 	</div></div>
 </check>
 <div class="gb-full"><input type="checkbox" name="exclude_wip" <check if="{{isset(@searchForm.exclude_wip)}}">checked="checked"</check> value="1"> {{@LN__SearchCompletedOnly}}</div>
-<div class="gb-full"><div class="search-buttons"><button class="button" type="submit">{{@LN__Search}}</button> <button class="button" type="reset">{{@LN__Reset}}</button></div></div>
+<div class="gb-full"><div class="search-buttons"><button class="button is-success" type="submit">{{@LN__Search}}</button> <button class="button is-danger" type="reset">{{@LN__Reset}}</button></div></div>
 <div class="gb-full"><div class="buttons-alignment"><check if="{{!empty(@searchLink)}}"><a class="button" href="{{@BASE}}/story/browse/{{@searchLink}}<check if="{{isset(@paginate.page)}}">/page={{@paginate.page}}</check>">{{@LN__HideSearchForm}}</a></check>&nbsp;</div></div>
 </div>
 

@@ -1,50 +1,76 @@
-<div class="grid-wrapper">
-	<div class="gb-3qrt">
+<div class="columns">
+	<div class="column is-three-quarters">
 		<check if="{{@data.chapid=='new'}}">New chapter!</check>
 		<form method="post" action="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}};chapter={{@data.chapid}}">
-  			<div class="gb-full"><h6>{{@LN__StoryTitle}}</h6><input class="readonly" readonly value="{{@data.storytitle}}"></div>
+			<div class="columns is-multiline">
+				<div class="column is-full"><h6>{{@LN__StoryTitle}}:</h6>{{@data.storytitle}}</div>
 
-  			<div class="gb-full"><h6>{{@LN__ChapterTitle}}</h6><input placeholder="Your chapter title goes here" type="text" name="form[chapter_title]" value="{{@data.title}}"></div>
-			<div class="gb-full"><h6>{{@LN__Foreword}}</h6><textarea placeholder="Notes and dedications go here" name="form[chapter_notes]">{{@data.notes}}</textarea></div>
-			
+				<div class="column is-full"><h6>{{@LN__ChapterTitle}}:</h6><input class="input" placeholder="Your chapter title goes here" type="text" name="form[chapter_title]" value="{{@data.title}}"></div>
+
+				<div class="column is-one-third"><h6>{{@LN__Foreword}}</h6><textarea class="textarea" placeholder="Notes and dedications go here" name="form[chapter_notes]">{{@data.notes}}</textarea></div>
+
 {*		<!-- story status fields -->	*}
-				<div class="gb-1thrd">
+				<div class="column is-one-third">
 					<h6>{{@LN__UCP_statusValidated}}: <strong>{{ ${"LN__UCP_statusValidated_".@data.validated.0} }}</strong></h6>
-					{{@LN__ChangeTo}}:<select id="validated" name="form[validated]">
+					{{@LN__ChangeTo}}:<br /><div class="select"><select id="validated" name="form[validated]">
 						<loop from="{{ @i=0 }}" to="{{ @i < 4 }}" step="{{ @i++ }}">
 							<check if="{{ @i==@data.validated.0 OR (@i!=2 OR !(@_SESSION['groups']&8)) AND (@i!=3 OR (@_SESSION['groups']&8)) }}">
 							<option value="{{ @i }}"<check if="{{@i==@data.validated.0}}"> selected="selected"</check>>{{ ${"LN__UCP_statusValidated_".@i} }}</option>
 							</check>
 						</loop>
-					</select>
+					</select></div>
 				</div>
-				<div class="gb-1thrd">
+				<div class="column is-one-third">
 					<h6>{{@LN__UCP_statusValidatedReason}}: <strong>{{ ${"LN__UCP_statusValReason_".@data.validated.1} }}</strong></h6>
-					{{@LN__ChangeTo}}:<select id="validated" name="form[valreason]">
+					{{@LN__ChangeTo}}:<br /><div class="select"><select id="validated" name="form[valreason]">
 					<loop from="{{ @i=0 }}" to="{{ @i < 10 }}" step="{{ @i++ }}">
 						<option value="{{ @i }}"<check if="{{@i==@data.validated.1}}"> selected="selected"</check>>{{ ${"LN__UCP_statusValReason_".@i} }}</option>
 					</loop>
-					</select>
+					</select></div>
 				</div>
-				<div class="gb-1thrd">&nbsp;</div>
 {*		<!-- end: story status fields -->	*}
 
-			<div class="gb-full"><h6>{{@LN__ChapterText}}
-			<check if="{{@data.editmode=='visual'}}">
-				<true> <a href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}};chapter={{@data.chapid}}/plain">{{@LN__SwitchPlainHTML}}</a></true>
-				<false> <a href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}};chapter={{@data.chapid}}/visual">{{@LN__SwitchVisual}}</a></false>
-			</check></h6>
-			<textarea placeholder="Your chapter's content goes here" name="form[chapter_text]" id="editor1">{{@data.chaptertext}}</textarea></div>
-			<check if="{{@data.editmode=='visual'}}"><script>
-				// Replace the <textarea id="editor1"> with a CKEditor
-				// instance, using default configuration.
-				CKEDITOR.replace( 'editor1' );
-			</script></check>
+				<div class="column is-full">
+					<span class="level">
+						<span class="level-left">
+							<h6>{{@LN__ChapterText}}</h6>
+						</span>
+						<span class="level-right">
+							<check if="{{@data.editor=='visual'}}">
+								<true> <a href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}};chapter={{@data.chapid}}/editor=plain">{{@LN__SwitchPlainHTML}}</a></true>
+								<false> <a href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}};chapter={{@data.chapid}}/editor=visual">{{@LN__SwitchVisual}}</a></false>
+							</check>
+						</span>
+					</span>
+					<textarea class="textarea" placeholder="Your chapter's content goes here" name="form[chapter_text]" id="tinymce" rows="10">{{@data.chaptertext}}</textarea>
+				</div>
 
-			<input class="button" type="submit"> <input class="button" type="reset">
+				<div class="column is-full" align="right">
+				<div class="field is-grouped">
+{*					<p class="control">
+						<a class="button is-danger" href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}}">
+							<span class="icon">{ICON:remove}</span>
+							<span>__Delete</span>
+						</a>
+					</p>				*}
+					<p class="control">
+						<button class="button is-primary" type="submit">
+							<span class="icon"><i class="fas fa-save"></i></span>
+							<span>__Submit</span>
+						</button>
+					</p>
+					<p class="control">
+						<button class="button is-light" type="reset">
+							<span class="icon"><i class="fas fa-undo-alt"></i></span>
+							<span>__Reset</span>
+						</button>
+					</p>
+					</div>
+				</div>
+			</div>
 		</form>
 	</div>
-	<div class="gb-1qrt">
+	<div class="column is-one-quarter">
 		<include href="stories/chapterlist.html" />
 	</div>
 </div>

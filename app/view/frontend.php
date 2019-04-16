@@ -26,13 +26,13 @@ class Frontend extends Template
 		if ( FALSE==\Config::getPublic('maintenance') OR $_SESSION['groups']&64 )
 			$body =  $this->post_render(
 										$this->tagWork(
-												\Template::instance()->render('body.html')
+												\Template::instance()->render('main/body.html')
 										)
 								);
 		else 
 			$body =  $this->post_render(
 										$this->tagWork(
-												\Template::instance()->render('body_maintenance.html')
+												\Template::instance()->render('main/body.maintenance.html')
 										)
 								);
 

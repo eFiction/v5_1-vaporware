@@ -1,15 +1,39 @@
+<check if="{{isset(@deleted)}}">
+	<switch expr="{{ @deleted }}">
+		<case value="confirm" break="TRUE">
+			<div class="alert-box half info">__DeleteConfirm</div>
+		</case>
+		<case value="failed" break="TRUE">
+			<div class="alert-box half error">__DeleteFailed</div>
+		</case>
+	</switch>
+</check>
+<a href="{{@BASE}}{{@data.form.returnpath}}">{ICON:arrow-left} {{@LN__ReturnToOverview}}</a>
+<check if="{{@_SESSION.groups&8}}">
+	<true>
+		<check if="{{@data.validated.0<3}}">
+			<div class="alert-box info">{{@LN__UCP_NotFinishedS}}</div>
+			<check if="{{@data.validchapters==0}}"><div class="alert-box warning">{{@LN__UCP_CannotValidateNoChapter}}</div></check>
+		</check>
+	</true>
+	<false>
+		<check if="{{@data.validated.0==1}}"><div class="alert-box warning">{{@LN__UCP_NotValidatedS}}</div></check>
+		<check if="{{@data.validated.0==2}}"><div class="alert-box info">{{@LN__UCP_BeingValidatedS}}</div></check>
+	</false>
+</check>
 <div class="columns">
-	<check if="{{ isset(@form_warning) }}"><div class="gb-90 alert-box warning">{{ @form_warning }}</div></check>
+	<check if="{{ isset(@deleteWarning) }}"><div class="gb-90 alert-box warning">{{ @deleteWarning }}</div></check>
 	<div class="column is-three-quarters">
-		<form method="post" action="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}}<check if="{{!empty(@data.returnpath)}}">;returnpath={{@data.returnpath}}</check>">
+		<form method="post" action="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}};returnpath={{@data.form.returnpath}}">
 			<div class="columns is-multiline">
 				<div class="column is-two-thirds"><h6>{{@LN__Title}}</h6><input class="input" placeholder="Your story title goes here" type="text" name="form[story_title]" value="{{@data.title}}"></div>
 				<div class="column is-one-third"><h6>{{@LN__Rating}}</h6>
 					<div class="select"><select id="ratingid" name="form[ratingid]">
 					<repeat group="{{ @data.ratings }}" value="{{ @rating }}"><option value="{{ @rating.rid }}"<check if="{{@rating.rid==@data.ratingid}}"> selected="selected"</check>>{{ @rating.rating }}</option></repeat>
-					</select>
-					</div>
+					</select></div>
 				</div>
+
+				<div class="gb-full"></div>
 {*		<!-- The next fields will be filled by the javascript below, do not change the id! --> *}
 				<div class="column is-one-quarter"><h6>{{@LN__MainAuthor}} <a class="tooltip is-tooltip-multiline" data-tooltip="Info: {{@UCP_ExplainMainAuthor}}.">{ICON:info}</a></h6></div>
 				<div class="column is-three-quarters"><input class="input" type="text" id="mainauthor-select" name="form[mainauthor]" /></div>
@@ -26,45 +50,48 @@
 				<div class="column is-one-quarter"><h6>{{@LN__Characters}} </h6></div>
 				<div class="column is-three-quarters"><input class="input" type="text" id="character-select" name="form[characters]" /></div>
 {*		<!-- end of special fields -->	*}
-				<div class="column is-full"><h6>{{@LN__StoryNotes}}</h6><textarea class="textarea" placeholder="{{@LN__StoryNotesExplained}}" name="form[story_notes]">{{@data.storynotes}}</textarea></div>
+				<div class="column is-full"><h6>{{@LN__Foreword}}</h6><textarea class="textarea" placeholder="{{@LN__StoryNotesExplained}}" name="form[story_notes]">{{@data.storynotes}}</textarea></div>
 				<div class="column is-full"><h6>{{@LN__StorySummary}}</h6><textarea class="textarea" placeholder="{{@LN__StorySummaryExplained}}" name="form[story_summary]">{{@data.summary}}</textarea></div>
 {*		<!-- story status fields -->	*}
 				<div class="column is-one-third">
-					<h6>{{@LN__UCP_statusValidated}}: <strong>{{ ${"LN__UCP_statusValidated_".@data.validated.0} }}</strong></h6>
-					{{@LN__ChangeTo}}:<br /><div class="select"><select id="validated" name="form[validated]">
-						<loop from="{{ @i=0 }}" to="{{ @i < 4 }}" step="{{ @i++ }}">
-							<check if="{{ @i==@data.validated.0 OR (@i!=2 OR !(@_SESSION['groups']&8)) AND (@i!=3 OR (@_SESSION['groups']&8)) }}">
-							<option value="{{ @i }}"<check if="{{@i==@data.validated.0}}"> selected="selected"</check>>{{ ${"LN__UCP_statusValidated_".@i} }}</option>
-							</check>
-						</loop>
-					</select></div>
+					<h6>{{@LN__UCP_statusValidated}}:<br/>
+					<strong>{{ ${"LN__UCP_statusValidated_".@data.validated.0} }}</strong></h6>
+<check if="{{@data.validated.0<3}}">
+	<check if="{{@_SESSION.groups&8}}">
+		<true>
+					<check if="{{@data.validchapters>0}}"><input type="checkbox" name="form[mark_validated]" />{{@LN__UCP_FinishStory}}</check>
+		</true>
+		<false>					
+					<input type="checkbox" name="form[request_validation]" <check if="{{@data.validated.0==2}}">checked="checked" </check>/>{{@LN__UCP_RequestValidation}}
+		</false>
+	</check>
+</check>
 				</div>
 				<div class="column is-one-third">
-					<h6>{{@LN__UCP_statusValidatedReason}}: <strong>{{ ${"LN__UCP_statusValReason_".@data.validated.1} }}</strong></h6>
-					{{@LN__ChangeTo}}:<br /><div class="select"><select id="validated" name="form[valreason]">
-					<loop from="{{ @i=0 }}" to="{{ @i < 4 }}" step="{{ @i++ }}">
-						<option value="{{ @i }}"<check if="{{@i==@data.validated.1}}"> selected="selected"</check>>{{ ${"LN__UCP_statusValReason_".@i} }}</option>
-					</loop>
-					</select></div>
+					<h6>{{@LN__UCP_statusValidatedReason}}:<br/>
+					<strong>{{ ${"LN__UCP_statusValReason_".@data.validated.1} }}</strong></h6>
 				</div>
 				<div class="column is-one-third">
 					<h6>{{@LN__UCP_statusCompleted}}: <strong>{{ ${"LN__UCP_statusCompleted_".@data.completed} }}</strong></h6>
-					{{@LN__ChangeTo}}:<br /><div class="select"><select id="completed" name="form[completed]">
+					{{@LN__ChangeTo}}:<select id="completed" name="form[completed]">
 						<loop from="{{ @i=0 }}" to="{{ @i <= 6 }}" step="{{ @i++ }}">
 							<option value="{{ @i }}"<check if="{{@i==@data.completed}}"> selected="selected"</check>>{{ ${"LN__UCP_statusCompleted_".@i} }}</option>
 						</loop>
 						<option value="9"<check if="{{9==@data.completed}}"> selected="selected"</check>>{{ @LN__UCP_statusCompleted_9 }}</option>
-					</select></div>
+					</select>
 				</div>
 {*		<!-- end: story status fields -->	*}
 				<div class="column is-full" align="right">
 				<div class="field is-grouped">
-{*					<p class="control">
-						<a class="button is-danger" href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}}">
+					<p class="control">
+						<check if="{{ @data.completed==0 }}">
+							<a class="button is-danger"><input class="is-checkradio is-danger" type="checkbox" name="deleteComfirm" />{ICON:check} Confirm</a>
+						</check>
+						<button class="button is-danger" type="submit" name="delete" value="{{@LN__Delete}}">
 							<span class="icon">{ICON:remove}</span>
 							<span>__Delete</span>
-						</a>
-					</p>				*}
+						</button>
+					</p>
 					<p class="control">
 						<button class="button is-primary" type="submit">
 							<span class="icon"><i class="fas fa-save"></i></span>
@@ -83,12 +110,12 @@
 		</form>
 	</div>
 	<div class="column is-one-quarter">
-		<include href="stories/chapterlist.html" />
+		<include href="usercp/author/chapterlist.html" />
 	</div>
 </div>
 <script type="text/javascript">
 $(document).ready(function() {
-    $("#category-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    $("#category-select").tokenInput("{{$BASE}}/userCP/ajax/stories",{
     	method: "post",
     	queryParam: "category",
     	preventDuplicates: true,
@@ -97,7 +124,7 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-    $("#mainauthor-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    $("#mainauthor-select").tokenInput("{{$BASE}}/userCP/ajax/stories",{
     	method: "post",
     	queryParam: "author",
     	preventDuplicates: true,
@@ -106,7 +133,7 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-    $("#supauthor-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    $("#supauthor-select").tokenInput("{{$BASE}}/userCP/ajax/stories",{
     	method: "post",
     	queryParam: "author",
     	preventDuplicates: true,
@@ -115,16 +142,18 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
-    $("#tag-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    $("#tag-select").tokenInput("{{$BASE}}/userCP/ajax/stories",{
     	method: "post",
     	queryParam: "tag",
+		hintText: "{{@LN__Token_InputHint}}",
     	preventDuplicates: true,
     	prePopulate: {{@prePop.tag | raw}}
     });
 });
 
 $(document).ready(function() {
-    $("#character-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    $("#character-select").tokenInput(function(){
+    return "{{$BASE}}/userCP/ajax/stories/"+$("#category-select").val()},{
     	method: "post",
     	queryParam: "character",
     	preventDuplicates: true,

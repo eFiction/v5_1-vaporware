@@ -2,7 +2,7 @@
 
 <F3:check if="{{isset(@paginate.firstPage)}}">
 	<true>
-		<include href="paginate.html" />
+		<include href="main/paginate.html" />
 		<h3>{{  ${"LN__FavType_".@extradata.0.type}, @paginate.total | format }}</h3>
 	</true>
 	<false>
@@ -30,4 +30,4 @@
 	</repeat>
 </tbody>
 </table>
-<F3:check if="{{isset(@paginate.firstPage) AND sizeof(@extradata)>4 }}"><include href="paginate.html" /></F3:check>
+<F3:check if="{{isset(@paginate.firstPage) AND sizeof(@extradata)>4 }}"><include href="main/paginate.html" /></F3:check>

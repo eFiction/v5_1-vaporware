@@ -1,5 +1,6 @@
 /* import basic settings, IE-fixes and grids */
 @import url(bulma.css);
+@import url(bulma.tooltip.css);
 @import url(forms.css);
 @import url(typography.css);
 @import url(tokeninput.css);

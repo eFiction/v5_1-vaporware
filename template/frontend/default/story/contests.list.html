@@ -1,4 +1,4 @@
-<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="main/paginate.html" /></F3:check>
 <div class="columns">
 	<div class="column">
 <repeat group="{{ @contests }}" value="{{ @contest }}" counter="{{ @ctr }}">
@@ -20,4 +20,4 @@ votable: {{@contest.votable}}
 </repeat>
 	</div>
 </div>
-<F3:check if="{{isset(@paginate.firstPage) AND sizeof(@contests)>1}}"><include href="paginate.html" /></F3:check>
+<F3:check if="{{isset(@paginate.firstPage) AND sizeof(@contests)>1}}"><include href="main/paginate.html" /></F3:check>

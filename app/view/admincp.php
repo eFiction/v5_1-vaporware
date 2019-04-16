@@ -333,18 +333,12 @@ class AdminCP extends Base
 		return $this->render('stories/edit_meta.html');
 	}
 
-	public function storyChapterEdit(array $chapterData, array $chapterList, string $editor = "plain"): string
+	public function storyChapterEdit(array $chapterData, array $chapterList): string
 	{
-		if ($editor == "plain")
+		if($chapterData['editor']=="visual")
 		{
-			$chapterData['notes']		= preg_replace("/<br\\s*\\/>\\s*/i", "\n", $chapterData['notes']);
-			$chapterData['chaptertext']	= html_entity_decode(preg_replace("/<br\\s*\\/>\\s*/i", "\n", $chapterData['chaptertext']));
-			$chapterData['editmode']	= "plain";
-		}
-		else
-		{
-			\Registry::get('VIEW')->javascript( 'head', TRUE, "ckeditor/ckeditor.js" );
-			$chapterData['editmode']	= "visual";
+			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
+			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
 		}
 
 		$this->f3->set('data', $chapterData);

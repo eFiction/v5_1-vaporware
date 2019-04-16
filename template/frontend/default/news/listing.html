@@ -1,5 +1,5 @@
 <h2>{{@LN__News_Box}}</h2>
-<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="main/paginate.html" /></F3:check>
 <repeat group="{{ @newsItems }}" value="{{ @news }}" counter="{{ @ctr }}">
 	<div class="news-box">
 		<h3><a href='{{@BASE}}/news/id={{ @news.nid }}'>{{ @news.headline }}</a></h3>
@@ -8,4 +8,4 @@
 		<div align="right"><a href='{{@BASE}}/news/id={{@news.nid}}#comments'><input class="button" type="submit" value="{{ @LN__CommentsC, @news.comments | format }}"></a></div>
 	</div>
 </repeat>
-<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="main/paginate.html" /></F3:check>

@@ -1,5 +1,6 @@
 /* import basic settings, IE-fixes and grids */
 @import url(bulma.css);
+@import url(bulma.tooltip.css);
 @import url(menu.css);
 @import url(forms.css);
 @import url(typography.css);
@@ -31,3 +32,5 @@
 .notification.has-border {
     border: 1px solid #dbdbdb;
 }
+
+
