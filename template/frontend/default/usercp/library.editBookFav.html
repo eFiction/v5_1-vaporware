@@ -13,7 +13,14 @@
 	<table>
 		<tr><td colspan="2"><h6>{{@data.name}}:</h6></td></tr>
 		<tr><td colspan="2"><textarea class="textarea" name="comments">{{@data.comments}}</textarea></td></tr>
-		<tr><td>{{@LN__Notification}}</td><td><input type="checkbox" name="notify" value="yes" <check if="{{@data.notify}}">checked="checked"</check> />
+{*		<tr>
+			<check if="{{ @block=='bookmark' }}">
+				<true><td>{@LN__MakeFavourite}</td></true>
+				<false><td>{@LN__MakeBookmark}</td></false>
+			</check>
+			<td><input type="checkbox" name="change" value="yes" />
+		</tr> *}
+		<tr><td>{{@LN__Notification}}</td><td><input type="checkbox" name="notify" value="yes" <check if="{{@data.notify}}">checked="checked"</check> /></tr>
 		<tr>
 			<td rowspan=4>{{@LN__Visibility}}</td>
 			<td>

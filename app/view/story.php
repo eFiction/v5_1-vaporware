@@ -136,6 +136,24 @@ class Story extends Base
 		return $this->render('story/categories.html');
 	}
 	
+	public function contestList(array $data)
+	{
+		foreach ( $data as &$dat )
+			$this->dataProcess($dat);
+
+		$this->f3->set('contests', $data);
+		
+		return $this->render('story/contests.list.html');
+		//return print_r($data,1);
+	}
+	
+	public function contestLoad(array $data)
+	{
+		$this->dataProcess($data);
+		
+		return print_r($data,1);
+	}
+	
 	public function epubXMLtag()
 	{
 		return "<?xml version='1.0' encoding='utf-8'?>\n";

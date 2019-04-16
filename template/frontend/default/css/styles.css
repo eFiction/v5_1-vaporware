@@ -6,21 +6,22 @@
 @import url(jquery.datetimepicker.css);
 @import url(cookieconsent.css);
 
+/* --------------- listing --------------- */
 
-.story-box {
+.story-box, .contest-box {
 	margin: 6px 8px;
 	padding: 6px 8px;
 	border: 1px solid #efefef;
 }
-.story-list-head {
+.story-list-head, .contest-list-head {
 	border-bottom: 1px solid #efefef;
 	padding: 4px 2px;
 	font-size: large;
 }
-.story-list-actions {
+.story-list-actions, .contest-list-actions {
 	text-align: right;
 }
-.story-list-summary {
+.story-list-summary, .contest-list-summary {
 	text-align: justify;
 	padding: 6px;
 }
@@ -28,6 +29,8 @@
 	text-align: center;
 	font-size: small;
 }
+
+/* --------------- sidebar --------------- */
 
 .sbarbox {
 	margin: 8px 0;
@@ -69,6 +72,8 @@
 	padding: 0 6px;
 }
 
+/* --------------- archive news --------------- */
+
 .news-box {
 	border: 1px solid #efefef;
 	margin: 6px 0;
@@ -86,7 +91,7 @@
 	text-align: justify;
 }
 
-/*-----------------  AUTHOR'S INDEX  -----------------*/
+/* --------------- authors index --------------- */
 
 .author-grid-wrapper {
 	background-color: #fff;
@@ -116,32 +121,31 @@
 
 .alphabetical ul {
 	margin: 20px 0;
-}
+	}
 .alphabetical li {
 	list-style: none;
 	min-width: 200px;
 	padding: 4px 6px;
 	margin: 1px;
-}
+	}
 
 .nav-alphabet ul {
 	margin: 10px auto;
 	text-align: center;
-}
+	}
 .nav-alphabet li {
 	background-color: #fafafa;
 	list-style: none;
 	list-style-position: inside;
 	display: inline;
 	padding: 6px 8px;
-}
+	}
 
-.button.navmenu
-{
+.button.navmenu {
 	margin: 0px 5px 0px 5px;
 	text-align: left;
-}
-/*----------------- FIELDSET -----------------*/
+	}
+/* --------------- fieldset --------------- */
 
 fieldset {
 	margin: 6px 0;

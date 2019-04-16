@@ -561,7 +561,6 @@ class AdminCP extends Controlpanel {
 		);
 
 		return $data;
-		
 	}
 
 	public function contestLoad(int $conid)

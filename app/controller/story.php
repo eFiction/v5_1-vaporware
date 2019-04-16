@@ -38,6 +38,9 @@ class Story extends Base
 			case 'series':
 				$data = $this->series($params);
 				break;
+			case 'contests':
+				$data = $this->contests($params);
+				break;
 			/*
 			case 'search':
 			case 'browse':
@@ -221,7 +224,7 @@ class Story extends Base
 
 	protected function intro(array $params): string
 	{
-		if ( isset($params['*']) ) $get = $this->parametric($params['*']); // 3.6
+		if ( isset($params['*']) ) $get = $this->parametric($params['*']);
 
 		$data = $this->model->intro();
 		
@@ -234,6 +237,36 @@ class Story extends Base
 
 		$stories = $this->template->viewList($data);
 		return [ $info[0], $stories];
+	}
+	
+	protected function contests(array $params)
+	{
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+
+		if ( isset($params['id']) )
+		{
+			if ( NULL === $contest = $this->model->contestLoad((int)$params['id']) )
+			{
+				// no contest
+				\Base::instance()->reroute("/story/contests", false);
+				exit;			
+			}
+			if ( isset($params['stories']) )
+			{
+				$buffer = "**Stories**";
+				
+			}
+			else $buffer = $this->template->contestLoad($contest);
+		}
+	
+		if ( empty($buffer) )
+		{
+			$data = $this->model->contestsList();
+			
+			$buffer = $this->template->contestList($data);
+		}
+
+		return $buffer;
 	}
 	
 	protected function updates(array $params): string

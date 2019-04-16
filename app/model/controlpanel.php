@@ -137,10 +137,10 @@ class Controlpanel extends Base {
 		}
 		else $pre['char'] = '""';
 		
-		$authors = 		$this->exec ( "SELECT A.aid as id, A.name FROM `tbl_authors`A INNER JOIN `tbl_stories_authors`Rel ON ( U.uid = Rel.aid AND Rel.sid = :sid AND Rel.type = 'M' );", [ ":sid" => $storyData['sid'] ]);
+		$authors = 		$this->exec ( "SELECT U.uid as id, U.username as name FROM `tbl_users`U INNER JOIN `tbl_stories_authors`Rel ON ( U.uid = Rel.aid AND Rel.sid = :sid AND Rel.type = 'M' );", [ ":sid" => $storyData['sid'] ]);
 		$pre['mainauth'] = json_encode($authors);
 
-		$supauthors = 	$this->exec ( "SELECT A.aid as id, A.name FROM `tbl_authors`A INNER JOIN `tbl_stories_authors`Rel ON ( U.uid = Rel.aid AND Rel.sid = :sid AND Rel.type = 'S' );", [ ":sid" => $storyData['sid'] ]);
+		$supauthors = 	$this->exec ( "SELECT U.uid as id, U.username as name FROM `tbl_users`U INNER JOIN `tbl_stories_authors`Rel ON ( U.uid = Rel.aid AND Rel.sid = :sid AND Rel.type = 'S' );", [ ":sid" => $storyData['sid'] ]);
 		$pre['supauth'] = json_encode($supauthors);
 
 		return $pre;
@@ -156,7 +156,7 @@ class Controlpanel extends Base {
 							FROM `tbl_stories`S
 								LEFT JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid )
 								INNER JOIN `tbl_stories_authors`rSA ON ( rSA.sid = S.sid AND rSA.type='M' )
-									INNER JOIN `tbl_authors`A ON ( (rSA.aid = A.aid) AND (A.uid=:uidU OR A.curator=:uidC) )
+									INNER JOIN `tbl_users`U ON ( (rSA.aid = U.uid) AND (U.uid=:uidU OR U.curator=:uidC) )
 						WHERE S.sid = :sid ";
 			$countBind = [ ":sid" => $storyID, ":uidU" => $userID, ":uidC" => $userID ];
 			
@@ -276,7 +276,7 @@ class Controlpanel extends Base {
 		$sql = "SELECT SELECT_OUTER.sid,
 					GROUP_CONCAT(DISTINCT tid,',',tag,',',description,',',tgid ORDER BY `order`,tgid,tag ASC SEPARATOR '||') AS tagblock,
 					GROUP_CONCAT(DISTINCT charid,',',charname ORDER BY charname ASC SEPARATOR '||') AS characterblock,
-					GROUP_CONCAT(DISTINCT aid,',',name,',',username ORDER BY name ASC SEPARATOR '||' ) as authorblock,
+					GROUP_CONCAT(DISTINCT uid,',',username ORDER BY username ASC SEPARATOR '||' ) as authorblock,
 					GROUP_CONCAT(DISTINCT cid,',',category ORDER BY category ASC SEPARATOR '||' ) as categoryblock,
 					GROUP_CONCAT(DISTINCT ratingid,',',rating_name,',',ratingwarning,',',rating_image SEPARATOR '||' ) as rating,
 					COUNT(DISTINCT fid) AS reviews,
@@ -286,15 +286,14 @@ class Controlpanel extends Base {
 						SELECT S.sid,C.chapid,UNIX_TIMESTAMP(S.date) as published, UNIX_TIMESTAMP(S.updated) as modified,
 								F.fid,
 								S.ratingid, Ra.rating as rating_name, IF(Ra.rating_image,Ra.rating_image,'') as rating_image, Ra.ratingwarning,
-								A.aid, A.name, U.username,
+								U.uid, U.username,
 								Cat.cid, Cat.category,
 								TG.description,TG.order,TG.tgid,T.label as tag,T.tid,
 								Ch.charid, Ch.charname
 							FROM `tbl_stories` S
 								LEFT JOIN `tbl_ratings` Ra ON ( Ra.rid = S.ratingid )
 								LEFT JOIN `tbl_stories_authors`rSA ON ( rSA.sid = S.sid )
-									LEFT JOIN `tbl_authors`A ON ( rSA.aid = A.aid )
-									LEFT JOIN `tbl_users`U ON ( A.uid = U.uid )
+									LEFT JOIN `tbl_users`U ON ( rSA.aid = U.uid )
 								LEFT JOIN `tbl_stories_tags`rST ON ( rST.sid = S.sid )
 									LEFT JOIN `tbl_tags` T ON ( T.tid = rST.tid AND rST.character = 0 )
 										LEFT JOIN `tbl_tag_groups` TG ON ( TG.tgid = T.tgid )
@@ -361,7 +360,7 @@ class Controlpanel extends Base {
 						SELECT 
 							Ser.seriesid,
 							MAX(Ra.rid) as max_rating_id,
-							GROUP_CONCAT(DISTINCT A.aid,',',A.name,',',U.username ORDER BY username ASC SEPARATOR '||' ) as authorblock,
+							GROUP_CONCAT(DISTINCT U.uid,',',U.username ORDER BY username ASC SEPARATOR '||' ) as authorblock,
 							GROUP_CONCAT(DISTINCT Chara.charid,',',Chara.charname ORDER BY charname ASC SEPARATOR '||') AS characterblock,
 							GROUP_CONCAT(DISTINCT C.cid,',',C.category ORDER BY category ASC SEPARATOR '||' ) as categoryblock,
 							GROUP_CONCAT(DISTINCT T.tid,',',T.label,',',TG.description,',',TG.tgid ORDER BY TG.order,TG.tgid,T.label ASC SEPARATOR '||') AS tagblock
@@ -376,8 +375,7 @@ class Controlpanel extends Base {
 									LEFT JOIN `tbl_stories_categories`rSC ON ( rSC.sid = S.sid )
 										LEFT JOIN `tbl_categories`C ON ( rSC.cid = C.cid )
 									LEFT JOIN `tbl_stories_authors`rSA ON ( rSA.sid = S.sid )
-										LEFT JOIN `tbl_authors`A ON ( rSA.aid = A.aid )
-										LEFT JOIN `tbl_users`U ON ( A.uid = U.uid )
+										LEFT JOIN `tbl_users`U ON ( rSA.aid = U.uid )
 						WHERE Ser.seriesid = :series
 						GROUP BY Ser.seriesid
 					) AS SERIES

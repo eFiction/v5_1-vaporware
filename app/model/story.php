@@ -186,8 +186,7 @@ class Story extends Base
 		return $this->exec("SELECT rid, rating from `tbl_ratings`");
 	}
 	
-//	public function updates(int $year, $month=0, $day=0)
-	public function updates($year, $month=0, $day=0)
+	public function updates(int $year, $month=0, $day=0)
 	{
 		if ( $year > 0 )
 		{
@@ -227,6 +226,94 @@ class Story extends Base
 		return $data;
 	}
 	
+	public function contestsList() : array
+	{
+		$limit = 5;
+		$pos = (int)$this->f3->get('paginate.page') - 1;
+
+		$sql = "SELECT SQL_CALC_FOUND_ROWS
+					C.conid, C.title, C.summary,
+                    IF(C.active='date',IF(C.date_open<NOW(),IF(C.date_close>NOW() OR C.date_close IS NULL,'active','closed'),'prepare'),C.active) as active,
+                    IF(C.votable='date',IF(C.date_close<NOW() OR C.date_close IS NULL,IF(C.vote_closed>NOW() OR C.vote_closed IS NULL,'active','closed'),'prepare'),C.votable) as votable,
+					UNIX_TIMESTAMP(C.date_open) as date_open, UNIX_TIMESTAMP(C.date_close) as date_close, UNIX_TIMESTAMP(C.vote_closed) as vote_closed, 
+					C.cache_tags, C.cache_characters, C.cache_categories, C.cache_stories,
+					U.username, COUNT(R.lid) as count
+				FROM `tbl_contests`C
+					LEFT JOIN `tbl_users`U ON ( C.uid = U.uid )
+					LEFT JOIN `tbl_contest_relations`R ON ( C.conid = R.conid AND R.type='ST' )
+				WHERE concealed = 0
+				GROUP BY C.conid
+				ORDER BY C.conid DESC
+				LIMIT ".(max(0,$pos*$limit)).",".$limit;
+
+		$data = $this->exec($sql);
+				
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/story/contests",
+			$limit
+		);
+		
+		foreach ( $data as &$dat )
+		{
+			
+		}
+
+		return $data;
+	}
+
+	public function contestLoad(int $conid)
+	{
+		$sql = "SELECT C.conid as id, C.title, C.summary, C.concealed,
+                    IF(C.active='date',IF(C.date_open<NOW(),IF(C.date_close>NOW() OR C.date_close IS NULL,'active','closed'),'prepare'),C.active) as active,
+                    IF(C.votable='date',IF(C.date_close<NOW() OR C.date_close IS NULL,IF(C.vote_closed>NOW() OR C.vote_closed IS NULL,'active','closed'),'prepare'),C.votable) as votable,
+					UNIX_TIMESTAMP(C.date_open) as date_open, UNIX_TIMESTAMP(C.date_close) as date_close, UNIX_TIMESTAMP(C.vote_closed) as vote_closed, 
+					C.cache_tags, C.cache_characters, C.cache_categories,
+					U.uid, U.username
+					FROM `tbl_contests`C
+					LEFT JOIN `tbl_users`U ON ( C.uid=U.uid )
+					WHERE C.conid = :conid";
+/*		$sql = "SELECT C.conid as id, C.title, C.summary, C.concealed, C.date_open, C.date_close, C.vote_closed,
+					C.cache_tags, C.cache_characters, C.cache_categories,
+					GROUP_CONCAT(T.tid,',',T.label SEPARATOR '||') as tag_list,
+					GROUP_CONCAT(Ch.charid,',',Ch.charname SEPARATOR '||') as character_list, 
+					GROUP_CONCAT(Cat.cid,',',Cat.category SEPARATOR '||') as category_list, 
+					U.uid, U.username
+					FROM `tbl_contests`C
+					LEFT JOIN `tbl_users`U ON ( C.uid=U.uid )
+					LEFT JOIN `tbl_contest_relations`RelC ON ( C.conid=RelC.conid )
+						LEFT JOIN `tbl_tags`T ON ( RelC.relid = T.tid AND RelC.type='T' )
+						LEFT JOIN `tbl_characters`Ch ON ( RelC.relid = Ch.charid AND RelC.type='CH' )
+						LEFT JOIN `tbl_categories`Cat ON ( RelC.relid = Cat.cid AND RelC.type='CA' )
+					WHERE C.conid = :conid";	*/
+					/*
+					--GROUP_CONCAT(S.sid,',',S.title SEPARATOR '||') as story_list,
+					--LEFT JOIN `tbl_stories`S ON ( RelC.relid = S.sid AND RelC.type='ST' )
+					*/
+
+		$data = $this->exec($sql, [":conid" => $conid ]);
+		if (sizeof($data)==1) 
+		{
+			/*
+			$data[0]['date_open'] = ($data[0]['date_open']>0)
+				? $this->timeToUser($data[0]['date_open'],  $this->config['date_format'])
+				: "";
+			$data[0]['date_close'] = ($data[0]['date_close']>0)
+				? $this->timeToUser($data[0]['date_close'], $this->config['date_format'])
+				: "";
+			$data[0]['vote_closed'] = ($data[0]['vote_closed']>0)
+				? $this->timeToUser($data[0]['vote_closed'], $this->config['date_format'])
+				: "";
+				*/
+			//$data[0]['tag_list'] = $this->cleanResult($data[0]['tag_list']);
+			//$data[0]['character_list'] = $this->cleanResult($data[0]['character_list']);
+			//$data[0]['category_list'] = $this->cleanResult($data[0]['category_list']);
+
+			return $data[0];
+		}
+		return NULL;
+	}
+
 	public function searchPrepopulate ($item, $id)
 	{
 		if ( $item == "author")

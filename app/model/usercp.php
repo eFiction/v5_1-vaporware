@@ -1181,11 +1181,12 @@ class UserCP extends Controlpanel
 				"uid"			=>	$_SESSION['userID'],
 				"item"			=>	$params['id'][1],
 				"type"			=>	$params['id'][0],
-				"bookmark"		=>	(($params[0]=="bookmark") ? 1 : 0),
+				"bookmark"		=>	(int)($params[0]=="bookmark" XOR isset($post['change'])),	// prepare for bm-fav change
 				"notify"		=>	(int)@isset($post['notify']),
 				"visibility"	=>	(isset($post['visibility'])) ? $post['visibility'] : '',
 				"comments"		=>	$post['comments'],
 			];
+
 			return $this->insertArray('tbl_user_favourites', $insert, TRUE);
 		}
 		return FALSE;
