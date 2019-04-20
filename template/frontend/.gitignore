@@ -5,3 +5,6 @@
 # And the default template
 !/default
 !/default/**
+# Add the darkmode overwrite
+!/darkfault
+!/darkfault/**
