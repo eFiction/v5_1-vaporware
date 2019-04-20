@@ -105,7 +105,7 @@ class AdminCP extends Base
 				$this->archiveRatings($f3, $params);
 				break;
 			default:
-				$this->buffer(\Template::instance()->render('access.html'));
+				$this->buffer( $this->template->access() );
 		}
 	}
 	
@@ -270,7 +270,7 @@ class AdminCP extends Base
 			{
 				//$data['categories'] = $this->model->getCategories();
 				//$data['tags']
-				$data['raw'] = @$params['raw'];
+				$data['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
 				return $this->template->contestEdit($data, @$params['returnpath']);
 			}
 		}
@@ -680,7 +680,7 @@ class AdminCP extends Base
 				$this->homeStories($f3, $params);
 				break;
 			default:
-				$this->buffer(\Template::instance()->render('access.html'));
+				$this->buffer( $this->template->access() );
 		}
 	}
 	
@@ -1002,7 +1002,7 @@ class AdminCP extends Base
 				$this->membersHome($f3);
 				break;
 			default:
-				$this->buffer(\Template::instance()->render('access.html'));
+				$this->buffer( $this->template->access() );
 		}
 	}
 
@@ -1183,7 +1183,7 @@ class AdminCP extends Base
 				$data['General'] = $this->model->settingsFields('settings_general');
 				break;
 			default:
-				$this->buffer(\Template::instance()->render('access.html'));
+				$this->buffer( $this->template->access() );
 		}
 		if (sizeof($data))  $this->buffer( $this->template->settingsFields($data, "settings/".$params['module'], $this->feedback) );
 		if (isset($extra)) $this->buffer( $extra );
@@ -1303,7 +1303,7 @@ class AdminCP extends Base
 				$this->storiesSeries($f3, $params);
 				break;
 			default:
-				$this->buffer(\Template::instance()->render('access.html'));
+				$this->buffer( $this->template->access() );
 		}
 	}
 	
@@ -1560,6 +1560,7 @@ class AdminCP extends Base
 		{
 			if ( NULL !== $data = $this->model->seriesLoad($params['id']) )
 			{
+				$data['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
 				$this->buffer( $this->template->seriesEdit($data, @$params['returnpath']) );
 				return;
 			}
@@ -1591,6 +1592,11 @@ class AdminCP extends Base
 				$module
 			)
 		);
+	}
+	
+	protected function storiesSeriesEdit(array $series)
+	{
+		
 	}
 
 }

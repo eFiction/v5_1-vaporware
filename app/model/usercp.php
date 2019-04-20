@@ -90,6 +90,9 @@ class UserCP extends Controlpanel
 			}
 			else
 				$this->menu[$selected]["sub"] = $this->panelMenu($selected, $data);
+			
+			// will not work for sub menus yet
+			$this->menu[$selected]['selected'] = 1;
 		}
 		return $this->menu;
 	}
@@ -406,7 +409,7 @@ class UserCP extends Controlpanel
 		// Check tags:
 		$this->storyRelationTag( $story->sid, $post['tags'] );
 		// Check Characters:
-		$this->storyRelationTag( $story->sid, $post['characters'], 1 );
+		$this->storyRelationCharacter( $story->sid, $post['characters'] );
 		// Check Categories:
 		$this->storyRelationCategories( $story->sid, $post['category'] );
 		// Check Authors:

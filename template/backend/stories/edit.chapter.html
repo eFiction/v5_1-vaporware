@@ -1,7 +1,7 @@
 <div class="columns">
 	<div class="column is-three-quarters">
 		<check if="{{@data.chapid=='new'}}">New chapter!</check>
-		<form method="post" action="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}};chapter={{@data.chapid}}">
+		<form method="post" action="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}}/chapter={{@data.chapid}}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}">
 			<div class="columns is-multiline">
 				<div class="column is-full"><h6>{{@LN__StoryTitle}}:</h6>{{@data.storytitle}}</div>
 
@@ -37,8 +37,8 @@
 						</span>
 						<span class="level-right">
 							<check if="{{@data.editor=='visual'}}">
-								<true> <a href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}};chapter={{@data.chapid}}/editor=plain">{{@LN__SwitchPlainHTML}}</a></true>
-								<false> <a href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}};chapter={{@data.chapid}}/editor=visual">{{@LN__SwitchVisual}}</a></false>
+								<true> <a href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}}/chapter={{@data.chapid}}/editor=plain">{{@LN__SwitchPlainHTML}}</a></true>
+								<false> <a href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}}/chapter={{@data.chapid}}/editor=visual">{{@LN__SwitchVisual}}</a></false>
 							</check>
 						</span>
 					</span>

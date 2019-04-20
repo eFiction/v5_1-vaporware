@@ -7,7 +7,12 @@ class AdminCP extends Base
 	public function menuShow($menu="")
 	{
 		$this->f3->set('panel_menu', $menu);
-		return $this->render('menu.html');
+		return $this->render('main/menu.html');
+	}
+	
+	public function access()
+	{
+		return $this->render('main/access.html');
 	}
 	
 	public function settingsFields($data,$target,$feedback)
@@ -16,7 +21,7 @@ class AdminCP extends Base
 		$this->f3->set('form_elements', $data);
 		$this->f3->set('form_feedback', $feedback);
 		// resolve() eval's the language injections
-		$html = \Template::instance()->resolve($this->render('form_blocks.html'));
+		$html = \Template::instance()->resolve($this->render('main/formblocks.html'));
 		return $html;
 	}
 
@@ -92,22 +97,22 @@ class AdminCP extends Base
 		$this->f3->set('sort', $sort);
 		$this->f3->set('contestlist', $data);
 
-		return $this->render('archive/contest_list.html');
+		return $this->render('archive/contest.list.html');
 	}
 	
 	public function contestEdit(array $data, $returnpath)
 	{
-		if(!isset($data['raw']))
+		if($data['editor']=="visual")
 		{
-			$this->javascript( 'head', TRUE, "//cdn.tinymce.com/4/tinymce.min.js" );
-			$this->javascript( 'head', TRUE, "editor.js" );
+			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
+			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
 		}
 		$this->javascript( 'head', TRUE, "jquery.datetimepicker.js" );
 
 		$this->f3->set('data', $data);
 		$this->f3->set('returnpath', $returnpath);
 
-		return \Template::instance()->render('archive/contest_edit.html');
+		return \Template::instance()->render('archive/contest.edit.html');
 	}
 
 	public function contestEntries(array $data, $returnpath)
@@ -115,7 +120,7 @@ class AdminCP extends Base
 		$this->f3->set('data', $data);
 		$this->f3->set('returnpath', $returnpath);
 		
-		return \Template::instance()->render('archive/contest_entries.html');
+		return \Template::instance()->render('archive/contest.entries.html');
 	}
 
 	public function custompageList(array $data, array $sort)
@@ -272,11 +277,20 @@ class AdminCP extends Base
 		$this->f3->set('module', 	$module);
 		$this->f3->set('sort', $sort);
 		
-		return $this->render('stories/seriesList.html');
+		return $this->render('stories/series.list.html');
 	}
 	
 	public function seriesEdit(array $data, string $returnpath="" )
 	{
+		if($data['editor']=="visual")
+		{
+			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
+			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
+		}
+		$this->dataProcess($data);
+		$this->f3->set('data', 		$data);
+
+		return $this->render('stories/series.edit.html');
 		return "Edit";
 	}
 	
@@ -330,7 +344,7 @@ class AdminCP extends Base
 		$this->f3->set('data', $storyData);
 		$this->f3->set('chapterList', $chapterList);
 		
-		return $this->render('stories/edit_meta.html');
+		return $this->render('stories/edit.header.html');
 	}
 
 	public function storyChapterEdit(array $chapterData, array $chapterList): string
@@ -344,14 +358,14 @@ class AdminCP extends Base
 		$this->f3->set('data', $chapterData);
 		$this->f3->set('chapterList', $chapterList);
 
-		return $this->render('stories/edit_chapter.html');
+		return $this->render('stories/edit.chapter.html');
 	}
 
 	public function storyListPending(array $data, array $sort)
 	{
 		$this->f3->set('data', $data);
 		$this->f3->set('sort', $sort);
-		return $this->render('stories/pendingList.html');
+		return $this->render('stories/pending.list.html');
 	}
 	
 	public function storyValidatePending(array $data, $returnpath)
@@ -364,7 +378,7 @@ class AdminCP extends Base
 
 		$this->f3->set('data', 		 $data);
 		$this->f3->set('returnpath', $returnpath);
-		return $this->render('stories/pendingView.html');
+		return $this->render('stories/pending.view.html');
 	}
 	
 	public function storyValidateChapter(array $data, $chapterText, $returnpath)
@@ -374,7 +388,7 @@ class AdminCP extends Base
 		$this->f3->set('data', 			$data);
 		$this->f3->set('chapterText', 	$chapterText);
 		$this->f3->set('returnpath',	$returnpath);
-		return $this->render('stories/pendingChapter.html');
+		return $this->render('stories/pending.chapter.html');
 	}
 
 	public function tagList($data, $sort)

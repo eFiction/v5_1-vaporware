@@ -10,7 +10,7 @@
 </check>
 <div class="columns">
 	<div class="column is-three-quarters">
-		<form method="post" action="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}}/chapter={{@data.chapid}};returnpath={{@data.form.returnpath}}">
+		<form method="post" action="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}}/chapter={{@data.chapid}}/editor={{ @data.editor=='visual' ? "visual" : "plain" }};returnpath={{@data.form.returnpath}}">
   			<div class="columns is-multiline">
 				<div class="column is-full"><h6>{{@LN__StoryTitle}}:</h6>{{@data.form.storytitle}}</div>
 

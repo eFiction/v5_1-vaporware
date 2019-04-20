@@ -3,7 +3,7 @@
 <div class="news-box">
 	<h3><a href='{{@BASE}}/news/id={{ @news.nid }}'>{{ @news.headline }}</a></h3>
 	<div class="news-date-author">{{@LN__News_writtenby}} <a href='{{@BASE}}/members/id={{ @news.uid }}'>{{ @news.username }}</a> @ {{ date(@CONFIG.datetime_format, @news.timestamp) }} <check if="{{@canAdmin['home/news']}}"><a href="{{@BASE}}/adminCP/home/news/id={{@news.nid}}" target="_blank">{ICON:edit}</a></check></div>
-	{{ @news.newstext | raw}}
+	{{ nl2br(@news.newstext) | raw}}
 </div>
 
 <repeat group="{{ @news.comments }}" value="{{ @comment }}" counter="{{ @ctr }}">

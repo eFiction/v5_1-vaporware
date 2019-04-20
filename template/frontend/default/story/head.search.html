@@ -1,53 +1,74 @@
 <!-- https://bulma.io/documentation/form/ -->
 
+<h4>{{@LN__AdvancedSearch}}</h4>
 <form method="post" action="{{@BASE}}/story/search/">
-	<fieldset><legend>{{@LN__AdvancedSearch}}</legend>
-	<div class="grid-wrapper">
-	<!-- row #1 -->
-		<div class="gb-half">{{@LN__Title}}<br /><input class="input" placeholder="" type="text" name="story_title" value="<check if="{{isset(@searchForm.story_title)}}">{{@searchForm.story_title}}</check>"></div>
-		<div class="gb-half">{{@LN__Author}}<br /><input type="text" id="author-select" name="author" /></div>
-	<!-- row #2 -->
-		<div class="gb-half">{{@LN__Categories}}<br /><input type="text" id="category-select" name="category" /></div>
-		<div class="gb-half">{{@LN__Characters}}<br /><input type="text" id="characters-select" name="characters" /></div>
-	<!-- row #3 -->
-		<div class="gb-half">{{@LN__TagsInclude}}<br /><input type="text" id="tagIn-select" name="tagIn" /></div>
-		<div class="gb-half">{{@LN__TagsExclude}}<br /><input type="text" id="tagOut-select" name="tagOut" /></div>
-	</div>
-	<!-- misc -->	
-	<div class="grid-wrapper">
-	<div class="gb-half">
-		{{@LN__LibraryStories}}: <select class="search" name="library">
+
+<div class="columns is-multiline">
+	<div class="column is-one-quarter"><h6>{{@LN__Title}}</h6></div>
+	<div class="column is-three-quarters"><input class="input" placeholder="" type="text" name="story_title" value="<check if="{{isset(@searchForm.story_title)}}">{{@searchForm.story_title}}</check>" /></div>
+
+	<div class="column is-one-quarter"><h6>{{@LN__Author}}</h6></div>
+	<div class="column is-three-quarters"><input type="text" id="author-select" name="author" /></div>
+
+	<div class="column is-one-quarter"><h6>{{@LN__Categories}}</h6></div>
+	<div class="column is-three-quarters"><input type="text" id="category-select" name="category" /></div>
+
+	<div class="column is-one-quarter"><h6>{{@LN__Characters}}</h6></div>
+	<div class="column is-three-quarters"><input type="text" id="characters-select" name="characters" /></div>
+
+	<div class="column is-one-quarter"><h6>{{@LN__TagsInclude}}</h6></div>
+	<div class="column is-three-quarters"><input type="text" id="tagIn-select" name="tagIn" /></div>
+	
+	<div class="column is-one-quarter"><h6>{{@LN__TagsExclude}}</h6></div>
+	<div class="column is-three-quarters"><input type="text" id="tagOut-select" name="tagOut" /></div>
+
+	<div class="column is-half"><h6>{{@LN__LibraryStories}}</h6>
+		<div class="select">
+		<select class="search" name="library">
 			<option value="no">{{@LN__no}}</option>
 			<option value="both"<check if="{{isset(@searchForm.library) AND @searchForm.library=='both'}}"> selected="selected"</check>>{{@LN__Search_FavBM}}</option>
 			<option value="fav"<check if="{{isset(@searchForm.library) AND @searchForm.library=='fav'}}"> selected="selected"</check>>{{@LN__Search_Fav}}</option>
 			<option value="bm"<check if="{{isset(@searchForm.library) AND @searchForm.library=='bm'}}"> selected="selected"</check>>{{@LN__Search_BM}}</option>
 		</select>
+		</div>
 	</div>
-	<div class="gb-half">
-		{{@LN__StoryExtent}}: <select class="search" name="chapters">
+	
+	<div class="column is-half"><h6>{{@LN__StoryExtent}}</h6>
+		<div class="select">
+		<select class="search" name="chapters">
 			<option value="single"<check if="{{isset(@searchForm.chapters) AND @searchForm.chapters=='single'}}"> selected="selected"</check>>{{@LN__Size_SingleChapter}}</option>
 			<option value="multi"<check if="{{isset(@searchForm.chapters) AND @searchForm.chapters=='multi'}}"> selected="selected"</check>>{{@LN__Size_MultiChapter}}</option>
 			<option value="both"<check if="{{(empty(@searchForm.chapters) OR @searchForm.chapters=='both')}}"> selected="selected"</check>>{{@LN__Size_All}}</option>
 		</select>
+		</div>
 	</div>
-<check if="{{isset(@searchRatings)}}">
-	<div class="gb-full"><div class="search-rating">{{@LN__Rating}} from <select class="search" name="rating[0]">
+	
+	<div class="column is-half"><h6>{{@LN__StoryExtent}}</h6>
+	<check if="{{isset(@searchRatings)}}">
+		<span class="text-alignment">{{@LN__Rating}} from <div class="select"><select class="search" name="rating[0]">
 		<repeat group="{{ @searchRatings }}" value="{{ @rating }}">
 			<option value="{{ @rating.rid }}" <check if="{{@rating.rid==@searchForm.rating.0}}">selected="selected" </check> >{{ @rating.rating }}</option>
 		</repeat>
-		</select> to <select class="search" name="rating[1]">
+		</select></div> to</span> <div class="select"><select class="search" name="rating[1]">
 		<repeat group="{{ @searchRatings }}" value="{{ @rating }}">
 			<option value="{{ @rating.rid }}" <check if="{{@rating.rid==@searchForm.rating.1}}">selected="selected" </check> >{{ @rating.rating }}</option>
 		</repeat>
-		</select>
-	</div></div>
-</check>
-<div class="gb-full"><input type="checkbox" name="exclude_wip" <check if="{{isset(@searchForm.exclude_wip)}}">checked="checked"</check> value="1"> {{@LN__SearchCompletedOnly}}</div>
-<div class="gb-full"><div class="search-buttons"><button class="button is-success" type="submit">{{@LN__Search}}</button> <button class="button is-danger" type="reset">{{@LN__Reset}}</button></div></div>
-<div class="gb-full"><div class="buttons-alignment"><check if="{{!empty(@searchLink)}}"><a class="button" href="{{@BASE}}/story/browse/{{@searchLink}}<check if="{{isset(@paginate.page)}}">/page={{@paginate.page}}</check>">{{@LN__HideSearchForm}}</a></check>&nbsp;</div></div>
+		</select></div>
+	</check>
+	</div>
+
+	<div class="column is-half"><h6>{{@LN__SearchCompletedOnly}}</h6>
+	<input type="checkbox" name="exclude_wip" <check if="{{isset(@searchForm.exclude_wip)}}">checked="checked"</check> value="1" />
+	</div>
+
 </div>
 
-	</fieldset>
+<button class="button is-success" type="submit">{{@LN__Search}}</button> <button class="button is-light" type="reset">{{@LN__Reset}}</button>
+
+<br /><br />
+
+<div class="buttons-alignment"><check if="{{!empty(@searchLink)}}"><a class="button is-light" href="{{@BASE}}/story/browse/{{@searchLink}}<check if="{{isset(@paginate.page)}}">/page={{@paginate.page}}</check>">{{@LN__HideSearchForm}}</a></check></div>
+
 </form>
 <script type="text/javascript">
 $(document).ready(function() {
@@ -106,5 +127,3 @@ $(document).ready(function() {
     });
 });
 </script>
-
-<br /><hr><br />

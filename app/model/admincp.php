@@ -1213,12 +1213,54 @@ class AdminCP extends Controlpanel {
 	
 	public function seriesLoad(int $seriesid)
 	{
-		$sql = "SELECT * FROM `tbl_series`Ser WHERE `seriesid` = :seriesid";
+		$sql = "SELECT Ser.seriesid as id, Ser.title, Ser.summary, Ser.type, Ser.cache_tags
+					FROM `tbl_series`Ser
+						LEFT JOIN `tbl_series_stories`rSSer ON ( rSSer.seriesid = Ser.seriesid )
+				
+					WHERE Ser.seriesid = :seriesid
+					GROUP BY Ser.seriesid";
 		$data = $this->exec($sql, [":seriesid" => $seriesid ]);
+		
 		if (sizeof($data)!=1) 
 			return NULL;
 
+		$data[0]['current'] =
+		[
+			"tags"			=> $this->seriesCountTags($seriesid),
+			"characters"	=> $this->seriesCountCharacters($seriesid),
+		];
+		//$data[0]['pre']['tag']		 = $this->jsonPrepop($data[0]['tag_list']);
+		//$data[0]['pre']['character'] = $this->jsonPrepop($data[0]['character_list']);
+		//$data[0]['pre']['category']	 = $this->jsonPrepop($data[0]['category_list']);
 		return $data[0];
+	}
+	
+	protected function seriesCountCharacters(int $seriesid)
+	{
+		$sql = "SELECT Ch.charname as name, COUNT(rST.sid) AS counted
+					FROM `tbl_series_stories`Ser
+				LEFT JOIN `tbl_stories`S ON ( S.sid = Ser.sid )
+					LEFT JOIN `tbl_stories_tags`rST ON ( S.sid = rST.sid AND rST.character = 1 )
+						LEFT JOIN `tbl_characters`Ch ON ( rST.tid = Ch.charid )
+				WHERE seriesid = :seriesid AND Ch.charname IS NOT NULL
+				GROUP BY Ch.charid
+				ORDER BY counted DESC;";
+		
+		return $this->exec( $sql, [ ":seriesid" => $seriesid ] );
+	}
+	
+	protected function seriesCountTags(int $seriesid)
+	{
+		$sql = "SELECT T.label as name, COUNT(rST.sid) AS counted
+					FROM `tbl_series_stories`Ser
+				LEFT JOIN `tbl_stories`S ON ( S.sid = Ser.sid )
+					LEFT JOIN `tbl_stories_tags`rST ON ( S.sid = rST.sid AND rST.character = 0 )
+						LEFT JOIN `tbl_tags`T ON ( rST.tid = T.tid )
+				WHERE seriesid = :seriesid AND T.label IS NOT NULL
+				GROUP BY T.tid
+				ORDER BY counted DESC;";
+		
+		return $this->exec( $sql, [ ":seriesid" => $seriesid ] );
 	}
 
 	public function storyAdd(array $data)
@@ -1327,7 +1369,7 @@ class AdminCP extends Controlpanel {
 		// Check tags:
 		$this->storyRelationTag( $current->sid, $post['tags'] );
 		// Check Characters:
-		$this->storyRelationTag( $current->sid, $post['characters'], 1 );
+		$this->storyRelationCharacter( $current->sid, $post['characters'] );
 		// Check Categories:
 		$this->storyRelationCategories( $current->sid, $post['category'] );
 		// Check Authors:

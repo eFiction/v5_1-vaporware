@@ -169,3 +169,26 @@ legend {
 	-moz-border-radius: 2px;
 	border-radius: 2px; 
 }
+
+/* --------------- reviews --------------- */
+
+.review-headline {
+	font-size: inherit;
+	border-bottom: 1px dashed #efefef;
+}
+.review-content {
+	border-left: 2px solid #efefef;
+	padding: 0 6px;
+}
+
+/* --------------- sidewide --------------- */
+
+.buttons-alignment {
+	text-align: center;
+}
+
+.text-alignment {
+	vertical-align: sub;
+	height: 2.25em;
+	line-height: 1.5;
+}

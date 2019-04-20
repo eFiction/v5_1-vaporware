@@ -793,7 +793,8 @@ class Story extends Base
 	public function blockFeaturedStory($items=1, $order=FALSE)
 	{
 		$limit = ($items) ? "LIMIT 0,".$items : "";
-		$sort = ( $order == "random" ) ? 'RAND()' : 'S.featured DESC';
+		//$sort = ( $order == "random" ) ? 'RAND()' : 'S.featured DESC';
+		$sort = 'RAND()';
 
 		return $this->exec("SELECT S.title, S.sid, S.summary, S.cache_authors, S.cache_rating, S.cache_categories
 				FROM `tbl_stories`S 

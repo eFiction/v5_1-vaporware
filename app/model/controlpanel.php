@@ -536,6 +536,12 @@ class Controlpanel extends Base {
 		unset($categories);
 	}
 	
+	// wrapper for storyRelationTag
+	public function storyRelationCharacter( $sid, $data )
+	{
+		$this->storyRelationTag( $sid, $data, 1 );
+	}
+
 	public function storyRelationTag( $sid, $data, $character = 0 )
 	{
 		// Check tags:

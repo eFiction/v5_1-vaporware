@@ -682,6 +682,50 @@ class Story extends Base
 			
 			return $this->template->blockStory("random", $data);
 		}
+		elseif ( $select[0] == "featured" )
+		{
+			/*
+				$items: 0 = all featured stories
+				$order: "random" or NULL
+			*/
+			$items = (isset($select[2]) AND is_numeric($select[2])) ? $select[2] : 1;
+			$order = isset($select[3]) ? $select[3] : FALSE;
+			$data = $this->model->blockFeaturedStory($items,$order);
+			
+			return $this->template->blockStory("featured", $data);
+		}
+		elseif ( $select[0] == "recommend" )
+		{
+			// break if module not enabled
+			if ( empty(\Config::getPublic('optional_modules')['recommendations']) ) return "";
+			/*
+				$items: 0 = all featured stories
+				$order: "random" or NULL
+			*/
+			$items = (isset($select[2]) AND is_numeric($select[2])) ? $select[2] : 1;
+			$order = isset($select[3]) ? $select[3] : FALSE;
+			
+			$data = $this->model->blockRecommendedStory($items,$order);
+			
+			return $this->template->blockStory("recommended", $data);
+		}
+		elseif ( $select[0] == "tagcloud" )
+		{
+			// Get number of desired items from template call or set to maximum items from config
+			$items = (isset($select[2]) AND is_numeric($select[2])) ? $select[2] : \Config::getPublic('tagcloud_elements');
+			
+			// if there is a minimum amount of items requested, make sure the template call does not request less items
+			if ( 0 < \Config::getPublic('tagcloud_minimum_elements') )
+				$items = max(\Config::getPublic('tagcloud_minimum_elements'),$items);
+			
+			$data = $this->model->blockTagcloud($items);
+
+			// If size of data is below minimum element threshhold, don't bother building a tagcloud
+			if ( sizeof($data)<\Config::getPublic('tagcloud_minimum_elements') ) return "";
+
+			// Wow, we are really getting a tag cloud, all eyes to the sky
+			return $this->template->blockTagcloud($data);
+		}
 		/*
 		elseif ( $select[1] == "fame" )
 		{
@@ -728,50 +772,6 @@ class Story extends Base
 			return $this->template->blockStory("random", $data, $select[2]);
 		}
 		*/
-		elseif ( $select[1] == "featured" )
-		{
-			/*
-				$items: 0 = all featured stories
-				$order: "random" or NULL
-			*/
-			$items = (isset($select[2]) AND is_numeric($select[2])) ? $select[2] : 1;
-			$order = isset($select[3]) ? $select[3] : FALSE;
-			$data = $this->model->blockFeaturedStory($items,$order);
-			
-			return $this->template->blockStory("featured", $data);
-		}
-		elseif ( $select[1] == "recommend" )
-		{
-			// break if module not enabled
-			if ( empty(\Config::getPublic('optional_modules')['recommendations']) ) return "";
-			/*
-				$items: 0 = all featured stories
-				$order: "random" or NULL
-			*/
-			$items = (isset($select[2]) AND is_numeric($select[2])) ? $select[2] : 1;
-			$order = isset($select[3]) ? $select[3] : FALSE;
-			
-			$data = $this->model->blockRecommendedStory($items,$order);
-			
-			return $this->template->blockStory("recommended", $data);
-		}
-		elseif ( $select[1] == "tagcloud" )
-		{
-			// Get number of desired items from template call or set to maximum items from config
-			$items = (isset($select[2]) AND is_numeric($select[2])) ? $select[2] : \Config::getPublic('tagcloud_elements');
-			
-			// if there is a minimum amount of items requested, make sure the template call does not request less items
-			if ( 0 < \Config::getPublic('tagcloud_minimum_elements') )
-				$items = max(\Config::getPublic('tagcloud_minimum_elements'),$items);
-			
-			$data = $this->model->blockTagcloud($items);
-
-			// If size of data is below minimum element threshhold, don't bother building a tagcloud
-			if ( sizeof($data)<\Config::getPublic('tagcloud_minimum_elements') ) return "";
-
-			// Wow, we are really getting a tag cloud, all eyes to the sky
-			return $this->template->blockTagcloud($data);
-		}
 		return "";
 	}
 

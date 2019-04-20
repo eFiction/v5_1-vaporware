@@ -1,12 +1,89 @@
-<h3>{{@LN__ACP_EditRating}}</h3>
-<form action="{{@BASE}}/adminCP/archive/ratings/id={{ @data['rid'] }}" method="post">
-	<div class="grid-wrapper">
+{* provide a return link if a path exists *}
+<check if="{{!empty(@returnpath)}}"><a href="{{@BASE}}{{@returnpath}}">__return</a></check>
+
+<!-- error notification -->
+<check if="{{ isset(@form_error) }}">
+	<div class="notification is-warning">
+		<button class="delete"></button>
+		{{ @form_error }}
+	</div>
+</check>
+<!-- END: error notification -->
+<!-- success notification -->
+<check if="{{ isset(@form_changes) }}">
+	<div class="notification is-success">
+		<button class="delete"></button>
+		{{ @LN__Changes_saved }}
+	</div>
+</check>
+<!-- END: success notification -->
+
+<h2>{{@LN__ACP_EditRating}}</h3>
+
+{*
 		<check if="{{ isset(@errors) }}"><div class="gb-90 alert-box error">{{ @errors }}</div></check>
 		<check if="{{ isset(@changes) }}"><div class="gb-90 alert-box success">{{ @LN__Status_Changes, @changes | format }}</div></check>
-		<div class="gb-20">{{@LN__ACP_RatingLabel}}:</div><div class="gb-80"><input type="text" size=80 name="form_data[rating]" value="{{ @data['rating'] }}" /></div>
-		<div class="gb-20">{{@LN__ACP_RatingAge}}:</div><div class="gb-80"><input type="text" size=5 name="form_data[rating_age]" value="{{ @data['rating_age'] }}" /></div>
-		<div class="gb-20">{{@LN__ACP_RatingWarning}}?</div><div class="gb-80"><input type="checkbox" name="form_data[ratingwarning]" value="ratingwarning" <check if="{{ @data['ratingwarning'] }}">checked="checked"</check> ></div>
-		<div class="gb-full">{{@LN__ACP_RatingWarningText}}:<br /><textarea name="form_data[warningtext]" rows="30" cols="80">{{ @data['warningtext'] }}</textarea><br /></div>
-		<div class="gb-40" align="right"><input type="submit"></div><div class="gb-60"><input type="reset"></div>
+*}
+
+<form action="{{@BASE}}/adminCP/archive/ratings/id={{ @data['rid'] }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__ACP_RatingLabel}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<input class="input" type="text" name="form_data[rating]" value="{{ @data['rating'] }}" />
+		</div></div>
 	</div>
+</div>
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__ACP_RatingAge}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<input class="input" type="text" name="form_data[rating_age]" value="{{ @data['rating_age'] }}" />
+		</div></div>
+	</div>
+</div>
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__ACP_RatingWarning}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<a class="button is-light"><input type="checkbox" name="form_data[ratingwarning]" value="ratingwarning"<check if="{{ @data['ratingwarning'] }}"> checked="checked"</check> /></a>
+		</div></div>
+	</div>
+</div>
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__ACP_RatingWarningText}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<textarea class="textarea" name="form_data[warningtext]" rows="5">{{ @data['warningtext'] }}</textarea>
+		</div></div>
+	</div>
+</div>
+
+<div class="field is-horizontal">
+	<div class="field-label"><!-- Left empty for spacing --></div>
+	<div class="field-body">
+		<div class="field">
+			<div class="control">
+				<div class="field is-grouped">
+					<p class="control">
+						<button class="button is-primary" type="submit">
+							<span class="icon">{ICON:save}</span>
+							<span>{{@LN__Submit}}</span>
+						</button>
+					</p>
+					<p class="control">
+						<button class="button is-light" type="reset">
+							<span class="icon">{ICON:undo}</span>
+							<span>{{@LN__Reset}}</span>
+						</button>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
 </form>

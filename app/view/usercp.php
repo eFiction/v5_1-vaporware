@@ -4,7 +4,7 @@ namespace View;
 class UserCP extends Base
 {
 
-	public function showMenu($menu="")
+	public function showMenu(array $menu=[]): string
 	{
 		$this->f3->set('panel_menu', $menu);
 		return $this->render('usercp/menu.html');

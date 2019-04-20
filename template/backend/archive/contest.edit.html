@@ -18,8 +18,8 @@
 </check>
 <!-- END: success notification -->
 
-<h1>{{@LN__ACP_Contest}}:</h1>
-<form action="{{@BASE}}/adminCP/archive/contests/id={{ @data['id'] }}<check if="{{ @data.raw }}">/raw=1</check><check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
+<h2>{{@LN__ACP_Contest}}</h2>
+<form action="{{@BASE}}/adminCP/archive/contests/id={{ @data['id'] }}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
 <div class="field is-horizontal">
   <div class="field-label is-normal">
     <label class="label">{{@LN__Title}}</label>
@@ -102,7 +102,10 @@
 		</div>
 		<div class="field">
 			<div class="control">
-				<a href="{{@BASE}}/adminCP/archive/contests/id={{@data.id}}<check if="{{ !@data.raw }}">/raw=1</check>"><check if="{{ @data.raw }}"><true>{{@LN__SwitchVisual}}</true><false>{{@LN__SwitchPlainHTML}}</false></check></a>
+				<check if="{{@data.editor=='visual'}}">
+					<true> <a href="{{@BASE}}/adminCP/archive/contests/id={{@data.id}}/editor=plain">{{@LN__SwitchPlainHTML}}</a></true>
+					<false> <a href="{{@BASE}}/adminCP/archive/contests/id={{@data.id}}/editor=visual">{{@LN__SwitchVisual}}</a></false>
+				</check>
 			</div>
 		</div>
 	</div>
@@ -112,7 +115,7 @@
 	<div class="field-label is-normal"><label class="label">{{@LN__ContestDescription}}</label></div>
 	<div class="field-body">
 		<div class="field"><div class="control">
-			<textarea name="form_data[summary]" id="tinymce" rows="20" cols="80">{{ @data.summary }}</textarea>
+			<textarea class="textarea" name="form_data[summary]" id="tinymce" rows="20" cols="80">{{ @data.summary }}</textarea>
 		</div></div>
 	</div>
 </div>
