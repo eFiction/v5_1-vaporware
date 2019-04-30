@@ -198,7 +198,7 @@ class Base extends \Prefab {
 	{
 		$sql_StoryConstruct = "SELECT SQL_CALC_FOUND_ROWS
 				S.sid, S.title, S.summary, S.storynotes, S.completed, S.wordcount, UNIX_TIMESTAMP(S.date) as published, UNIX_TIMESTAMP(S.updated) as modified, 
-				S.count,GROUP_CONCAT(Ser.seriesid,',',rSS.inorder,',',Ser.title ORDER BY Ser.title DESC SEPARATOR '||') as in_series @EXTRA@,
+				S.count,GROUP_CONCAT(Coll.collid,',',rCS.inorder,',',Coll.title ORDER BY Coll.title DESC SEPARATOR '||') as in_series @EXTRA@,
 				".((isset($this->config['optional_modules']['contests']))?"GROUP_CONCAT(rSC.relid) as contests,":"")."
 				GROUP_CONCAT(Fav.bookmark,',',Fav.fid SEPARATOR '||') as is_favourite,
 				Edit.uid as can_edit,
@@ -207,8 +207,8 @@ class Base extends \Prefab {
 			FROM `tbl_stories`S
 				@JOIN@
 			".((isset($this->config['optional_modules']['contests']))?"LEFT JOIN `tbl_contest_relations`rSC ON ( rSC.relid = S.sid AND rSC.type = 'story' )":"")."
-				LEFT JOIN `tbl_series_stories`rSS ON ( rSS.sid = S.sid )
-					LEFT JOIN `tbl_series`Ser ON ( Ser.seriesid=rSS.seriesid )
+				LEFT JOIN `tbl_collection_stories`rCS ON ( rCS.sid = S.sid )
+					LEFT JOIN `tbl_collections`Coll ON ( Coll.collid=rCS.collid )
 				LEFT JOIN `tbl_ratings`Ra ON ( Ra.rid = S.ratingid )
 				LEFT JOIN `tbl_stories_authors`rSAE ON ( S.sid = rSAE.sid )
 					LEFT JOIN `tbl_users`Edit ON ( ( rSAE.aid = Edit.uid ) AND ( ( Edit.uid = ".(int)$_SESSION['userID']." ) OR ( Edit.curator = ".(int)$_SESSION['userID']." ) ) )
@@ -414,22 +414,22 @@ class Base extends \Prefab {
 			$sql[]= "SET @rw  := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_feedback`F WHERE F.writer_uid={$_SESSION['userID']} AND F.type IN ('RC','SE','ST') GROUP BY F.type) AS F1);";
 			if(array_key_exists("recommendations", $this->config['optional_modules']))
 			{
-				$sql[]= "SET @rr  := (SELECT CONCAT_WS('//', SUM(SE+ST+RC), GROUP_CONCAT(type,',',IF(ST=0,IF(SE=0,RC,SE),ST) SEPARATOR '||')) FROM 
-							(SELECT F.type, COUNT(SA.lid) as ST, COUNT(Ser.seriesid) as SE, COUNT(Rec.recid) as RC
+				$sql[]= "SET @rr  := (SELECT CONCAT_WS('//', SUM(SC+ST+RC), GROUP_CONCAT(type,',',IF(ST=0,IF(SC=0,RC,SC),ST) SEPARATOR '||')) FROM 
+							(SELECT F.type, COUNT(SA.lid) as ST, COUNT(C.collid) as SC, COUNT(Rec.recid) as RC
 								FROM `tbl_feedback`F
 									LEFT JOIN `tbl_stories_authors`SA ON ( F.reference = SA.sid AND F.type='ST' AND SA.aid = {$_SESSION['userID']} )
 									LEFT JOIN `tbl_recommendations`Rec ON ( F.reference = Rec.recid AND F.type = 'RC' AND Rec.uid = {$_SESSION['userID']} )
-									LEFT JOIN `tbl_series`Ser ON ( F.reference = Ser.seriesid AND F.type = 'SE' AND Ser.uid = {$_SESSION['userID']}	)
-							WHERE F.type IN ('RC','SE','ST') GROUP BY F.type) as F1)";
+									LEFT JOIN `tbl_collections`C ON ( F.reference = C.collid AND F.type = 'SC' AND C.uid = {$_SESSION['userID']}	)
+							WHERE F.type IN ('RC','SC','ST') GROUP BY F.type) as F1)";
 			}
 			else
 			{
-				$sql[]= "SET @rr  := (SELECT CONCAT_WS('//', SUM(SE+ST), GROUP_CONCAT(type,',',IF(ST=0,SE,ST) SEPARATOR '||')) FROM 
-							(SELECT F.type, COUNT(SA.lid) as ST, COUNT(Ser.seriesid) as SE
+				$sql[]= "SET @rr  := (SELECT CONCAT_WS('//', SUM(SC+ST), GROUP_CONCAT(type,',',IF(ST=0,SC,ST) SEPARATOR '||')) FROM 
+							(SELECT F.type, COUNT(SA.lid) as ST, COUNT(C.collid) as SC
 								FROM `tbl_feedback`F
 									LEFT JOIN `tbl_stories_authors`SA ON ( F.reference = SA.sid AND F.type='ST' AND SA.aid = {$_SESSION['userID']} )
-									LEFT JOIN `tbl_series`Ser ON ( F.reference = Ser.seriesid AND F.type = 'SE' AND Ser.uid = {$_SESSION['userID']} )
-							WHERE F.type IN ('RC','SE','ST') GROUP BY F.type) as F1)";
+									LEFT JOIN `tbl_collections`C ON ( F.reference = C.collid AND F.type = 'SC' AND C.uid = {$_SESSION['userID']} )
+							WHERE F.type IN ('RC','SC','ST') GROUP BY F.type) as F1)";
 			}
 			$sql[]= "SET @rq := (SELECT COUNT(DISTINCT SA.sid) FROM `tbl_feedback`F INNER JOIN `tbl_stories_authors`SA ON ( F.reference = SA.sid AND F.type='ST' AND SA.aid = {$_SESSION['userID']}) )";
 			$sql[]= "SET @st := (SELECT COUNT(1) FROM `tbl_stories_authors` WHERE `aid` = {$_SESSION['userID']} )";

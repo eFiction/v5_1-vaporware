@@ -1,23 +1,24 @@
-		<check if="{{!empty(@storyData.rating_name)}}"><div class="story-info2"><b>{{@LN__Rating}}:</b> {{@storyData.rating_name}}</div></check>
-		<check if="{{!empty(@storyData.cache_categories)}}"><div class="story-info2"><b>{{@LN__Categories}}:</b> <repeat group="{{ @storyData.cache_categories }}" value="{{ @group }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check><a href="{{@BASE}}/story/search/category={{ @group[0] }}">{{ @group[1] }}</a></repeat></div></check>
-		<div class="story-info2"><b>{{@LN__Status}}:</b> <check if="{{@storyData.completed==1}}"><true>{{@LN__Completed}}</true><false>{{@LN__WIP}}</false></check></div>
-		<div class="story-info2"><b>{{@LN__Reviews}}:</b> <a href="{{@BASE}}/story/reviews/{{ @storyData.sid}}">{{ @LN__Review_Link, @storyData['reviews'] | format }}</a></div>
+		<check if="{{!empty(@storyData.rating_name)}}"><div class="story-info2"><strong>{{@LN__Rating}}:</strong> {{@storyData.rating_name}}</div></check>
+		<check if="{{!empty(@storyData.cache_categories)}}"><div class="story-info2"><strong>{{@LN__Categories}}:</strong> <repeat group="{{ @storyData.cache_categories }}" value="{{ @group }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check><a href="{{@BASE}}/story/search/category={{ @group[0] }}">{{ @group[1] }}</a></repeat></div></check>
+		<div class="story-info2"><strong>{{@LN__Status}}:</strong> <check if="{{@storyData.completed==1}}"><true>{{@LN__Completed}}</true><false>{{@LN__WIP}}</false></check></div>
+		<div class="story-info2"><strong>{{@LN__Reviews}}:</strong> <a href="{{@BASE}}/story/reviews/{{ @storyData.sid}}">{{ @LN__Review_Link, @storyData['reviews'] | format }}</a></div>
 	{* Different tag views: uncomment the one you prefer *}
 	{* Simple view, all tags in one list *}
 		{* 
 		<check if="{{ isset(@storyData.cache_tags.simple) }}">
-			<div class="story-info2"><b>{{@LN__Tags}}:</b> <repeat group="{{ @storyData.cache_tags.simple }}" value="{{ @tag }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check><a href="{{@BASE}}/story/search/tagIn={{ @tag[0] }}">{{ @tag[1] }}</a></repeat></div>
+			<div class="story-info2"><strong>{{@LN__Tags}}:</strong> <repeat group="{{ @storyData.cache_tags.simple }}" value="{{ @tag }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check><a href="{{@BASE}}/story/search/tagIn={{ @tag[0] }}">{{ @tag[1] }}</a></repeat></div>
 		</check>
 		*}
 	{* Structured, tags by tag group *}
 		<check if="{{ isset(@storyData.cache_tags.structured) }}">
-			<div class="story-info2"><b>{{@LN__Tags}}:</b> <repeat group="{{ @storyData.cache_tags.structured }}" value="{{ @tags }}" counter="{{ @i }}"><check if="{{ @i }}>1"> * </check><repeat group="{{ @tags }}" value="{{ @tag }}" counter="{{ @j }}"><check if="{{ @j>1 }}">, </check><a href="{{@BASE}}/story/search/tagIn={{ @tag[0] }}">{{ @tag[1] }}</a></repeat></repeat></div>
+			<div class="story-info2"><strong>{{@LN__Tags}}:</strong> <repeat group="{{ @storyData.cache_tags.structured }}" value="{{ @tags }}" counter="{{ @i }}"><check if="{{ @i }}>1"> * </check><repeat group="{{ @tags }}" value="{{ @tag }}" counter="{{ @j }}"><check if="{{ @j>1 }}">, </check><a href="{{@BASE}}/story/search/tagIn={{ @tag[0] }}">{{ @tag[1] }}</a></repeat></repeat></div>
 		</check>
 <check if="{{ isset(@storyData.cache_characters.0.1) }}">
-		<div class="story-info2"><b>{{@LN__Characters}}:</b> <repeat group="{{ @storyData['cache_characters'] }}" value="{{ @tag }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check><a href="{{@BASE}}/story/search/charIn={{ @tag[0] }}">{{ @tag[1] }}</a></repeat></div>
+		<div class="story-info2"><strong>{{@LN__Characters}}:</strong> <repeat group="{{ @storyData.cache_characters }}" value="{{ @tag }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check><a href="{{@BASE}}/story/search/charIn={{ @tag[0] }}">{{ @tag[1] }}</a></repeat></div>
 </check>
-<check if="{{ @storyData['storynotes'] > '' }}">
-		<div class="story-info2"><b>{{@LN__Foreword}}:</b> {{ @storyData.storynotes | raw}}</div>
+		<div class="story-info2"><strong>{{@LN__Summary}}:</strong> {{@storyData.summary | raw}}</div>
+<br />
+<check if="{{ @storyData.storynotes > '' }}">
+		<div class="story-info2"><strong>{{@LN__Foreword}}:</strong> {{ @storyData.storynotes | raw}}</div>
 </check>
-		<div class="story-info2"><b>{{@LN__Summary}}:</b> {{@storyData.summary | raw}}</div>
 		<hr />

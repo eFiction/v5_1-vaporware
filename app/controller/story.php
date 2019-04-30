@@ -253,10 +253,10 @@ class Story extends Base
 			}
 			if ( isset($params['stories']) )
 			{
-				$buffer = "**Stories**";
-				
+				$stories = $this->model->contestStories($contest['id']);
+				$buffer = $this->template->contestStories($contest, $stories);
 			}
-			else $buffer = $this->template->contestLoad($contest);
+			else $buffer = $this->template->contestShow($contest);
 		}
 	
 		if ( empty($buffer) )
@@ -644,7 +644,6 @@ class Story extends Base
 
 		if($storyData = $this->model->getStory($story,(int)$chapter))
 		{
-			//$this->buffer("Bei der Arbeit!");
 			$chapter = max ( 0, min ( $chapter, $storyData['chapters']) );
 			$reviewData = $this->model->loadReviews($story,$selected,$storyData['chapid']);
 
@@ -688,8 +687,8 @@ class Story extends Base
 				$items: 0 = all featured stories
 				$order: "random" or NULL
 			*/
-			$items = (isset($select[2]) AND is_numeric($select[2])) ? $select[2] : 1;
-			$order = isset($select[3]) ? $select[3] : FALSE;
+			$items = (isset($select[1]) AND is_numeric($select[1])) ? $select[1] : 1;
+			$order = $select[2] ?? NULL;
 			$data = $this->model->blockFeaturedStory($items,$order);
 			
 			return $this->template->blockStory("featured", $data);
@@ -702,8 +701,8 @@ class Story extends Base
 				$items: 0 = all featured stories
 				$order: "random" or NULL
 			*/
-			$items = (isset($select[2]) AND is_numeric($select[2])) ? $select[2] : 1;
-			$order = isset($select[3]) ? $select[3] : FALSE;
+			$items = (isset($select[1]) AND is_numeric($select[1])) ? $select[1] : 1;
+			$order = $select[2] ?? NULL;
 			
 			$data = $this->model->blockRecommendedStory($items,$order);
 			
@@ -759,7 +758,7 @@ class Story extends Base
 			}
 			
 			/*
-				update the TTL of a change was made to the template
+				update the TTL if a change was made to the template
 				this will not work if the template does not provide a TTL
 				
 				in this case, the TTL has to be calculated again, bloating this update

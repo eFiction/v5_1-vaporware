@@ -83,6 +83,8 @@ return array(
 //'Sort_TagGroup'	=> 'Tag group',
 'Sort_Visibility' 	=> 'Visibility',
 'Sort_Comment'		=> 'Kommentar',
+'Sort_StartDate'	=> 'Start date',
+'Sort_EndDate'		=> 'End date',
 
 // [4] Registrierung
 'Registration'			=> 'Registrierung',
@@ -531,7 +533,9 @@ return array(
 //'Feat_Current'			=> 'Aktuelles Feature',
 //'Feat_Past'				=> 'Ehemaliges Feature',
 //'Feat_Upcoming'			=> 'Zukünftiges Feature (noch nicht aktiv, nur eine Notiz)',
+'Feat_Auto'				=> 'Automatisch (Zeitraum unten einstellen)',
 //'SelectedBy'			=> 'Ausgewählt von',
+//'AddFeature'			=> 'Add as feature',
 
 // Admin - Archive - Contest
 //'AdminMenu_Contests'	=> 'Wettbewerb',
@@ -570,16 +574,17 @@ return array(
 	'CFG_allow_reviews'			=> 'Reviews erlauben',
 	'CFG_allow_guest_reviews'	=> 'Gäste können Reviews schreiben',
 	'CFG_allow_review_delete'	=> 'Autoren können Reviews ihrer Geschichten löschen',
-	// 'CFG_allow_rateonly'		=> 'Erlaube Ratings ohne Reviews (einschließlich Kudos)',
+	'CFG_allow_rateonly'		=> 'Erlaube Ratings ohne Reviews (einschließlich Kudos)',
 // archive_submit
 	// 'CFG_author_self' 			=> 'Every member can post stories@SMALL@If set to no, members must be added to group Authors to allow them to post stories',
 	// 'CFG_story_validation'	 	=> 'Stories require validation@SMALL@This does not apply to trusted authors.',
-	// 'CFG_stories_min_words'		=> 'Minimale Anzahl von Wörtern je Kapitel',
-	// 'CFG_stories_max_words'		=> 'Maximale Anzahl von Wörtern je Kapitel@SMALL@(0 = unlimited)',
-	// 'CFG_advanced_editor' 		=> 'Erlaube grafischen Editor',
-	// 'CFG_allow_co_author' 		=> 'Erlaube weitere Autoren zu Geschichten hinzufügen',
-	// 'CFG_stories_min_tags'		=> 'Minimale verlangte Anzahl an Tags',
-	// 'CFG_allow_series'	 		=> 'Allow authors to create series@SMALL@Member series are now collections',
+	'CFG_stories_min_words'		=> 'Minimale Anzahl von Wörtern je Kapitel',
+	'CFG_stories_max_words'		=> 'Maximale Anzahl von Wörtern je Kapitel@SMALL@(0 = unlimited)',
+	'CFG_advanced_editor' 		=> 'Erlaube grafischen Editor',
+	'CFG_allow_co_author' 		=> 'Erlaube weitere Autoren zu Geschichten hinzufügen',
+	'CFG_stories_min_tags'		=> 'Minimale verlangte Anzahl an Tags',
+	'CFG_allow_collections'	 	=> 'Autoren können Sammlungen erstellen@SMALL@Unsortiert',
+	'CFG_allow_series'	 		=> 'Autoren können Serien erstellen@SMALL@Sortiert',
 	// 'CFG_allow_roundrobin'	 	=> 'Erlaube Round Robins',
 // archive_tags_cloud
 	// 'CFG_tagcloud_basesize'		=> 'Relative Basisgröße in Prozent zur normalen Fontgröße.',
@@ -776,6 +781,26 @@ return array(
 'RedirectedOldLink'		=> 'Du wirst von einem alten Link umgeleitet',
 'ClickHereToProceed'	=> 'Klicke hier, um zur neuen Seite zu gelangen',
 'NeverShowMessageAgain'	=> 'Zeige diesen Hinweis nicht mehr an',
+
+// Collections
+//'CollectionStatus_H'	=> 'H',
+//'CollectionStatus_F'	=> 'F',
+//'CollectionStatus_P'	=> 'P',
+//'CollectionStatus_A'	=> 'A',
+
+// Contests
+//'ContestPrepare'			=> 'Contest is being prepared',
+//'ContestIsActiveOn'			=> 'Contest will be active {0}',
+//'ContestIsActiveSince'		=> 'Contest is active since {0}',
+//'ContestActive'				=> 'Contest is active',
+//'ContestWasActiveSince'		=> 'Contest was active since {0}',
+//'ContestWillCloseOn'		=> 'Contest will close on {0}',
+//'ContestIsClosedSince'		=> 'Contest closed since {0}',
+//'ContestIsClosed'			=> 'Contest is closed',
+//'ContestVotePrepare'		=> 'Voting is being prepared',
+//'ContestVoteWillCloseOn'	=> 'Voting will close {0}',
+//'ContestVoteIsClosedSince'	=> 'Voting closed on {0}',
+//'ContestVoteIsClosed'		=> 'Voting was closed',
 
 );
 

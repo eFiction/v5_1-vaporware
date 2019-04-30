@@ -102,7 +102,7 @@ class AdminCP extends Base
 	
 	public function contestEdit(array $data, $returnpath)
 	{
-		if($data['editor']=="visual")
+		if($data['editor']=="visual" AND $this->config['advanced_editor']==TRUE )
 		{
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
@@ -145,21 +145,31 @@ class AdminCP extends Base
 		return $this->render('home/custompage_edit.html');
 	}
 
-//	public function featuredList(array $data, array $sort, string $select)
-	public function featuredList(array $data, array $sort, $select)
+	public function featuredList(array $data, array $sort, string $select)
 	{
 		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+
+		if( isset($_SESSION['lastAction']) )
+		{
+			$this->f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
+			unset($_SESSION['lastAction']);
+		}
 
 		$this->f3->set('featured', $data);
 		$this->f3->set('sort', $sort);
 		$this->f3->set('select', $select);
-		return $this->render('archive/featured_list.html');
+		return $this->render('stories/featured.list.html');
 	}
 
-	public function featuredEdit(array $data)
+	public function featuredEdit(array $data, string $returnpath): string
 	{
+		$this->javascript( 'head', TRUE, "jquery.datetimepicker.js" );
+
 		$this->f3->set('data', $data);
-		return $this->render('archive/featured_edit.html');
+		$this->f3->set('format', $this->config['date_preset']." ".$this->config['time_preset']);
+		$this->f3->set('returnpath', $returnpath);
+
+		return $this->render('stories/featured.edit.html');
 	}
 
 	public function homeWelcome($v, $c)
@@ -268,7 +278,7 @@ class AdminCP extends Base
 		return $this->render('archive/rating_list.html');
 	}
 	
-	public function seriesList(array $data, array $sort, string $module) : string
+	public function collectionsList(array $data, array $sort, string $module) : string
 	{
 		while ( list($key, $value) = each($data) )
 			$this->dataProcess($data[$key], $key);
@@ -277,20 +287,22 @@ class AdminCP extends Base
 		$this->f3->set('module', 	$module);
 		$this->f3->set('sort', $sort);
 		
-		return $this->render('stories/series.list.html');
+		return $this->render('stories/collections.list.html');
 	}
 	
-	public function seriesEdit(array $data, string $returnpath="" )
+	public function collectionEdit(array $data, array $prePop, string $returnpath="" )
 	{
-		if($data['editor']=="visual")
+		if($data['editor']=="visual" AND $this->config['advanced_editor']==TRUE )
 		{
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
 		}
 		$this->dataProcess($data);
+		$this->f3->set('prePop', $prePop);
 		$this->f3->set('data', 		$data);
+		$this->f3->set('returnpath', $returnpath);
 
-		return $this->render('stories/series.edit.html');
+		return $this->render('stories/collection.edit.html');
 		return "Edit";
 	}
 	
@@ -349,7 +361,7 @@ class AdminCP extends Base
 
 	public function storyChapterEdit(array $chapterData, array $chapterList): string
 	{
-		if($chapterData['editor']=="visual")
+		if($chapterData['editor']=="visual" AND $this->config['advanced_editor']==TRUE )
 		{
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );

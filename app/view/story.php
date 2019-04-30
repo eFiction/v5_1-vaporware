@@ -144,14 +144,27 @@ class Story extends Base
 		$this->f3->set('contests', $data);
 		
 		return $this->render('story/contests.list.html');
-		//return print_r($data,1);
 	}
 	
-	public function contestLoad(array $data)
+	public function contestShow(array $data)
 	{
 		$this->dataProcess($data);
 		
-		return print_r($data,1);
+		$this->f3->set('data', $data);
+		
+		return $this->render('story/contest.show.html');
+	}
+	
+	public function contestStories(array $contest, array $stories)
+	{
+		$this->dataProcess($contest);
+		foreach ( $stories as &$story )
+			$this->dataProcess($story);
+		
+		$this->f3->set('contest', $contest);
+		$this->f3->set('stories', $stories);
+		
+		return $this->render('story/contest.stories.html');
 	}
 	
 	public function epubXMLtag()

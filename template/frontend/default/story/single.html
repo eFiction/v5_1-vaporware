@@ -34,9 +34,11 @@
 <div class="columns">		
 		<check if="{{ @data.dropdown }}">
 			<div class="column">
+			<div class="select">
 			<select class='select chap-change' id='chap_change' onchange="changeChapter();">
 				<repeat group="{{ @data.dropdown }}" value="{{ @item }}"><option <check if="{{ @item[0] }}">selected="selected" </check> value="{{ @item[1] }}"><check if="{{ @item[2] }}">{{ @item[2] }}) </check>{{ @item[3] }}</option></repeat>
 			</select>
+			</div>
 			</div>
 		</check>
 </div>

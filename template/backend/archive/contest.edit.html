@@ -101,12 +101,14 @@
 			</div>
 		</div>
 		<div class="field">
+			<check if="\Config::getPublic('advanced_editor') == TRUE ">
 			<div class="control">
 				<check if="{{@data.editor=='visual'}}">
 					<true> <a href="{{@BASE}}/adminCP/archive/contests/id={{@data.id}}/editor=plain">{{@LN__SwitchPlainHTML}}</a></true>
 					<false> <a href="{{@BASE}}/adminCP/archive/contests/id={{@data.id}}/editor=visual">{{@LN__SwitchVisual}}</a></false>
 				</check>
 			</div>
+			</check>&nbsp;
 		</div>
 	</div>
 </div>

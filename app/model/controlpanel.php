@@ -113,7 +113,7 @@ class Controlpanel extends Base {
 	
 	public function storyEditPrePop(array $storyData)
 	{
-		$categories = json_decode($storyData['cache_categories']);
+		$categories = json_decode($storyData['cache_categories']??"null");
 		if(sizeof($categories))
 		{
 			foreach ( $categories as $tmp ) $pre['cat'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
@@ -121,27 +121,35 @@ class Controlpanel extends Base {
 		}
 		else $pre['cat'] = '""';
 
-		$tags = json_decode($storyData['cache_tags'],TRUE)['simple'];
+		$tags = json_decode($storyData['cache_tags']??"null",TRUE);
 		if(sizeof($tags)>0)
 		{
-			foreach ( $tags as $tmp ) $pre['tag'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
+			foreach ( $tags['simple']??$tags as $tmp ) $pre['tag'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
 			$pre['tag'] = json_encode($pre['tag']);
 		}
 		else $pre['tag'] = '""';
 
-		$characters = json_decode($storyData['cache_characters']);
+		$characters = json_decode($storyData['cache_characters']??"null");
 		if(sizeof($characters))
 		{
 			foreach ( $characters as $tmp ) $pre['char'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
 			$pre['char'] = json_encode($pre['char']);
 		}
 		else $pre['char'] = '""';
-		
-		$authors = 		$this->exec ( "SELECT U.uid as id, U.username as name FROM `tbl_users`U INNER JOIN `tbl_stories_authors`Rel ON ( U.uid = Rel.aid AND Rel.sid = :sid AND Rel.type = 'M' );", [ ":sid" => $storyData['sid'] ]);
-		$pre['mainauth'] = json_encode($authors);
 
-		$supauthors = 	$this->exec ( "SELECT U.uid as id, U.username as name FROM `tbl_users`U INNER JOIN `tbl_stories_authors`Rel ON ( U.uid = Rel.aid AND Rel.sid = :sid AND Rel.type = 'S' );", [ ":sid" => $storyData['sid'] ]);
-		$pre['supauth'] = json_encode($supauthors);
+		if (isset($storyData['sid']))
+		{
+			$authors = 		$this->exec ( "SELECT U.uid as id, U.username as name FROM `tbl_users`U INNER JOIN `tbl_stories_authors`Rel ON ( U.uid = Rel.aid AND Rel.sid = :sid AND Rel.type = 'M' );", [ ":sid" => $storyData['sid'] ]);
+			$pre['mainauth'] = json_encode($authors);
+
+			$supauthors = 	$this->exec ( "SELECT U.uid as id, U.username as name FROM `tbl_users`U INNER JOIN `tbl_stories_authors`Rel ON ( U.uid = Rel.aid AND Rel.sid = :sid AND Rel.type = 'S' );", [ ":sid" => $storyData['sid'] ]);
+			$pre['supauth'] = json_encode($supauthors);
+		}
+		elseif (isset($storyData['collid']))
+		{
+			$maintainer = 	$this->exec ( "SELECT U.uid as id, U.username as name FROM `tbl_users`U INNER JOIN `tbl_collections`Coll ON ( U.uid = Coll.uid AND Coll.collid = :collid );", [ ":collid" => $storyData['collid'] ]);
+			$pre['maintainer'] = json_encode($maintainer);
+		}
 
 		return $pre;
 	}
@@ -346,10 +354,10 @@ class Controlpanel extends Base {
 					);
 	}
 
-	public function rebuildSeriesCache($seriesID)
+	public function rebuildSeriesCache($collID)
 	{
 		$sql = "SELECT 
-					SERIES.seriesid, 
+					SERIES.collid, 
 					SERIES.tagblock, 
 					SERIES.characterblock, 
 					SERIES.authorblock, 
@@ -358,15 +366,15 @@ class Controlpanel extends Base {
 				FROM
 					(
 						SELECT 
-							Ser.seriesid,
+							Coll.collid,
 							MAX(Ra.rid) as max_rating_id,
 							GROUP_CONCAT(DISTINCT U.uid,',',U.username ORDER BY username ASC SEPARATOR '||' ) as authorblock,
 							GROUP_CONCAT(DISTINCT Chara.charid,',',Chara.charname ORDER BY charname ASC SEPARATOR '||') AS characterblock,
 							GROUP_CONCAT(DISTINCT C.cid,',',C.category ORDER BY category ASC SEPARATOR '||' ) as categoryblock,
 							GROUP_CONCAT(DISTINCT T.tid,',',T.label,',',TG.description,',',TG.tgid ORDER BY TG.order,TG.tgid,T.label ASC SEPARATOR '||') AS tagblock
-						FROM `tbl_series`Ser
-							LEFT JOIN `tbl_series_stories`TrS ON ( Ser.seriesid = TrS.seriesid )
-								LEFT JOIN `tbl_stories`S ON ( TrS.sid = S.sid )
+						FROM `tbl_collections`Coll
+							LEFT JOIN `tbl_collection_stories`rCS ON ( Coll.collid = rCS.collid )
+								LEFT JOIN `tbl_stories`S ON ( rCS.sid = S.sid )
 									LEFT JOIN `tbl_ratings`Ra ON ( Ra.rid = S.ratingid )
 									LEFT JOIN `tbl_stories_tags`rST ON ( rST.sid = S.sid )
 										LEFT JOIN `tbl_tags`T ON ( T.tid = rST.tid AND rST.character = 0 )
@@ -376,11 +384,11 @@ class Controlpanel extends Base {
 										LEFT JOIN `tbl_categories`C ON ( rSC.cid = C.cid )
 									LEFT JOIN `tbl_stories_authors`rSA ON ( rSA.sid = S.sid )
 										LEFT JOIN `tbl_users`U ON ( rSA.aid = U.uid )
-						WHERE Ser.seriesid = :series
-						GROUP BY Ser.seriesid
+						WHERE Coll.collid = :collection
+						GROUP BY Coll.collid
 					) AS SERIES
 				LEFT JOIN `tbl_ratings`R ON (R.rid = max_rating_id);";
-		$item = $this->exec($sql, [':series' => $seriesID] );
+		$item = $this->exec($sql, [':collection' => $collID] );
 		
 		if ( empty($item) ) return FALSE;
 		
@@ -392,7 +400,7 @@ class Controlpanel extends Base {
 
 		$this->update
 		(
-			'tbl_series',
+			'tbl_collections',
 			[
 				'cache_tags'		=> json_encode($tagblock),
 				'cache_characters'	=> json_encode($this->cleanResult($item['characterblock'])),
@@ -400,7 +408,7 @@ class Controlpanel extends Base {
 				'cache_categories'	=> json_encode($this->cleanResult($item['categoryblock'])),
 				'max_rating'		=> json_encode(explode(",",$item['max_rating'])),
 			],
-			['seriesid=?',$seriesID]
+			['collid=?',$collID]
 		);
 	}
 

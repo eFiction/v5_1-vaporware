@@ -233,18 +233,19 @@ class Story extends Base
 
 		$sql = "SELECT SQL_CALC_FOUND_ROWS
 					C.conid, C.title, C.summary,
-                    IF(C.active='date',IF(C.date_open<NOW(),IF(C.date_close>NOW() OR C.date_close IS NULL,'active','closed'),'prepare'),C.active) as active,
-                    IF(C.votable='date',IF(C.date_close<NOW() OR C.date_close IS NULL,IF(C.vote_closed>NOW() OR C.vote_closed IS NULL,'active','closed'),'prepare'),C.votable) as votable,
+                    IF(C.active='date',IF(C.date_open<NOW(),IF(C.date_close>NOW() OR C.date_close IS NULL,'active','closed'),'preparing'),C.active) as active,
+                    IF(C.votable='date',IF(C.date_close<NOW() OR C.date_close IS NULL,IF(C.vote_closed>NOW() OR C.vote_closed IS NULL,'active','closed'),'preparing'),C.votable) as votable,
 					UNIX_TIMESTAMP(C.date_open) as date_open, UNIX_TIMESTAMP(C.date_close) as date_close, UNIX_TIMESTAMP(C.vote_closed) as vote_closed, 
 					C.cache_tags, C.cache_characters, C.cache_categories, C.cache_stories,
 					U.username, COUNT(R.lid) as count
 				FROM `tbl_contests`C
 					LEFT JOIN `tbl_users`U ON ( C.uid = U.uid )
 					LEFT JOIN `tbl_contest_relations`R ON ( C.conid = R.conid AND R.type='ST' )
-				WHERE concealed = 0
+				WHERE concealed = 0 @WHERE@
 				GROUP BY C.conid
 				ORDER BY C.conid DESC
 				LIMIT ".(max(0,$pos*$limit)).",".$limit;
+		if ( 1 ) $sql = str_replace("@WHERE@", "AND ((C.active='date' AND C.date_open<=NOW()) OR C.active>2)", $sql);
 
 		$data = $this->exec($sql);
 				
@@ -269,10 +270,16 @@ class Story extends Base
                     IF(C.votable='date',IF(C.date_close<NOW() OR C.date_close IS NULL,IF(C.vote_closed>NOW() OR C.vote_closed IS NULL,'active','closed'),'prepare'),C.votable) as votable,
 					UNIX_TIMESTAMP(C.date_open) as date_open, UNIX_TIMESTAMP(C.date_close) as date_close, UNIX_TIMESTAMP(C.vote_closed) as vote_closed, 
 					C.cache_tags, C.cache_characters, C.cache_categories,
-					U.uid, U.username
+					U.uid, U.username,
+					COUNT(DISTINCT rC.relid) as stories
 					FROM `tbl_contests`C
-					LEFT JOIN `tbl_users`U ON ( C.uid=U.uid )
-					WHERE C.conid = :conid";
+						LEFT JOIN `tbl_users`U ON ( C.uid=U.uid )
+						LEFT JOIN `tbl_contest_relations`rC ON ( C.conid = rC.conid and rC.type = 'ST' )
+					WHERE 
+						C.concealed = 0 @WHERE@
+						AND C.conid = :conid";
+		if ( 1 ) $sql = str_replace("@WHERE@", "AND ((C.active='date' AND C.date_open<=NOW()) OR C.active>2)", $sql);
+
 /*		$sql = "SELECT C.conid as id, C.title, C.summary, C.concealed, C.date_open, C.date_close, C.vote_closed,
 					C.cache_tags, C.cache_characters, C.cache_categories,
 					GROUP_CONCAT(T.tid,',',T.label SEPARATOR '||') as tag_list,
@@ -312,6 +319,31 @@ class Story extends Base
 			return $data[0];
 		}
 		return NULL;
+	}
+	
+	public function contestStories(int $conid): array
+	{
+		$limit = 5;
+		$pos = (int)$this->f3->get('paginate.page') - 1;
+
+		$sql = "SELECT SQL_CALC_FOUND_ROWS
+				S.sid, S.title, S.cache_tags, S.cache_categories, S.cache_authors, S.reviews, S.summary, UNIX_TIMESTAMP(S.date) as published, UNIX_TIMESTAMP(S.updated) as modified, S.chapters, S.wordcount, S.completed, S.count
+				FROM `tbl_stories`S
+					INNER JOIN `tbl_contest_relations`rSC ON ( rSC.relid = S.sid AND rSC.type = 'ST' )
+				WHERE rSC.conid = :conid
+				LIMIT ".(max(0,$pos*$limit)).",".$limit;
+				
+		$data = $this->exec($sql, [":conid" => $conid ]);
+		
+		if ( 0==sizeof($data) ) return[];
+		
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/story/contests/id={$conid}/stories",
+			$limit
+		);
+
+		return($data);
 	}
 
 	public function searchPrepopulate ($item, $id)
@@ -777,7 +809,7 @@ class Story extends Base
 			LIMIT 0, '.(int)$items);
 	}
 	
-	public function blockRecommendedStory($items=1, $order=FALSE)
+	public function blockRecommendedStory(int $items=1, $order=FALSE)
 	{
 		$limit = ($items) ? "LIMIT 0,".$items : "";
 		$sort = ( $order == "random" ) ? 'RAND()' : 'Rec.date DESC';
@@ -790,16 +822,15 @@ class Story extends Base
 						ORDER BY {$sort} {$limit}");
 	}
 
-	public function blockFeaturedStory($items=1, $order=FALSE)
+	public function blockFeaturedStory(int $items=1, $order=FALSE): array
 	{
 		$limit = ($items) ? "LIMIT 0,".$items : "";
-		//$sort = ( $order == "random" ) ? 'RAND()' : 'S.featured DESC';
-		$sort = 'RAND()';
+		$sort = ( $order ) ? 'RAND()' : 'S.updated DESC';
 
 		return $this->exec("SELECT S.title, S.sid, S.summary, S.cache_authors, S.cache_rating, S.cache_categories
-				FROM `tbl_stories`S 
-					INNER JOIN `tbl_featured`F ON ( type='ST' AND F.id = S.sid AND F.status=1 OR ( F.status IS NULL AND F.start < NOW() AND F.end > NOW() ))
-				WHERE S.validated >= 30
+				FROM `tbl_featured`F
+					INNER JOIN `tbl_stories`S ON ( F.id = S.sid AND S.validated >= 30 )
+				WHERE F.type='ST' AND (F.status=1 OR ( F.status IS NULL AND F.start < NOW() AND F.end > NOW() ))
 			ORDER BY {$sort} {$limit}");
 		// 1 = aktuell, 2, ehemals
 	}

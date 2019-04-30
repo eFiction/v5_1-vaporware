@@ -116,13 +116,32 @@ class Auth extends Base
 		$sql[] = "DELETE FROM `tbl_sessions` WHERE (user = 0 AND TIMESTAMPDIFF(MINUTE,`lastvisited`,NOW())>60 )
 																						OR 
 																						TIMESTAMPDIFF(MONTH,`lastvisited`,NOW())>1;";
+/*
 		$sql[] = "SET @guests  := (SELECT COUNT(DISTINCT S.session) 
-																	FROM `tbl_sessions`S WHERE S.user IS NULL AND NOT (S.session = '{$session_id}' AND S.ip = INET_ATON('{$_SERVER['REMOTE_ADDR']}') )
-															);";
+										FROM `tbl_sessions`S 
+											WHERE S.user = 0
+											AND NOT (S.session = '{$session_id}' AND S.ip = INET_ATON('{$_SERVER['REMOTE_ADDR']}') )
+											AND TIMESTAMPDIFF(MINUTE,S.lastvisited,NOW())<15
+									);";
+*/
+		$sql[] = "SET @guests  := (SELECT COUNT(DISTINCT S.session) 
+										FROM `tbl_sessions`S 
+											WHERE S.user = 0
+											AND NOT (S.session = '{$session_id}' AND S.ip = INET_ATON('{$_SERVER['REMOTE_ADDR']}') )
+											AND TIMESTAMPDIFF(MINUTE,S.lastvisited,NOW())<15
+									);";
+/* 		
 		$sql[] = "SET @members := (SELECT COUNT(DISTINCT user) FROM (SELECT * FROM `tbl_sessions` GROUP BY user ORDER BY `lastvisited` DESC) as S WHERE 
-															S.user IS NOT NULL AND 
+															S.user > 0 AND 
 															TIMESTAMPDIFF(MINUTE,S.lastvisited,NOW())<60 AND
 															NOT (S.session = '{$session_id}' AND S.ip = INET_ATON('{$_SERVER['REMOTE_ADDR']}') )
+											);";
+ */		
+		$sql[] = "SET @members := (SELECT COUNT(DISTINCT user)
+										FROM `tbl_sessions`S
+											WHERE S.user > 0
+											AND TIMESTAMPDIFF(MINUTE,S.lastvisited,NOW())<60
+											AND NOT (S.session = '{$session_id}' AND S.ip = INET_ATON('{$_SERVER['REMOTE_ADDR']}') )
 											);";
 		$sql[] = "UPDATE `tbl_sessions`S SET lastvisited = CURRENT_TIMESTAMP WHERE S.session = '{$session_id}' AND S.ip = INET_ATON('{$_SERVER['REMOTE_ADDR']}');";
 
@@ -149,7 +168,8 @@ class Auth extends Base
 			
 			$this->f3->set('usercount', 
 					[
-						"member"	=>	$user['@members']+1,
+						//"member"	=>	$user['@members']+1,
+						"member"	=>	$user['@members'],
 						"guest"		=>	$user['@guests']
 					]
 			);
@@ -179,7 +199,8 @@ class Auth extends Base
 			$this->f3->set('usercount', 
 					[
 						"member"	=>	$user['@members'],
-						"guest"		=>	$user['@guests']+1
+						//"guest"		=>	$user['@guests']+1
+						"guest"		=>	$user['@guests']
 					]
 			);
 			//if ( $user['session'] == '' )	Auth::instance()->createSession();

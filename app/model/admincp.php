@@ -40,6 +40,11 @@ class AdminCP extends Controlpanel {
 				$ajax_sql = "SELECT U.username as name, U.uid as id from `tbl_users`U WHERE U.username LIKE :username AND ( U.groups & 5 ) ORDER BY U.username ASC LIMIT 5";
 				$bind = [ ":username" =>  "%{$data['author']}%" ];
 			}
+			elseif(isset($data['user']))
+			{
+				$ajax_sql = "SELECT U.username as name, U.uid as id from `tbl_users`U WHERE U.username LIKE :username AND ( U.groups & 1 ) ORDER BY U.username ASC LIMIT 5";
+				$bind = [ ":username" =>  "%{$data['author']}%" ];
+			}
 			elseif(isset($data['tag']))
 			{
 				$ajax_sql = "SELECT label as name, tid as id from `tbl_tags`T WHERE T.label LIKE :tag ORDER BY T.label ASC LIMIT 10";
@@ -710,7 +715,7 @@ class AdminCP extends Controlpanel {
 		$_SESSION['lastAction'] = [ "deleteResult" => $contest->erase() ];
 	}
 
-	public function featuredList ( int $page, array $sort, string &$status )
+	public function featuredList ( int $page, array $sort, string &$status ): array
 	{
 		/*
 		int status = 
@@ -718,20 +723,6 @@ class AdminCP extends Controlpanel {
 			2: past
 			3: upcoming
 		*/
-
-		/*
-		active:
-		SELECT * FROM `tbl_featured` WHERE status=1 OR ( start < NOW() AND end > NOW() )
-		*/
-		/*
-		past:
-		SELECT * FROM `tbl_featured` WHERE status=2 OR end < NOW()
-		*/
-		/*
-		upcoming:
-		SELECT * FROM `tbl_featured` WHERE start > NOW()
-		*/
-
 		$limit = 20;
 		$pos = $page - 1;
 		
@@ -752,15 +743,17 @@ class AdminCP extends Controlpanel {
 				(
 					"%JOIN%",
 					$join,
-					"SELECT SQL_CALC_FOUND_ROWS S.title, S.sid, S.summary, S.cache_authors, S.cache_rating
+					"SELECT SQL_CALC_FOUND_ROWS S.title, S.sid, S.summary, S.cache_authors, S.cache_rating, 
+							IF(F.start IS NULL OR STATUS IS NOT NULL,NULL,UNIX_TIMESTAMP(F.start)) as start, 
+							IF(F.end IS NULL OR STATUS IS NOT NULL,NULL,UNIX_TIMESTAMP(F.end)) as end
 						FROM `tbl_stories`S
-						INNER JOIN `tbl_featured`F ON ( F.type='ST' AND F.id = S.sid AND %JOIN% )
+						INNER JOIN `tbl_featured`F ON ( F.type='ST' AND F.id = S.sid AND (%JOIN%) )
 					ORDER BY {$sort['order']} {$sort['direction']}
 					LIMIT ".(max(0,$pos*$limit)).",".$limit
 				);
 
 		$data = $this->exec($sql);
-				
+		
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
 			"/adminCP/archive/featured/select={$status}/order={$sort['link']},{$sort['direction']}",
@@ -770,8 +763,7 @@ class AdminCP extends Controlpanel {
 		return $data;
 	}
 	
-//	public function featuredLoad ( int $sid )
-	public function featuredLoad( $sid )
+	public function featuredLoad( int $sid )
 	{
 		$sql = "SELECT SQL_CALC_FOUND_ROWS S.title, S.sid, S.summary, F.status, F.start, F.end, F.uid, U.username, S.cache_authors, S.cache_rating
 					FROM `tbl_stories`S
@@ -781,39 +773,64 @@ class AdminCP extends Controlpanel {
 		$data = $this->exec($sql, [":sid" => $sid ]);
 		if (sizeof($data)==1)
 		{
+			// going with the preset date/time versions to make sure the datetimepicker is happy
+			if ( $data[0]['start'] != NULL ) $data[0]['start'] = $this->timeToUser($data[0]['start'], $this->config['date_preset']." ".$this->config['time_preset']);
+			if ( $data[0]['end']   != NULL ) $data[0]['end']   = $this->timeToUser($data[0]['end'],   $this->config['date_preset']." ".$this->config['time_preset']);
+			// unpack author cache
 			$data[0]['cache_authors'] = json_decode($data[0]['cache_authors'], TRUE);
 			return $data[0];
 		}
 		return NULL;
 	}
 
-//	public function featuredSave(int $sid, array $data)
-	public function featuredSave($sid, array $data)
+	public function featuredSave( int $sid, array $data )
 	{
-		$i = NULL;
+		//print_r($data);exit;
 		$feature=new \DB\SQL\Mapper($this->db, $this->prefix.'featured');
-		$feature->load(array('sid=?',$sid));
+		$feature->load(array('id=? AND type="ST"',$sid));
+		// copy form data, also used to create a new feature
 		$feature->copyfrom( 
 			[ 
-				"status"	=> $data['status'], 
-				"sid"		=> $sid,
+				"status"	=> ($data['status']>0) ? $data['status'] : NULL, 
+				"id"		=> $sid,
 				"uid"		=> $_SESSION['userID']
 			]
 		);
 
-		if ( TRUE === $feature->changed("status") )
+		if ( NULL === $feature->status OR ""!=($data['start']??"") OR ""!=($data['end']??"") )
+		//if ( NULL === $feature->status OR isset($data['start']) OR isset($data['end']) )
 		{
-			if ( $data['status'] < 3 AND $feature->start === NULL )
-				$feature->start = date('Y-m-d H:i:s');
-			if ( $data['status'] == 1 AND $feature->end === NULL )
-				$feature->end = date('Y-m-d H:i:s');
-			$i = 1;
-		}
+			// we either have or require a start date, so let's make sure this is proper
+			$start = ( ""==($data['start']??"") OR ( FALSE === $obj = \DateTime::createFromFormat($this->config['date_preset']." ".$this->config['time_preset'], $data['start']) ) )
+				? date('Y-m-d H:i')
+				: $obj->format('Y-m-d H:i');
+			$feature->start = $start.":00";
 
+			// same goes for the end date
+			$end = ( ""==($data['end']??"") OR ( FALSE === $obj = \DateTime::createFromFormat($this->config['date_preset']." ".$this->config['time_preset'], $data['end']) ) )
+				? date('Y-m-d H:i')
+				: $obj->format('Y-m-d H:i');
+			$feature->end = $end.":00";
+
+			// if start is past end, make them the same
+			if ( \DateTime::createFromFormat('Y-m-d H:i', $start)->format("U") > \DateTime::createFromFormat('Y-m-d H:i', $end)->format("U") )
+				$feature->end = $feature->start;
+		}
+		// make note of data change, must occur before save()
+		$_SESSION['lastAction'] = [ "saveResult" => (int)$feature->changed() ];
+
+		// save date
 		$feature->save();
-		return $i;
 	}
 	
+	public function featuredDelete(int $sid)
+	{
+		$feature=new \DB\SQL\Mapper($this->db, $this->prefix.'featured');
+		$feature->load(array('id=? AND type="ST"',$sid));
+		
+		$_SESSION['lastAction'] = [ "deleteResult" => $feature->erase() ];
+	}
+
 	public function logGetCount()
 	{
 		$count = [];
@@ -1175,30 +1192,25 @@ class AdminCP extends Controlpanel {
 			return "[]";
 	}
 	
-	public function seriesAdd()
+	public function collectionAdd()
 	{
 		
 	}
 	
-	public function seriesList(int $page, array $sort, string $module) : array
+	public function collectionsList(int $page, array $sort, string $module) : array
 	{
 		$limit = 20;
 		$pos = $page - 1;
 		
-		$sql = str_replace
-				(
-					"%TYPE%",
-					($module=="collections")?"C":"S",
-					"SELECT SQL_CALC_FOUND_ROWS
-						Ser.seriesid, Ser.title, Ser.cache_authors,
-						COUNT(DISTINCT rSerS.sid) as stories
-							FROM `tbl_series`Ser
-								LEFT JOIN `tbl_series_stories`rSerS ON ( Ser.seriesid = rSerS.seriesid )
-						WHERE Ser.type = '%TYPE%'
-						GROUP BY Ser.seriesid
-						ORDER BY {$sort['order']} {$sort['direction']}
-						LIMIT ".(max(0,$pos*$limit)).",".$limit
-				);
+		$sql = 	"SELECT SQL_CALC_FOUND_ROWS
+					Coll.collid, Coll.title, Coll.cache_authors,
+					COUNT(DISTINCT rCS.sid) as stories
+				FROM `tbl_collections`Coll
+					LEFT JOIN `tbl_collection_stories`rCS ON ( Coll.collid = rCS.collid )
+				WHERE Coll.ordered = ".(int)($module!="collections")."
+				GROUP BY Coll.collid
+				ORDER BY {$sort['order']} {$sort['direction']}
+				LIMIT ".(max(0,$pos*$limit)).",".$limit;
 		
 		$data = $this->exec( $sql );
 
@@ -1211,56 +1223,57 @@ class AdminCP extends Controlpanel {
 		return $data;
 	}
 	
-	public function seriesLoad(int $seriesid)
+	public function collectionLoad(int $collid)
 	{
-		$sql = "SELECT Ser.seriesid as id, Ser.title, Ser.summary, Ser.type, Ser.cache_tags
-					FROM `tbl_series`Ser
-						LEFT JOIN `tbl_series_stories`rSSer ON ( rSSer.seriesid = Ser.seriesid )
+		$sql = "SELECT Coll.collid, Coll.title, Coll.summary, Coll.ordered, Coll.status, Coll.cache_tags, Coll.cache_characters, Coll.cache_categories
+					FROM `tbl_collections`Coll
+						LEFT JOIN `tbl_collection_stories`rCS ON ( Coll.collid = rCS.collid )
 				
-					WHERE Ser.seriesid = :seriesid
-					GROUP BY Ser.seriesid";
-		$data = $this->exec($sql, [":seriesid" => $seriesid ]);
-		
-		if (sizeof($data)!=1) 
+					WHERE Coll.collid = :collid
+					GROUP BY Coll.collid";
+		$data = $this->exec($sql, [":collid" => $collid ])[0] ?? [];
+
+		if (sizeof($data)==0) 
 			return NULL;
 
-		$data[0]['current'] =
+		// Compile currently used tags and characters from stories in this collection
+		$data['current'] =
 		[
-			"tags"			=> $this->seriesCountTags($seriesid),
-			"characters"	=> $this->seriesCountCharacters($seriesid),
+			"tags"			=> $this->collectionCountTags($collid),
+			"characters"	=> $this->collectionCountCharacters($collid),
 		];
-		//$data[0]['pre']['tag']		 = $this->jsonPrepop($data[0]['tag_list']);
-		//$data[0]['pre']['character'] = $this->jsonPrepop($data[0]['character_list']);
-		//$data[0]['pre']['category']	 = $this->jsonPrepop($data[0]['category_list']);
-		return $data[0];
+		// inject possible collection states
+		$data['states'] = ['H','F','P','A'];
+
+		return $data;
 	}
 	
-	protected function seriesCountCharacters(int $seriesid)
+	protected function collectionCountCharacters(int $collid)
 	{
 		$sql = "SELECT Ch.charname as name, COUNT(rST.sid) AS counted
-					FROM `tbl_series_stories`Ser
-				LEFT JOIN `tbl_stories`S ON ( S.sid = Ser.sid )
+					FROM `tbl_collection_stories`rCS
+				LEFT JOIN `tbl_stories`S ON ( S.sid = rCS.sid )
 					LEFT JOIN `tbl_stories_tags`rST ON ( S.sid = rST.sid AND rST.character = 1 )
 						LEFT JOIN `tbl_characters`Ch ON ( rST.tid = Ch.charid )
-				WHERE seriesid = :seriesid AND Ch.charname IS NOT NULL
+				WHERE collid = :collid AND Ch.charname IS NOT NULL
 				GROUP BY Ch.charid
 				ORDER BY counted DESC;";
 		
-		return $this->exec( $sql, [ ":seriesid" => $seriesid ] );
+		return $this->exec( $sql, [ ":collid" => $collid ] );
 	}
 	
-	protected function seriesCountTags(int $seriesid)
+	protected function collectionCountTags(int $collid)
 	{
 		$sql = "SELECT T.label as name, COUNT(rST.sid) AS counted
-					FROM `tbl_series_stories`Ser
-				LEFT JOIN `tbl_stories`S ON ( S.sid = Ser.sid )
+					FROM `tbl_collection_stories`rCS
+				LEFT JOIN `tbl_stories`S ON ( S.sid = rCS.sid )
 					LEFT JOIN `tbl_stories_tags`rST ON ( S.sid = rST.sid AND rST.character = 0 )
 						LEFT JOIN `tbl_tags`T ON ( rST.tid = T.tid )
-				WHERE seriesid = :seriesid AND T.label IS NOT NULL
+				WHERE collid = :collid AND T.label IS NOT NULL
 				GROUP BY T.tid
 				ORDER BY counted DESC;";
 		
-		return $this->exec( $sql, [ ":seriesid" => $seriesid ] );
+		return $this->exec( $sql, [ ":collid" => $collid ] );
 	}
 
 	public function storyAdd(array $data)

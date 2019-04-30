@@ -83,6 +83,8 @@ return array(
 'Sort_TagGroup'		=> 'Tag group',
 'Sort_Visibility' 	=> 'Visibility',
 'Sort_Comment'		=> 'Comment',
+'Sort_StartDate'	=> 'Start date',
+'Sort_EndDate'		=> 'End date',
 
 // [4] Global -- User registration 15
 'Registration'			=> 'Registration',
@@ -530,8 +532,10 @@ return array(
 	'AdminMenu_Past' => 'Past',
 'Feat_Current'			=> 'Currently featured',
 'Feat_Past'				=> 'Past feature',
-'Feat_Upcoming'			=> 'Upcoming feature (not active yet, merely a note)',
+'Feat_Upcoming'			=> 'Upcoming feature (will not self-activate)',
+'Feat_Auto'				=> 'Automatic (set time frame below)',
 'SelectedBy'			=> 'Selected by',
+'AddFeature'			=> 'Add as feature',
 
 // Admin - Archive - Contest
 'AdminMenu_Contests'	=> 'Contests',
@@ -548,6 +552,7 @@ return array(
 'ElementDeleted'	=> 'Element deleted',
 'FailedDelete'		=> 'Failed to delete element',
 
+'AdminMenu_Recommendations'	=> 'Recommendations',
 
 // Config explain
 // archive_general
@@ -579,7 +584,8 @@ return array(
 	'CFG_advanced_editor' 		=> 'Allow use of graphical editor',
 	'CFG_allow_co_author' 		=> 'Allow addition of other authors to stories',
 	'CFG_stories_min_tags'		=> 'Minimum amount of tags required',
-	'CFG_allow_series'	 		=> 'Allow authors to create series@SMALL@Member series are now collections',
+	'CFG_allow_collections'	 	=> 'Allow authors to create collections@SMALL@Unordered',
+	'CFG_allow_series'	 		=> 'Allow authors to create series@SMALL@Ordered',
 	'CFG_allow_roundrobin'	 	=> 'Allow round robins',
 // archive_tags_cloud
 	'CFG_tagcloud_basesize'		=> 'Base size in percent relative to normal font size.',
@@ -776,6 +782,26 @@ return array(
 'RedirectedOldLink'		=> 'You are being redirected from an old link',
 'ClickHereToProceed'	=> 'Click here to proceed to the new location',
 'NeverShowMessageAgain'	=> 'Never show this message again',
+
+// Collections
+'CollectionStatus_H'	=> 'H',
+'CollectionStatus_F'	=> 'F',
+'CollectionStatus_P'	=> 'P',
+'CollectionStatus_A'	=> 'A',
+
+// Contests
+'ContestPrepare'			=> 'Contest is being prepared',
+'ContestIsActiveOn'			=> 'Contest will be active {0}',
+'ContestIsActiveSince'		=> 'Contest is active since {0}',
+'ContestActive'				=> 'Contest is active',
+'ContestWasActiveSince'		=> 'Contest was active since {0}',
+'ContestWillCloseOn'		=> 'Contest will close on {0}',
+'ContestIsClosedSince'		=> 'Contest closed since {0}',
+'ContestIsClosed'			=> 'Contest is closed',
+'ContestVotePrepare'		=> 'Voting is being prepared',
+'ContestVoteWillCloseOn'	=> 'Voting will close {0}',
+'ContestVoteIsClosedSince'	=> 'Voting closed on {0}',
+'ContestVoteIsClosed'		=> 'Voting was closed',
 
 );
 

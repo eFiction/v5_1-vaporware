@@ -1,0 +1,196 @@
+{* provide a return link if a path exists *}
+<check if="{{!empty(@returnpath)}}"><a href="{{@BASE}}{{@returnpath}}">__return</a></check>
+
+<!-- error notification -->
+<check if="{{ isset(@form_error) }}">
+	<div class="notification is-warning">
+		<button class="delete"></button>
+		{{ @form_error }}
+	</div>
+</check>
+<!-- END: error notification -->
+<!-- success notification -->
+<check if="{{ isset(@form_changes) }}">
+	<div class="notification is-success">
+		<button class="delete"></button>
+		{{ @LN__Changes_saved }}
+	</div>
+</check>
+<!-- END: success notification -->
+
+<h2><check if="{{@data.ordered==1}}"><true>{{@LN__Series}}</true><false>{@LN_Collection}</false></check></h2>
+<form action="{{@BASE}}/adminCP/stories/series/id={{ @data['collid'] }}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
+<div class="field is-horizontal">
+  <div class="field-label is-normal">
+    <label class="label">{{@LN__Title}}</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <div class="control">
+        <input class="input" type="text" name="form_data[title]" value="{{ @data['title'] }}" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{@LN__Maintainer}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<input class="input" type="text" id="maintainer-select" name="form_data[maintainer]" />
+		</div></div>
+	</div>
+</div>
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__Categories}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<input class="input" type="text" id="category-select" name="form_data[category]" />
+		</div></div>
+	</div>
+</div>
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__Tags}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<input class="input" type="text" id="tag-select" name="form_data[tags]" />
+		</div></div>
+	</div>
+</div>
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{@LN__inStories}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<div class="buttons are-small"><repeat group="{{ @data.current.tags }}" value="{{ @currentTag }}">
+				<a class="button">{{ @currentTag.name }} ({{ @currentTag.counted }}x)</a>
+			</repeat>
+			</div>
+		</div></div>
+	</div>
+</div>
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__Characters}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<input class="input" type="text" id="character-select" name="form_data[characters]" />
+		</div></div>
+	</div>
+</div>
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{@LN__inStories}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<div class="buttons are-small"><repeat group="{{ @data.current.characters }}" value="{{ @currentCharacters }}">
+				<a class="button">{{ @currentCharacters.name }} ({{ @currentCharacters.counted }}x)</a>
+			</repeat>
+			</div>
+		</div></div>
+	</div>
+</div>
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{@LN__Visibility}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<div class="select">
+				<select id="validated" name="form[status]">
+					<repeat group="{{ @data.states }}" value="{{ @status }}">
+						<option value="{{ @status }}"<check if="{{ @status==@data.status }}"> selected="selected"</check>>{{ ${"LN__CollectionStatus_".@status} }}</option>
+					</repeat>
+				</select>
+			</div>
+		</div></div>
+	</div>
+</div>
+
+<check if="\Config::getPublic('advanced_editor') == TRUE ">
+<div class="field is-horizontal">
+	<div class="field-label is-normal"></div>
+	<div class="field-body">
+		<div class="field">
+			<check if="{{@data.editor=='visual'}}">
+				<true> <a href="{{@BASE}}/adminCP/stories/series/id={{@data.collid}}/editor=plain<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">{{@LN__SwitchPlainHTML}}</a></true>
+				<false> <a href="{{@BASE}}/adminCP/stories/series/id={{@data.collid}}/editor=visual<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">{{@LN__SwitchVisual}}</a></false>
+			</check>
+		</div>
+	</div>
+</div>
+</check>
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{@LN__SeriesDescription}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<textarea class="textarea" name="form_data[summary]" id="tinymce" rows="10" cols="80">{{ @data.summary | raw }}</textarea>
+		</div></div>
+	</div>
+</div>
+
+<div class="field is-horizontal">
+	<div class="field-label">&nbsp;</div>
+	<div class="field-body">
+		<div class="field is-grouped">
+			<p class="control">
+				<a class="button is-danger" href="{{@BASE}}/adminCP/stories/series/id={{@data.collid}}">
+					<span class="icon">{ICON:remove}</span>
+					<span>__Delete</span>
+				</a>
+			</p>				
+			<p class="control">
+				<button class="button is-primary" type="submit">
+					<span class="icon"><i class="fas fa-save"></i></span>
+					<span>__Submit</span>
+				</button>
+			</p>
+			<p class="control">
+				<button class="button is-light" type="reset">
+					<span class="icon"><i class="fas fa-undo-alt"></i></span>
+					<span>__Reset</span>
+				</button>
+			</p>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#category-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "category",
+    	preventDuplicates: true,
+    	prePopulate: {{@prePop.cat | raw}}
+    });
+});
+
+$(document).ready(function() {
+    $("#maintainer-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "user",
+    	preventDuplicates: true,
+    	prePopulate: {{@prePop.maintainer | raw}}
+    });
+});
+
+$(document).ready(function() {
+    $("#tag-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "tag",
+    	preventDuplicates: true,
+    	prePopulate: {{@prePop.tag | raw}}
+    });
+});
+
+$(document).ready(function() {
+    $("#character-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "character",
+    	preventDuplicates: true,
+    	prePopulate: {{@prePop.char | raw}}
+    });
+});
+
+</script>

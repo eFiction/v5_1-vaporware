@@ -37,20 +37,24 @@
 			</div>
 
 			<div class="column">
+				<check if="{{ isset(@title_h1) }}">
+					<h1>{{ @title_h1 }}</h1>
+				</check>
+					
+				<check if="{{ isset(@title_h3) }}">
+					<h3>{{ @title_h3 }}</h3>
+				</check>
 
-			<check if="{{ isset(@title_h1) }}">
-				<h1>{{ @title_h1 }}</h1>
-			</check>
-				
-			<check if="{{ isset(@title_h3) }}">
-				<h3>{{ @title_h3 }}</h3>
-			</check>
-
-			<check if="{{ isset(@menu_upper) }}">
-			<div>
-				<repeat group="{{ @menu_upper }}" value="{{ @menu_item }}"><div class="button"><span><span class='tinyicon'>{{ @menu_item['icon'] }}</span> <a href="{{@BASE}}/adminCP/{{ @menu_item['link'] }}">{{ ${'LN__AdminMenu_'.@menu_item['label']} }}</a></span></div> </repeat>
-			</div>
-			</check>
+				<check if="{{ isset(@menu_upper) }}">
+					<p class="buttons">
+						<repeat group="{{ @menu_upper }}" value="{{ @menu_item }}">
+							<a class="button" href="{{@BASE}}/adminCP/{{ @menu_item['link'] }}">
+								<span class="icon">{{ @menu_item['icon'] }}</span>
+								<span>{{ ${'LN__AdminMenu_'.@menu_item['label']} }}</span>
+							</a>
+						</repeat>
+					</p>
+				</check>
 				<br />
 				{{@BODY | raw }}
 			</div>

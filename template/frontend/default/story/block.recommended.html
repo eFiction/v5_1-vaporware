@@ -6,7 +6,7 @@
 			<a href="{{@story.url}}" target="_blank">{{@story.title}}</a> {ICON:external-link} {{@LN__by}} {{@story.author}}<br />
 			{{@LN__RecommBy}} <a href="{{@BASE}}/members/id={{@story.uid}}">{{@story.username}}</a><br />
 			<check if="{{isset(@story.cache_categories.0.1)}}">
-				<repeat group='@story.cache_categories' value='@category' counter='{{ @ctr }}'><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/story/browse/catIn={{@category.0}}">{{@category.1}}</a></repeat><br />
+				<repeat group='@story.cache_categories' value='@category' counter='{{ @ctr }}'><check if="{{@ctr>1}}">, </check>{ICON:folder} <a href="{{@BASE}}/story/browse/catIn={{@category.0}}">{{@category.1}}</a></repeat><br />
 			</check>
 			<check if="{{isset(@story.cache_rating.1)}}">{{@LN__Rating}}: {{@story.cache_rating.1}}<br /></check>
 			<span class="toggle">
@@ -14,7 +14,7 @@
 				<span class="toggle_less" style="display:none">{ICON:square-up} {{@LN__HideDetails}}</span>
 			</span>
 			<div class="toggle_container" style="display:none">{{@LN__Summary}}: {{ @story.summary | raw }}</div>
-		</div>
+		</div><br />
 	</repeat>
 </true>
 <false>

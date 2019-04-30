@@ -1,9 +1,9 @@
 <check if="{{isset(@categoriesData['parent'])}}">
 		<h2>{{@categoriesData['parent']['category']}}</h2>
 		{{@categoriesData['parent']['description']}}
-		<br/>
+		<br />
 		<check if="{{@categoriesData.parent.count}}"><div class="buttons-alignment"><a class="button" href="{{@BASE}}/story/browse/category={{@categoriesData.parent.cid}}">{{ @LN__BrowseStories, @categoriesData.parent.count | format }}</a></div><br /><br /></check>
-		<br/>Go back <a href="{{@BASE}}/story/categories/{{@categoriesData['parent']['parent_cid']}}">up</a><br />
+		<br />Go back <a href="{{@BASE}}/story/categories/{{@categoriesData['parent']['parent_cid']}}">up</a><br />
 </check>
 <div class="columns is-multiline">
 

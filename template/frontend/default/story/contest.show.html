@@ -1,0 +1,80 @@
+<div class="columns">
+	<div class="column is-one-quarter"><a href="{{@BASE}}/story/contests">*</a></div>
+	<div class="column is-two-quarters"><h4>{{@data.title}}<br />{{@LN__by}} <a href="{{@BASE}}/member/{{@data.username}}">{{@data.username}}</a></h4></div>
+	<div class="column is-one-quarter">
+		<div class="is-pulled-right"><a href="{{@BASE}}/story/contests/id={{@data.id}}/stories">{{@data.stories}}</div>
+	</div>
+</div>
+
+<check if="{{!empty(@data.rating_name)}}"><div class="story-info2"><b>{{@LN__Rating}}:</b> {{@data.rating_name}}</div></check>
+<check if="{{!empty(@data.cache_categories)}}"><div class="story-info2"><b>{{@LN__Categories}}:</b> <repeat group="{{ @data.cache_categories }}" value="{{ @group }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check><a href="{{@BASE}}/story/search/category={{ @group[0] }}">{{ @group[1] }}</a></repeat></div></check>
+<check if="{{!empty(@data.cache_characters) }}"><div class="story-info2"><b>{{@LN__Characters}}:</b> <repeat group="{{ @data.cache_characters }}" value="{{ @tag }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check><a href="{{@BASE}}/story/search/charIn={{ @tag[0] }}">{{ @tag[1] }}</a></repeat></div></check>
+
+<div class="story-info2"><b>{{@LN__Summary}}:</b> {{@data.summary | raw}}</div>
+<hr />
+
+<div class="columns">
+	<div class="column is-one-third">
+		<switch expr="{{ @data.active }}">
+			<case value="preparing" break="TRUE">
+				<check if="{{ isset(@data.date_open) }}">
+					<true>{{@LN__ContestIsActiveOn, date(@CONFIG.date_format ,@data.date_open) | format }}</true>
+					<false>{{@LN__ContestPrepare}}</false>
+				</check>
+			</case>
+			<case value="active" break="TRUE">
+				<check if="{{ isset(@data.date_open) }}">
+					<true>{{@LN__ContestIsActiveSince, date(@CONFIG.date_format ,@data.date_open) | format }}</true>
+					<false>{{@LN__ContestActive}}</false>
+				</check>
+			</case>
+			<case value="closed" break="TRUE">
+				<check if="{{ isset(@data.date_open) }}">
+					<true>{{@LN__ContestWasActiveSince, date(@CONFIG.date_format ,@data.date_open) | format }}</true>
+					<false>&nbsp;</false>
+				</check>
+			</case>
+		</switch>
+	</div>
+	<div class="column is-one-third">
+		<switch expr="{{ @data.active }}">
+			<case value="preparing" break="TRUE">
+				<check if="{{ isset(@data.date_close) }}">
+					<true>{{@LN__ContestWillCloseOn, date(@CONFIG.date_format ,@data.date_close) | format }}</true>
+					<false>&nbsp;</false>
+				</check>
+			</case>
+			<case value="active" break="TRUE">
+				<check if="{{ isset(@data.date_close) }}">
+					<true>{{@LN__ContestWillCloseOn, date(@CONFIG.date_format ,@data.date_close) | format }}</true>
+					<false>&nbsp;</false>
+				</check>
+			</case>
+			<case value="closed" break="TRUE">
+				<check if="{{ isset(@data.date_close) }}">
+					<true>{{@LN__ContestIsClosedSince, date(@CONFIG.date_format ,@data.date_close) | format }}</true>
+					<false>{{@LN__ContestIsClosed}}</false>
+				</check>
+			</case>
+		</switch>
+	</div>
+	<div class="column is-one-third">
+		<switch expr="{{ @data.votable }}">
+			<case value="preparing" break="TRUE">
+				{LN__ContestVotePrepare}
+			</case>
+			<case value="active" break="TRUE">
+				<check if="{{ isset(@data.vote_closed) }}">
+					<true>{{@LN__ContestVoteWillCloseOn, date(@CONFIG.date_format ,@data.vote_closed) | format }}</true>
+					<false>&nbsp;</false>
+				</check>
+			</case>
+			<case value="closed" break="TRUE">
+				<check if="{{ isset(@data.vote_closed) }}">
+					<true>{{@LN__ContestVoteIsClosedSince, date(@CONFIG.date_format ,@data.vote_closed) | format }}</true>
+					<false>{{@LN__ContestVoteIsClosed}}</false>
+				</check>
+			</case>
+		</switch>
+	</div>
+</div>

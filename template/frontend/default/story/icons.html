@@ -1,13 +1,17 @@
-<check if="{{ @SESSION['userID']==0 }}">
-	<true>
-	</true>
-	<false>
-		<a href="{{@BASE}}/userCP/library/bookmark/edit/id=ST,{{@data.story.sid}};returnpath={{@PATH}}"<check if="{{isset(@data.story.is_favourite.1)}}"><true> title="{{@LN__BookmarkRemove, @data.story.title | format }}">{ICON:bookmark}</true><false> title="{{@LN__BookmarkAdd, @data.story.title | format }}">{ICON:bookmark-off}</false></check></a>&nbsp;
-		<a href="{{@BASE}}/userCP/library/favourite/edit/id=ST,{{@data.story.sid}};returnpath={{@PATH}}"<check if="{{@@data.story.is_favourite.0>0}}"><true> title="{{@LN__FavouriteRemove, @data.story.title | format }}">{ICON:favourite}</true><false> title="{{@LN__FavouriteAdd, @data.story.title | format }}">{ICON:favourite-off}</false></check></a>&nbsp;
-	</false>
-</check>
-{* <a href="{{@BASE}}/story/print/{{@data.story.sid}},paper" title="{{@LN__PrintView,@data.story.title|format}}" target="_blank">{ICON:print}</a>&nbsp; *}
-{* {ICON:flag-off}&nbsp; *}
-<a href="{{@BASE}}/story/print/{{@data.story.sid}},epub" title="{{@LN__DownloadEPub,@data.story.title|format}}">{ICON:download}</a>&nbsp;
-<check if="{{ is_numeric(@data.story.can_edit) }}"> / <a href="{{@BASE}}/userCP/author/uid={{@data.story.can_edit}}/edit/sid={{@data.story.sid}};returnpath={{@PATH}}">{ICON:edit}</a></check>
-<check if="{{ @_SESSION.groups&64 }}"> / <a href="{{@BASE}}/adminCP/stories/edit/story={{@data.story.sid}}" target="_blank">{ICON:edit}</a></check>
+<div class="field has-addons">
+	{* Show bookmark and favourite icons for users *}
+	<check if="{{ @SESSION['userID']>0 }}">
+		<p class="control"><a class="button" href="{{@BASE}}/userCP/library/bookmark/edit/id=ST,{{@data.story.sid}};returnpath={{@PATH}}"<check if="{{isset(@data.story.is_favourite.1)}}"><true> title="{{@LN__BookmarkRemove, @data.story.title | format }}">{ICON:bookmark}</true><false> title="{{@LN__BookmarkAdd, @data.story.title | format }}">{ICON:bookmark-off}</false></check></a></p>
+		<p class="control"><a class="button" href="{{@BASE}}/userCP/library/favourite/edit/id=ST,{{@data.story.sid}};returnpath={{@PATH}}"<check if="{{@@data.story.is_favourite.0>0}}"><true> title="{{@LN__FavouriteRemove, @data.story.title | format }}">{ICON:favourite}</true><false> title="{{@LN__FavouriteAdd, @data.story.title | format }}">{ICON:favourite-off}</false></check></a></p>
+	</check>
+	{* print view, not available yet *}
+	{* <a href="{{@BASE}}/story/print/{{@data.story.sid}},paper" title="{{@LN__PrintView,@data.story.title|format}}" target="_blank">{ICON:print}</a>&nbsp; *}
+	{* report story, not yet *}
+	{* {ICON:flag-off}&nbsp; *}
+	{* ePub *}
+	<p class="control"><a class="button" href="{{@BASE}}/story/print/{{@data.story.sid}},epub" title="{{@LN__DownloadEPub,@data.story.title|format}}">{ICON:download}</a></p>
+	{* regular edit button *}
+	<check if="{{ is_numeric(@data.story.can_edit) }}"><p class="control"><a href="{{@BASE}}/userCP/author/uid={{@data.story.can_edit}}/edit/sid={{@data.story.sid}};returnpath={{@PATH}}">{ICON:edit}</a></p></check>
+	{* admin edit button *}
+	<check if="{{ @_SESSION.groups&64 }}"><p class="control"><a class="button" href="{{@BASE}}/adminCP/stories/edit/story={{@data.story.sid}}" target="_blank">{ICON:edit}</a></p></check>
+</div>

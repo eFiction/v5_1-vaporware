@@ -34,8 +34,8 @@
 <tbody>
 	<repeat group="{{ @data }}" value="{{ @row }}">
 	<tr>
-		<td><a href="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @row['seriesid'] }};returnpath=/adminCP/stories/{{@module}}/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
-		<td>{{ @row.seriesid }}</td>
+		<td><a href="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @row['collid'] }};returnpath=/adminCP/stories/{{@module}}/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
+		<td>{{ @row.collid }}</td>
 		<td>{{ @row.title }}</td>
 		<td>{{ is_array(@row.authors)?implode(", ",@row.authors):"&nbsp;" }}</td>
 	</tr>

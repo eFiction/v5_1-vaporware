@@ -160,11 +160,11 @@ class Members extends Base
 				"from"		=> "`tbl_stories`S",
 				"join"		=> "S.sid = Fav.item AND Fav.type='ST'"
 			],
-			"SE"	=>
+			"SC"	=>
 			[
-				"fields"	=> "'SE' as type, Ser.seriesid as id, Ser.title as name, Ser.cache_authors",
-				"from"		=> "`tbl_series`Ser",
-				"join"		=> "Ser.seriesid = Fav.item AND Fav.type='SE'"
+				"fields"	=> "'SC' as type, Coll.collid as id, Coll.title as name, Coll.cache_authors",
+				"from"		=> "`tbl_collections`Coll",
+				"join"		=> "Coll.collid = Fav.item AND Fav.type='SC'"
 			],
 			"RC"	=>
 			[

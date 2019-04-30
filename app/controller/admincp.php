@@ -78,16 +78,13 @@ class AdminCP extends Base
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Archive') );
 		$f3->set('title_h1', $f3->get('LN__AdminMenu_Archive') );
 
-		switch( $this->moduleInit([ "submit", "featured", "contests", "characters", "tags", "categories", "ratings" ], @$params['module']) )
+		switch( $this->moduleInit([ "submit", "contests", "characters", "tags", "categories", "ratings" ], @$params['module']) )
 		{
 			case "home":
 				$this->archiveHome($f3);
 				break;
 			case "submit":
 				$this->archiveSubmit($f3, $this->feedback);
-				break;
-			case "featured":
-				$this->archiveFeatured($f3, $params);
 				break;
 			case "contests":
 				$this->buffer( $this->archiveContests($f3, $params) );
@@ -122,10 +119,6 @@ class AdminCP extends Base
 		elseif ( $params['module']=="editMeta" )
 			$data = $this->model->ajax("editMeta", $post);
 
-		elseif ( $params['module']=="featured" )
-		{
-			$data = $this->model->ajax("storySearch", $post);
-		}
 		elseif ( $params['module']=="ratingsort" )
 		{
 			$data = $this->model->ajax("ratingsort", $post);
@@ -159,55 +152,6 @@ class AdminCP extends Base
 		$data['Images'] = $this->model->settingsFields('archive_images');
 		$data['Reviews'] = $this->model->settingsFields('archive_reviews');
 		$this->buffer( $this->template->settingsFields($data, "archive/submit", $feedback) );
-	}
-	
-	protected function archiveFeatured(\Base $f3, array $params)//: void
-	{
-		$this->response->addTitle( $f3->get('LN__AdminMenu_Featured') );
-		$allowedSubs = $this->menuShowUpper("archive/featured");
-		
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
-
-		if ( isset( $_POST['sid'] ) )
-		{
-			$params['sid'] = (int)$_POST['sid'];
-		}
-
-		if ( isset ($params['select']) )
-		{
-			$allow_order = array (
-				"id"		=>	"S.sid",
-				"title"		=>	"S.title",
-			);
-
-			// sort order
-			$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "title";
-			$sort["order"]		= $allow_order[$sort["link"]];
-			$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="desc") ?	"desc" : "asc";
-			
-			$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
-
-			$data = $this->model->featuredList($page, $sort, $params['select']);
-			$this->buffer( $this->template->featuredList($data, $sort, $params['select']) );
-			
-			return;
-		}
-		elseif (isset($_POST['form_data']))
-		{
-			$changes = $this->model->featuredSave($params['sid'], $f3->get('POST.form_data') );
-		}
-
-		if( isset ($params['sid']) )
-		{
-			$data = $this->model->featuredLoad($params['sid']);
-			$data['errors'] = @$errors;
-			$data['changes'] = @$changes;
-			$this->buffer( $this->template->featuredEdit($data) );
-		}
-		else
-		{
-			$this->buffer( \View\Base::stub() );
-		}
 	}
 	
 	protected function archiveContests(\Base $f3, array $params): string
@@ -1284,7 +1228,7 @@ class AdminCP extends Base
 		// add module title
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Stories') );
 
-		switch( $this->moduleInit([ "pending", "edit", "add", "series", "collections" ], @$params['module']) )
+		switch( $this->moduleInit([ "pending", "edit", "add", "series", "featured", "collections" ], @$params['module']) )
 		{
 			case "pending":
 				$this->buffer( $this->storiesPending($f3, $params) );
@@ -1298,9 +1242,12 @@ class AdminCP extends Base
 			case "home":
 				$this->storiesHome($f3, $params);
 				break;
+			case "featured":
+				$this->storiesFeatured($f3, $params);
+				break;
 			case "series":
 			case "collections":
-				$this->storiesSeries($f3, $params);
+				$this->storiesCollections($f3, $params);
 				break;
 			default:
 				$this->buffer( $this->template->access() );
@@ -1320,6 +1267,9 @@ class AdminCP extends Base
 		elseif ( $params['module']=="editMeta" )
 			$data = $this->model->ajax("editMeta", $post);
 		
+		elseif ( $params['module']=="featured" )
+			$data = $this->model->ajax("storySearch", $post);
+
 		elseif ( $params['module']=="chaptersort" )
 		{
 			//if ( isset($params[2]) ) $params = $this->parametric($params[2]); // 3.6
@@ -1536,7 +1486,57 @@ class AdminCP extends Base
 		$this->buffer( \View\Base::stub() );
 	}
 
-	protected function storiesSeries(\Base $f3, array $params)
+	protected function storiesFeatured(\Base $f3, array $params)//: void
+	{
+		$this->response->addTitle( $f3->get('LN__AdminMenu_Featured') );
+		$allowedSubs = $this->menuShowUpper("stories/featured");
+		
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+
+		if ( isset( $_POST['sid'] ) )
+			$params['sid'] = (int)$_POST['sid'];
+
+		if (isset($_POST['form_data']))
+			$changes = $this->model->featuredSave($params['sid'], $f3->get('POST.form_data') );
+
+		// delete through the dialog box
+		if( isset($params['delete']) AND ( $_POST['confirmed'] ?? FALSE ) )
+		{
+			$this->model->featuredDelete((int)$params['delete']);
+			$f3->reroute($params['returnpath']??"/adminCP/stories/featured", false);
+			exit;
+		}
+
+		if( isset ($params['sid']) )
+		{
+			$data = $this->model->featuredLoad($params['sid']);
+			$this->buffer( $this->template->featuredEdit($data, @$params['returnpath']) );
+		}
+		else
+		{
+			$select = $params['select'] ?? "current";
+			
+			$allow_order = array (
+				"id"		=>	"S.sid",
+				"title"		=>	"S.title",
+			);
+
+			// sort order
+			$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "title";
+			$sort["order"]		= $allow_order[$sort["link"]];
+			$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="desc") ?	"desc" : "asc";
+			
+			$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
+
+			$data = $this->model->featuredList($page, $sort, $select);
+			$this->buffer( $this->template->featuredList($data, $sort, $select) );
+			
+			return;
+		}
+
+	}
+	
+	protected function storiesCollections(\Base $f3, array $params)
 	{
 		if ( $params['module']=="collections" )
 		{
@@ -1555,13 +1555,13 @@ class AdminCP extends Base
 		
 
 
-
 		if( isset ($params['id']) )
 		{
-			if ( NULL !== $data = $this->model->seriesLoad($params['id']) )
+			if ( NULL !== $data = $this->model->collectionLoad($params['id']) )
 			{
 				$data['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
-				$this->buffer( $this->template->seriesEdit($data, @$params['returnpath']) );
+				$prePopulate = $this->model->storyEditPrePop($data);
+				$this->buffer( $this->template->collectionEdit($data, $prePopulate, @$params['returnpath']) );
 				return;
 			}
 			else $f3->set('form_error', "__failedLoad");
@@ -1572,7 +1572,7 @@ class AdminCP extends Base
 
 		// search/browse
 		$allow_order = array (
-				"id"		=>	"Ser.seriesid",
+				"id"		=>	"Coll.collid",
 				"date"		=>	"date",
 				"title"		=>	"title",
 				"author"	=>	"author",
@@ -1585,16 +1585,16 @@ class AdminCP extends Base
 
 		$this->buffer
 		(
-			$this->template->seriesList
+			$this->template->collectionsList
 			(
-				$this->model->seriesList($page, $sort, $module),
+				$this->model->collectionsList($page, $sort, $module),
 				$sort,
 				$module
 			)
 		);
 	}
 	
-	protected function storiesSeriesEdit(array $series)
+	protected function storiesCollectionsEdit(array $series)
 	{
 		
 	}
