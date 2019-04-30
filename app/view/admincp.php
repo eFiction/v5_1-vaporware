@@ -165,6 +165,12 @@ class AdminCP extends Base
 	{
 		$this->javascript( 'head', TRUE, "jquery.datetimepicker.js" );
 
+		if( isset($_SESSION['lastAction']) )
+		{
+			$this->f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
+			unset($_SESSION['lastAction']);
+		}
+
 		$this->f3->set('data', $data);
 		$this->f3->set('format', $this->config['date_preset']." ".$this->config['time_preset']);
 		$this->f3->set('returnpath', $returnpath);
