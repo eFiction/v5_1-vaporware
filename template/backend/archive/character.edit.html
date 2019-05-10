@@ -27,7 +27,7 @@
 		<div class="column is-5"><input class="input" type="text" name="form_data[charname]" value="{{ @data.charname }}" /></div>
 	</div>
 	<div class="columns">
-		<div class="column is-2">{{@LN__ACP_Category}}</div>
+		<div class="column is-2">{{@LN__ACP_Category}} <a class="tooltip is-tooltip-multiline" data-tooltip="__*GlobalCategoriesHint."><i class="fas fa-info-circle"></i></a></div>
 		<div class="column">
 			<check if="{{sizeof(@categories)>0}}">
 				<table class="table is-striped is-hoverable">
