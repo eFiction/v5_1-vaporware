@@ -70,10 +70,10 @@
 	<tr>
 		<th><a href="{{@BASE}}/adminCP/home/custompages/id={{ @row['id'] }};returnpath=/adminCP/home/custompages/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
 		<td><a href="{{@BASE}}/adminCP/home/custompages/delete={{ @row['id'] }}" class="deleteItem" title="#{{ @row['id'] }}: {{ @row['label'] }}">{ICON:trash}</a></td>
-		<td><check if="{{ @row['as_page']==1 }}"><true>{ICON:check}</true><false>{ICON:remove}</false></check></td>
-		<td>{{ @row['id'] }}</td>
-		<td>{{ @row['label'] }}</td>
-		<td>{{ @row['title'] }}</td>
+		<td><check if="{{ @row.as_page==1 }}"><true><a href="{{@BASE}}/page/{{ @row.label }}" target="_blank">{ICON:check}</a></true><false>{ICON:remove}</false></check></td>
+		<td>{{ @row.id }}</td>
+		<td>{{ @row.label }}</td>
+		<td>{{ @row.title }}</td>
 	</tr>
 	</repeat>
 </tbody>

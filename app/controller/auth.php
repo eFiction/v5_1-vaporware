@@ -42,7 +42,26 @@ class Auth extends Base {
 		}
 		else $session_id = \Model\Auth::instance()->createSession();
 
-		if ( isset($session_id) && $user = \Model\Auth::instance()->validateSession($session_id) AND $user['userID']>0 )
+		if ( $f3->get('AJAX') AND isset($session_id) AND $user = \Model\Auth::instance()->validateAJAXSession($session_id) AND $user['userID']>0 )
+		{
+			$_SESSION = array_merge (
+				$_SESSION,
+				[
+					'groups' 			=> 	$user['groups'],
+					'username'			=> 	$user['username'],
+					'mail'				=> 	[ 
+												(int)@$user['cache_messaging']['inbox']['sum'], 
+												(int)@$user['cache_messaging']['unread']['sum']
+											],
+					'allowed_authors'	=> 	explode(",",$user['allowed_authors']),
+					'preferences'		=> 	$user['preferences'],
+					'tpl'				=> 	[ "default", 1],
+				]
+			);
+
+			return TRUE;
+		}
+		elseif ( isset($session_id) AND $user = \Model\Auth::instance()->validateSession($session_id) AND $user['userID']>0 )
 		{
 			$_SESSION = array_merge (
 				$_SESSION,

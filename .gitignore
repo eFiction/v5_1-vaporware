@@ -2,3 +2,4 @@
 /data/*
 !/data/.htaccess
 !/data/config.ini
+/mystuff

@@ -1,8 +1,9 @@
+<!-- delete notification -->
 <check if="{{ isset(@deleteResult) }}">
 	<check if="{{ @deleteResult===0 }}"><div class="notification is-warning"><button class="delete"></button>{{@LN__FailedDelete}}</div></check>
 	<check if="{{ @deleteResult===1 }}"><div class="notification is-success"><button class="delete"></button>{{@LN__ElementDeleted}}</div></check>
 </check>
-
+<!-- END: delete notification -->
 
 <div class="columns">
 	<div class="column">
@@ -31,17 +32,6 @@
 				<label class="label">{{@LN__SearchCharacter}}</label>
 				<div class="control">
 					<input type="text" id="char-select" name="charid" />
-					<script type="text/javascript">
-					$(document).ready(function() {
-						$("#char-select").tokenInput("{{$BASE}}/adminCP/ajax/archive/search",{
-							method: "post",
-							queryParam: "charname",
-							hintText: "{{@LN__Token_StartTyping}} ...",
-							noResultsText: "{{@LN__Token_NoMatches}}.",
-							tokenLimit: 1
-						});
-					});
-					</script>
 				</div>
 			</div>
 			<div class="field">
@@ -54,7 +44,6 @@
 	</div>
 </div>
 
-<check if="{{ sizeof(@characterlist)>0 }}"><true>
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
 <table class="table is-striped is-hoverable is-fullwidth" id="textblockForm">
 <thead>
@@ -73,7 +62,7 @@
 			</check></a> {{@LN__Sort_ID}}
 		</th>
 		<th><a href="{{@BASE}}/adminCP/archive/characters/order=name,
-			<check if="{{ @sort['link']!='label' }}">
+			<check if="{{ @sort['link']!='name' }}">
 				<true>desc">{ICON:sort}</true>
 				<false>
 					<check if="{{ @sort['direction']=='asc' }}">
@@ -81,18 +70,17 @@
 						<false>asc">{ICON:sort-alpha-desc}</false>
 					</check>
 				</false>
-			</check></a> {{@LN__Sort_Label}}
+			</check></a> {{@LN__Sort_Name}}
 		</th>
-		<th><a href="{{@BASE}}/adminCP/archive/characters/order=category,
-			<check if="{{ @sort['link']!='group' }}">
-				<true>desc">{ICON:sort}</true>
-				<false>
-					<check if="{{ @sort['direction']=='asc' }}">
-						<true>desc">{ICON:sort-alpha-asc}</true>
-						<false>asc">{ICON:sort-alpha-desc}</false>
-					</check>
-				</false>
-			</check></a> {{@LN__Sort_Category}}
+		<th>{{@LN__Sort_Category}}: 
+			<span class="select"><select id="categoryselect">
+				<option value="">__*FullList</option>
+				<option <check if="{{0 == @category}}">selected='selected' </check>value="0">__*Global</option>
+				<repeat group="{{@categories}}" value="{{@catData}}">
+					<option <check if="{{@catData.id == @category}}">selected='selected' </check> value="{{@catData.id}}">{{@catData.name}}</option>
+				</repeat>
+			</select>
+			</span>
 		</th>
 		<th><a href="{{@BASE}}/adminCP/archive/characters/order=count,
 			<check if="{{ @sort['link']!='count' }}">
@@ -107,6 +95,7 @@
 		</th>
 	</tr>
 </thead>
+<check if="{{ sizeof(@characterlist)>0 }}"><true>
 <tbody>
 	<repeat group="{{ @characterlist }}" value="{{ @row }}">
 	<tr>
@@ -131,5 +120,33 @@
 </table>
 <F3:check if="{{isset(@paginate.firstPage) AND sizeof(@characterlist)>4}}"><include href="paginate.html" /></F3:check>
 </true><false>
+</table>
 {{@LN__NoEntries}}
 </false></check>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	$("#char-select").tokenInput("{{$BASE}}/adminCP/ajax/archive/search",{
+		method: "post",
+		queryParam: "charname",
+		hintText: "{{@LN__Token_StartTyping}} ...",
+		noResultsText: "{{@LN__Token_NoMatches}}.",
+		tokenLimit: 1
+	});
+});
+
+$(function(){
+  // bind change event to select
+  $('#categoryselect').on('change', function () {
+      var url = $(this).val(); // get selected value
+      if (url) { // require a URL
+          window.location = "{{@BASE}}/adminCP/archive/characters/category="+url; // redirect
+      }
+	  else
+	  {
+		window.location = "{{@BASE}}/adminCP/archive/characters"; // redirect
+	  }
+      return false;
+  });
+});
+</script>

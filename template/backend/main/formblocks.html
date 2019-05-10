@@ -7,8 +7,9 @@
 	</check>
 	
 	<repeat group="{{ @form_elements }}" key="{{@title }}" value="{{ @elements }}" counter="{{ @ctr }}">
+	<fieldset class="box">
+		<legend class="label has-text-centered">{{ ${'LN__AdminMenu_'.@title} }}</legend>
 		<dl class="settings">
-		<dt class="settings-title">{{ ${'LN__AdminMenu_'.@title} }}</dt>
 		<repeat group="{{ @elements.fields }}" value="{{ @element }}" counter="{{ @ctr }}">
 			<dt>{{ nl2br(@element.comment) |raw}}<check if="{{ @element.comment_small }}"><br /><small>{{ nl2br(@element.comment_small) | raw }}</small></check></dt>
 			<switch expr="{{ @element['type'] }}">
@@ -40,10 +41,24 @@
 				<!-- END: SELECT -->
 				</case>
 			</switch>
+		
 		</repeat>
 		</dl>
+	</fieldset>
 	</repeat>
 
-	<hr />
-	<input class="button is-success" type="submit"> <input class="button is-danger" type="reset">
+<div class="field is-grouped">
+	<p class="control">
+		<button class="button is-primary" type="submit">
+			<span class="icon"><i class="fas fa-save"></i></span>
+			<span>{{@LN__Save}}</span>
+		</button>
+	</p>
+	<p class="control">
+		<button class="button is-light" type="reset">
+			<span class="icon"><i class="fas fa-undo-alt"></i></span>
+			<span>{{@LN__Reset}}</span>
+		</button>
+	</p>
+</div>
 </form>

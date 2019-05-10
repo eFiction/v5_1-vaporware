@@ -48,8 +48,8 @@
 				<check if="{{ isset(@menu_upper) }}">
 					<p class="buttons">
 						<repeat group="{{ @menu_upper }}" value="{{ @menu_item }}">
-							<a class="button" href="{{@BASE}}/adminCP/{{ @menu_item['link'] }}">
-								<span class="icon">{{ @menu_item['icon'] }}</span>
+							<a class="button" href="{{@BASE}}/adminCP/{{ @menu_item.link }}">
+								<span class="icon">{{ @menu_item.icon }}</span>
 								<span>{{ ${'LN__AdminMenu_'.@menu_item['label']} }}</span>
 							</a>
 						</repeat>

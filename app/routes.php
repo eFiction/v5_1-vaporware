@@ -125,8 +125,12 @@ if ($_SESSION['groups'] & 1)
 		$f3->route( [ 'POST /adminCP/ajax/members/@module [ajax]', 'POST /adminCP/ajax/members/@module/* [ajax]' ], 'Controller\AdminCP->membersAjax' );
 
 		// Settings
-		$f3->route( [ 'GET /adminCP/settings', 'GET /adminCP/settings/@module' ], 'Controller\AdminCP->__settings' );
+		$f3->route( [ 'GET /adminCP/settings', 'GET /adminCP/settings/@module', 'GET /adminCP/settings/@module/*' ], 'Controller\AdminCP->__settings' );
 		$f3->route( 'POST /adminCP/settings/@module', 'Controller\AdminCP->__settingsSave' );
+
+		// Modules
+		$f3->route( [ 'GET /adminCP/modules', 'GET /adminCP/modules/@module', 'GET /adminCP/modules/@module/*' ], 'Controller\AdminCP->__modules' );
+		$f3->route( 'POST /adminCP/modules/@module', 'Controller\AdminCP->__modulesSave' );
 
 	}
 }

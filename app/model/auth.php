@@ -203,11 +203,38 @@ class Auth extends Base
 						"guest"		=>	$user['@guests']
 					]
 			);
-			//if ( $user['session'] == '' )	Auth::instance()->createSession();
 			if ( $user['session'] == '' )	$this->createSession();
 			return FALSE;
 		}
 	}
+
+	public function validateAJAXSession($session_id)
+	{
+		// this is a cut-down session handler, used in AJAX context.
+		$sql[] = "SELECT S.session, UNIX_TIMESTAMP(S.lastvisited) as time, S.ip, IF(S.user,S.user,0) as userID, 
+						U.username, U.groups, U.preferences,
+						GROUP_CONCAT(DISTINCT U2.uid) as allowed_authors
+							FROM `tbl_sessions`S 
+							INNER JOIN `tbl_users` U ON ( IF(S.user,S.user = U.uid,U.uid=0) )
+								LEFT JOIN `tbl_users`U2 ON ( (U.uid = U2.uid OR U.uid = U2.curator) AND U.groups&5 )
+						WHERE S.session = '{$session_id}' AND S.ip = INET_ATON('{$_SERVER['REMOTE_ADDR']}');";
+
+		$user = $this->exec($sql)[0];
+	
+		if ( $user['session'] > '' && $user['userID'] > 0 )
+		{
+			$_SESSION['userID']	= $user['userID'];
+			$user['preferences'] = json_decode($user['preferences'],TRUE);
+			$user['preferences']['language'] = "en";
+			return $user;
+		}
+		else
+		{
+			$_SESSION['userID']	= FALSE;
+			return FALSE;
+		}
+	}
+
 
 	public function registerCheckInput(&$register )
 	{

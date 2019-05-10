@@ -76,6 +76,8 @@ abstract class Base {
 		if (isset($item['cache_rating'])) 		$item['cache_rating']		= json_decode($item['cache_rating'],TRUE);
 		if (isset($item['cache_tags'])) 		$item['cache_tags']			= json_decode($item['cache_tags'],TRUE);
 		if (isset($item['cache_characters'])) 	$item['cache_characters']	= json_decode($item['cache_characters'],TRUE);
+												// build a combined tag/character array
+												$item['all_tags'] 			= array_merge( $item['cache_tags']['simple']??[], $item['cache_characters']??[] );
 		if (isset($item['cache_stories']))		$item['cache_stories']		= json_decode($item['cache_stories'],TRUE);
 	}
 

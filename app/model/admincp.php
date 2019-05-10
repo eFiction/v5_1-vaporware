@@ -6,7 +6,7 @@ class AdminCP extends Controlpanel {
 	protected $menu = [];
 	protected $access = [];
 	
-	public function ajax($key, $data)
+	public function ajax(string $key, array $data, array $params = [])
 	{
 		$bind = NULL;
 		
@@ -52,7 +52,33 @@ class AdminCP extends Controlpanel {
 			}
 			elseif(isset($data['character']))
 			{
-				$ajax_sql = "SELECT Ch.charname as name, Ch.charid as id from `tbl_characters`Ch WHERE Ch.charname LIKE :charname ORDER BY Ch.charname ASC LIMIT 5";
+				if ( isset($params['categories']) )
+				{
+					$where = ( is_array($params['categories']) )
+						? "FIND_IN_SET(C.cid, :categories)"
+						: "C.cid = :categories";
+					$bind = ( is_array($params['categories']) )
+						? implode(",",$params['categories'])
+						: $params['categories'];
+					$c = [];
+					$this->getCategories
+					(
+						$c,
+						$this->exec("SELECT C.cid,C.parent_cid 
+										FROM `tbl_categories`C
+									WHERE {$where};", [ ":categories" => $bind ] )
+					);
+					
+					if ( sizeof($c) ) $categories = " OR rCC.catid IN (".implode(",",$c).")";
+				}
+				
+				$ajax_sql = "SELECT Ch.charname as name, Ch.charid as id
+								FROM `tbl_characters`Ch 
+								LEFT JOIN `tbl_character_categories`rCC ON ( Ch.charid = rCC.charid )
+							WHERE Ch.charname LIKE :charname AND ( rCC.catid IS NULL ".($categories??"")." )
+							GROUP BY id
+							ORDER BY Ch.charname ASC LIMIT 5";
+//echo $ajax_sql;
 				$bind = [ ":charname" =>  "%{$data['character']}%" ];
 			}
 		}
@@ -103,6 +129,19 @@ class AdminCP extends Controlpanel {
 
 		if ( isset($ajax_sql) ) return $this->exec($ajax_sql, $bind);
 		return NULL;
+	}
+	
+	protected function getCategories(array &$c, array $data)
+	{
+//		print_r ( $data);
+		foreach ( $data as $d )
+		{
+			// take note of this category
+			$c[] = $d['cid'];
+			// if a parent category exists, traverse the tree
+			if ( $d['parent_cid'] > 0 ) 
+				$this->getCategories($c, $this->exec("SELECT C.cid, C.parent_cid FROM `tbl_categories`C WHERE `cid` = {$d['parent_cid']};"));
+		}
 	}
 	
 	public function settingsFields($select)
@@ -310,8 +349,7 @@ class AdminCP extends Controlpanel {
 		return $temp[0];
 	}
 
-//	public function categoryLoad(int $cid)
-	public function categoryLoad($cid)
+	public function categoryLoad(int $cid)
 	{
 		if ( $cid == 0 ) return NULL;
 		$sql = "SELECT cid as id, parent_cid, category, description, image, locked, leveldown, inorder, stats FROM `tbl_categories`C WHERE C.cid = :cid";
@@ -320,8 +358,7 @@ class AdminCP extends Controlpanel {
 		return FALSE;
 	}
 
-//	public function categoryLoadPossibleParents(int $cid)
-	public function categoryLoadPossibleParents($cid)
+	public function categoryLoadPossibleParents(int $cid)
 	{
 		$sql = "SELECT C.cid, C.parent_cid, C.leveldown, C.category
 					FROM `tbl_categories`C 
@@ -334,8 +371,7 @@ class AdminCP extends Controlpanel {
 		return $data;
 	}
 
-//	public function categorySave(int $cid, array $data)
-	public function categorySave($cid, array $data)
+	public function categorySave(int $cid, array $data)
 	{
 		$category=new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
 		$category->load(array('cid=?',$cid));
@@ -375,8 +411,7 @@ class AdminCP extends Controlpanel {
 		return $i;
 	}
 	
-//	protected function categoryLevelAdjust( int $cid, int $level)
-	protected function categoryLevelAdjust($cid, $level)
+	protected function categoryLevelAdjust( int $cid, int $level)
 	{
 		$category=new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
 		$category->load(array('cid=?',$cid));
@@ -392,8 +427,7 @@ class AdminCP extends Controlpanel {
 		}
 	}
 	
-//	public function categoryMove(int $catID=0, $direction=NULL, $parent=NULL)
-	public function categoryMove($catID=0, $direction=NULL, $parent=NULL)
+	public function categoryMove(int $catID=0, $direction=NULL, $parent=NULL)
 	{
 		if ( $parent === NULL )
 		{
@@ -454,8 +488,7 @@ class AdminCP extends Controlpanel {
 		return $parent;
 	}
 	
-//	public function categoryDelete( int $cid )
-	public function categoryDelete( $cid )
+	public function categoryDelete( int $cid )
 	{
 		$delete = new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
 		$delete->load( ["cid = ?", $cid ] );
@@ -471,18 +504,43 @@ class AdminCP extends Controlpanel {
 		else return FALSE;
 	}
 	
-	public function characterList($page, $sort)
+	public function characterList(int $page, array $sort, int $category)
 	{
 		/*
 		$tags = new \DB\SQL\Mapper($this->db, $this->prefix.'characters' );
 		$data = $tags->paginate($page, 10, NULL, [ 'order' => "{$sort['order']} {$sort['direction']}", ] );
 		*/
+		
+		// Only global characters
+		if ( $category == 0 )
+		{
+			$join = "";
+			$url = "/category=0";
+			$where = "WHERE rCC.catid IS NULL";
+		}
+		// limited by category
+		elseif ( $category > 0 )
+		{
+			$join = "INNER JOIN `tbl_character_categories`rCC2 ON ( Ch.charid = rCC2.charid AND rCC2.catid = {$category} )";
+			$url = "/category=".$category;
+			$where = "";
+		}
+		// full list
+		else
+		{
+			$where = $join = $url = "";
+		}
+
 		$limit = 20;
 		$pos = $page - 1;
 
-		$sql = "SELECT SQL_CALC_FOUND_ROWS Ch.charid, Ch.charname, Ch.count, Cat.category
+		$sql = "SELECT SQL_CALC_FOUND_ROWS Ch.charid, Ch.charname, Ch.count, GROUP_CONCAT(Cat.category SEPARATOR ', ') as category
 				FROM `tbl_characters`Ch 
-				LEFT JOIN `tbl_categories`Cat ON ( Ch.catid=Cat.cid )
+                {$join}
+                LEFT JOIN `tbl_character_categories`rCC ON ( Ch.charid = rCC.charid )
+					LEFT JOIN `tbl_categories`Cat ON ( rCC.catid=Cat.cid )
+				{$where}
+                GROUP BY Ch.charid
 				ORDER BY {$sort['order']} {$sort['direction']}
 				LIMIT ".(max(0,$pos*$limit)).",".$limit;
 
@@ -490,22 +548,36 @@ class AdminCP extends Controlpanel {
 				
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
-			"/adminCP/archive/characters/order={$sort['link']},{$sort['direction']}",
+			"/adminCP/archive/characters{$url}/order={$sort['link']},{$sort['direction']}",
 			$limit
 		);
 				
 		return $data;
 	}
 
-	public function characterLoad(int $charid)
+	public function characterCategories()
 	{
-		$sql = "SELECT Ch.charid as id, Ch.charname, Ch.biography, Ch.count, Cat.cid, Cat.category 
+		return $this->exec("SELECT Cat.cid as id, Cat.category as name, COUNT(DISTINCT rCC.charid) as counted
+							FROM `tbl_categories`Cat 
+								LEFT JOIN `tbl_character_categories`rCC ON ( Cat.cid = rCC.catid )
+							GROUP BY Cat.cid
+							HAVING counted > 0
+							ORDER BY Cat.category ASC;");
+	}
+
+	public function characterLoad(int $charid): array
+	{
+		$sql = "SELECT Ch.charid as id, Ch.charname, Ch.biography, Ch.count, GROUP_CONCAT(rCC.catid) as categories
 					FROM `tbl_characters`Ch
-					LEFT JOIN `tbl_categories`Cat ON ( Ch.catid=Cat.cid )
+						LEFT JOIN `tbl_character_categories`rCC ON ( Ch.charid=rCC.charid )
 					WHERE Ch.charid = :charid";
 		$data = $this->exec($sql, [":charid" => $charid ]);
-		if (sizeof($data)==1) return $data[0];
-		return NULL;
+		if (sizeof($data)==1)
+		{
+			$data[0]['categories'] = explode(",",$data[0]['categories']);
+			return $data[0];
+		}
+		return [];
 	}
 	
 	public function characterAdd(string $name)
@@ -519,17 +591,47 @@ class AdminCP extends Controlpanel {
 	
 	public function characterSave(int $charid, array $data)
 	{
-		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'characters');
-		$tag->load(array('charid=?',$charid));
-		$tag->copyfrom( [ "catid" => $data['catid'], "charname" => $data['charname'], "biography" => $data['biography'] ]);
+		$character=new \DB\SQL\Mapper($this->db, $this->prefix.'characters');
+		$character->load(array('charid=?',$charid));
+		$character->copyfrom( [ "charname" => $data['charname'], "biography" => $data['biography'] ]);
+			$i =  $character->changed("charname");
+			$i += $character->changed("biography");
+		$character->save();
+		
+		// Filter categories:
+		$categories = array_filter($data['categories']);
 
-		//if ( TRUE === $i = $tag->changed("tgid") ) $this->tagGroupRecount();
-		$i = $tag->changed("catid");
-		$i += $tag->changed("charname");
-		$i += $tag->changed("biography");
+		// open a db mapper to the relation table
+		$relations = new \DB\SQL\Mapper($this->db, $this->prefix.'character_categories');
 
-		$tag->save();
-		return $i;
+		// check all existing links
+		foreach ( $relations->find(array('`charid` = ?',$charid)) as $X )
+		{
+			$temp=array_search($X['catid'], $categories);
+			if ( $temp===FALSE )
+			// Excess relation, drop from table
+			{
+				$recounts[] = $X['catid'];
+				$relations->erase(['lid=?',$X['lid']]);
+			}
+			// already in database
+			else unset($categories[$temp]);
+		}
+		
+		// Insert any character/category relations not already present
+		if ( sizeof($categories)>0 )
+		{
+			foreach ( $categories as $temp)
+			{
+				// Add relation to table
+				$relations->reset();
+				$relations->charid = $charid;
+				$relations->catid = $temp;
+				$relations->save();
+				$recounts[] = $temp;
+			}
+		}
+		return ($i+sizeof($recounts??[]));
 	}
 
 	public function characterDelete(int $charid)
@@ -756,10 +858,11 @@ class AdminCP extends Controlpanel {
 		
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
-			"/adminCP/archive/featured/select={$status}/order={$sort['link']},{$sort['direction']}",
+			"/adminCP/stories/featured/select={$status}/order={$sort['link']},{$sort['direction']}",
 			$limit
 		);
-		
+		foreach ( $data as &$dat )
+			$dat['cache_authors'] = json_decode($dat['cache_authors'], TRUE);
 		return $data;
 	}
 	
@@ -785,7 +888,6 @@ class AdminCP extends Controlpanel {
 
 	public function featuredSave( int $sid, array $data )
 	{
-		//print_r($data);exit;
 		$feature=new \DB\SQL\Mapper($this->db, $this->prefix.'featured');
 		$feature->load(array('id=? AND type="ST"',$sid));
 		// copy form data, also used to create a new feature
@@ -829,6 +931,68 @@ class AdminCP extends Controlpanel {
 		$feature->load(array('id=? AND type="ST"',$sid));
 		
 		$_SESSION['lastAction'] = [ "deleteResult" => $feature->erase() ];
+	}
+
+	public function recommendationSave( int $recid, array $data )
+	{
+		$recommendation=new \DB\SQL\Mapper($this->db, $this->prefix.'recommendations');
+		
+		// load the recommendation if an ID is provided
+		if ( $recid > 0 ) $recommendation->load(array('recid=?',$recid));
+
+		// copy form data, also used to create a new feature
+		$recommendation->copyfrom( 
+			[ 
+				"status"	=> ($data['status']>0) ? $data['status'] : NULL, 
+				"id"		=> $recid,
+				"uid"		=> $_SESSION['userID']
+			]
+		);
+
+		if ( NULL === $recommendation->status OR ""!=($data['start']??"") OR ""!=($data['end']??"") )
+		{
+			// we either have or require a start date, so let's make sure this is proper
+			$start = ( ""==($data['start']??"") OR ( FALSE === $obj = \DateTime::createFromFormat($this->config['date_preset']." ".$this->config['time_preset'], $data['start']) ) )
+				? date('Y-m-d H:i')
+				: $obj->format('Y-m-d H:i');
+			$recommendation->start = $start.":00";
+
+			// same goes for the end date
+			$end = ( ""==($data['end']??"") OR ( FALSE === $obj = \DateTime::createFromFormat($this->config['date_preset']." ".$this->config['time_preset'], $data['end']) ) )
+				? date('Y-m-d H:i')
+				: $obj->format('Y-m-d H:i');
+			$recommendation->end = $end.":00";
+
+			// if start is past end, make them the same
+			if ( \DateTime::createFromFormat('Y-m-d H:i', $start)->format("U") > \DateTime::createFromFormat('Y-m-d H:i', $end)->format("U") )
+				$recommendation->end = $recommendation->start;
+		}
+		// make note of data change, must occur before save()
+		$_SESSION['lastAction'] = [ "saveResult" => (int)$recommendation->changed() ];
+
+		// save date
+		$recommendation->save();
+	}
+
+	public function recommendationDelete(int $recid)
+	{
+		// map the recommendation
+		$recommendations=new \DB\SQL\Mapper($this->db, $this->prefix.'recommendations');
+		
+		// map all relations
+		$relations=new \DB\SQL\Mapper($this->db, $this->prefix.'recommendation_relations');
+		
+		// map a possible feature tag
+		$featured=new \DB\SQL\Mapper($this->db, $this->prefix.'featured');
+		
+		// delete all mapped entries and count the deletions
+		$_SESSION['lastAction']['deleteDetails'] = 
+		[ 
+			$recommendations->erase(array('recid=?',$recid)), 
+			$relations->erase(array('recid=?',$recid)), 
+			$featured->erase(array("id=? AND type='RC'",$recid))
+		];
+		$_SESSION['lastAction']['deleteResult']  = [ array_sum($_SESSION['lastAction']['deleteDetails']) ];
 	}
 
 	public function logGetCount()
@@ -1598,17 +1762,13 @@ class AdminCP extends Controlpanel {
 		return $data;
 	}
 
-//	public function tagLoad(int $tid)
-	public function tagLoad($tid)
+	public function tagLoad(int $tid)
 	{
 		$sql = "SELECT T.tid as id, T.tgid, T.label, T.description, T.count, G.description as groupname FROM `tbl_tags`T LEFT JOIN `tbl_tag_groups`G ON ( T.tgid=G.tgid) WHERE T.tid = :tid";
-		$data = $this->exec($sql, [":tid" => $tid ]);
-		if (sizeof($data)==1) return $data[0];
-		return NULL;
+		return $this->exec($sql, [":tid" => $tid ])[0]??NULL;
 	}
 
-//	public function tagSave(int $tid, array $data)
-	public function tagSave($tid, array $data)
+	public function tagSave(int $tid, array $data)
 	{
 		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'tags');
 		$tag->load(array('tid=?',$tid));
@@ -1623,8 +1783,7 @@ class AdminCP extends Controlpanel {
 		return $i;
 	}
 	
-//	public function tagDelete(int $tid)
-	public function tagDelete($tid)
+	public function tagDelete(int $tid)
 	{
 		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'tags');
 		$tag->load(array('tid=?',$tid));
@@ -1677,17 +1836,13 @@ class AdminCP extends Controlpanel {
 		return $data;
 	}
 	
-//	public function tagGroupLoad(int $tgid)
-	public function tagGroupLoad($tgid)
+	public function tagGroupLoad(int $tgid)
 	{
 		$sql = "SELECT TG.tgid as id, TG.label as label, TG.description FROM `tbl_tag_groups`TG WHERE TG.tgid = :tgid";
-		$data = $this->exec($sql, [":tgid" => $tgid ]);
-		if (sizeof($data)==1) return $data[0];
-		return NULL;
+		return $this->exec($sql, [":tgid" => $tgid ])[0]??NULL;
 	}
 	
-//	public function tagGroupSave(int $tgid, array $data)
-	public function tagGroupSave($tgid, array $data)
+	public function tagGroupSave(int $tgid, array $data)
 	{
 		$taggroup=new \DB\SQL\Mapper($this->db, $this->prefix.'tag_groups');
 		$taggroup->load(array('tgid=?',$tgid));
@@ -1700,8 +1855,7 @@ class AdminCP extends Controlpanel {
 		return $i;
 	}
 	
-//	public function tagGroupDelete(int $tgid)
-	public function tagGroupDelete($tgid)
+	public function tagGroupDelete(int $tgid)
 	{
 		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'tags');
 		if($tag->count(array('tgid=?',$tgid)))
@@ -1816,17 +1970,13 @@ class AdminCP extends Controlpanel {
 		return $data['subset'];
 	}
 
-//	public function loadCustompage(int $id)
-	public function loadCustompage($id)
+	public function loadCustompage(int $id)
 	{
 		$sql = "SELECT TB.* FROM `tbl_textblocks`TB WHERE TB.id = :id";
-		$data = $this->exec($sql, [":id" => $id ]);
-		if (sizeof($data)==1) return $data[0];
-		return NULL;
+		return $this->exec($sql, [":id" => $id ])[0]??NULL;
 	}
 
-//	public function saveCustompage(int $id, array $data)
-	public function saveCustompage($id, array $data)
+	public function saveCustompage(int $id, array $data)
 	{
 		if( empty($data['label']) )
 		{
@@ -1859,8 +2009,7 @@ class AdminCP extends Controlpanel {
 		return $i;
 	}
 	
-//	public function addCustompage( string $label )
-	public function addCustompage( $label )
+	public function addCustompage( string $label )
 	{
 		$textblock=new \DB\SQL\Mapper($this->db, $this->prefix.'textblocks');
 		$conflicts = (int)$textblock->count(array('label=?',$label));
@@ -1871,8 +2020,7 @@ class AdminCP extends Controlpanel {
 		return $textblock->_id;
 	}
 
-//	public function deleteCustompage( int $id )
-	public function deleteCustompage( $id )
+	public function deleteCustompage( int $id )
 	{
 		$delete = new \DB\SQL\Mapper($this->db, $this->prefix.'textblocks');
 		if ( $delete->count( ["id = ?", $id ] ) == 0 ) return FALSE;
@@ -1906,7 +2054,6 @@ class AdminCP extends Controlpanel {
 		return $data;
 	}
 
-//	public function loadNews(int $id)
 	public function newsLoad(int $id)
 	{
 		$sql = "SELECT N.nid as id, N.headline, N.newstext, N.datetime, UNIX_TIMESTAMP(N.datetime) as timestamp FROM `tbl_news`N WHERE `nid` = :nid";
@@ -1920,7 +2067,6 @@ class AdminCP extends Controlpanel {
 		return $data[0];
 	}
 
-//	public function addNews( string $headline )
 	public function newsAdd( string $headline )
 	{
 		$news=new \DB\SQL\Mapper($this->db, $this->prefix.'news');

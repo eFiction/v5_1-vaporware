@@ -32,6 +32,7 @@ return array(
 'Error'			=> 'Error',
 'Success'		=> 'Success',
 'Search'		=> 'Search',
+'Save'			=> 'Save',	// db
 'Reset'			=> 'Reset',
 'Edit'			=> 'Edit',
 'Title' 		=>	'Title',
@@ -525,6 +526,12 @@ return array(
 'CreateNewPage'			=> 'Create new page or textblock',
 'DuplicateLabel'		=> 'Label already exists',
 
+// Custom pages
+'TextblockLabel'		=> 'Label/link for this texblock',
+'TextblockPage'			=> 'Use as page',
+'TextblockPageExplain'	=> 'This textblock can be used as a standalone page via /page/label',
+'TextblockContent'		=> 'Content',
+
 // Admin - Archive - Featured
 'AdminMenu_Featured' => 'Featured',
 	'AdminMenu_Upcoming' => 'Upcoming',
@@ -581,7 +588,6 @@ return array(
 	'CFG_story_validation'	 	=> 'Stories require validation@SMALL@This does not apply to trusted authors.',
 	'CFG_stories_min_words'		=> 'Minimum amount of words for a chapter',
 	'CFG_stories_max_words'		=> 'Maximum amount of words for a chapter@SMALL@(0 = unlimited)',
-	'CFG_advanced_editor' 		=> 'Allow use of graphical editor',
 	'CFG_allow_co_author' 		=> 'Allow addition of other authors to stories',
 	'CFG_stories_min_tags'		=> 'Minimum amount of tags required',
 	'CFG_allow_collections'	 	=> 'Allow authors to create collections@SMALL@Unordered',
@@ -632,8 +638,7 @@ return array(
 	'CFG_page_title_reverse'	=> 'Reverse sort order of page title elements.@SMALL@(Default is <b>no</b>)',
 	'CFG_page_title_separator'	=> 'Separator for page title elements',
 	'CFG_adjacent_paginations' 	=> 'Contiguous page links to display@SMALL@"1" to display: 1 ... 4 [5] 6 ... 9<br/>"2" to display: 1 ... 3 4 [5] 6 7 ... 9<br>"0" to display all links',
-	'CFG_shoutbox_entries'		=> 'Number of shoutbox items to display',
-	'CFG_shoutbox_guest'		=> 'Allow guest posts in shoutbox',
+	'CFG_advanced_editor' 		=> 'Allow use of graphical editor',
 	'CFG_allow_comment_news'	=> 'Allow news comments',
 	'CFG_allow_guest_comment_news'	=> 'Allow guest news comments',
 // settings_report
@@ -670,6 +675,9 @@ return array(
 	'CFG_debug'						=> 'Debug level',
 	'CFG_maintenance'				=> 'Archive closed for maintenance',
 	'CFG_logging'					=> 'Log actions',
+// settings_modules
+	'CFG_shoutbox_entries'		=> 'Number of shoutbox items to display',
+	'CFG_shoutbox_guest'		=> 'Allow guest posts in shoutbox',
 
 // Story view'
 'AuthorCounted' => '{0, plural,'.

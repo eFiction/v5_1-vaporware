@@ -32,6 +32,7 @@ return array(
 'Error'			=> 'Fehler',
 'Success'		=> 'Erfolg',
 'Search' 		=> 'Suche',
+'Save'			=> 'Speichern',		// db
 'Reset'			=> 'Zurücksetzen',
 'Edit'			=> 'Bearbeiten',
 'Title' 		=>	'Titel',
@@ -525,6 +526,12 @@ return array(
 'CreateNewPage'			=> 'Neue Seite oder neuen Textblock anlegen',
 'DuplicateLabel'		=> 'Bezeichner existiert bereits',
 
+// Custom pages
+//'TextblockLabel'		=> 'Label/link for this texblock',
+//'TextblockPage'			=> 'Use as page',
+//'TextblockPageExplain'	=> 'This textblock can be used as a standalone page via /page/label',
+'TextblockContent'		=> 'Content',
+
 // Admin - Archive - Featured
 'AdminMenu_Featured' => 'Feature',
 	'AdminMenu_Upcoming' => 'Zukünftige',
@@ -552,6 +559,7 @@ return array(
 'ElementDeleted'	=> 'Element gelöscht',
 'FailedDelete'		=> 'Element konnte nicht gelöscht werden',
 
+'AdminMenu_Recommendations'	=> 'Empfehlungen',
 
 // Config explain
 // archive_general
@@ -580,7 +588,6 @@ return array(
 	// 'CFG_story_validation'	 	=> 'Stories require validation@SMALL@This does not apply to trusted authors.',
 	'CFG_stories_min_words'		=> 'Minimale Anzahl von Wörtern je Kapitel',
 	'CFG_stories_max_words'		=> 'Maximale Anzahl von Wörtern je Kapitel@SMALL@(0 = unlimited)',
-	'CFG_advanced_editor' 		=> 'Erlaube grafischen Editor',
 	'CFG_allow_co_author' 		=> 'Erlaube weitere Autoren zu Geschichten hinzufügen',
 	'CFG_stories_min_tags'		=> 'Minimale verlangte Anzahl an Tags',
 	'CFG_allow_collections'	 	=> 'Autoren können Sammlungen erstellen@SMALL@Unsortiert',
@@ -631,8 +638,7 @@ return array(
 	'CFG_page_title_reverse'	=> 'Kehre Sortierung der Seiten-Titel Elemente um @SMALL@(Standard ist <b>nein</b>)',
 	'CFG_page_title_separator'	=> 'Trenner für Seiten-Titel Elemente',
 	'CFG_adjacent_paginations' 	=> 'Anzeige zusammenhängender Page-Links @SMALL@"1" für: 1 ... 4 [5] 6 ... 9<br />"2" für: 1 ... 3 4 [5] 6 7 ... 9<br />"0" um alle Links anzuzeigen',
-	'CFG_shoutbox_entries'		=> 'Anzahl der anzuzeigenden Shoutbox-Einträge',
-	'CFG_shoutbox_guest'		=> 'Erlaube Gästen die Shoutbox zu benutzen',
+	'CFG_advanced_editor' 		=> 'Erlaube grafischen Editor',
 	'CFG_allow_comment_news'	=> 'Erlaube News-Kommentare',
 	'CFG_allow_guest_comment_news'	=> 'Erlaube Gästen News-Kommentare',
 // settings_report
@@ -669,6 +675,9 @@ return array(
 	// 'CFG_debug'						=> 'Debug level',
 	'CFG_maintenance'				=> 'Archiv wegen Wartungsarbeiten geschlossen',
 	// 'CFG_logging'					=> 'Log actions',
+// settings_modules
+	'CFG_shoutbox_entries'		=> 'Anzahl der anzuzeigenden Shoutbox-Einträge',
+	'CFG_shoutbox_guest'		=> 'Erlaube Gästen die Shoutbox zu benutzen',
 
 // Story view'
 'AuthorCounted' => '{0, plural,'.

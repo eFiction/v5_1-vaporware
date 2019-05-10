@@ -52,6 +52,7 @@
 				</false>
 			</check></a> {{@LN__Sort_Title}}
 		</th>
+		<th>{{@LN__Author}}</th>
 		<th><a href="{{@BASE}}/adminCP/stories/featured/select={{@select}}/order=start,
 			<check if="{{ @sort['link']!='group' }}">
 				<true>desc">{ICON:sort}</true>
@@ -81,8 +82,9 @@
 	<tr>
 		<td><a href="{{@BASE}}/adminCP/stories/featured/sid={{ @row['sid'] }};returnpath=/adminCP/stories/featured/select={{@select}}/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
 		<td><a href="{{@BASE}}/adminCP/stories/featured/delete={{ @row['sid'] }};returnpath=/adminCP/stories/featured/select={{@select}}/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}" class="deleteItem" title="#{{ @row['sid'] }}: {{ @row['title'] }}">{ICON:trash}</a></td>
-		<td>{{ @row['sid'] }}</td>
-		<td>{{ @row['title'] }}</td>
+		<td>{{ @row.sid }}</td>
+		<td>{{ @row.title }}</td>
+		<td><repeat group="{{@row.cache_authors}}" value="{{@author}}" counter="{{ @i }}"><check if="{{ @i>1 }}">, </check>{{@author[1]}}</repeat></td>
 		<td><check if="{{ @row.start != NULL }}">{{ date(\Config::getPublic("datetime_format"), @row.start) }}</check> </td>
 		<td><check if="{{ @row.end != NULL }}">{{ date(\Config::getPublic("datetime_format"), @row.end) }}</check> </td>
 	</tr>
@@ -94,14 +96,14 @@
 {{@LN__NoEntries}}
 </false></check>
 
-        <script type="text/javascript">
-        $(document).ready(function() {
-            $("#add-featured").tokenInput("{{$BASE}}/adminCP/ajax/stories/featured",{
-            	method: "post",
-            	queryParam: "storyID",
-            	hintText: "{{@LN__Token_StartTyping}} ...",
-				noResultsText: "{{@LN__Token_NoMatches}}.",
-				tokenLimit: 1
-            });
-        });
-        </script>
+<script type="text/javascript">
+$(document).ready(function() {
+	$("#add-featured").tokenInput("{{$BASE}}/adminCP/ajax/stories/featured",{
+		method: "post",
+		queryParam: "storyID",
+		hintText: "{{@LN__Token_StartTyping}} ...",
+		noResultsText: "{{@LN__Token_NoMatches}}.",
+		tokenLimit: 1
+	});
+});
+</script>
