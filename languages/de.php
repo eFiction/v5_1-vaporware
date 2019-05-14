@@ -427,6 +427,7 @@ return array(
 	'AdminMenu_Logs_RF' => 'Fehler bei der Registrierung',
 	'AdminMenu_Logs_VS' => 'Bestätigungen',
 'AdminMenu_Shoutbox' => 'Shoutbox',
+'AdminMenu_Polls' => 'Umfragen',
 
 'AdminMenu_Settings' => 'Einstellungen',
 'AdminMenu_DateTime'	=> 'Datum und Uhrzeit',
@@ -488,10 +489,20 @@ return array(
 'ACP_Character'			=> 'Charakter',
 	'ACP_NewCharacter'	=> 'Neuen Charakter anlegen',
 //	'ACP_CharacterName'	=> 'Character name',
+	'GlobalCharacters'	=> 'Globale Charaktere',
+	'FullList'			=> 'Vollständige Liste',
 //'ACP_Biography'			=> 'Biografie',
 'ACP_Contest'			=> 'Wettbewerb',
 //	'ACP_EditContestEntries'	=> 'Wettbewerb-Einträge editieren',
+	'ACP_ContestActive'			=> 'Contest active status',
 	'ACP_ContestDateRange'	=>	'Zeitraum des Wettbewerbs',
+	'ContestActiveDate'		=> 'Automatic/by date',
+	'ContestActivePreparing'	=> 'Contest being prepared',
+	'ContestActiveActive'	=> 'Contest active',
+	'ContestActiveClosed'	=> 'Contest closed',
+	'ContestVotingDate'		=> 'Automatic/by date',
+	'ContestVotingActive'	=> 'Voting open',
+	'ContestVotingClosed'	=> 'Voting closed',
 	'ACP_NewContest'		=>	'Neuen Wettbewerb erstellen', //DB
 'ACP_Category'			=> 'Kategorie',
 	'ACP_EditCategory'		=> 'Kategorie bearbeiten',
@@ -558,6 +569,9 @@ return array(
 'CannotDeleteUsedElement'	=> 'Kann ein Element, dass zurzeit verwendet wird, nicht löschen.',
 'ElementDeleted'	=> 'Element gelöscht',
 'FailedDelete'		=> 'Element konnte nicht gelöscht werden',
+//'AddContestStory'	=> 'Add story to this contest',
+//'ElementAdded'		=> 'Element added',
+//'FailedAdd'			=> 'Failed to add element',
 
 'AdminMenu_Recommendations'	=> 'Empfehlungen',
 

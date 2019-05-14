@@ -1,1 +1,70 @@
+<check if="{{ isset(@addResult) }}">
+	<!-- error notification -->
+	<check if="{{ @addResult===0 }}">
+		<div class="notification is-warning">
+			<button class="delete"></button>
+			{{@LN__FailedAdd}}
+		</div>
+	</check>
+	<!-- END: error notification -->
+	<!-- success notification -->
+	<check if="{{ @addResult===1 }}">
+		<div class="notification is-success">
+			<button class="delete"></button>
+			{{@LN__ElementAdded}}
+		</div>
+	</check>
+	<!-- END: success notification -->
+</check>
+
+<check if="{{ isset(@deleteResult) }}">
+	<!-- error notification -->
+	<check if="{{ @deleteResult===0 }}">
+		<div class="notification is-warning">
+			<button class="delete"></button>
+			{{@LN__FailedDelete}}
+		</div>
+	</check>
+	<!-- END: error notification -->
+	<!-- success notification -->
+	<check if="{{ @deleteResult===1 }}">
+		<div class="notification is-success">
+			<button class="delete"></button>
+			{{@LN__ElementDeleted}}
+		</div>
+	</check>
+	<!-- END: success notification -->
+</check>
+
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
+
+		<div class="notification">
+		<form method="post" action="{{@BASE}}/adminCP/archive/contests/id={{@data.id}}/entries">
+			<div class="field">
+				<label class="label">{{@LN__AddContestStory}}</label>
+				<div class="control">
+					<input type="text" id="story-select" name="entries_data" />
+					<script type="text/javascript">
+					$(document).ready(function() {
+						$("#story-select").tokenInput("{{$BASE}}/adminCP/ajax/archive/search",{
+							method: "post",
+							queryParam: "storyID",
+							hintText: "{{@LN__Token_StartTyping}} ...",
+							noResultsText: "{{@LN__Token_NoMatches}}.",
+							tokenLimit: 1
+						});
+					});
+					</script>
+				</div>
+			</div>
+			<div class="field">
+				<div class="control">
+					<button class="button is-link">{{@LN__Add}}</button>
+				</div>
+			</div>
+		</form>
+		</div>
+
 <pre>{{print_r(@data.stories,1)}}</pre>
+
+<F3:check if="{{isset(@paginate.firstPage) AND sizeof(@data.stories)>4}}"><include href="paginate.html" /></F3:check>

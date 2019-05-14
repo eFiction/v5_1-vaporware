@@ -74,8 +74,8 @@
 		</th>
 		<th>{{@LN__Sort_Category}}: 
 			<span class="select"><select id="categoryselect">
-				<option value="">__*FullList</option>
-				<option <check if="{{0 == @category}}">selected='selected' </check>value="0">__*Global</option>
+				<option value="">[{{@LN__FullList}}]</option>
+				<option <check if="{{0 == @category}}">selected='selected' </check>value="0">[{{@LN__GlobalCharacters}}]</option>
 				<repeat group="{{@categories}}" value="{{@catData}}">
 					<option <check if="{{@catData.id == @category}}">selected='selected' </check> value="{{@catData.id}}">{{@catData.name}}</option>
 				</repeat>

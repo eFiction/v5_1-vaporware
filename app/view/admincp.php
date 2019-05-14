@@ -120,6 +120,12 @@ class AdminCP extends Base
 
 	public function contestEntries(array $data, $returnpath)
 	{
+		if( isset($_SESSION['lastAction']) )
+		{
+			$this->f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
+			unset($_SESSION['lastAction']);
+		}
+
 		$this->f3->set('data', $data);
 		$this->f3->set('returnpath', $returnpath);
 		

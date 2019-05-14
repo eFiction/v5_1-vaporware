@@ -427,6 +427,7 @@ return array(
 	'AdminMenu_Logs_RF' => 'Registration failure',
 	'AdminMenu_Logs_VS' => 'Validations',
 'AdminMenu_Shoutbox' => 'Shoutbox',
+'AdminMenu_Polls' => 'Polls',
 
 'AdminMenu_Settings' => 'Settings',
 'AdminMenu_DateTime'	=> 'Date and time',
@@ -488,10 +489,20 @@ return array(
 'ACP_Character'			=> 'Character',
 	'ACP_NewCharacter'	=> 'Create new character',
 	'ACP_CharacterName'	=> 'Character name',
+	'GlobalCharacters'	=> 'Global characters',
+	'FullList'			=> 'Full list',
 'ACP_Biography'			=> 'Biography',
 'ACP_Contest'			=> 'Contest',
 	'ACP_EditContestEntries'	=> 'Edit contest entries',
+	'ACP_ContestActive'			=> 'Contest active status',
 	'ACP_ContestDateRange'	=>	'Contest date range',
+	'ContestActiveDate'		=> 'Automatic/by date',
+	'ContestActivePreparing'	=> 'Contest being prepared',
+	'ContestActiveActive'	=> 'Contest active',
+	'ContestActiveClosed'	=> 'Contest closed',
+	'ContestVotingDate'		=> 'Automatic/by date',
+	'ContestVotingActive'	=> 'Voting open',
+	'ContestVotingClosed'	=> 'Voting closed',
 	'ACP_NewContest'	=>	'Create new contest', //DB
 'ACP_Category'			=> 'Category',
 	'ACP_EditCategory'		=> 'Edit category',
@@ -558,6 +569,9 @@ return array(
 'CannotDeleteUsedElement'	=> 'Cannot delete an element that is currently being used.',
 'ElementDeleted'	=> 'Element deleted',
 'FailedDelete'		=> 'Failed to delete element',
+'AddContestStory'	=> 'Add story to this contest',
+'ElementAdded'		=> 'Element added',
+'FailedAdd'			=> 'Failed to add element',
 
 'AdminMenu_Recommendations'	=> 'Recommendations',
 

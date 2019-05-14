@@ -35,20 +35,54 @@
 
 <div class="field is-horizontal">
   <div class="field-label is-normal">
+    <label class="label">{{@LN__ACP_ContestActive}}</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+		<select class="input" name="form_data[active]" onchange="this.form.submit()">
+			<option value="date"<check if="{{@data.active=='date'}}"> selected="selected"</check>>{{@LN__ContestActiveDate}}</option>
+			<option value="preparing"<check if="{{@data.active=='preparing'}}"> selected="selected"</check>>{{@LN__ContestActivePreparing}}</option>
+			<option value="active"<check if="{{@data.active=='active'}}"> selected="selected"</check>>{{@LN__ContestActiveActive}}</option>
+			<option value="closed"<check if="{{@data.active=='closed'}}"> selected="selected"</check>>{{@LN__ContestActiveClosed}}</option>
+		</select>
+    </div>
+    <div class="field">
+		<select class="input" name="form_data[votable]" onchange="this.form.submit()">
+			<option value="date"<check if="{{@data.votable=='date'}}"> selected="selected"</check>>{{@LN__ContestVotingDate}}</option>
+			<option value="active"<check if="{{@data.votable=='active'}}"> selected="selected"</check>>{{@LN__ContestVotingActive}}</option>
+			<option value="closed"<check if="{{@data.votable=='closed'}}"> selected="selected"</check>>{{@LN__ContestVotingClosed}}</option>
+		</select>
+    </div>
+  </div>
+</div>
+
+<div class="field is-horizontal">
+  <div class="field-label is-normal">
     <label class="label">{{@LN__ACP_ContestDateRange}}</label>
   </div>
   <div class="field-body">
     <div class="field">
+	from
       <div class="control has-icons-left">
-        <input class="input" type="text" name="form_data[date_open]" id="date_open"/>
+        <input class="input" type="text" name="form_data[date_open]" id="date_open"<check if="{{@data.active!='date'}}"> disabled</check> />
         <span class="icon is-small is-left">
           {ICON:calendar}
         </span>
       </div>
     </div>
     <div class="field">
+	through
       <div class="control has-icons-left">
-        <input class="input" type="text" name="form_data[date_close]" id="date_close"/>
+        <input class="input" type="text" name="form_data[date_close]" id="date_close"<check if="{{@data.active!='date'}}"> disabled</check> />
+        <span class="icon is-small is-left">
+          {ICON:calendar}
+        </span>
+      </div>
+    </div>
+    <div class="field">
+	voting
+      <div class="control has-icons-left">
+        <input class="input" type="text" name="form_data[vote_close]" id="vote_close"<check if="{{@data.votable!='date'}}"> disabled</check> />
         <span class="icon is-small is-left">
           {ICON:calendar}
         </span>
@@ -56,6 +90,15 @@
     </div>
   </div>
 </div>
+
+<check if="{{@data.active!='date'}}">
+	<input type="hidden" name="form_data[date_open]" value="{{ @data.date_open }}">
+	<input type="hidden" name="form_data[date_close]" value="{{ @data.date_close }}">
+</check>
+<check if="{{@data.votable!='date'}}">
+	<input type="hidden" name="form_data[vote_close]" value="{{ @data.vote_close }}">
+</check>
+
 
 <div class="field is-horizontal">
 	<div class="field-label is-normal"><label class="label">{{@LN__Characters}}</label></div>
@@ -173,6 +216,12 @@ $('#date_close').datetimepicker({
 	dayOfWeekStart : 1,
 	timepicker:false,
 	value:'{{ @data.date_close }}',
+	format:'{{\Config::getPublic("date_format")}}',
+});
+$('#vote_close').datetimepicker({
+	dayOfWeekStart : 1,
+	timepicker:false,
+	value:'{{ @data.vote_close }}',
 	format:'{{\Config::getPublic("date_format")}}',
 });
 </script>

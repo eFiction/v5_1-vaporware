@@ -230,6 +230,24 @@ class Story extends Base
 	{
 		$limit = 5;
 		$pos = (int)$this->f3->get('paginate.page') - 1;
+		
+		/*
+			IF
+			(
+				C.votable='date',
+				then IF
+				(
+					C.date_close<NOW() OR C.date_close IS NULL,
+					then IF
+					(
+						C.vote_closed>NOW() OR C.vote_closed IS NULL,
+						then 'active',
+						else 'closed'
+					),
+					else 'preparing'),
+				else C.votable
+			) as votable,
+		*/
 
 		$sql = "SELECT SQL_CALC_FOUND_ROWS
 					C.conid, C.title, C.summary,

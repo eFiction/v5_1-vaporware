@@ -27,6 +27,11 @@ class AdminCP extends Controlpanel {
 				$ajax_sql = "SELECT C.title as name,C.conid as id FROM `tbl_contests`C WHERE C.title LIKE :label LIMIT 10";
 				$bind = [ ":label" =>  "%{$data['contestname']}%" ];
 			}
+			elseif(isset($data['storyID']))
+			{
+				$ajax_sql = "SELECT S.title as name,S.sid as id from `tbl_stories`S WHERE S.title LIKE :story OR S.sid = :sid ORDER BY S.title ASC";
+				$bind = [ ":story" =>  "%{$data['storyID']}%", ":sid" =>  $data['storyID'] ];
+			}
 		}
 		elseif ( $key == "editMeta" )
 		{
@@ -649,7 +654,8 @@ class AdminCP extends Controlpanel {
 
 		$sql = "SELECT SQL_CALC_FOUND_ROWS
 					C.conid, C.title, 
-					UNIX_TIMESTAMP(C.date_open) as date_open, UNIX_TIMESTAMP(C.date_close) as date_close, UNIX_TIMESTAMP(C.vote_closed) as vote_closed, 
+					C.active, C.votable,
+					UNIX_TIMESTAMP(C.date_open) as date_open, UNIX_TIMESTAMP(C.date_close) as date_close, UNIX_TIMESTAMP(C.vote_close) as vote_close, 
 					C.cache_tags, C.cache_characters, 
 					U.username, COUNT(R.lid) as count
 				FROM `tbl_contests`C
@@ -672,7 +678,8 @@ class AdminCP extends Controlpanel {
 
 	public function contestLoad(int $conid)
 	{
-		$sql = "SELECT C.conid as id, C.title, C.summary, C.concealed, C.date_open, C.date_close,
+		$sql = "SELECT C.conid as id, C.title, C.summary, C.concealed, C.date_open, C.date_close, C.vote_close,
+					C.active, C.votable,
 					GROUP_CONCAT(T.tid,',',T.label SEPARATOR '||') as tag_list,
 					GROUP_CONCAT(Ch.charid,',',Ch.charname SEPARATOR '||') as character_list, 
 					GROUP_CONCAT(Cat.cid,',',Cat.category SEPARATOR '||') as category_list, 
@@ -708,16 +715,27 @@ class AdminCP extends Controlpanel {
 		return NULL;
 	}
 
-	public function contestLoadEntries($conid)
+	public function contestLoadEntries(int $conid, int $page, array $sort)
 	{
-		$sql = "SELECT S.sid, S.title
+		$limit = 10;
+		$pos = $page - 1;
+
+		$sql = "SELECT SQL_CALC_FOUND_ROWS
+					S.sid, S.title
 					FROM `tbl_contests`C
 						LEFT JOIN `tbl_contest_relations`RelC ON ( C.conid = RelC.conid )
 						INNER JOIN `tbl_stories`S ON ( S.sid = RelC.relid AND RelC.type='ST' )
-					WHERE C.conid = :conid";
+					WHERE C.conid = :conid
+					LIMIT ".(max(0,$pos*$limit)).",".$limit;
 
 		$data = $this->exec($sql, [":conid" => $conid ]);
 		
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/adminCP/archive/contests/id={$conid}/entries",
+			$limit
+		);
+
 		return $data;
 	}
 	
@@ -747,12 +765,17 @@ class AdminCP extends Controlpanel {
 				"title"			=> $data['title'],
 				"concealed"		=> isset($data['concealed']) ? 1 : 0,
 				"summary"		=> $data['summary'],
+				"active"		=> $data['active'],
 				"date_open"		=> empty($data['date_open']) ?
 										NULL :
 										\DateTime::createFromFormat($this->config['date_format'], $data['date_open'])->format('Y-m-d')." 00:00:00",
 				"date_close"	=> empty($data['date_close']) ?
 										NULL :
 										\DateTime::createFromFormat($this->config['date_format'], $data['date_close'])->format('Y-m-d')." 00:00:00",
+				"votable"		=> $data['votable'],
+				"vote_close"	=> empty($data['vote_close']) ?
+										NULL :
+										\DateTime::createFromFormat($this->config['date_format'], $data['vote_close'])->format('Y-m-d')." 00:00:00",
 			]
 		);
 
@@ -761,6 +784,7 @@ class AdminCP extends Controlpanel {
 		$i += $contest->changed("summary");
 		$i += $contest->changed("date_open");
 		$i += $contest->changed("date_close");
+		$i += $contest->changed("vote_close");
 		
 		$contest->save();
 		
@@ -808,9 +832,23 @@ class AdminCP extends Controlpanel {
 		}
 		unset($relations);
 	}
+	
+	public function contestStoryAdd(int $conID, int $storyID)// : void
+	{
+		$stories = new \DB\SQL\Mapper($this->db, $this->prefix.'contest_relations');
+		if ( 0 === $stories->count(array("conid=? AND relid=? AND type='ST'",$conID, $storyID)) )
+		{
+			$stories->reset();
+			$stories->conid = $conID;
+			$stories->relid = $storyID;
+			$stories->type  = 'ST';
+			$stories->save();
+			$_SESSION['lastAction'] = [ "addResult" => 1 ];
+		}
+		else $_SESSION['lastAction'] = [ "addResult" => 0 ];
+	}
 
-//	public function contestDelete(int $conid)
-	public function contestDelete($conid)
+	public function contestDelete(int $conid)
 	{
 		$contest=new \DB\SQL\Mapper($this->db, $this->prefix.'contests');
 		$contest->load(array('conid=?',$conid));

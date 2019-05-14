@@ -146,6 +146,7 @@ class AdminCP extends Base
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Contests') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Contests') );
+		$f3->set('wiki', 'Archive:Contests');
 
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 
@@ -169,10 +170,9 @@ class AdminCP extends Base
 					)
 				);
 			}			
-			elseif ( isset($_POST['entries_data']) )
+			elseif ( isset($_POST['entries_data']) AND 0 < (int)($_POST['entries_data']) )
 			{
-				//if ( FALSE === $changes = $this->model->contestSave($params['id'], $f3->get('POST.form_data') ) )
-				//	$errors = $f3->get('form_error');
+				$this->model->contestStoryAdd($params['id'], $f3->get('POST.entries_data') );
 			}
 			elseif ( isset($_POST['newContest']) )
 			{
@@ -186,7 +186,7 @@ class AdminCP extends Base
 			elseif ( isset($_POST['conid']) ) $params['id'] = $f3->get('POST.conid');
 		}
 
-		if( isset ($params['id']) )
+		if( isset ($params['id']) AND 0 < (int)$params['id'] )
 		{
 			// Load contest data
 			$data = $this->model->contestLoad($params['id']);
@@ -194,14 +194,11 @@ class AdminCP extends Base
 			// Edit or add contest entries
 			if( isset($params['entries']) )
 			{
-				$data['stories'] = $this->model->contestLoadEntries($params['id']);
-				return $this->template->contestEntries($data, @$params['returnpath']);
+				return $this->archiveContestsEntries($params, $data);
 			}
 			// Edit contest data
 			else
 			{
-				//$data['categories'] = $this->model->getCategories();
-				//$data['tags']
 				$data['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
 				return $this->template->contestEdit($data, @$params['returnpath']);
 			}
@@ -225,6 +222,29 @@ class AdminCP extends Base
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
 		
 		return $this->template->contestsList($this->model->contestsList($page, $sort), $sort);
+	}
+	
+	protected function archiveContestsEntries(array $params, array $data)
+	{
+		// page will always be an integer > 0
+		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
+		
+		// search/browse
+		$allow_order = array (
+			"id"		=>	"conid",
+			"name"		=>	"title",
+			"open"		=>	"date_open",
+			"close"		=>	"date_close",
+			"count"		=>	"count",
+		);
+
+		// sort order
+		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "id";
+		$sort["order"]		= $allow_order[$sort["link"]];
+		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
+
+		$data['stories'] = $this->model->contestLoadEntries($params['id'], $page, $sort);
+		return $this->template->contestEntries($data, @$params['returnpath']);
 	}
 
 	protected function archiveCharacters(\Base $f3, array $params): string
@@ -600,7 +620,7 @@ class AdminCP extends Base
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Home') );
 		$f3->set('title_h1', $f3->get('LN__AdminMenu_Home') );
 
-		switch( $this->moduleInit([ "manual", "custompages", "news", "logs", "shoutbox" ], @$params['module']) )
+		switch( $this->moduleInit([ "manual", "custompages", "news", "logs", "shoutbox", "polls" ], @$params['module']) )
 		{
 			case "custompages":
 				$this->homeCustompages( $f3, $params );
@@ -619,6 +639,9 @@ class AdminCP extends Base
 				break;
 			case "shoutbox":
 				$this->homeShoutbox( $f3, $params );
+				break;
+			case "polls":
+				$this->homePolls( $f3, $params );
 				break;
 			case "stories":
 				$this->homeStories($f3, $params);
@@ -768,6 +791,15 @@ class AdminCP extends Base
 				$sub
 			)
 		);
+	}
+	
+	protected function homePolls(\Base $f3, array $params)//: void
+	{
+		$this->response->addTitle( $f3->get('LN__AdminMenu_Polls') );
+		$f3->set('title_h3', $f3->get('LN__AdminMenu_Polls') );
+
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		
 	}
 	
 	protected function homeShoutbox(\Base $f3, array $params)//: void
