@@ -32,6 +32,11 @@ class AdminCP extends Controlpanel {
 				$ajax_sql = "SELECT S.title as name,S.sid as id from `tbl_stories`S WHERE S.title LIKE :story OR S.sid = :sid ORDER BY S.title ASC";
 				$bind = [ ":story" =>  "%{$data['storyID']}%", ":sid" =>  $data['storyID'] ];
 			}
+			elseif(isset($data['collID']))
+			{
+				$ajax_sql = "SELECT C.title as name,C.collid as id from `tbl_collections`C WHERE C.title LIKE :collection OR C.collid = :collid ORDER BY C.title ASC";
+				$bind = [ ":collection" =>  "%{$data['collID']}%", ":collid" =>  $data['collID'] ];
+			}
 		}
 		elseif ( $key == "editMeta" )
 		{
@@ -715,30 +720,6 @@ class AdminCP extends Controlpanel {
 		return NULL;
 	}
 
-	public function contestLoadEntries(int $conid, int $page, array $sort)
-	{
-		$limit = 10;
-		$pos = $page - 1;
-
-		$sql = "SELECT SQL_CALC_FOUND_ROWS
-					S.sid, S.title
-					FROM `tbl_contests`C
-						LEFT JOIN `tbl_contest_relations`RelC ON ( C.conid = RelC.conid )
-						INNER JOIN `tbl_stories`S ON ( S.sid = RelC.relid AND RelC.type='ST' )
-					WHERE C.conid = :conid
-					LIMIT ".(max(0,$pos*$limit)).",".$limit;
-
-		$data = $this->exec($sql, [":conid" => $conid ]);
-		
-		$this->paginate(
-			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
-			"/adminCP/archive/contests/id={$conid}/entries",
-			$limit
-		);
-
-		return $data;
-	}
-	
 	public function contestAdd($name)
 	{
 		$contest=new \DB\SQL\Mapper($this->db, $this->prefix.'contests');
@@ -833,19 +814,88 @@ class AdminCP extends Controlpanel {
 		unset($relations);
 	}
 	
-	public function contestStoryAdd(int $conID, int $storyID)// : void
+	public function contestLoadEntries(int $conid, int $page, array $sort)
 	{
-		$stories = new \DB\SQL\Mapper($this->db, $this->prefix.'contest_relations');
-		if ( 0 === $stories->count(array("conid=? AND relid=? AND type='ST'",$conID, $storyID)) )
+		$limit = 10;
+		$pos = $page - 1;
+
+		$sql = "SELECT SQL_CALC_FOUND_ROWS 
+				E.* FROM (
+					SELECT 
+						IF(S.sid IS NULL,Coll.collid,S.sid) as id,
+						IF(S.title IS NULL,Coll.title,S.title) as title, 
+						IF(S.cache_authors IS NULL,Coll.cache_authors,S.cache_authors) as cache_authors, 
+						IF(S.validated IS NULL,'39',S.validated) as validated, 
+						IF(S.completed IS NULL,'9',S.completed) as completed, 
+						RelC.type, RelC.lid
+						FROM `tbl_contests`C
+							LEFT JOIN `tbl_contest_relations`RelC ON ( C.conid = RelC.conid )
+								LEFT JOIN `tbl_stories`S ON ( S.sid = RelC.relid AND RelC.type='ST' )
+								LEFT JOIN `tbl_collections`Coll ON ( Coll.collid = RelC.relid AND RelC.type='CO' )
+						WHERE C.conid = :conid AND ( RelC.type='ST' OR RelC.type='CO' )
+					) as E
+				GROUP BY id
+				ORDER BY {$sort['order']} {$sort['direction']}
+				LIMIT ".(max(0,$pos*$limit)).",".$limit;
+
+		$data = $this->exec($sql, [":conid" => $conid ]);
+		
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/adminCP/archive/contests/id={$conid}/entries/order={$sort['link']},{$sort['direction']}",
+			$limit
+		);
+		
+		if ( sizeof($data)>0 )
 		{
-			$stories->reset();
-			$stories->conid = $conID;
-			$stories->relid = $storyID;
-			$stories->type  = 'ST';
-			$stories->save();
-			$_SESSION['lastAction'] = [ "addResult" => 1 ];
+			foreach ($data as &$dat)
+			{
+				$dat['cache_authors'] = json_decode($dat['cache_authors']);
+				foreach ($dat['cache_authors'] as $ca) $dat['authors'][] = $ca[1];
+				$dat['authors'] = implode(", ",$dat['authors']);
+			}
 		}
-		else $_SESSION['lastAction'] = [ "addResult" => 0 ];
+
+		return $data;
+	}
+
+	public function contestEntryAdd(int $conID, int $entryID, string $type="S")// : void
+	{
+		if ( $type == "S" )
+		{
+			$stories = new \DB\SQL\Mapper($this->db, $this->prefix.'contest_relations');
+			if ( 0 === $stories->count(array("conid=? AND relid=? AND type='ST'",$conID, $entryID)) )
+			{
+				$stories->reset();
+				$stories->conid = $conID;
+				$stories->relid = $entryID;
+				$stories->type  = 'ST';
+				$stories->save();
+				$_SESSION['lastAction'] = [ "addResult" => 1 ];
+			}
+			else $_SESSION['lastAction'] = [ "addResult" => 0 ];
+		}
+		elseif ( $type == "C" )
+		{
+			$collections = new \DB\SQL\Mapper($this->db, $this->prefix.'contest_relations');
+			if ( 0 === $collections->count(array("conid=? AND relid=? AND type='CO'",$conID, $entryID)) )
+			{
+				$collections->reset();
+				$collections->conid = $conID;
+				$collections->relid = $entryID;
+				$collections->type  = 'CO';
+				$collections->save();
+				$_SESSION['lastAction'] = [ "addResult" => 1 ];
+			}
+			else $_SESSION['lastAction'] = [ "addResult" => 0 ];
+		}
+	}
+
+	public function contestEntryRemove(int $conID, int $linkID)
+	{
+		$link=new \DB\SQL\Mapper($this->db, $this->prefix.'contest_relations');
+		$link->load(array("conid=? AND lid=?",$conID, $linkID));
+		$_SESSION['lastAction'] = [ "deleteResult" => $link->erase() ];
 	}
 
 	public function contestDelete(int $conid)

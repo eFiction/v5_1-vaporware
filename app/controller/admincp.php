@@ -158,6 +158,7 @@ class AdminCP extends Base
 		}
 		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
 		{
+			// save changes to an existing contest
 			if ( isset($_POST['form_data']) )
 			{
 				$f3->set
@@ -169,11 +170,17 @@ class AdminCP extends Base
 						$f3->get('POST.form_data')
 					)
 				);
-			}			
-			elseif ( isset($_POST['entries_data']) AND 0 < (int)($_POST['entries_data']) )
-			{
-				$this->model->contestStoryAdd($params['id'], $f3->get('POST.entries_data') );
 			}
+
+			// add a story to an existing contest
+			elseif ( isset($_POST['entry_story']) AND 0 < (int)($_POST['entry_story']) )
+				$this->model->contestEntryAdd($params['id'], $f3->get('POST.entry_story'), "S" );
+
+			// add a collection or series to an existing contest
+			elseif ( isset($_POST['entry_collection']) AND 0 < (int)($_POST['entry_collection']) )
+				$this->model->contestEntryAdd($params['id'], $f3->get('POST.entry_collection'), "C" );
+
+			// create a new contest
 			elseif ( isset($_POST['newContest']) )
 			{
 				if ( NULL !== $newID = $this->model->contestAdd( $f3->get('POST.newContest') ) )
@@ -194,7 +201,7 @@ class AdminCP extends Base
 			// Edit or add contest entries
 			if( isset($params['entries']) )
 			{
-				return $this->archiveContestsEntries($params, $data);
+				return $this->archiveContestsEntries($f3, $params, $data);
 			}
 			// Edit contest data
 			else
@@ -224,27 +231,41 @@ class AdminCP extends Base
 		return $this->template->contestsList($this->model->contestsList($page, $sort), $sort);
 	}
 	
-	protected function archiveContestsEntries(array $params, array $data)
+	protected function archiveContestsEntries(\Base $f3, array $params, array $data)
 	{
+		if ( isset($params['remove']) )
+		{
+			$this->model->contestEntryRemove( (int)$params['id'], (int)$params['remove'] );
+			$url = "/adminCP/archive/contests/id=".(int)$params['id']."/entries";
+			if ( isset($params['order']) ) $url .= "/order=".implode(",",$params['order']);
+			if ( isset($params['page']) )  $url .= "/page=".$params['page'];
+			$f3->reroute($url, false);
+			exit;
+			
+		}
+
 		// page will always be an integer > 0
 		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
 		
 		// search/browse
 		$allow_order = array (
-			"id"		=>	"conid",
-			"name"		=>	"title",
-			"open"		=>	"date_open",
-			"close"		=>	"date_close",
-			"count"		=>	"count",
+			"id"		=>	"id",
+			"title"		=>	"title",
+			"validated"	=>	"validated",
+			"completed"	=>	"completed",
 		);
 
 		// sort order
 		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "id";
 		$sort["order"]		= $allow_order[$sort["link"]];
-		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
+		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="desc") ?	"desc" : "asc";
+		// sort icons
+		$sort['data']['id'] = 	 ( $sort['direction']=="desc" OR $sort['link']!='id' ) ? "asc" : "desc";
+		$sort['data']['title'] = ( $sort['direction']=="desc" OR $sort['link']!='title' ) ? "asc" : "desc";
+
 
 		$data['stories'] = $this->model->contestLoadEntries($params['id'], $page, $sort);
-		return $this->template->contestEntries($data, @$params['returnpath']);
+		return $this->template->contestEntries($data, $sort, @$params['returnpath']);
 	}
 
 	protected function archiveCharacters(\Base $f3, array $params): string
@@ -397,6 +418,11 @@ class AdminCP extends Base
 		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "label";
 		$sort["order"]		= $allow_order[$sort["link"]];
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="desc") ?	"desc" : "asc";
+		// sort icons
+		$sort['data']['id']    = ( $sort['direction']=="desc" OR $sort['link']!='id' )    ? "asc" : "desc";
+		$sort['data']['label'] = ( $sort['direction']=="desc" OR $sort['link']!='label' ) ? "asc" : "desc";
+		$sort['data']['group'] = ( $sort['direction']=="desc" OR $sort['link']!='group' ) ? "asc" : "desc";
+		$sort['data']['count'] = ( $sort['direction']=="desc" OR $sort['link']!='count' ) ? "asc" : "desc";
 		
 		$data = $this->model->tagList($page, $sort);
 		$this->buffer ( $this->template->tagList($data, $sort) );

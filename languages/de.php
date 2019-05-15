@@ -570,6 +570,7 @@ return array(
 'ElementDeleted'	=> 'Element gelöscht',
 'FailedDelete'		=> 'Element konnte nicht gelöscht werden',
 //'AddContestStory'	=> 'Add story to this contest',
+'AddContestCollection'	=> 'Sammlung/Serie zu diesem Wettbewerb hinzufügen',
 //'ElementAdded'		=> 'Element added',
 //'FailedAdd'			=> 'Failed to add element',
 

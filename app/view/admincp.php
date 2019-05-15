@@ -118,15 +118,18 @@ class AdminCP extends Base
 		return \Template::instance()->render('archive/contest.edit.html');
 	}
 
-	public function contestEntries(array $data, $returnpath)
+	public function contestEntries(array $data, array $sort, string $returnpath): string
 	{
+		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+
 		if( isset($_SESSION['lastAction']) )
 		{
 			$this->f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
 			unset($_SESSION['lastAction']);
 		}
-
+		
 		$this->f3->set('data', $data);
+		$this->f3->set('sort', $sort);
 		$this->f3->set('returnpath', $returnpath);
 		
 		return \Template::instance()->render('archive/contest.entries.html');

@@ -157,8 +157,7 @@ class Base extends \Prefab {
 		return NULL;
 	}
 	
-//	protected function timeToUser($dbTime, string $formatOut="Y-m-d H:i", bool $timestamp = FALSE)
-	protected function timeToUser($dbTime, $formatOut="Y-m-d H:i", $timestamp = FALSE)
+	protected function timeToUser(string $dbTime, string $formatOut="Y-m-d H:i", bool $timestamp = FALSE): string
 	{
 		$date = new \DateTime($dbTime);
 		$tz_server = timezone_name_get($date->getTimezone());

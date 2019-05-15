@@ -44,17 +44,6 @@
 				<label class="label">{{@LN__SearchTag}}</label>
 				<div class="control">
 					<input type="text" id="tag-select" name="tid" />
-					<script type="text/javascript">
-					$(document).ready(function() {
-						$("#tag-select").tokenInput("{{$BASE}}/adminCP/ajax/archive/search",{
-							method: "post",
-							queryParam: "tagname",
-							hintText: "{{@LN__Token_StartTyping}} ...",
-							noResultsText: "{{@LN__Token_NoMatches}}.",
-							tokenLimit: 1
-						});
-					});
-					</script>
 				</div>
 			</div>
 			<div class="field">
@@ -73,48 +62,28 @@
 	<tr>
 		<th>&nbsp;</th>
 		<th>&nbsp;</th>
-		<th><a href="{{@BASE}}/adminCP/archive/tags/edit/order=id,
-			<check if="{{ @sort['link']!='id' }}">
-				<true>desc">{ICON:sort}</true>
-				<false>
-					<check if="{{ @sort['direction']=='asc' }}">
-						<true>desc">{ICON:sort-numeric-asc}</true>
-						<false>asc">{ICON:sort-numeric-desc}</false>
-					</check>
-				</false>
+		<th><a href="{{@BASE}}/adminCP/archive/tags/edit/order=id,{{@sort.data.id}}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">
+			<check if="{{ @sort.link=='id' }}">
+				<true>{ICON:sort-numeric-{{@sort.data.id}}}</true>
+				<false>{ICON:sort}</false>
 			</check></a> {{@LN__Sort_ID}}
 		</th>
-		<th><a href="{{@BASE}}/adminCP/archive/tags/edit/order=label,
-			<check if="{{ @sort['link']!='label' }}">
-				<true>desc">{ICON:sort}</true>
-				<false>
-					<check if="{{ @sort['direction']=='asc' }}">
-						<true>desc">{ICON:sort-alpha-asc}</true>
-						<false>asc">{ICON:sort-alpha-desc}</false>
-					</check>
-				</false>
+		<th><a href="{{@BASE}}/adminCP/archive/tags/edit/order=label,{{@sort.data.label}}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">
+			<check if="{{ @sort.link=='label' }}">
+				<true>{ICON:sort-alpha-{{@sort.data.label}}}</true>
+				<false>{ICON:sort}</false>
 			</check></a> {{@LN__Sort_Label}}
 		</th>
-		<th><a href="{{@BASE}}/adminCP/archive/tags/edit/order=group,
-			<check if="{{ @sort['link']!='group' }}">
-				<true>desc">{ICON:sort}</true>
-				<false>
-					<check if="{{ @sort['direction']=='asc' }}">
-						<true>desc">{ICON:sort-alpha-asc}</true>
-						<false>asc">{ICON:sort-alpha-desc}</false>
-					</check>
-				</false>
+		<th><a href="{{@BASE}}/adminCP/archive/tags/edit/order=group,{{@sort.data.group}}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">
+			<check if="{{ @sort.link=='group' }}">
+				<true>{ICON:sort-alpha-{{@sort.data.group}}}</true>
+				<false>{ICON:sort}</false>
 			</check></a> {{@LN__Sort_TagGroup}}
 		</th>
-		<th><a href="{{@BASE}}/adminCP/archive/tags/edit/order=count,
-			<check if="{{ @sort['link']!='count' }}">
-				<true>desc">{ICON:sort}</true>
-				<false>
-					<check if="{{ @sort['direction']=='asc' }}">
-						<true>desc">{ICON:sort-numeric-asc}</true>
-						<false>asc">{ICON:sort-numeric-desc}</false>
-					</check>
-				</false>
+		<th><a href="{{@BASE}}/adminCP/archive/tags/edit/order=count,{{@sort.data.count}}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">
+			<check if="{{ @sort.link=='count' }}">
+				<true>{ICON:sort-numeric-{{@sort.data.count}}}</true>
+				<false>{ICON:sort}</false>
 			</check></a> {{@LN__Sort_Count}}
 		</th>
 	</tr>
@@ -122,12 +91,12 @@
 <tbody>
 	<repeat group="{{ @taglist }}" value="{{ @row }}">
 	<tr>
-		<td><a href="{{@BASE}}/adminCP/archive/tags/edit/id={{ @row['tid'] }};returnpath=/adminCP/archive/tags/edit/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
-		<td><a href="{{@BASE}}/adminCP/archive/tags/edit/delete={{ @row['tid'] }}" class="deleteItem" title="#{{ @row['tid'] }}: {{ @row['label'] }}">{ICON:trash}</a></td>
-		<td>{{ @row['tid'] }}</td>
-		<td>{{ @row['label'] }}</td>
-		<td>{{ @row['group'] }}</td>
-		<td>{{ @row['count'] }}</td>
+		<td><a href="{{@BASE}}/adminCP/archive/tags/edit/id={{ @row.tid }};returnpath=/adminCP/archive/tags/edit/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
+		<td><a href="{{@BASE}}/adminCP/archive/tags/edit/delete={{ @row.tid }}" class="deleteItem" title="#{{ @row.tid }}: {{ @row.label }}">{ICON:trash}</a></td>
+		<td>{{ @row.tid }}</td>
+		<td>{{ @row.label }}</td>
+		<td>{{ @row.group }}</td>
+		<td>{{ @row.count }}</td>
 	</tr>
 	</repeat>
 </tbody>
@@ -136,3 +105,15 @@
 </true><false>
 {{@LN__NoEntries}}
 </false></check>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	$("#tag-select").tokenInput("{{$BASE}}/adminCP/ajax/archive/search",{
+		method: "post",
+		queryParam: "tagname",
+		hintText: "{{@LN__Token_StartTyping}} ...",
+		noResultsText: "{{@LN__Token_NoMatches}}.",
+		tokenLimit: 1
+	});
+});
+</script>

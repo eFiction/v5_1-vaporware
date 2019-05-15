@@ -569,7 +569,8 @@ return array(
 'CannotDeleteUsedElement'	=> 'Cannot delete an element that is currently being used.',
 'ElementDeleted'	=> 'Element deleted',
 'FailedDelete'		=> 'Failed to delete element',
-'AddContestStory'	=> 'Add story to this contest',
+'AddContestStory'		=> 'Add story to this contest',
+'AddContestCollection'	=> 'Add collection/series to this contest',
 'ElementAdded'		=> 'Element added',
 'FailedAdd'			=> 'Failed to add element',
 
