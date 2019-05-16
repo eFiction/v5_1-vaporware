@@ -323,5 +323,9 @@ class Story extends Base
 		$this->f3->set('renderData', $taglist);
 		return $this->render('story/block.tagcloud.html');
 	}
-	
+
+	public function blockContests($data)
+	{
+		return "<pre>".print_r($data,1)."</pre>";
+	}
 }

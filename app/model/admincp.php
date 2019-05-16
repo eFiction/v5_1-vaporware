@@ -696,10 +696,6 @@ class AdminCP extends Controlpanel {
 						LEFT JOIN `tbl_characters`Ch ON ( RelC.relid = Ch.charid AND RelC.type='CH' )
 						LEFT JOIN `tbl_categories`Cat ON ( RelC.relid = Cat.cid AND RelC.type='CA' )
 					WHERE C.conid = :conid";
-					/*
-					--GROUP_CONCAT(S.sid,',',S.title SEPARATOR '||') as story_list,
-					--LEFT JOIN `tbl_stories`S ON ( RelC.relid = S.sid AND RelC.type='ST' )
-					*/
 
 		$data = $this->exec($sql, [":conid" => $conid ]);
 		if (sizeof($data)==1) 
@@ -711,7 +707,6 @@ class AdminCP extends Controlpanel {
 				? $this->timeToUser($data[0]['date_close'], $this->config['date_format'])
 				: "";
 
-			//$data[0]['story_list']		 = parent::cleanResult($data[0]['story_list']);
 			$data[0]['pre']['tag']		 = $this->jsonPrepop($data[0]['tag_list']);
 			$data[0]['pre']['character'] = $this->jsonPrepop($data[0]['character_list']);
 			$data[0]['pre']['category']	 = $this->jsonPrepop($data[0]['category_list']);
@@ -776,6 +771,9 @@ class AdminCP extends Controlpanel {
 
 		$this->rebuildContestCache($contest->conid);
 
+		// drop contest block cache
+		\Cache::instance()->set('blockContestsCache', "");
+		
 		return $i;
 	}
 	
@@ -872,6 +870,8 @@ class AdminCP extends Controlpanel {
 				$stories->type  = 'ST';
 				$stories->save();
 				$_SESSION['lastAction'] = [ "addResult" => 1 ];
+				// drop contest block cache
+				\Cache::instance()->set('blockContestsCache', "");
 			}
 			else $_SESSION['lastAction'] = [ "addResult" => 0 ];
 		}
@@ -886,6 +886,8 @@ class AdminCP extends Controlpanel {
 				$collections->type  = 'CO';
 				$collections->save();
 				$_SESSION['lastAction'] = [ "addResult" => 1 ];
+				// drop contest block cache
+				\Cache::instance()->set('blockContestsCache', "");
 			}
 			else $_SESSION['lastAction'] = [ "addResult" => 0 ];
 		}
@@ -896,6 +898,8 @@ class AdminCP extends Controlpanel {
 		$link=new \DB\SQL\Mapper($this->db, $this->prefix.'contest_relations');
 		$link->load(array("conid=? AND lid=?",$conID, $linkID));
 		$_SESSION['lastAction'] = [ "deleteResult" => $link->erase() ];
+		// drop contest block cache
+		\Cache::instance()->set('blockContestsCache', "");
 	}
 
 	public function contestDelete(int $conid)
@@ -903,6 +907,8 @@ class AdminCP extends Controlpanel {
 		$contest=new \DB\SQL\Mapper($this->db, $this->prefix.'contests');
 		$contest->load(array('conid=?',$conid));
 		$_SESSION['lastAction'] = [ "deleteResult" => $contest->erase() ];
+		// drop contest block cache
+		\Cache::instance()->set('blockContestsCache', "");
 	}
 
 	public function featuredList ( int $page, array $sort, string &$status ): array
@@ -1335,6 +1341,11 @@ class AdminCP extends Controlpanel {
 				],
 				"id = {$item['id']}"
 		);
+	}
+	
+	public function pollList(int $page, array $sort) : array
+	{
+		
 	}
 	
 	public function ratingAdd($rating)

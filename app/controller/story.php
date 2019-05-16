@@ -725,6 +725,15 @@ class Story extends Base
 			// Wow, we are really getting a tag cloud, all eyes to the sky
 			return $this->template->blockTagcloud($data);
 		}
+		elseif ( $select[0] == "contest" )
+		{
+			// break if module not enabled
+			if ( empty(\Config::getPublic('optional_modules')['contests']) ) return "";
+			// get the data
+			$data = $this->model->blockContests( ($select[1]??FALSE), ($select[2]??FALSE) );
+			
+			return $this->template->blockContests($data);
+		}
 		/*
 		elseif ( $select[1] == "fame" )
 		{

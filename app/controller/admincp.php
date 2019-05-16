@@ -249,7 +249,7 @@ class AdminCP extends Base
 		
 		// search/browse
 		$allow_order = array (
-			"id"		=>	"id",
+			"id"		=>	"lid",
 			"title"		=>	"title",
 			"validated"	=>	"validated",
 			"completed"	=>	"completed",
@@ -826,7 +826,66 @@ class AdminCP extends Base
 
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 		
-	}
+		if ( isset($params['delete']) )
+		{
+			//$this->model->characterDelete( (int)$params['delete'] );
+			//$f3->reroute('/adminCP/archive/characters', false);
+		}
+		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
+		{
+			if ( isset($_POST['form_data']) )
+			{
+				/*
+				$f3->set
+				(
+					'form_changes',
+					$this->model->characterSave
+					(
+						$params['id'],
+						$f3->get('POST.form_data')
+					)
+				);
+				*/
+			}
+			elseif ( isset($_POST['newCharacter']) )
+			{
+				//$newID = $this->model->characterAdd( $f3->get('POST.newCharacter') );
+				//$f3->reroute('/adminCP/archive/characters/id='.$newID, false);
+			}
+		}
+		
+		if( isset ($params['id']) )
+		{
+			//$data = $this->model->characterLoad($params['id']);
+			//return $this->template->characterEdit($data, @$params['returnpath']);
+		}
+
+		// search/browse
+		$allow_order = array (
+				"id"		=>	"id",
+				"open"		=>	"start_date",
+				"close"		=>	"end_date",
+		);
+
+		// page will always be an integer > 0
+		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
+
+		// sort order
+		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "id";
+		$sort["order"]		= $allow_order[$sort["link"]];
+		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
+		// sort icons
+		$sort['data']['id'] = 	 ( $sort['direction']=="desc" OR $sort['link']!='id' ) ? "asc" : "desc";
+		$sort['data']['open'] =  ( $sort['direction']=="desc" OR $sort['link']!='open' ) ? "asc" : "desc";
+		$sort['data']['close'] = ( $sort['direction']=="desc" OR $sort['link']!='close' ) ? "asc" : "desc";
+
+		return $this->template->pollList
+				(
+					$this->model->pollList($page, $sort),
+					$sort,
+					$page
+				);
+		}
 	
 	protected function homeShoutbox(\Base $f3, array $params)//: void
 	{
@@ -858,6 +917,7 @@ class AdminCP extends Base
 				$f3->reroute("/adminCP/home/shoutbox/order={$sort['order']},{$sort['direction']}/page={$page}", false);
 				exit;
 			}
+			// old
 			else $f3->set('form_error', "__failedDelete");
 		}
 		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
@@ -887,6 +947,7 @@ class AdminCP extends Base
 				$this->buffer( $this->template->shoutEdit($data, $sort, $page) );
 				return;
 			}
+			// old
 			else $f3->set('form_error', "__failedLoad");
 		}
 		

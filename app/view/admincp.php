@@ -324,6 +324,11 @@ class AdminCP extends Base
 		return "Edit";
 	}
 	
+	public function pollList(array $data, array $sort, int $page)
+	{
+		
+	}
+	
 	public function shoutEdit(array $data, array $sort, $page)
 	{
 		$this->f3->set('data', $data);

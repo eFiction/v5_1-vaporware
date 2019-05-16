@@ -252,8 +252,8 @@ class Story extends Base
 		$sql = "SELECT SQL_CALC_FOUND_ROWS
 					C.conid, C.title, C.summary,
                     IF(C.active='date',IF(C.date_open<NOW(),IF(C.date_close>NOW() OR C.date_close IS NULL,'active','closed'),'preparing'),C.active) as active,
-                    IF(C.votable='date',IF(C.date_close<NOW() OR C.date_close IS NULL,IF(C.vote_closed>NOW() OR C.vote_closed IS NULL,'active','closed'),'preparing'),C.votable) as votable,
-					UNIX_TIMESTAMP(C.date_open) as date_open, UNIX_TIMESTAMP(C.date_close) as date_close, UNIX_TIMESTAMP(C.vote_closed) as vote_closed, 
+                    IF(C.votable='date',IF(C.date_close<NOW() OR C.date_close IS NULL,IF(C.vote_close>NOW() OR C.vote_close IS NULL,'active','closed'),'preparing'),C.votable) as votable,
+					UNIX_TIMESTAMP(C.date_open) as date_open, UNIX_TIMESTAMP(C.date_close) as date_close, UNIX_TIMESTAMP(C.vote_close) as vote_close, 
 					C.cache_tags, C.cache_characters, C.cache_categories, C.cache_stories,
 					U.username, COUNT(R.lid) as count
 				FROM `tbl_contests`C
@@ -820,11 +820,18 @@ class Story extends Base
 	
 	public function blockTagcloud($items)
 	{
-		return $this->exec('SELECT T.tid, T.label, T.count
-				FROM `tbl_tags`T
-			WHERE T.tgid = 1 AND T.count > 0
-			ORDER BY T.count DESC
-			LIMIT 0, '.(int)$items);
+		if ( "" == $data = \Cache::instance()->get('blockTagcloudCache') )
+		{
+			$data = $this->exec('SELECT T.tid, T.label, T.count
+					FROM `tbl_tags`T
+				WHERE T.tgid = 1 AND T.count > 0
+				ORDER BY T.count DESC
+				LIMIT 0, '.(int)$items);
+			// cache the tagcloud for 15 minutes
+			// this cache is not deleted anywhere and has to expire over time
+			\Cache::instance()->set('blockTagcloudCache', $data, 900);
+		}
+		return $data;
 	}
 	
 	public function blockRecommendedStory(int $items=1, $order=FALSE)
@@ -851,6 +858,60 @@ class Story extends Base
 				WHERE F.type='ST' AND (F.status=1 OR ( F.status IS NULL AND F.start < NOW() AND F.end > NOW() ))
 			ORDER BY {$sort} {$limit}");
 		// 1 = aktuell, 2, ehemals
+	}
+	
+	public function blockContests( $items=FALSE, $order=FALSE ): array
+	{
+		if ( "" == $data = \Cache::instance()->get('blockContestsCache') )
+		{
+			// no other sort for now
+			$sort = ( $order == "random" ) ? 'RAND()' : 'RAND()';
+			// because the results are being cached, there can be no limit on this query
+			
+			$open_sql = 
+				"SELECT SQL_CALC_FOUND_ROWS
+						C.conid, C.title, 
+						C.active, C.votable,
+						UNIX_TIMESTAMP(C.date_open) as date_open, UNIX_TIMESTAMP(C.date_close) as date_close, UNIX_TIMESTAMP(C.vote_close) as vote_close, 
+						-- C.cache_tags, C.cache_characters, 
+						U.username, COUNT(R.lid) as count
+					FROM `tbl_contests`C
+						LEFT JOIN `tbl_users`U ON ( C.uid = U.uid )
+						LEFT JOIN `tbl_contest_relations`R ON ( C.conid = R.conid AND ( R.type='ST' OR R.type='CO' ) )
+					WHERE C.concealed = 0 AND ( C.active='active' OR ( C.active='date' AND C.date_open<NOW() AND C.date_close>NOW() ) )
+					GROUP BY C.conid
+					ORDER BY {$sort}";
+			
+			$votable_sql = 
+				"SELECT SQL_CALC_FOUND_ROWS
+						C.conid, C.title, 
+						C.active, C.votable,
+						UNIX_TIMESTAMP(C.date_open) as date_open, UNIX_TIMESTAMP(C.date_close) as date_close, UNIX_TIMESTAMP(C.vote_close) as vote_close, 
+						-- C.cache_tags, C.cache_characters, 
+						U.username, COUNT(R.lid) as count
+					FROM `tbl_contests`C
+						LEFT JOIN `tbl_users`U ON ( C.uid = U.uid )
+						LEFT JOIN `tbl_contest_relations`R ON ( C.conid = R.conid AND ( R.type='ST' OR R.type='CO' ) )
+					WHERE C.concealed = 0 AND C.votable='active' OR ( C.votable='date' AND C.date_close<NOW() AND C.vote_close>NOW()  )
+					GROUP BY C.conid
+					ORDER BY {$sort}";
+			
+			$data = [ "open" => $this->exec($open_sql), "votable" => $this->exec($votable_sql)];
+			\Cache::instance()->set('blockContestsCache', $data);
+		}
+		elseif ( $order == "random" )
+		{
+			shuffle( $data['open'] );
+			shuffle( $data['votable'] );
+		}
+		
+		// $data now holds the requested results
+		
+		// apply item limit if requested
+		if ( $items AND 0<(int)$items )
+			return [ "open" => array_slice($data['open'], 0, $items), "votable" => array_slice($data['votable'], 0, $items) ];
+		else
+			return $data;
 	}
 	
 	public function printEPub($id)
