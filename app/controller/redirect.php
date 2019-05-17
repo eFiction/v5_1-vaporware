@@ -53,7 +53,7 @@ class Redirect extends Base
 		}
 		elseif ( $params['a']=="browse" )
 		{
-			print_r($old_data);
+			//print_r($old_data);
 			// Browse is best handled by a search type
 			$redirect = "/story/search";
 
@@ -101,7 +101,7 @@ class Redirect extends Base
 		elseif ( $params['a']=="viewpage" )
 		{
 			$page = explode("=",$params['b']);
-			$redirect = "/page/".@$page[1];
+			$redirect = "/home/page/".@$page[1];
 		}
 		
 		if ( isset($COOKIE['redirect_seen'] ) ) $f3->reroute($redirect, false);

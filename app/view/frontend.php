@@ -79,7 +79,8 @@ class Frontend extends Template
 			}
 			elseif ( $match[1] == "PAGE" )
 			{
-				$page = \View\Page::load($match[2]);
+				// *old&ugly
+				$page = \View\Home::loadPage($match[2]);
 				$tpl = str_replace ( $match[0], $page, $tpl );
 			}
 			else $tpl = str_replace ( $match[0], "*missing block: {$match[2]}*", $tpl );

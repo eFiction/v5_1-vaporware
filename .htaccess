@@ -8,7 +8,7 @@ RewriteEngine On
 # RewriteBase "/"
 
 # rewrite old links v2
-RewriteCond %{REQUEST_URI}~%{QUERY_STRING} ^(.*?\/*)?(modules/challenges/)?(browse|viewpage|viewuser|viewstory|viewseries|reviews|challenges|news)\.php~?(.+)$ [NC]
+RewriteCond %{REQUEST_URI}~%{QUERY_STRING} ^(.*?\/*)?(modules/challenges/)?(contact|browse|viewpage|viewuser|viewstory|viewseries|reviews|challenges|news)\.php~?(.+)$ [NC]
 RewriteRule ^(.+).php$ %1/redirect/%3/%4 [R=301,L,NE]
 
 # F3 generic rewrite

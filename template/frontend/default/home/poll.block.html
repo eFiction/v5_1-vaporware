@@ -1,0 +1,17 @@
+<div class="news-box">
+	<h5><a href='{{@BASE}}/home/polls'>{{@LN__PollBox}}</a></h5>
+	<repeat group="{{ @pollItems }}" value="{{ @poll }}" counter="{{ @ctr }}">
+		<a href='{{@BASE}}/home/polls/id={{ @poll.id }}'>{{ @poll.question }}</a><br />
+		{LN__*PollOpen}: {{ date(@CONFIG.datetime_format, @poll.start_date) }}<br />
+		<check if="{{ @poll.end_date==NULL }}"">
+			<true>
+				{@LN__*PollManual}
+			</true>
+			<false>
+				{LN__*PollClose}: {{ date(@CONFIG.datetime_format, @poll.end_date) }}
+			</false>
+		</check>
+		<br />
+	</repeat>
+	<a class="button is-light" href='{{@BASE}}/home/polls'>{{@LN__AllPolls}}</a>
+</div>

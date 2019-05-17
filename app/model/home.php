@@ -1,13 +1,17 @@
 <?php
-
 namespace Model;
 
-class News extends Base
+class Home extends Base
 {
-	public function loadOverview($items)
+	public function loadPage(string $page)
 	{
-		$pos = (int)\Base::instance()->get('paginate.page') - 1;
-		
+		$data = $this->exec( "SELECT content, title FROM `tbl_textblocks`T WHERE T.label= :label ;" , array ( ":label" => $page ) );
+		return ($data[0] ?? []);
+	}
+	
+	public function loadNewsOverview($items)
+	{
+		$pos = (int)$this->f3->get('paginate.page') - 1;
 		
 		$sql = "SELECT SQL_CALC_FOUND_ROWS N.nid, N.headline, N.newstext, N.comments, UNIX_TIMESTAMP(N.datetime) as timestamp, 
 			U.uid,U.username,
@@ -24,11 +28,11 @@ class News extends Base
 	
 	public function listNews($items=5)
 	{
-		$data = $this->loadOverview($items);
+		$data = $this->loadNewsOverview($items);
 
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
-			"/news",
+			"/home/news",
 			$items
 		);
 		return $data;
@@ -71,5 +75,18 @@ class News extends Base
 		];
 		return $this->exec($sql, $bind);
 	}
-	
+
+	public function loadPolls(): array
+	{
+		$sql = "SELECT SQL_CALC_FOUND_ROWS P.poll_id as id, P.question, UNIX_TIMESTAMP(P.start_date) as start_date, UNIX_TIMESTAMP(P.end_date) as end_date,
+					U.uid, U.username
+				FROM `tbl_poll`P
+					LEFT JOIN `tbl_users`U ON ( P.uid = U.uid )
+				WHERE P.start_date IS NOT NULL AND ( P.end_date IS NULL OR P.end_date>NOW() )
+				";
+
+		$data = $this->exec($sql);
+			
+		return $data;
+	}
 }

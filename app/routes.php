@@ -10,7 +10,10 @@
 
 if ( FALSE == $config->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
 {
-	$f3->route( [ 'GET /', 'GET /page/*', 'GET /*' ], 'Controller\Page->getMain' );
+	$f3->route(
+		[ 'GET /', 'GET /*', 	// catch-all
+		  'GET|POST /home', 'GET /home/@module', 'GET|POST /home/@module/*'
+		],  'Controller\Home->index' );
 
 	// Load routes if not in maintenance
 	$f3->route(
@@ -43,15 +46,7 @@ if ( FALSE == $config->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
 	  [ 'GET /authors', 'GET /authors/@id', 'GET /authors/@id/*' ],
 		'Controller\Authors->index' );
 
-	$f3->route(
-	  [ 'GET|POST /news', 'GET /news/*' ],
-		'Controller\News->index' );
-	$f3->route(
-	  [ 'POST /news/*' ],
-		'Controller\News->save' );
-
 	$f3->route( 'GET /shoutbox/@action/@sub', 'Controller\Blocks->shoutbox' );
-
 
 	// Ajax routes
 	$f3->route( 
@@ -62,7 +57,7 @@ if ( FALSE == $config->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
 	$f3->route( 'POST /story/ajax/@segment [ajax]', 'Controller\Story->ajax' );
 }
 else
-	$f3->route( [ 'GET /', 'GET /page/*', 'GET /*' ], 'Controller\Page->maintenance' );
+	$f3->route( [ 'GET /', 'GET /page/*', 'GET /*' ], 'Controller\Home->maintenance' );
 
 // privacy needs to be available at all times
 $f3->route( [ 'GET /privacy', 'GET /privacy/*' ], 'Controller\Privacy->index' );

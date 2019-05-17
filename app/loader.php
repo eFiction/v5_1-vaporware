@@ -12,7 +12,7 @@ $this->modules =
 						"menu"			=> [ "\\Controller\Blocks", "buildMenu" ],
 						"tagcloud"		=> [ "\\Controller\Blocks", "tagcloud" ],
 						"story"			=> [ "\\Controller\Story", "storyBlocks" ],
-						"news"			=> [ "\\Controller\News", "blocks" ],
+						"home"			=> [ "\\Controller\Home", "blocks" ],
 						"categories"	=> [ "\\Controller\Blocks", "categories" ],
 						"profile"		=> [ "\\Controller\Blocks", "authorProfile" ],
 					];

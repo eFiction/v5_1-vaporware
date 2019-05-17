@@ -761,6 +761,10 @@ return array(
 'Button_reviewChapter'	=> 'Review zu diesem Kapitel schreiben',
 'Button_writeComment'	=> 'Kommentar schreiben',
 
+// Polls
+'PollBox'		=> 'Polls',
+'AllPolls'		=> 'Show all polls',
+
 // Archiv News'
 'News_Headline'	=> 'Schlagzeile',
 'News_DateTimeExplain' => 'Artikel werden zur oben angegeben Zeit sichtbar',
