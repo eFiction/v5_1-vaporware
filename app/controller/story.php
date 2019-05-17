@@ -658,12 +658,8 @@ class Story extends Base
 
 		if ( $select[0] == "stats" )
 		{
-			if ( FALSE === $data = \Cache::instance()->get('stats') )
-			{
-				$data = $this->model->blockStats();
-				\Cache::instance()->set('stats', $data, 3600);
-			}
-
+			// $data is cached for 1 hour
+			$data = $this->model->blockStats();
 			return $this->template->archiveStats($data);
 		}
 		elseif ( $select[0] == "new" )
@@ -677,6 +673,7 @@ class Story extends Base
 		elseif ( $select[0] == "random" )
 		{
 			$items = (isset($select[1]) AND is_numeric($select[1])) ? $select[1] : 1;
+			// cached for 1 minute
 			$data = $this->model->blockRandomStory($items);
 			
 			return $this->template->blockStory("random", $data);

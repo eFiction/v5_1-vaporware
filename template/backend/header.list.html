@@ -1,0 +1,50 @@
+<check if="{{!empty(@returnpath)}}"><a href="{{@BASE}}{{@returnpath}}">{ICON:arrow-left} {{@LN__ReturnToOverview}}</a></check>
+
+<check if="{{ isset(@addResult) }}">
+	<!-- error notification -->
+	<check if="{{ @addResult===0 }}">
+		<div class="notification is-warning">
+			<button class="delete"></button>
+			{{@LN__FailedAdd}}
+		</div>
+	</check>
+	<!-- END: error notification -->
+	<!-- success notification -->
+	<check if="{{ @addResult===1 }}">
+		<div class="notification is-success">
+			<button class="delete"></button>
+			{{@LN__ElementAdded}}
+		</div>
+	</check>
+	<!-- END: success notification -->
+</check>
+
+<check if="{{ isset(@deleteResult) }}">
+	<!-- error notification -->
+	<check if="{{ @deleteResult===0 }}">
+		<div class="notification is-warning">
+			<button class="delete"></button>
+			{{@LN__FailedDelete}}
+		</div>
+	</check>
+	<!-- END: error notification -->
+	<!-- success notification -->
+	<check if="{{ @deleteResult===1 }}">
+		<div class="notification is-success">
+			<button class="delete"></button>
+			{{@LN__ElementDeleted}}
+		</div>
+	</check>
+	<!-- END: success notification -->
+</check>
+
+<check if="{{ isset(@saveResult) }}">
+	<!-- success notification -->
+	<check if="{{ @saveResult>0 }}">
+		<div class="notification is-success">
+			<button class="delete"></button>
+			{{@LN__Changes_saved}}
+		</div>
+	</check>
+	<!-- END: success notification -->
+</check>

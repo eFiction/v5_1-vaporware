@@ -3,6 +3,16 @@ namespace View;
 
 class AdminCP extends Base
 {
+	public function __construct()
+	{
+		parent::__construct();
+		
+		if( isset($_SESSION['lastAction']) )
+		{
+			$this->f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
+			unset($_SESSION['lastAction']);
+		}
+	}
 
 	public function menuShow($menu="")
 	{
@@ -122,12 +132,6 @@ class AdminCP extends Base
 	{
 		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 
-		if( isset($_SESSION['lastAction']) )
-		{
-			$this->f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
-			unset($_SESSION['lastAction']);
-		}
-		
 		$this->f3->set('data', $data);
 		$this->f3->set('sort', $sort);
 		$this->f3->set('returnpath', $returnpath);
@@ -324,9 +328,12 @@ class AdminCP extends Base
 		return "Edit";
 	}
 	
-	public function pollList(array $data, array $sort, int $page)
+	public function pollList(array $data, array $sort): string
 	{
-		
+		$this->f3->set('data', $data);
+		$this->f3->set('sort', $sort);
+
+		return $this->render('home/poll.list.html');
 	}
 	
 	public function shoutEdit(array $data, array $sort, $page)

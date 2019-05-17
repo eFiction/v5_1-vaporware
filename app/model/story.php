@@ -773,28 +773,32 @@ class Story extends Base
 
 	public function blockStats()
 	{
-		
-		$statSQL = [
-			"SET @users = (SELECT COUNT(*) FROM `tbl_users`U WHERE U.groups > 0);",
-			// more precise stats, only counting authors with actual stories
-			"SET @authors = ( SELECT COUNT(DISTINCT rSA.aid) FROM `tbl_stories_authors`rSA INNER JOIN `tbl_stories`S ON ( S.sid = rSA.sid AND S.validated >= 20 AND S.completed >= 6 ) );",
-			//"SET @authors = (SELECT COUNT(*) FROM `tbl_users`U WHERE ( U.groups & 4 ) );",
-			"SET @reviews = (SELECT COUNT(*) FROM `tbl_feedback`F WHERE F.type='ST');",
-			"SET @stories = (SELECT COUNT(DISTINCT sid) FROM `tbl_stories`S WHERE S.validated >= 30 );",
-			//"SET @chapters = (SELECT COUNT(DISTINCT chapid) FROM `tbl_chapters`C INNER JOIN `tbl_stories`S ON ( C.sid=S.sid AND S.validated >= 30 AND C.validated >= 20 ) );",
-			// Count chapters from validated stories that are at least w.i.p.
-			"SET @chapters = (SELECT SUM(S.chapters) FROM `tbl_stories`S WHERE S.validated >= 30 AND S.completed >= 6 );",
-			//"SET @words = (SELECT SUM(C.wordcount) FROM `tbl_chapters`C INNER JOIN `tbl_stories`S ON ( C.sid=S.sid AND S.validated >= 30 AND C.validated >= 30 ) );",
-			// Count words from validated stories that are at least w.i.p.
-			"SET @words = (SELECT SUM(S.wordcount) FROM `tbl_stories`S WHERE S.validated >= 30 AND S.completed >= 6 );",
-			"SET @newmember = (SELECT CONCAT_WS(',', U.uid, U.username) FROM `tbl_users`U WHERE U.groups>0 ORDER BY U.registered DESC LIMIT 1);",
-			"SELECT @users as users, @authors as authors, @reviews as reviews, @stories as stories, @chapters as chapters, @words as words, @newmember as newmember;",
-		];
-		$statsData = $this->exec($statSQL)[0];
-		
-		foreach($statsData as $statKey => $statValue)
+		if ( "" == $stats = \Cache::instance()->get('statsCache') )
 		{
-			$stats[$statKey] = ($statKey=="newmember") ? explode(",",$statValue) : $statValue;
+			$statSQL = [
+				"SET @users = (SELECT COUNT(*) FROM `tbl_users`U WHERE U.groups > 0);",
+				// more precise stats, only counting authors with actual stories
+				"SET @authors = ( SELECT COUNT(DISTINCT rSA.aid) FROM `tbl_stories_authors`rSA INNER JOIN `tbl_stories`S ON ( S.sid = rSA.sid AND S.validated >= 20 AND S.completed >= 6 ) );",
+				//"SET @authors = (SELECT COUNT(*) FROM `tbl_users`U WHERE ( U.groups & 4 ) );",
+				"SET @reviews = (SELECT COUNT(*) FROM `tbl_feedback`F WHERE F.type='ST');",
+				"SET @stories = (SELECT COUNT(DISTINCT sid) FROM `tbl_stories`S WHERE S.validated >= 30 );",
+				//"SET @chapters = (SELECT COUNT(DISTINCT chapid) FROM `tbl_chapters`C INNER JOIN `tbl_stories`S ON ( C.sid=S.sid AND S.validated >= 30 AND C.validated >= 20 ) );",
+				// Count chapters from validated stories that are at least w.i.p.
+				"SET @chapters = (SELECT SUM(S.chapters) FROM `tbl_stories`S WHERE S.validated >= 30 AND S.completed >= 6 );",
+				//"SET @words = (SELECT SUM(C.wordcount) FROM `tbl_chapters`C INNER JOIN `tbl_stories`S ON ( C.sid=S.sid AND S.validated >= 30 AND C.validated >= 30 ) );",
+				// Count words from validated stories that are at least w.i.p.
+				"SET @words = (SELECT SUM(S.wordcount) FROM `tbl_stories`S WHERE S.validated >= 30 AND S.completed >= 6 );",
+				"SET @newmember = (SELECT CONCAT_WS(',', U.uid, U.username) FROM `tbl_users`U WHERE U.groups>0 ORDER BY U.registered DESC LIMIT 1);",
+				"SELECT @users as users, @authors as authors, @reviews as reviews, @stories as stories, @chapters as chapters, @words as words, @newmember as newmember;",
+			];
+			$statsData = $this->exec($statSQL)[0];
+			
+			foreach($statsData as $statKey => $statValue)
+			{
+				$stats[$statKey] = ($statKey=="newmember") ? explode(",",$statValue) : $statValue;
+			}
+			// Cache stats for 1 hour
+			\Cache::instance()->set('statsCache', $stats, 3600);
 		}
 
 		return $stats;
@@ -812,10 +816,17 @@ class Story extends Base
 	
 	public function blockRandomStory($items=1)
 	{
-		return $this->exec('SELECT S.title, S.sid, S.summary, S.cache_authors, S.cache_rating, S.cache_categories, S.cache_tags
+		if ( "" == $data = \Cache::instance()->get('randomStoryCache') )
+		{
+			$data = $this->exec('SELECT S.title, S.sid, S.summary, S.cache_authors, S.cache_rating, S.cache_categories, S.cache_tags
 				FROM `tbl_stories`S WHERE S.validated >= 30 AND S.completed >= 6
 			ORDER BY RAND() 
 			LIMIT '.(int)$items);
+			// Cache random story for 1 minute
+			// this cache is not deleted anywhere and has to expire
+			\Cache::instance()->set('randomStoryCache', $data, 60);
+		}
+		return $data;
 	}
 	
 	public function blockTagcloud($items)
@@ -828,7 +839,7 @@ class Story extends Base
 				ORDER BY T.count DESC
 				LIMIT 0, '.(int)$items);
 			// cache the tagcloud for 15 minutes
-			// this cache is not deleted anywhere and has to expire over time
+			// this cache is not deleted anywhere and has to expire
 			\Cache::instance()->set('blockTagcloudCache', $data, 900);
 		}
 		return $data;

@@ -576,6 +576,8 @@ return array(
 
 'AdminMenu_Recommendations'	=> 'Recommendations',
 
+'CreateNewPoll'		=> 'Create a new poll',
+
 // Config explain
 // archive_general
 	'CFG_stories_per_page'		=> 'Stories per page in the Archive.',

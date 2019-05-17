@@ -163,13 +163,15 @@ class AdminCP extends Base
 			{
 				$f3->set
 				(
-					'form_changes',
+					'saveResult',
 					$this->model->contestSave
 					(
 						$params['id'],
 						$f3->get('POST.form_data')
 					)
 				);
+				
+				echo $f3->get('saveResult');
 			}
 
 			// add a story to an existing contest
@@ -667,7 +669,7 @@ class AdminCP extends Base
 				$this->homeShoutbox( $f3, $params );
 				break;
 			case "polls":
-				$this->homePolls( $f3, $params );
+				$this->buffer( $this->homePolls( $f3, $params ) );
 				break;
 			case "stories":
 				$this->homeStories($f3, $params);
@@ -847,7 +849,7 @@ class AdminCP extends Base
 				);
 				*/
 			}
-			elseif ( isset($_POST['newCharacter']) )
+			elseif ( isset($_POST['newPoll']) )
 			{
 				//$newID = $this->model->characterAdd( $f3->get('POST.newCharacter') );
 				//$f3->reroute('/adminCP/archive/characters/id='.$newID, false);
@@ -856,7 +858,9 @@ class AdminCP extends Base
 		
 		if( isset ($params['id']) )
 		{
-			//$data = $this->model->characterLoad($params['id']);
+			$data = $this->model->pollLoad((int)$params['id']);
+			if ( sizeof($data)==0 ) $f3->reroute('/adminCP/home/polls', false);
+			return print_r($data,1);
 			//return $this->template->characterEdit($data, @$params['returnpath']);
 		}
 
@@ -882,8 +886,7 @@ class AdminCP extends Base
 		return $this->template->pollList
 				(
 					$this->model->pollList($page, $sort),
-					$sort,
-					$page
+					$sort
 				);
 		}
 	

@@ -772,7 +772,7 @@ class AdminCP extends Controlpanel {
 		$this->rebuildContestCache($contest->conid);
 
 		// drop contest block cache
-		\Cache::instance()->set('blockContestsCache', "");
+		\Cache::instance()->clear('blockContestsCache');
 		
 		return $i;
 	}
@@ -869,11 +869,11 @@ class AdminCP extends Controlpanel {
 				$stories->relid = $entryID;
 				$stories->type  = 'ST';
 				$stories->save();
-				$_SESSION['lastAction'] = [ "addResult" => 1 ];
+				$addResult = 1;
 				// drop contest block cache
-				\Cache::instance()->set('blockContestsCache', "");
+				\Cache::instance()->clear('blockContestsCache');
 			}
-			else $_SESSION['lastAction'] = [ "addResult" => 0 ];
+			else $addResult = 0;
 		}
 		elseif ( $type == "C" )
 		{
@@ -885,21 +885,23 @@ class AdminCP extends Controlpanel {
 				$collections->relid = $entryID;
 				$collections->type  = 'CO';
 				$collections->save();
-				$_SESSION['lastAction'] = [ "addResult" => 1 ];
+				$addResult = 1;
 				// drop contest block cache
-				\Cache::instance()->set('blockContestsCache', "");
+				\Cache::instance()->clear('blockContestsCache');
 			}
-			else $_SESSION['lastAction'] = [ "addResult" => 0 ];
+			else $addResult = 0;
 		}
+		$this->f3->set("addResult",$addResult);
 	}
 
 	public function contestEntryRemove(int $conID, int $linkID)
 	{
 		$link=new \DB\SQL\Mapper($this->db, $this->prefix.'contest_relations');
 		$link->load(array("conid=? AND lid=?",$conID, $linkID));
+		// show result after reload
 		$_SESSION['lastAction'] = [ "deleteResult" => $link->erase() ];
 		// drop contest block cache
-		\Cache::instance()->set('blockContestsCache', "");
+		\Cache::instance()->clear('blockContestsCache');
 	}
 
 	public function contestDelete(int $conid)
@@ -908,7 +910,7 @@ class AdminCP extends Controlpanel {
 		$contest->load(array('conid=?',$conid));
 		$_SESSION['lastAction'] = [ "deleteResult" => $contest->erase() ];
 		// drop contest block cache
-		\Cache::instance()->set('blockContestsCache', "");
+		\Cache::instance()->clear('blockContestsCache');
 	}
 
 	public function featuredList ( int $page, array $sort, string &$status ): array
@@ -1345,7 +1347,47 @@ class AdminCP extends Controlpanel {
 	
 	public function pollList(int $page, array $sort) : array
 	{
+		$limit = 15;
+		$pos = $page - 1;
+
+		$sql = "SELECT SQL_CALC_FOUND_ROWS P.poll_id as id, P.question, UNIX_TIMESTAMP(P.start_date) as start_date, UNIX_TIMESTAMP(P.end_date) as end_date,
+					U.uid, U.username
+				FROM `tbl_poll`P
+					LEFT JOIN `tbl_users`U ON ( P.uid = U.uid )
+				ORDER BY {$sort['order']} {$sort['direction']}
+				LIMIT ".(max(0,$pos*$limit)).",".$limit;
+
+		$data = $this->exec($sql);
+
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/adminCP/home/polls/order={$sort['link']},{$sort['direction']}",
+			$limit
+		);
+
+		return $data;
+	}
+	
+	public function pollLoad(int $pollID): array
+	{
+		$sql = "SELECT P.poll_id as id, P.question, P.options, P.results, P.cache, UNIX_TIMESTAMP(P.start_date) as start_date, UNIX_TIMESTAMP(P.end_date) as end_date,
+					U.uid, U.username
+				FROM `tbl_poll`P
+					LEFT JOIN `tbl_poll_votes`V ON ( P.poll_id = V.poll_id )
+					LEFT JOIN `tbl_users`U ON ( P.uid = U.uid )
+				WHERE P.poll_id = :pollid
+				GROUP BY V.option;";
+
+		if ( NULL === $data = @$this->exec($sql, [":pollid" => $pollID])[0] )
+			return [];
+
+		// build a cache array
+		if ( $data['cache']==NULL )
+			$data['cache'] = $this->pollBuildCache($data);
+		// build the result array from the cache field
+		else $data['cache'] = json_decode($data['cache'],TRUE);
 		
+		return $data;
 	}
 	
 	public function ratingAdd($rating)

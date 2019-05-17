@@ -285,6 +285,41 @@ class Base extends \Prefab {
 			'lastPage'  => $last_page,
 		]);
 	}
+	
+	public function pollBuildCache(array $data): array
+	{
+		// we need the options array for both styles
+		$data['options'] = json_decode($data['options'], TRUE);
+
+		foreach ( $data['options'] as $key => $opt )
+			$data['cache'][$key]["opt"] = $opt;
+
+		if ( $data['results'] == NULL )
+		// new style poll
+		{
+			$sql = "SELECT V.option, COUNT(DISTINCT vote_id) as votes
+						FROM `tbl_poll_votes`V
+					WHERE V.poll_id = {$data['id']}
+					GROUP BY V.option;";
+			$votes = $this->exec($sql);
+
+			if ( sizeof($votes)>0 )
+			foreach ( $votes as $vote )
+			// sql results start with index 1, so we have to adjust for the options that start with index 0
+				$data['cache'][($vote['option']-1)]["res"] = $vote['votes'];
+		}
+		else
+		// old style poll
+		{
+			$data['results'] = json_decode($data['results'], TRUE);
+			foreach ( $data['results'] as $key => $res )
+				$data['cache'][$key]["res"] = $res;
+		}
+		// write the array to the database
+		$this->update("tbl_poll", [ "cache" => json_encode($data['cache']) ], "poll_id=".$data['id']);
+		
+		return $data['cache'];
+	}
 
 	/*
 	protected function storyStates($completed,$validated)
