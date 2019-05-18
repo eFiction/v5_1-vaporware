@@ -683,7 +683,7 @@ class AdminCP extends Controlpanel {
 
 	public function contestLoad(int $conid)
 	{
-		$sql = "SELECT C.conid as id, C.title, C.summary, C.concealed, C.date_open, C.date_close, C.vote_close,
+		$sql = "SELECT C.conid as id, C.title, C.summary, C.description, C.concealed, C.date_open, C.date_close, C.vote_close,
 					C.active, C.votable,
 					GROUP_CONCAT(T.tid,',',T.label SEPARATOR '||') as tag_list,
 					GROUP_CONCAT(Ch.charid,',',Ch.charname SEPARATOR '||') as character_list, 
@@ -705,6 +705,9 @@ class AdminCP extends Controlpanel {
 				: "";
 			$data[0]['date_close'] = ($data[0]['date_close']>0)
 				? $this->timeToUser($data[0]['date_close'], $this->config['date_format'])
+				: "";
+			$data[0]['vote_close'] = ($data[0]['vote_close']>0)
+				? $this->timeToUser($data[0]['vote_close'], $this->config['date_format'])
 				: "";
 
 			$data[0]['pre']['tag']		 = $this->jsonPrepop($data[0]['tag_list']);
@@ -826,11 +829,10 @@ class AdminCP extends Controlpanel {
 						IF(S.validated IS NULL,'39',S.validated) as validated, 
 						IF(S.completed IS NULL,'9',S.completed) as completed, 
 						RelC.type, RelC.lid
-						FROM `tbl_contests`C
-							LEFT JOIN `tbl_contest_relations`RelC ON ( C.conid = RelC.conid )
-								LEFT JOIN `tbl_stories`S ON ( S.sid = RelC.relid AND RelC.type='ST' )
-								LEFT JOIN `tbl_collections`Coll ON ( Coll.collid = RelC.relid AND RelC.type='CO' )
-						WHERE C.conid = :conid AND ( RelC.type='ST' OR RelC.type='CO' )
+						FROM `tbl_contest_relations`RelC
+							LEFT JOIN `tbl_stories`S ON ( S.sid = RelC.relid AND RelC.type='ST' )
+							LEFT JOIN `tbl_collections`Coll ON ( Coll.collid = RelC.relid AND RelC.type='CO' )
+						WHERE RelC.conid = :conid AND ( RelC.type='ST' OR RelC.type='CO' )
 					) as E
 				GROUP BY id
 				ORDER BY {$sort['order']} {$sort['direction']}

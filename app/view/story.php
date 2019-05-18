@@ -146,25 +146,26 @@ class Story extends Base
 		return $this->render('story/contests.list.html');
 	}
 	
-	public function contestShow(array $data)
+	public function contestShow(array $data, string $returnpath)
 	{
 		$this->dataProcess($data);
-		
+
 		$this->f3->set('data', $data);
+		$this->f3->set('returnpath', $returnpath=="" ? "/story/contests" : $returnpath );
 		
 		return $this->render('story/contest.show.html');
 	}
 	
-	public function contestStories(array $contest, array $stories)
+	public function contestEntries(array $contest, array $entries)
 	{
 		$this->dataProcess($contest);
-		foreach ( $stories as &$story )
-			$this->dataProcess($story);
+		foreach ( $entries as &$entry )
+			$this->dataProcess($entry);
 		
 		$this->f3->set('contest', $contest);
-		$this->f3->set('stories', $stories);
+		$this->f3->set('entries', $entries);
 		
-		return $this->render('story/contest.stories.html');
+		return $this->render('story/contest.entries.html');
 	}
 	
 	public function epubXMLtag()
@@ -324,8 +325,10 @@ class Story extends Base
 		return $this->render('story/block.tagcloud.html');
 	}
 
-	public function blockContests($data)
+	public function blockContests($contests)
 	{
-		return "<pre>".print_r($data,1)."</pre>";
+		
+		$this->f3->set('contests', $contests);
+		return $this->render('story/block.contest.html');
 	}
 }

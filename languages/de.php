@@ -178,6 +178,7 @@ return array(
 'Reviews' =>	'Reviews',
 'Foreword' =>	'Vorwort',
 'Summary' =>	'Klappentext',
+'Description' =>	'Description',	//db
 'Tags' =>	'Tags',
 
 // [11] Story -- Info
@@ -557,6 +558,7 @@ return array(
 
 // Admin - Archive - Contest
 //'AdminMenu_Contests'	=> 'Wettbewerb',
+'ContestSummary'		=> 'Kurzbeschreibung',
 //'ContestDescription'	=> 'Beschreibung des Wettbewerbs',
 
 'AdminMenu_Stories' => 'Geschichten',
@@ -764,6 +766,9 @@ return array(
 // Polls
 'PollBox'		=> 'Polls',
 'AllPolls'		=> 'Show all polls',
+'PollOpenSince'	=> 'Umfrage ist seit {0} geöffnet',
+'PollOUFN'		=> 'Umfrage ist bis auf Weiteres geöffnet',
+'PollCloseOn'	=> 'Umfrage wird am {0} geschlossen',
 
 // Archiv News'
 'News_Headline'	=> 'Schlagzeile',
@@ -819,6 +824,7 @@ return array(
 //'CollectionStatus_A'	=> 'A',
 
 // Contests
+'Contests'					=> 'Wettbewerbe',
 //'ContestPrepare'			=> 'Contest is being prepared',
 //'ContestIsActiveOn'			=> 'Contest will be active {0}',
 //'ContestIsActiveSince'		=> 'Contest is active since {0}',
@@ -827,10 +833,14 @@ return array(
 //'ContestWillCloseOn'		=> 'Contest will close on {0}',
 //'ContestIsClosedSince'		=> 'Contest closed since {0}',
 //'ContestIsClosed'			=> 'Contest is closed',
+'ContestOUFN'				=> 'Wettbewerb ist bis auf Weiteres offen',
 //'ContestVotePrepare'		=> 'Voting is being prepared',
 //'ContestVoteWillCloseOn'	=> 'Voting will close {0}',
 //'ContestVoteIsClosedSince'	=> 'Voting closed on {0}',
 //'ContestVoteIsClosed'		=> 'Voting was closed',
+'ContestVotingOUFN'			=> 'Abstimmung ist bis auf Weiteres offen',
+//'noOpenContests'			=> 'no open contests',
+//'noVotableContests'			=> 'no contests open for voting',
 
 );
 

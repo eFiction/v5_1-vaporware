@@ -170,8 +170,6 @@ class AdminCP extends Base
 						$f3->get('POST.form_data')
 					)
 				);
-				
-				echo $f3->get('saveResult');
 			}
 
 			// add a story to an existing contest

@@ -1,19 +1,21 @@
-<div class="columns">
-	<div class="column is-one-quarter"><a href="{{@BASE}}/story/contests">*</a></div>
+<div class="columns is-multiline">
+	<div class="column is-one-quarter"><a href="{{@BASE}}{{@returnpath}}">{{@LN__ReturnToOverview}}</a></div>
 	<div class="column is-two-quarters"><h4>{{@data.title}}<br />{{@LN__by}} <a href="{{@BASE}}/member/{{@data.username}}">{{@data.username}}</a></h4></div>
 	<div class="column is-one-quarter">
-		<div class="is-pulled-right"><a href="{{@BASE}}/story/contests/id={{@data.id}}/stories">{{@data.stories}}</div>
+		<div class="is-pulled-right"><a href="{{@BASE}}/story/contests/id={{@data.id}}/entries">{{@data.entries}}</a></div>
 	</div>
-</div>
 
-<check if="{{!empty(@data.rating_name)}}"><div class="story-info2"><b>{{@LN__Rating}}:</b> {{@data.rating_name}}</div></check>
-<check if="{{!empty(@data.cache_categories)}}"><div class="story-info2"><b>{{@LN__Categories}}:</b> <repeat group="{{ @data.cache_categories }}" value="{{ @group }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check><a href="{{@BASE}}/story/search/category={{ @group[0] }}">{{ @group[1] }}</a></repeat></div></check>
-<check if="{{!empty(@data.cache_characters) }}"><div class="story-info2"><b>{{@LN__Characters}}:</b> <repeat group="{{ @data.cache_characters }}" value="{{ @tag }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check><a href="{{@BASE}}/story/search/charIn={{ @tag[0] }}">{{ @tag[1] }}</a></repeat></div></check>
+<check if="{{!empty(@data.rating_name)}}"><div class="column is-full"><b>{{@LN__Rating}}:</b> {{@data.rating_name}}</div></check>
+<check if="{{!empty(@data.cache_categories)}}"><div class="column is-full"><b>{{@LN__Categories}}:</b> <repeat group="{{ @data.cache_categories }}" value="{{ @group }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check><a href="{{@BASE}}/story/search/category={{ @group[0] }}">{{ @group[1] }}</a></repeat></div></check>
+<check if="{{!empty(@data.cache_characters) }}"><div class="column is-full"><b>{{@LN__Characters}}:</b> <repeat group="{{ @data.cache_characters }}" value="{{ @tag }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check><a href="{{@BASE}}/story/search/charIn={{ @tag[0] }}">{{ @tag[1] }}</a></repeat></div></check>
 
-<div class="story-info2"><b>{{@LN__Summary}}:</b> {{@data.summary | raw}}</div>
-<hr />
+	<check if="{{!empty(@data.summary)}}">
+		<div class="column is-full"><b>{{@LN__Summary}}:</b> {{@data.summary | raw}}</div>
+	</check>
+	<div class="column is-full"><b>{{@LN__Description}}:</b> {{@data.description | raw}}</div>
 
-<div class="columns">
+	<hr />
+
 	<div class="column is-one-third">
 		<switch expr="{{ @data.active }}">
 			<case value="preparing" break="TRUE">

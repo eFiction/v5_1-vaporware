@@ -31,7 +31,7 @@ class Redirect extends Base
 		foreach ( $query as $q )
 		{
 			$item = explode("=", $q);
-			$old_data[$item[0]] = $item[1];
+			$old_data[$item[0]] = $item[1]??"";
 		}
 
 		// default: redirect to main page
@@ -53,7 +53,6 @@ class Redirect extends Base
 		}
 		elseif ( $params['a']=="browse" )
 		{
-			//print_r($old_data);
 			// Browse is best handled by a search type
 			$redirect = "/story/search";
 
@@ -102,6 +101,10 @@ class Redirect extends Base
 		{
 			$page = explode("=",$params['b']);
 			$redirect = "/home/page/".@$page[1];
+		}
+		elseif ( $params['a']=="contact" )
+		{
+			$redirect = "/home/contact";
 		}
 		
 		if ( isset($COOKIE['redirect_seen'] ) ) $f3->reroute($redirect, false);

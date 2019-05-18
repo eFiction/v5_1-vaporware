@@ -6,7 +6,7 @@
 			<!-- Left side -->
 			<div class="level-left">
 				<div class="level-item">
-					<a href="{{@BASE}}/story/contests/id={{@contest.conid}}">{{@contest.title}}</a>
+					<a href="{{@BASE}}/story/contests/id={{@contest.conid}}<check if="{{isset(@paginate.page)}}">;returnpath=/story/contests/page={{@paginate.page}}</check>">{{@contest.title}}</a>
 				</div>
 			</div>
 			<!-- Right side -->
@@ -18,7 +18,9 @@
 		</nav>
 			
 		</div>
-	{*	<div class="contest-list-summary">{{@contest.summary |raw}}</div>	*}
+		<check if="{{!empty(@contest.summary)}}">
+			<div class="contest-list-summary">{{@contest.summary |raw}}</div>
+		</check>
 		<check if="{{!empty(@contest.cache_categories)}}">
 			<div class="contest-list-category">{ICON:folder} <repeat group="{{@contest.cache_categories}}" value="{{@category}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check>{{@category.1}}</repeat></div>
 		</check>

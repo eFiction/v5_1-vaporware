@@ -139,10 +139,19 @@
 </div>
 
 <div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__ContestSummary}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<textarea class="textarea" name="form_data[summary]" id="tinymce" rows="2" cols="80">{{ @data.summary }}</textarea>
+		</div></div>
+	</div>
+</div>
+
+<div class="field is-horizontal">
 	<div class="field-label is-normal"><label class="label">{{@LN__ContestDescription}}</label></div>
 	<div class="field-body">
 		<div class="field"><div class="control">
-			<textarea class="textarea" name="form_data[summary]" id="tinymce" rows="20" cols="80">{{ @data.summary }}</textarea>
+			<textarea class="textarea" name="form_data[description]" id="tinymce" rows="10" cols="80">{{ @data.description }}</textarea>
 		</div></div>
 	</div>
 </div>

@@ -240,7 +240,7 @@ class Story extends Base
 					C.date_close<NOW() OR C.date_close IS NULL,
 					then IF
 					(
-						C.vote_closed>NOW() OR C.vote_closed IS NULL,
+						C.vote_close>NOW() OR C.vote_close IS NULL,
 						then 'active',
 						else 'closed'
 					),
@@ -261,7 +261,7 @@ class Story extends Base
 					LEFT JOIN `tbl_contest_relations`R ON ( C.conid = R.conid AND R.type='ST' )
 				WHERE concealed = 0 @WHERE@
 				GROUP BY C.conid
-				ORDER BY C.conid DESC
+				ORDER BY active ASC, votable ASC, C.conid DESC
 				LIMIT ".(max(0,$pos*$limit)).",".$limit;
 		if ( 1 ) $sql = str_replace("@WHERE@", "AND ((C.active='date' AND C.date_open<=NOW()) OR C.active>2)", $sql);
 
@@ -283,13 +283,13 @@ class Story extends Base
 
 	public function contestLoad(int $conid)
 	{
-		$sql = "SELECT C.conid as id, C.title, C.summary, C.concealed,
+		$sql = "SELECT C.conid as id, C.title, C.summary, C.description, 
                     IF(C.active='date',IF(C.date_open<NOW(),IF(C.date_close>NOW() OR C.date_close IS NULL,'active','closed'),'prepare'),C.active) as active,
-                    IF(C.votable='date',IF(C.date_close<NOW() OR C.date_close IS NULL,IF(C.vote_closed>NOW() OR C.vote_closed IS NULL,'active','closed'),'prepare'),C.votable) as votable,
-					UNIX_TIMESTAMP(C.date_open) as date_open, UNIX_TIMESTAMP(C.date_close) as date_close, UNIX_TIMESTAMP(C.vote_closed) as vote_closed, 
+                    IF(C.votable='date',IF(C.date_close<NOW() OR C.date_close IS NULL,IF(C.vote_close>NOW() OR C.vote_close IS NULL,'active','closed'),'prepare'),C.votable) as votable,
+					UNIX_TIMESTAMP(C.date_open) as date_open, UNIX_TIMESTAMP(C.date_close) as date_close, UNIX_TIMESTAMP(C.vote_close) as vote_close, 
 					C.cache_tags, C.cache_characters, C.cache_categories,
 					U.uid, U.username,
-					COUNT(DISTINCT rC.relid) as stories
+					COUNT(DISTINCT rC.relid) as entries
 					FROM `tbl_contests`C
 						LEFT JOIN `tbl_users`U ON ( C.uid=U.uid )
 						LEFT JOIN `tbl_contest_relations`rC ON ( C.conid = rC.conid and rC.type = 'ST' )
@@ -298,7 +298,7 @@ class Story extends Base
 						AND C.conid = :conid";
 		if ( 1 ) $sql = str_replace("@WHERE@", "AND ((C.active='date' AND C.date_open<=NOW()) OR C.active>2)", $sql);
 
-/*		$sql = "SELECT C.conid as id, C.title, C.summary, C.concealed, C.date_open, C.date_close, C.vote_closed,
+/*		$sql = "SELECT C.conid as id, C.title, C.summary, C.concealed, C.date_open, C.date_close, C.vote_close,
 					C.cache_tags, C.cache_characters, C.cache_categories,
 					GROUP_CONCAT(T.tid,',',T.label SEPARATOR '||') as tag_list,
 					GROUP_CONCAT(Ch.charid,',',Ch.charname SEPARATOR '||') as character_list, 
@@ -326,8 +326,8 @@ class Story extends Base
 			$data[0]['date_close'] = ($data[0]['date_close']>0)
 				? $this->timeToUser($data[0]['date_close'], $this->config['date_format'])
 				: "";
-			$data[0]['vote_closed'] = ($data[0]['vote_closed']>0)
-				? $this->timeToUser($data[0]['vote_closed'], $this->config['date_format'])
+			$data[0]['vote_close'] = ($data[0]['vote_close']>0)
+				? $this->timeToUser($data[0]['vote_close'], $this->config['date_format'])
 				: "";
 				*/
 			//$data[0]['tag_list'] = $this->cleanResult($data[0]['tag_list']);
@@ -339,16 +339,36 @@ class Story extends Base
 		return NULL;
 	}
 	
-	public function contestStories(int $conid): array
+	public function contestEntries(int $conid): array
 	{
 		$limit = 5;
 		$pos = (int)$this->f3->get('paginate.page') - 1;
 
-		$sql = "SELECT SQL_CALC_FOUND_ROWS
+/*		$sql = "SELECT SQL_CALC_FOUND_ROWS
 				S.sid, S.title, S.cache_tags, S.cache_categories, S.cache_authors, S.reviews, S.summary, UNIX_TIMESTAMP(S.date) as published, UNIX_TIMESTAMP(S.updated) as modified, S.chapters, S.wordcount, S.completed, S.count
 				FROM `tbl_stories`S
 					INNER JOIN `tbl_contest_relations`rSC ON ( rSC.relid = S.sid AND rSC.type = 'ST' )
 				WHERE rSC.conid = :conid
+				LIMIT ".(max(0,$pos*$limit)).",".$limit;		*/
+				
+		$sql = "SELECT SQL_CALC_FOUND_ROWS 
+				E.* FROM (
+					SELECT 
+						IF(S.sid IS NULL,Coll.collid,S.sid) as id,
+						IF(S.title IS NULL,Coll.title,S.title) as title, 
+						IF(S.summary IS NULL,Coll.summary,S.summary) as summary, 
+						IF(S.cache_authors IS NULL,Coll.cache_authors,S.cache_authors) as cache_authors, 
+						IF(S.cache_categories IS NULL,Coll.cache_categories,S.cache_categories) as cache_categories, 
+						IF(S.cache_tags IS NULL,Coll.cache_tags,S.cache_tags) as cache_tags, 
+						IF(S.validated IS NULL,'39',S.validated) as validated, 
+						IF(S.completed IS NULL,'9',S.completed) as completed, 
+						RelC.type, RelC.lid
+						FROM `tbl_contest_relations`RelC
+							LEFT JOIN `tbl_stories`S ON ( S.sid = RelC.relid AND RelC.type='ST' )
+							LEFT JOIN `tbl_collections`Coll ON ( Coll.collid = RelC.relid AND RelC.type='CO' )
+						WHERE RelC.conid = :conid AND ( RelC.type='ST' OR RelC.type='CO' )
+					) as E
+				GROUP BY id
 				LIMIT ".(max(0,$pos*$limit)).",".$limit;
 				
 		$data = $this->exec($sql, [":conid" => $conid ]);
@@ -357,7 +377,7 @@ class Story extends Base
 		
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
-			"/story/contests/id={$conid}/stories",
+			"/story/contests/id={$conid}/entries",
 			$limit
 		);
 
@@ -881,7 +901,7 @@ class Story extends Base
 			
 			$open_sql = 
 				"SELECT SQL_CALC_FOUND_ROWS
-						C.conid, C.title, 
+						C.conid, C.title, C.summary,
 						C.active, C.votable,
 						UNIX_TIMESTAMP(C.date_open) as date_open, UNIX_TIMESTAMP(C.date_close) as date_close, UNIX_TIMESTAMP(C.vote_close) as vote_close, 
 						-- C.cache_tags, C.cache_characters, 
@@ -895,7 +915,7 @@ class Story extends Base
 			
 			$votable_sql = 
 				"SELECT SQL_CALC_FOUND_ROWS
-						C.conid, C.title, 
+						C.conid, C.title, C.summary,
 						C.active, C.votable,
 						UNIX_TIMESTAMP(C.date_open) as date_open, UNIX_TIMESTAMP(C.date_close) as date_close, UNIX_TIMESTAMP(C.vote_close) as vote_close, 
 						-- C.cache_tags, C.cache_characters, 

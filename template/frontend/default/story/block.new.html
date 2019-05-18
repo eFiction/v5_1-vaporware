@@ -6,7 +6,7 @@
 			<true>
 					<div class="updated-stories-box">
 						<div class="updated-title"><a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a> {{@LN__by}} 
-						<repeat group="{{@story.cache_authors}}" value="{{ @author }}" counter="{{ @ctr }}"><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/members/id={{@author.0}}">{{@author.1}}</a></repeat></div>
+						<repeat group="{{@story.cache_authors}}" value="{{ @author }}" counter="{{ @ctr }}"><check if="{{@ctr>1}}">, </check><a href="{{@BASE}}/member/{{@author.1}}">{{@author.1}}</a></repeat></div>
 						<div class="updated-summary">{{@story.summary | raw}}</div>
 					</div>
 			</true>

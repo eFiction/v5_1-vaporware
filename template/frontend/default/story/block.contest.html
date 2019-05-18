@@ -1,0 +1,83 @@
+<h5><a href="{{@BASE}}/story/contests">{{@LN__Contests}}</a></h5>
+
+<div class="updated-stories-box">
+<check if="{{sizeof(@contests.open)>0}}">
+<true>
+	<repeat group="{{@contests.open}}"  value="{{ @contest }}" counter="{{ @ctr }}">
+		<check if="{{@extra=='large'}}">
+			<true>
+				<div class="updated-title"><a href="{{@BASE}}/story/contests/id={{@contest.conid}}">{{@contest.title}}</a> {{@LN__by}} <a href="{{@BASE}}/member/{{@contest.username}}">{{@contest.username}}</a></div>
+				<div class="updated-summary">{{@contest.description | raw}}</div>
+			</true>
+			<false>
+				<div class="updated-stories-box">
+					<div class="updated-title">
+						<check if="{{ @contest.summary!='' }}">
+						<span class="toggle">
+							<span class="toggle_more">{ICON:square-down}</span>
+							<span class="toggle_less" style="display:none" >{ICON:square-up}</span>
+						</span>
+						</check>
+						<a href="{{@BASE}}/story/contests/id={{@contest.conid}}">{{@contest.title}}</a> {{@LN__by}} <a href="{{@BASE}}/member/{{@contest.username}}">{{@contest.username}}</a><br />
+						<check if="{{ @contest.date_open>0 }}">
+							{{@LN__ContestIsActiveSince, date(@CONFIG.date_format ,@contest.date_open) | format }}<br />
+						</check>
+						<check if="{{ @contest.date_close>0 }}">
+							<true>{{@LN__ContestWillCloseOn, date(@CONFIG.date_format ,@contest.date_close) | format }}</true>
+							<false>{{@LN__ContestOUFN}}</false>
+						</check>
+						<check if="{{ @contest.summary!='' }}">
+						<div class="toggle_container" style="display:none"><div class="updated-summary">{{@contest.summary | raw}}</div></div>
+						</check>
+					</div>
+				</div>
+			</false>
+		</check>
+	</repeat>
+</true>
+<false>
+	{{@LN__noOpenContests}}
+</false>
+</check>
+</div>
+
+<div class="updated-stories-box">
+<check if="{{sizeof(@contests.votable)>0}}">
+<true>
+	<repeat group="{{@contests.votable}}"  value="{{ @contest }}" counter="{{ @ctr }}">
+		<check if="{{@extra=='large'}}">
+			<true>
+				<div class="updated-title"><a href="{{@BASE}}/story/contests/id={{@contest.conid}}">{{@contest.title}}</a> {{@LN__by}} <a href="{{@BASE}}/member/{{@contest.username}}">{{@contest.username}}</a></div>
+				<div class="updated-summary">{{@contest.description | raw}}</div>
+			</true>
+			<false>
+				<div class="updated-stories-box">
+					<div class="updated-title">
+						<check if="{{ @contest.summary!='' }}">
+						<span class="toggle">
+							<span class="toggle_more">{ICON:square-down}</span>
+							<span class="toggle_less" style="display:none" >{ICON:square-up}</span>
+						</span>
+						</check>
+						<a href="{{@BASE}}/story/contests/id={{@contest.conid}}">{{@contest.title}}</a> {{@LN__by}} <a href="{{@BASE}}/member/{{@contest.username}}">{{@contest.username}}</a><br />
+						<check if="{{ @contest.date_close>0 }}">
+							{{@LN__ContestWillCloseOn, date(@CONFIG.date_format ,@contest.date_close) | format }}<br />
+						</check>
+						<check if="{{ @contest.date_close>0 }}">
+							<true>{{@LN__ContestVoteWillCloseOn, date(@CONFIG.date_format ,@contest.vote_close) | format }}</true>
+							<false>{{@LN__ContestVotingOUFN}}</false>
+						</check>
+						<check if="{{ @contest.summary!='' }}">
+						<div class="toggle_container" style="display:none"><div class="updated-summary">{{@contest.summary | raw}}</div></div>
+						</check>
+					</div>
+				</div>
+			</false>
+		</check>
+	</repeat>
+</true>
+<false>
+	{{@LN__noVotableContests}}
+</false>
+</check>
+</div>

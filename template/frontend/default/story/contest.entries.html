@@ -1,0 +1,38 @@
+<h4>
+	<a href="{{@BASE}}/story/contests/id={{@contest.id}}">{{@contest.title}}</a><br />
+	{{@LN__by}} <a href="{{@BASE}}/member/{{@contest.username}}">{{@contest.username}}</a>
+</h4>
+
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="main/paginate.html" /></F3:check>
+
+<div class="columns">
+	<div class="column">
+	<repeat group="{{ @entries }}" value="{{ @entry }}" counter="{{ @ctr }}">
+		<div class="story-box">
+			<div class="story-list-head">
+				<check if="{{@entry.type=='ST'}}">
+					<true>
+						<a href="{{@BASE}}/story/read/{{@entry.id}}">{{@entry.title}}</a>
+					</true>
+					<false>
+						{{ @entry.title }}
+					</false>
+				</check>
+				{{@LN__by}} <repeat group="{{@entry.cache_authors}}" value="{{@author}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check><a href="{{@BASE}}/authors/{{@author.0}}">{{@author.1}}</a></repeat>
+			</div>
+			<check if="{{!empty(@entry.cache_categories)}}">
+				<div>{ICON:folder} <repeat group="{{@entry.cache_categories}}" value="{{@category}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check>{{@category.1}}</repeat></div>
+			</check>
+			<div class="tags">{ICON:tags}&nbsp;
+				<check if="{{isset(@story.all_tags.0)}}">
+					<true><repeat group="{{@story.all_tags}}" value="{{@tag}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}"> </check><span class="tag">{{@tag.1}}</span></repeat></true>
+					<false>{{@LN__NoTags}}</false>
+				</check>
+			</div>
+			<div>{{ @entry.summary | raw}}</div>
+		</div>
+	</repeat>
+	</div>
+</div>
+
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="main/paginate.html" /></F3:check>
