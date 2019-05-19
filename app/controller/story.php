@@ -35,6 +35,7 @@ class Story extends Base
 			case 'updates':
 				$data = $this->updates($params);
 				break;
+			case 'collections':
 			case 'series':
 				$data = $this->series($params);
 				break;
@@ -496,6 +497,20 @@ class Story extends Base
 	
 	public function series(array $params)//: void
 	{
+		$type = $params['action'];
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		
+		if ( isset($params['id']) )
+		{
+			
+			
+		}
+		else
+		{
+			$data = $this->model->{$type."List"}();
+			return $this->template->{$type."List"}($data);
+		}
+		
 		
 		return \View\Base::stub("Series");
 	}
@@ -504,7 +519,7 @@ class Story extends Base
 	{
 		$searchForm = strpos($params[0],"search");
 		$get = [];
-		if ( isset($params['*']) ) $get = $this->parametric($params['*']); // 3.6
+		if ( isset($params['*']) ) $get = $this->parametric($params['*']);
 		unset($get['page']);
 
 		// get search data from $_POST

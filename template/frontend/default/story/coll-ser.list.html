@@ -1,0 +1,7 @@
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="main/paginate.html" /></F3:check>
+
+<repeat group="{{ @data }}" value="{{ @entry }}">
+	{{@entry.title}}
+</repeat>
+
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="main/paginate.html" /></F3:check>

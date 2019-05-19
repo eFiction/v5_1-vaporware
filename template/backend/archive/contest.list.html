@@ -145,3 +145,5 @@
 </true><false>
 {{@LN__NoEntries}}
 </false></check>
+
+<F3:check if="{{isset(@paginate.firstPage) AND sizeof(@contestlist)>3}}"><include href="paginate.html" /></F3:check>

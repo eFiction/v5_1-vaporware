@@ -168,6 +168,22 @@ class Story extends Base
 		return $this->render('story/contest.entries.html');
 	}
 	
+	public function collectionsList(array $data)
+	{
+		$this->f3->set('type', "C");
+		$this->f3->set('data', $data);
+		
+		return $this->render('story/coll-ser.list.html');
+	}
+	
+	public function seriesList(array $data)
+	{
+		$this->f3->set('type', "S");
+		$this->f3->set('data', $data);
+		
+		return $this->render('story/coll-ser.list.html');
+	}
+	
 	public function epubXMLtag()
 	{
 		return "<?xml version='1.0' encoding='utf-8'?>\n";
