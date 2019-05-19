@@ -320,6 +320,10 @@ return array(
 			'zero	{No recommendations},'.
 			'one	{One recommendation},'.
 			'other	{# Recommendations} }',
+	'FavType_CO'		=> '{0, plural,'.
+			'zero	{No collections},'.
+			'one	{One collection},'.
+			'other	{# collections} }',
 	'FavType_SE'		=> '{0, plural,'.
 			'zero	{No series},'.
 			'one	{One series},'.

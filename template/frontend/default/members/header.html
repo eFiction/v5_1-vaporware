@@ -25,7 +25,6 @@
 				<div class="navbar-dropdown">
 				<repeat group="{{ @userdata.extras.favourites }}" value="{{ @favs }}">
 					<a class="navbar-item" href="{{@BASE}}/member/{{ @userdata.username }}/favourites/{{ @favs.1 }}">
-						<span class="icon">{ICON:favourite}</span>
 						<span>{{ ${"LN__FavType_".@favs[1]}, @favs.0 | format }}</span>
 					</a> 
 				</repeat>
@@ -41,7 +40,6 @@
 				<div class="navbar-dropdown">
 				<repeat group="{{ @userdata.extras.bookmarks }}" value="{{ @books }}">
 					<a class="navbar-item" href="{{@BASE}}/member/{{ @userdata.username }}/bookmarks/{{ @books.1 }}">
-						<span class="icon">{ICON:bookmark}</span>
 						<span>{{ ${"LN__FavType_".@books[1]}, @books.0 | format }}</span>
 					</a> 
 				</repeat>
@@ -51,8 +49,8 @@
 		</div>
 	
 		<div class="navbar-end">
-			<check if="{{ @userdata.uid != @_SESSION['userID'] }}">
-				<check if="{{ @userdata.extras.friend==NULL }}">
+			<check if="{{ @_SESSION['userID']>0 AND @userdata.uid != @_SESSION['userID'] }}">
+				<check if="{{ @userdata.friend==FALSE }}">
 				<true>
 				<a class="navbar-item button navmenu" href="{{@BASE}}/userCP/friends/update/add={{@userdata.username}};returnpath={{@current_path}}">
 					<span class="icon">{ICON:user-friend}</span>

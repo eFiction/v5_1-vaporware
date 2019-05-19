@@ -304,30 +304,34 @@ return array(
 	'Library_Bookmarks'		=> 'Lesezeichen ({0})',
 	'AddBookmark'			=> 'Lesezeichen hinzufügen',
 	'Library_Recommendations' => 'Empfehlungen ({0})',
-/*	'FavType_FAV'		=> '{0, plural,'.
-			'zero	{No favourites},'.
-			'one	{One favourite},'.
-			'other	{# Favourites} }',
+	'FavType_FAV'		=> '{0, plural,'.
+			'zero	{Keine Favoriten},'.
+			'one	{Ein Favorit},'.
+			'other	{# Favoriten} }',
 	'FavType_BM'		=> '{0, plural,'.
-			'zero	{No bookmarks},'.
-			'one	{One bookmark},'.
-			'other	{# Bookmarks} }',
+			'zero	{Keine Lesezeichen},'.
+			'one	{Ein Lesezeichen},'.
+			'other	{# Lesezeichen} }',
 	'FavType_AU'		=> '{0, plural,'.
-			'zero	{No authors},'.
-			'one	{One author},'.
-			'other	{# Authors} }',
+			'zero	{Keine Autoren},'.
+			'one	{Ein Autor},'.
+			'other	{# Autoren} }',
 	'FavType_RC'		=> '{0, plural,'.
-			'zero	{No recommendations},'.
-			'one	{One recommendation},'.
-			'other	{# Recommendations} }',
+			'zero	{Keine Empfehlungen},'.
+			'one	{Eine Empfehlung},'.
+			'other	{# Empfehlungen} }',
+	'FavType_CO'		=> '{0, plural,'.
+			'zero	{Keine Sammlungen},'.
+			'one	{Eine Sammlung},'.
+			'other	{# Sammlungen} }',
 	'FavType_SE'		=> '{0, plural,'.
-			'zero	{No series},'.
-			'one	{One series},'.
-			'other	{# Series} }',
+			'zero	{Keine Serien},'.
+			'one	{Eine Serie},'.
+			'other	{# Serien} }',
 	'FavType_ST'		=> '{0, plural,'.
-			'zero	{No stories},'.
-			'one	{One story},'.
-			'other	{# Stories} }',*/
+			'zero	{Keine Geschichten},'.
+			'one	{Eine Geschichte},'.
+			'other	{# Geschichten} }',
 			
 'UserMenu_Feedback' => 'Feedback',
 'UserMenu_Reviews' => 'Bewertungen',
