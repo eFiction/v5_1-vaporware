@@ -226,7 +226,7 @@ class Story extends Base
 		return $data;
 	}
 	
-	public function collectionsList($ordered = FALSE)
+	public function collectionsList(bool $ordered = FALSE)
 	{
 		$limit = 5;
 		$pos = (int)$this->f3->get('paginate.page') - 1;
@@ -254,9 +254,36 @@ class Story extends Base
 		return $data;
 	}
 	
-	public function seriesList($ordered = FALSE)
+	// wrapper for collectionsList
+	public function seriesList()
 	{
 		return $this->collectionsList(TRUE);
+	}
+
+	public function collectionsLoad(int $collID, bool $ordered = FALSE)
+	{
+		$sql = "SELECT SQL_CALC_FOUND_ROWS
+					C.collid, C.parent_collection, C.title, C.summary, C.open, C.max_rating,
+					C.chapters, C.wordcount,
+					C.cache_authors, C.cache_tags, C.cache_characters, C.cache_categories,
+					C2.title as parent_title
+				FROM `tbl_collections`C 
+					LEFT JOIN `tbl_collections`C2 ON ( C.parent_collection = C2.collid )
+				WHERE C.collid=:collid AND C.ordered=".(int)$ordered." AND C.chapters>0 AND C.status IN ('P','A')
+				GROUP BY C.collid;";
+		$data = $this->exec($sql, [":collid" => $collID ]);
+		if ( sizeof($data)==1 )
+		{
+			
+			return $data[0];
+		}
+		return NULL;
+	}
+
+	// wrapper for collectionsLoad
+	public function seriesLoad(int $collID)
+	{
+		return $this->collectionsLoad($collID, TRUE);
 	}
 	
 	public function contestsList() : array

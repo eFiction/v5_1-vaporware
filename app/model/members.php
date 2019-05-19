@@ -71,7 +71,7 @@ class Members extends Base
 		[
 			"ORDER" => "ORDER BY S.updated DESC" ,
 			"LIMIT" => "LIMIT ".(max(0,$pos*$limit)).",".$limit,
-			"JOIN" => "INNER JOIN `tbl_stories_authors`rSA ON ( rSA.sid = S.sid AND rSA.aid = :aid )"
+			"JOIN" => "INNER JOIN `tbl_stories_authors`rSA ON ( rSA.sid=S.sid AND rSA.aid=:aid )"
 		];
 		$data['stories'] = $this->storyData($replacements, ["aid" => $author['uid']]);
 		

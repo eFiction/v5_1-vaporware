@@ -502,8 +502,19 @@ class Story extends Base
 		
 		if ( isset($params['id']) )
 		{
-			return $params['id'];
-			
+			if ( NULL === $collection = $this->model->{$type."Load"}((int)$params['id']) )
+			{
+				// no contest
+				\Base::instance()->reroute("/story/".$type, false);
+				exit;			
+			}
+			if ( isset($params['entries']) )
+			{
+				//$entries = $this->model->contestEntries($contest['id']);
+				//$buffer = $this->template->contestEntries($contest, $entries);
+			}
+			return print_r($collection,TRUE);
+			//else $buffer = $this->template->contestShow($contest,$params['returnpath']);
 		}
 		else
 		{
