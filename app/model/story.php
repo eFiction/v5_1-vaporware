@@ -232,12 +232,15 @@ class Story extends Base
 		$pos = (int)$this->f3->get('paginate.page') - 1;
 
 		$sql = "SELECT SQL_CALC_FOUND_ROWS
-					C.collid, C.parent_collection, C.title, C.summary, C.open, C.max_rating, C.chapters, 
+					C.collid, C.parent_collection, C.title, C.summary, C.open, C.max_rating,
+					COUNT(DISTINCT rCS.sid) as stories, C.chapters, C.wordcount,
 					C.cache_authors, C.cache_tags, C.cache_characters, C.cache_categories,
 					C2.title as parent_title
 				FROM `tbl_collections`C 
 					LEFT JOIN `tbl_collections`C2 ON ( C.parent_collection = C2.collid )
-				WHERE C.ordered=".(int)$ordered." AND C.chapters>0
+					LEFT JOIN `tbl_collection_stories`rCS ON ( C.collid = rCS.collid AND rCS.confirmed = 1 )
+				WHERE C.ordered=".(int)$ordered." AND C.chapters>0 AND C.status IN ('P','A')
+				GROUP BY C.collid
 				LIMIT ".(max(0,$pos*$limit)).",".$limit;
 				
 		$data = $this->exec($sql);
@@ -328,28 +331,9 @@ class Story extends Base
 						AND C.conid = :conid";
 		if ( 1 ) $sql = str_replace("@WHERE@", "AND ((C.active='date' AND C.date_open<=NOW()) OR C.active>2)", $sql);
 
-/*		$sql = "SELECT C.conid as id, C.title, C.summary, C.concealed, C.date_open, C.date_close, C.vote_close,
-					C.cache_tags, C.cache_characters, C.cache_categories,
-					GROUP_CONCAT(T.tid,',',T.label SEPARATOR '||') as tag_list,
-					GROUP_CONCAT(Ch.charid,',',Ch.charname SEPARATOR '||') as character_list, 
-					GROUP_CONCAT(Cat.cid,',',Cat.category SEPARATOR '||') as category_list, 
-					U.uid, U.username
-					FROM `tbl_contests`C
-					LEFT JOIN `tbl_users`U ON ( C.uid=U.uid )
-					LEFT JOIN `tbl_contest_relations`RelC ON ( C.conid=RelC.conid )
-						LEFT JOIN `tbl_tags`T ON ( RelC.relid = T.tid AND RelC.type='T' )
-						LEFT JOIN `tbl_characters`Ch ON ( RelC.relid = Ch.charid AND RelC.type='CH' )
-						LEFT JOIN `tbl_categories`Cat ON ( RelC.relid = Cat.cid AND RelC.type='CA' )
-					WHERE C.conid = :conid";	*/
-					/*
-					--GROUP_CONCAT(S.sid,',',S.title SEPARATOR '||') as story_list,
-					--LEFT JOIN `tbl_stories`S ON ( RelC.relid = S.sid AND RelC.type='ST' )
-					*/
-
 		$data = $this->exec($sql, [":conid" => $conid ]);
 		if (sizeof($data)==1) 
 		{
-			/*
 			$data[0]['date_open'] = ($data[0]['date_open']>0)
 				? $this->timeToUser($data[0]['date_open'],  $this->config['date_format'])
 				: "";
@@ -359,10 +343,6 @@ class Story extends Base
 			$data[0]['vote_close'] = ($data[0]['vote_close']>0)
 				? $this->timeToUser($data[0]['vote_close'], $this->config['date_format'])
 				: "";
-				*/
-			//$data[0]['tag_list'] = $this->cleanResult($data[0]['tag_list']);
-			//$data[0]['character_list'] = $this->cleanResult($data[0]['character_list']);
-			//$data[0]['category_list'] = $this->cleanResult($data[0]['category_list']);
 
 			return $data[0];
 		}
@@ -374,13 +354,6 @@ class Story extends Base
 		$limit = 5;
 		$pos = (int)$this->f3->get('paginate.page') - 1;
 
-/*		$sql = "SELECT SQL_CALC_FOUND_ROWS
-				S.sid, S.title, S.cache_tags, S.cache_categories, S.cache_authors, S.reviews, S.summary, UNIX_TIMESTAMP(S.date) as published, UNIX_TIMESTAMP(S.updated) as modified, S.chapters, S.wordcount, S.completed, S.count
-				FROM `tbl_stories`S
-					INNER JOIN `tbl_contest_relations`rSC ON ( rSC.relid = S.sid AND rSC.type = 'ST' )
-				WHERE rSC.conid = :conid
-				LIMIT ".(max(0,$pos*$limit)).",".$limit;		*/
-				
 		$sql = "SELECT SQL_CALC_FOUND_ROWS 
 				E.* FROM (
 					SELECT 
@@ -392,7 +365,7 @@ class Story extends Base
 						IF(S.cache_tags IS NULL,Coll.cache_tags,S.cache_tags) as cache_tags, 
 						IF(S.validated IS NULL,'39',S.validated) as validated, 
 						IF(S.completed IS NULL,'9',S.completed) as completed, 
-						RelC.type, RelC.lid
+						RelC.type, RelC.lid, Coll.ordered
 						FROM `tbl_contest_relations`RelC
 							LEFT JOIN `tbl_stories`S ON ( S.sid = RelC.relid AND RelC.type='ST' )
 							LEFT JOIN `tbl_collections`Coll ON ( Coll.collid = RelC.relid AND RelC.type='CO' )

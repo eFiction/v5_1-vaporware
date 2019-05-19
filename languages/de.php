@@ -171,15 +171,16 @@ return array(
 'TagsExclude'	=>	'Tags nicht miteinbeziehen',
 
 // [10] Story -- Fields
-'Categories' =>	'Kategorien',
-'Characters' =>	'Charaktere',
-'Rating' =>	'Einstufung',
-'Status' =>	'Status',
-'Reviews' =>	'Reviews',
-'Foreword' =>	'Vorwort',
-'Summary' =>	'Klappentext',
-'Description' =>	'Description',	//db
-'Tags' =>	'Tags',
+'Categories' 	=>	'Kategorien',
+'Characters' 	=>	'Charaktere',
+'Rating'		=>	'Einstufung',
+//'MaxRating' 	=>	'Maximum rating', // db
+'Status' 		=>	'Status',
+'Reviews' 		=>	'Reviews',
+'Foreword' 		=>	'Vorwort',
+'Summary' 		=>	'Klappentext',
+'Description' 	=>	'Description',	//db
+'Tags' 			=>	'Tags',
 
 // [11] Story -- Info
 
@@ -277,6 +278,7 @@ return array(
 'Series'	=> 'Serie',
 'Story'		=> 'Geschichte',
 'Stories'	=> 'Geschichten',
+'Episodes'	=> 'Episodes',
 
 // UserCP elements
 'ChangeTo'	=> 'Ändern in',
@@ -561,7 +563,6 @@ return array(
 'ContestSummary'		=> 'Kurzbeschreibung',
 //'ContestDescription'	=> 'Beschreibung des Wettbewerbs',
 
-'AdminMenu_Stories' => 'Geschichten',
 'AdminMenu_Stories_Pending' => 'Ausstehend',
 'AdminMenu_Edit' => 'Editieren',
 'AdminMenu_Add' => 'Hinzufügen',
@@ -707,7 +708,6 @@ return array(
 'translatedBy'	=> 'übersetzt von',
 //'translatedFrom'	=> 'translated from',
 //'translatedTo'		=> 'translated to',
-'Stories' => 'Geschichten',
 'NewStories' => 'Neue Geschichten',
 //'noNewStory'			=> 'Keine neuen Geschichten',
 'RandomStory' => '{0, plural,'.
@@ -746,6 +746,7 @@ return array(
 'WIP' => 'In Arbeit',
 'Completed' => 'Abgeschlossen',
 'Characters' => 'Charaktere',
+'NoCharacters' => 'Keine Charaktere',
 'Clicks' => 'Klicks',
 'Author_Notes' => 'Anmerkungen des Autors',
 'Friend'	=> 'Friend',
@@ -822,6 +823,9 @@ return array(
 //'CollectionStatus_F'	=> 'F',
 //'CollectionStatus_P'	=> 'P',
 //'CollectionStatus_A'	=> 'A',
+'CollectionOpen_0'	=> 'Geschlossen',
+'CollectionOpen_1'	=> 'Moderiert',
+'CollectionOpen_2'	=> 'Offen',
 
 // Contests
 'Contests'					=> 'Wettbewerbe',

@@ -828,7 +828,7 @@ class AdminCP extends Controlpanel {
 						IF(S.cache_authors IS NULL,Coll.cache_authors,S.cache_authors) as cache_authors, 
 						IF(S.validated IS NULL,'39',S.validated) as validated, 
 						IF(S.completed IS NULL,'9',S.completed) as completed, 
-						RelC.type, RelC.lid
+						RelC.type, RelC.lid, Coll.ordered
 						FROM `tbl_contest_relations`RelC
 							LEFT JOIN `tbl_stories`S ON ( S.sid = RelC.relid AND RelC.type='ST' )
 							LEFT JOIN `tbl_collections`Coll ON ( Coll.collid = RelC.relid AND RelC.type='CO' )

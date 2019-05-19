@@ -174,6 +174,7 @@ return array(
 'Categories' =>	'Categories',
 'Characters' =>	'Characters',
 'Rating' =>	'Rating',
+'MaxRating' =>	'Maximum rating', // db
 'Status' =>	'Status',
 'Reviews' =>	'Reviews',
 'Foreword' =>	'Foreword',
@@ -277,6 +278,7 @@ return array(
 'Series'	=> 'Series',
 'Story'		=> 'Story',
 'Stories'	=> 'Stories',
+'Episodes'	=> 'Episodes',
 
 // UserCP elements
 'ChangeTo'	=> 'Change to',
@@ -561,7 +563,6 @@ return array(
 'ContestSummary'		=> 'Contest summary',
 'ContestDescription'	=> 'Contest description',
 
-'AdminMenu_Stories' => 'Stories',
 'AdminMenu_Stories_Pending' => 'Pending',
 'AdminMenu_Edit' => 'Edit',
 'AdminMenu_Add' => 'Add',
@@ -707,7 +708,6 @@ return array(
 'translatedBy'		=> 'translated by',
 'translatedFrom'	=> 'translated from',
 'translatedTo'		=> 'translated to',
-'Stories'				=> 'Stories',
 'NewStories'			=> 'New Stories',
 'noNewStory'			=> 'No new Stories',
 'RandomStory' => '{0, plural,'.
@@ -746,6 +746,7 @@ return array(
 'WIP' => 'Work in progress',
 'Completed' => 'Completed',
 'Characters' => 'Characters',
+'NoCharacters' => 'No characters',
 'Clicks' => 'Clicks',
 'Author_Notes' => 'Author notes',
 'Friend'	=> 'Friend',
@@ -822,6 +823,9 @@ return array(
 'CollectionStatus_F'	=> 'F',
 'CollectionStatus_P'	=> 'P',
 'CollectionStatus_A'	=> 'A',
+'CollectionOpen_0'	=> 'Closed',
+'CollectionOpen_1'	=> 'Moderated',
+'CollectionOpen_2'	=> 'Open',
 
 // Contests
 'Contests'					=> 'Contests',
@@ -836,8 +840,8 @@ return array(
 'ContestOUFN'				=> 'Contest is open until further notice',
 'ContestVotePrepare'		=> 'Voting is being prepared',
 'ContestVoteWillCloseOn'	=> 'Voting will close {0}',
-'ContestVoteIsClosedSince'	=> 'Voting closed on {0}',
-'ContestVoteIsClosed'		=> 'Voting was closed',
+'ContestVoteIsClosedSince'	=> 'Voting was closed on {0}',
+'ContestVoteIsClosed'		=> 'Voting is closed',
 'ContestVotingOUFN'			=> 'Voting is open until further notice',
 'noOpenContests'			=> 'no open contests',
 'noVotableContests'			=> 'no contests open for voting',

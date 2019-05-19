@@ -170,7 +170,10 @@ class Story extends Base
 	
 	public function collectionsList(array $data)
 	{
-		$this->f3->set('type', "C");
+		foreach ( $data as &$dat )
+			$this->dataProcess($dat);
+		
+		$this->f3->set('type', "collections");
 		$this->f3->set('data', $data);
 		
 		return $this->render('story/coll-ser.list.html');
@@ -178,7 +181,10 @@ class Story extends Base
 	
 	public function seriesList(array $data)
 	{
-		$this->f3->set('type', "S");
+		foreach ( $data as &$dat )
+			$this->dataProcess($dat);
+
+		$this->f3->set('type', "series");
 		$this->f3->set('data', $data);
 		
 		return $this->render('story/coll-ser.list.html');

@@ -37,7 +37,7 @@ class Story extends Base
 				break;
 			case 'collections':
 			case 'series':
-				$data = $this->series($params);
+				$data = $this->collections($params);
 				break;
 			case 'contests':
 				$data = $this->contests($params);
@@ -491,18 +491,18 @@ class Story extends Base
 
 			$zip->close();
 		}
-		return [ @fopen($filename,"rb"), filesize($filename) ];
+		return [ @fopen($filename,'rb'), filesize($filename) ];
 
 	}
 	
-	public function series(array $params)//: void
+	public function collections(array $params)//: void
 	{
 		$type = $params['action'];
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 		
 		if ( isset($params['id']) )
 		{
-			
+			return $params['id'];
 			
 		}
 		else
@@ -512,7 +512,6 @@ class Story extends Base
 		}
 		
 		
-		return \View\Base::stub("Series");
 	}
 
 	public function search(\Base $f3, array $params)

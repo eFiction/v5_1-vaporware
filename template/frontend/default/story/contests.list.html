@@ -25,9 +25,15 @@
 			<div class="contest-list-category">{ICON:folder} <repeat group="{{@contest.cache_categories}}" value="{{@category}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check>{{@category.1}}</repeat></div>
 		</check>
 		<div class="tags">{ICON:tags}&nbsp;
-			<check if="{{isset(@contest.cache_tags.simple.0)}}">
-				<true><repeat group="{{@contest.cache_tags.simple}}" value="{{@tag}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}"> </check><span class="tag">{{@tag.1}}</span></repeat></true>
+			<check if="{{isset(@contest.cache_tags.0)}}">
+				<true><repeat group="{{@contest.cache_tags}}" value="{{@tag}}"><span class="tag">{{@tag.1}}</span></repeat></true>
 				<false>{{@LN__NoTags}}</false>
+			</check>
+		</div>
+		<div class="tags">{ICON:members}&nbsp;
+			<check if="{{isset(@contest.cache_characters.0)}}">
+				<true><repeat group="{{@contest.cache_characters}}" value="{{@chara}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}"> </check><span class="tag">{{@chara.1}}</span></repeat></true>
+				<false>{{@LN__NoCharacters}}</false>
 			</check>
 		</div>
 	</div>

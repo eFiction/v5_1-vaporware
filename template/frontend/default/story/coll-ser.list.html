@@ -1,7 +1,31 @@
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="main/paginate.html" /></F3:check>
 
-<repeat group="{{ @data }}" value="{{ @entry }}">
-	{{@entry.title}}
+<div class="columns">
+	<div class="column">
+<repeat group="{{ @data }}" value="{{ @entry }}" counter="{{ @ctr }}">
+	<div class="story-box">
+		<div class="story-list-head"><a href="{{@BASE}}/story/{{@type}}/id={{@entry.collid}}">{{@entry.title}}</a> {{@LN__by}} <repeat group="{{@entry.cache_authors}}" value="{{@author}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check><a href="{{@BASE}}/authors/{{@author.0}}">{{@author.1}}</a></repeat></div>
+
+		<check if="{{!empty(@entry.cache_categories)}}">
+			<div>{ICON:folder} <repeat group="{{@entry.cache_categories}}" value="{{@category}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check>{{@category.1}}</repeat></div>
+		</check>
+		<div class="tags">{ICON:tags}&nbsp;
+			<check if="{{isset(@entry.cache_tags.0)}}">
+				<true><repeat group="{{@entry.cache_tags}}" value="{{@tag}}"><span class="tag">{{@tag.1}}</span></repeat></true>
+				<false>{{@LN__NoTags}}</false>
+			</check>
+		</div>
+		<div class="tags">{ICON:members}&nbsp;
+			<check if="{{isset(@entry.cache_characters.0)}}">
+				<true><repeat group="{{@entry.cache_characters}}" value="{{@chara}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}"> </check><span class="tag">{{@chara.1}}</span></repeat></true>
+				<false>{{@LN__NoTags}}</false>
+			</check>
+		</div>
+
+		<div class="story-list-info">{{ @type=='collections' ? @LN__Stories : @LN__Episodes }}: {{@entry.stories}} &bull; {{@LN__Chapters}}: {{@entry.chapters}} &bull; {{@LN__Words}}: {{@entry.wordcount}} &bull; {{@LN__MaxRating}}: {{@entry.max_rating.0}}<check if="{{ @type=='collections' }}"> &bull; {{ ${"LN__CollectionOpen_".@entry.open} }}</check></div>
+	</div>
 </repeat>
 
-<F3:check if="{{isset(@paginate.firstPage)}}"><include href="main/paginate.html" /></F3:check>
+</div></div>
+
+<F3:check if="{{isset(@paginate.firstPage) AND sizeof(@data)>2}}"><include href="main/paginate.html" /></F3:check>

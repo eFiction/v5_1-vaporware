@@ -12,10 +12,17 @@
 			<div class="story-list-head">
 				<check if="{{@entry.type=='ST'}}">
 					<true>
-						<a href="{{@BASE}}/story/read/{{@entry.id}}">{{@entry.title}}</a>
+						{ICON:text}<a href="{{@BASE}}/story/read/{{@entry.id}}">{{@entry.title}}</a>
 					</true>
 					<false>
-						{{ @entry.title }}
+						<check if="{{ @entry.ordered }}">
+							<true>
+								{ICON:numlist}<a href="{{@BASE}}/story/series/id={{@entry.id}}">{{@entry.title}}</a>
+							</true>
+							<false>
+								{ICON:list}<a href="{{@BASE}}/story/collections/id={{@entry.id}}">{{@entry.title}}</a>
+							</false>
+						</check>
 					</false>
 				</check>
 				{{@LN__by}} <repeat group="{{@entry.cache_authors}}" value="{{@author}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check><a href="{{@BASE}}/authors/{{@author.0}}">{{@author.1}}</a></repeat>

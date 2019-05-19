@@ -82,7 +82,7 @@
 			<td><a href="{{@BASE}}/adminCP/stories/series/id={{ @row.id }};returnpath=/adminCP/archive/contests/id={{@data.id}}/entries/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
 			<td><a href="{{@BASE}}/adminCP/archive/contests/id={{@data.id}}/entries/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}/remove={{ @row.lid }}" class="deleteItem" title="#{{ @row.lid }}: {{ @row.title }}">{ICON:trash}</a></td>
 			<td>{{ @row.lid }}</td>
-			<td>{ICON:list} {{ @row.title }}</td>
+			<td>{ICON:<check if="{{ @row.ordered }}">num</check>list} {{ @row.title }}</td>
 			<td>{{ @row.authors }}</td>
 		</tr>
 	</false>
