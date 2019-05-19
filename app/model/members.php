@@ -31,13 +31,7 @@ class Members extends Base
 															AND S.completed >= 2
 														)
 										WHERE rSA.aid = {$uid} );";
-			$stats[] = "SET @series  := (SELECT COUNT(DISTINCT C.collid) 
-											FROM `tbl_collections`C
-										WHERE C.uid = {$uid} AND C.ordered=1);";
-			$stats[] = "SET @collections  := (SELECT COUNT(DISTINCT C.collid) 
-											FROM `tbl_collections`C
-										WHERE C.uid = {$uid} AND C.ordered=0);";
-			$stats[] = "SELECT @stories as stories, @series as series, @collections as collections;";
+			$stats[] = "SELECT @stories as stories;";
 			$user['extras'] = $this->exec($stats)[0];
 			\Cache::instance()->set('memberProfileCache_'.$uid, $user, 300);
 		}
@@ -60,10 +54,17 @@ class Members extends Base
 
 		if ( "" == $library = \Cache::instance()->get('memberProfileCache_'.$uid.'_LibV_'.$visibility) )
 		{
+			$status = $visibility<2 ? "('F','P','A')" : "('P','A')";
+			$libSQL[] = "SET @series  := (SELECT COUNT(DISTINCT C.collid) 
+											FROM `tbl_collections`C
+										WHERE C.uid = {$uid} AND C.ordered=1 AND C.status IN {$status});";
+			$libSQL[] = "SET @collections  := (SELECT COUNT(DISTINCT C.collid) 
+											FROM `tbl_collections`C
+										WHERE C.uid = {$uid} AND C.ordered=0 AND C.status IN {$status});";
 			$libSQL[] = "SET @favourites := (SELECT GROUP_CONCAT(V SEPARATOR '||') FROM (SELECT CONCAT(COUNT(DISTINCT F.fid),',',F.type) as V  FROM `tbl_user_favourites`F WHERE `uid` = {$uid} AND `bookmark` = 0 AND `visibility` >= {$visibility} GROUP BY `type`) AS T);";
 			$libSQL[] = "SET @bookmarks := (SELECT GROUP_CONCAT(V SEPARATOR '||') FROM (SELECT CONCAT(COUNT(DISTINCT F.fid),',',F.type) as V  FROM `tbl_user_favourites`F WHERE `uid` = {$uid} AND `bookmark` = 1 AND `visibility` >= {$visibility} GROUP BY `type`) AS T);";
 
-			$libSQL[] = "SELECT @favourites as favourites, @bookmarks as bookmarks;";
+			$libSQL[] = "SELECT @series as series, @collections as collections, @favourites as favourites, @bookmarks as bookmarks;";
 			$library = $this->exec($libSQL)[0];
 
 			// parse and count favourites
@@ -119,6 +120,22 @@ class Members extends Base
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
 			"/member/{$author['username']}/stories",
+			$limit
+		);
+		
+		return $data;
+	}
+	
+	public function memberCollections(array $userData = [], string $selection)
+	{
+		$ordered = ($selection=="series");
+		// common SQL creation for member profile and story view
+		list ( $sql, $limit ) = $this->collectionsListBase($userData, $ordered);
+		$data = $this->exec($sql);
+				
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			$ordered ? "/member/{$userData['username']}/series" : "/member/{$userData['username']}/collections",
 			$limit
 		);
 		

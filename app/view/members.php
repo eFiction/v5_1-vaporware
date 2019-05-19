@@ -37,11 +37,24 @@ class Members extends Base
 	{
 		$this->f3->set('userdata', $userdata);
 		
-		while ( list($key, $value) = each($extradata['stories']) )
-			$this->dataProcess($extradata['stories'][$key], $key);
+		if ( sizeof(@$extradata['stories']) )
+			while ( list($key, $value) = each($extradata['stories']) )
+				$this->dataProcess($extradata['stories'][$key], $key);
 
 		$this->f3->set('extradata', $extradata);
 		return $this->render('members/stories.html');
+	}
+	
+	public function collections(array $userdata, array $collections)
+	{
+		$this->f3->set('userdata', $userdata);
+		
+		if ( sizeof($collections) )
+			while ( list($key, $value) = each($collections) )
+				$this->dataProcess($collections[$key], $key);
+
+		$this->f3->set('collections', $collections);
+		return $this->render('members/collections.html');
 	}
 	
 	public function listBookFav(array $userdata, array $extradata)

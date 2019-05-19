@@ -1,0 +1,51 @@
+<include href="members/header.html" />
+
+<F3:check if="{{isset(@paginate.firstPage)}}"><include href="main/paginate.html" /></F3:check>
+
+<div class="columns">
+	<div class="column">
+<repeat group="{{ @collections }}" value="{{ @collection }}" counter="{{ @ctr }}">
+	<div class="story-box">
+	<div class="story-list-head"><a href="{{@BASE}}/story/read/{{@collection.collid}}">{{@collection.title}}</a> {{@LN__by}} <repeat group="{{@collection.cache_authors}}" value="{{@author}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check><a href="{{@BASE}}/authors/{{@author.1}}">{{@author.1}}</a></repeat></div>
+{*	
+	<div class="story-list-actions">
+		&nbsp;
+		<check if="{{ @SESSION['userID']>0 }}">
+			<a href="{{@BASE}}/userCP/library/bookmark/edit/id=ST,{{@story.sid}};returnpath={{@PATH}}">
+				<check if="{{isset(@story.is_favourite.1)}}">
+					<true>{ICON:bookmark:{{@LN__BookmarkRemove, @story.title | format}}}</true>
+					<false>{ICON:bookmark-off:{{@LN__BookmarkAdd, @story.title | format}}}</false>
+				</check>
+			</a>&nbsp;
+			<check if="{{@@story.is_favourite.0>0}}">
+				<true>
+					<a href="{{@BASE}}/userCP/library/favourite/edit/id=ST,{{@story.sid}};returnpath={{@PATH}}" title="{{@LN__FavouriteRemove, @story.title | format}}">{ICON:favourite}
+				</true>
+				<false>
+					<a href="{{@BASE}}/userCP/library/favourite/edit/id=ST,{{@story.sid}};returnpath={{@PATH}}" title="{{@LN__FavouriteAdd, @story.title | format}}">{ICON:favourite-off}
+				</false>
+			</check>
+			</a>&nbsp;
+		</check>
+		<check if="{{@story.reviews>0}}">
+			<a href="{{@BASE}}/story/reviews/{{@story.sid}}" title="{{@LN__TitleReadReviews, @story.title | format}}">{ICON:comments} {{@story.reviews}}</a>
+		</check>
+	</div>
+	<check if="{{!empty(@story.cache_categories)}}">
+		<div class="story-list-category">{ICON:folder} <repeat group="{{@story.cache_categories}}" value="{{@category}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check>{{@category.1}}</repeat></div>
+	</check>
+	<div class="story-list-summary">{{@story.summary |raw}}</div>
+	<div class="tags">{ICON:tags}&nbsp;
+		<check if="{{isset(@story.cache_tags.simple.0)}}">
+			<true><repeat group="{{@story.cache_tags.simple}}" value="{{@tag}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}"> </check><span class="tag">{{@tag.1}}</span></repeat></true>
+			<false>{{@LN__NoTags}}</false>
+		</check>
+	</div>
+	<div class="story-list-info">{{@LN__Published}}: {{@story.published}} &bull; <check if="{{@story.modified}}">{{@LN__Updated}}: {{@story.modified}} &bull; </check>{{@LN__Chapters}}: {{@story.chapters}} &bull; {{@LN__Words}}: {{@story.wordcount}} &bull; {{@LN__Status}}: {{@story.completed==9 ? @LN__Completed : @LN__WIP}} &bull; <check if="{{!empty(@story.cache_rating.1)}}">{{@LN__Rating}}: {{@story.cache_rating.1}} &bull; </check>{{@LN__Clicks}}: {{@story.count}}</div>
+*}
+	</div>
+</repeat>
+
+</div></div>
+
+<F3:check if="{{isset(@paginate.firstPage) AND sizeof(@collections)>2}}"><include href="main/paginate.html" /></F3:check>

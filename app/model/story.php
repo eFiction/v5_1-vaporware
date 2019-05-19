@@ -228,21 +228,8 @@ class Story extends Base
 	
 	public function collectionsList(bool $ordered = FALSE)
 	{
-		$limit = 5;
-		$pos = (int)$this->f3->get('paginate.page') - 1;
-
-		$sql = "SELECT SQL_CALC_FOUND_ROWS
-					C.collid, C.parent_collection, C.title, C.summary, C.open, C.max_rating,
-					COUNT(DISTINCT rCS.sid) as stories, C.chapters, C.wordcount,
-					C.cache_authors, C.cache_tags, C.cache_characters, C.cache_categories,
-					C2.title as parent_title
-				FROM `tbl_collections`C 
-					LEFT JOIN `tbl_collections`C2 ON ( C.parent_collection = C2.collid )
-					LEFT JOIN `tbl_collection_stories`rCS ON ( C.collid = rCS.collid AND rCS.confirmed = 1 )
-				WHERE C.ordered=".(int)$ordered." AND C.chapters>0 AND C.status IN ('P','A')
-				GROUP BY C.collid
-				LIMIT ".(max(0,$pos*$limit)).",".$limit;
-				
+		// common SQL creation for member profile and story view
+		list ( $sql, $limit ) = $this->collectionsListBase([], $ordered);
 		$data = $this->exec($sql);
 				
 		$this->paginate(
@@ -253,7 +240,7 @@ class Story extends Base
 		
 		return $data;
 	}
-	
+
 	// wrapper for collectionsList
 	public function seriesList()
 	{
@@ -283,7 +270,7 @@ class Story extends Base
 	// wrapper for collectionsLoad
 	public function seriesLoad(int $collID)
 	{
-		return $this->collectionsLoad($collID, TRUE);
+		return $this->collectionsLoad($collID, $userData, TRUE);
 	}
 	
 	public function contestsList() : array

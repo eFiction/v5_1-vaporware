@@ -236,6 +236,39 @@ class Base extends \Prefab {
 		return str_replace(array_keys($replace), array_values($replace), $sql_StoryConstruct);
 	}
 
+	public function collectionsListBase(array $userData = [], bool $ordered = FALSE)
+	{
+		$limit = 5;
+		$pos = (int)$this->f3->get('paginate.page') - 1;
+
+		if ( sizeof($userData) )
+		{
+			$whereUser = "C.uid={$userData['uid']} AND ";
+			if ( $userData['visibility'] < 2 )
+				$status = "('F','P','A')";
+			else
+				$status = "('P','A')";
+		}
+		else
+		{
+			$whereUser = "";
+			$status = "('P','A')";
+		}
+		
+		$sql = "SELECT SQL_CALC_FOUND_ROWS
+					C.collid, C.parent_collection, C.title, C.summary, C.open, C.max_rating,
+					COUNT(DISTINCT rCS.sid) as stories, C.chapters, C.wordcount,
+					C.cache_authors, C.cache_tags, C.cache_characters, C.cache_categories,
+					C2.title as parent_title
+				FROM `tbl_collections`C 
+					LEFT JOIN `tbl_collections`C2 ON ( C.parent_collection = C2.collid )
+					LEFT JOIN `tbl_collection_stories`rCS ON ( C.collid = rCS.collid AND rCS.confirmed = 1 )
+				WHERE {$whereUser} C.ordered=".(int)$ordered." AND C.chapters>0 AND C.status IN {$status}
+				GROUP BY C.collid
+				LIMIT ".(max(0,$pos*$limit)).",".$limit;
+		return [ $sql, $limit ];	
+	}
+	
 	protected function paginate(int $total, string $route, int $limit=10)
 	{
 		/**

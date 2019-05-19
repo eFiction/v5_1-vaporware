@@ -55,6 +55,11 @@ class Members extends Base {
 			case "favourites":
 				$this->memberBookFav( $params['selection'], $user_data, $options );
 				break;
+			case "series":
+			case "collections":
+				$collections_data = $this->model->memberCollections($user_data, $params['selection'], $options);
+				$this->buffer ( $this->template->collections($user_data, $collections_data) );
+				break;
 			case "stories":
 			default:
 				$story_data = $this->model->memberStories($user_data, $options);

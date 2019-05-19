@@ -275,6 +275,7 @@ return array(
 'Recomm'	=> 'Recommendation',
 'Recomms'	=> 'Recommendations',
 'RecommBy'	=> 'Recommended by',
+'Collections'	=> 'Collections',
 'Series'	=> 'Series',
 'Story'		=> 'Story',
 'Stories'	=> 'Stories',

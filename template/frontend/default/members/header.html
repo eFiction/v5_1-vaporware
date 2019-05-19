@@ -16,6 +16,18 @@
 				<span>{{ @userdata.extras.stories }} {{@LN__Stories}}</span>
 			</a> 
 		</check>
+		<check if="{{ @userdata.extras.series>0 }}">
+			<a class="navbar-item button navmenu" href="{{@BASE}}/member/{{ @userdata.username }}/series">
+				<span class="icon">{ICON:numlist}</span>
+				<span>{{ @userdata.extras.series }} {{@LN__Series}}</span>
+			</a> 
+		</check>
+		<check if="{{ @userdata.extras.collections>0 }}">
+			<a class="navbar-item button navmenu" href="{{@BASE}}/member/{{ @userdata.username }}/collections">
+				<span class="icon">{ICON:list}</span>
+				<span>{{ @userdata.extras.collections }} {{@LN__Collections}}</span>
+			</a> 
+		</check>
 		<check if="{{ @userdata.extras.favourites_count>0 }}">
 			<div class="navbar-item has-dropdown is-hoverable">
 				<a class="navbar-link button navmenu">
