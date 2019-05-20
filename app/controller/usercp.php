@@ -626,6 +626,7 @@ class UserCP extends Base
 			[
 				[ "link" => "AU", "label" => "Author" ],
 				[ "link" => "RC", "label" => "Recomm" ],
+				[ "link" => "CO", "label" => "Collections" ],
 				[ "link" => "SE", "label" => "Series" ],
 				[ "link" => "ST", "label" => "Stories" ],
 			];
