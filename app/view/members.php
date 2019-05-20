@@ -45,7 +45,7 @@ class Members extends Base
 		return $this->render('members/stories.html');
 	}
 	
-	public function collections(array $userdata, array $collections)
+	public function collections(array $userdata, string $type, array $collections)
 	{
 		$this->f3->set('userdata', $userdata);
 		
@@ -53,6 +53,7 @@ class Members extends Base
 			while ( list($key, $value) = each($collections) )
 				$this->dataProcess($collections[$key], $key);
 
+		$this->f3->set('type', $type);
 		$this->f3->set('collections', $collections);
 		return $this->render('members/collections.html');
 	}

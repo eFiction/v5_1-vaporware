@@ -22,7 +22,8 @@
 		<td><a href="{{@BASE}}/
 			<check if="{{ @data.type == 'AU' }}">members/id={{ @data.id }}"></check>
 			<check if="{{ @data.type == 'RC' }}">story/read/{{ @data.id }}"></check>
-			<check if="{{ @data.type == 'SE' }}">story/read/{{ @data.id }}"></check>
+			<check if="{{ @data.type == 'CO' }}">story/collections/id={{ @data.id }}"></check>
+			<check if="{{ @data.type == 'SE' }}">story/series/id={{ @data.id }}"></check>
 			<check if="{{ @data.type == 'ST' }}">story/read/{{ @data.id }}"></check>
 			{{ @data.name }}</a></td>
 		<td>{{ @data.comments }}</td>

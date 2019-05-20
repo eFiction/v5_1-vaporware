@@ -237,6 +237,18 @@ class Story extends Base
 			$ordered ? "/story/series" : "/story/collections",
 			$limit
 		);
+
+		if ( sizeof($data)>0 )
+		{
+			foreach ( $data as &$dat)
+			{
+				$favs = $this->cleanResult($dat['is_favourite']);
+				$dat['is_favourite'] = [];
+				if(!empty($favs))
+				foreach ( $favs as $value )
+					if ( isset($value[1]) ) $dat['is_favourite'][$value[0]] = $value[1];
+			}
+		}
 		
 		return $data;
 	}
@@ -270,7 +282,7 @@ class Story extends Base
 	// wrapper for collectionsLoad
 	public function seriesLoad(int $collID)
 	{
-		return $this->collectionsLoad($collID, $userData, TRUE);
+		return $this->collectionsLoad($collID, TRUE);
 	}
 	
 	public function contestsList() : array

@@ -257,12 +257,14 @@ class Base extends \Prefab {
 		
 		$sql = "SELECT SQL_CALC_FOUND_ROWS
 					C.collid, C.parent_collection, C.title, C.summary, C.open, C.max_rating,
-					COUNT(DISTINCT rCS.sid) as stories, C.chapters, C.wordcount,
+					COUNT(DISTINCT rCS.sid) as stories, C.chapters, C.wordcount, C.reviews,
 					C.cache_authors, C.cache_tags, C.cache_characters, C.cache_categories,
+					GROUP_CONCAT(Fav.bookmark,',',Fav.fid SEPARATOR '||') as is_favourite,
 					C2.title as parent_title
 				FROM `tbl_collections`C 
 					LEFT JOIN `tbl_collections`C2 ON ( C.parent_collection = C2.collid )
 					LEFT JOIN `tbl_collection_stories`rCS ON ( C.collid = rCS.collid AND rCS.confirmed = 1 )
+					LEFT JOIN `tbl_user_favourites`Fav ON ( Fav.item = C.collid AND Fav.type IN ('CO','SE') AND Fav.uid = ".(int)$_SESSION['userID'].")
 				WHERE {$whereUser} C.ordered=".(int)$ordered." AND C.chapters>0 AND C.status IN {$status}
 				GROUP BY C.collid
 				LIMIT ".(max(0,$pos*$limit)).",".$limit;

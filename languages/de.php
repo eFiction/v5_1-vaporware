@@ -131,6 +131,7 @@ return array(
 
 // [7] Global -- Search
 'NoEntries'			=> 'Keine Einträge',
+'Entries'			=> 'Beiträge', //DB
 'NoRecordsInList'	=> 'Keine Einträge in dieser Liste',
 
 // [8] Global -- Archiv Stats'

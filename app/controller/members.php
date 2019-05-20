@@ -58,7 +58,7 @@ class Members extends Base {
 			case "series":
 			case "collections":
 				$collections_data = $this->model->memberCollections($user_data, $params['selection'], $options);
-				$this->buffer ( $this->template->collections($user_data, $collections_data) );
+				$this->buffer ( $this->template->collections($user_data, $params['selection'], $collections_data) );
 				break;
 			case "stories":
 			default:

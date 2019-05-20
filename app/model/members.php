@@ -139,6 +139,18 @@ class Members extends Base
 			$limit
 		);
 		
+		if ( sizeof($data)>0 )
+		{
+			foreach ( $data as &$dat)
+			{
+				$favs = $this->cleanResult($dat['is_favourite']);
+				$dat['is_favourite'] = [];
+				if(!empty($favs))
+				foreach ( $favs as $value )
+					if ( isset($value[1]) ) $dat['is_favourite'][$value[0]] = $value[1];
+			}
+		}
+
 		return $data;
 	}
 

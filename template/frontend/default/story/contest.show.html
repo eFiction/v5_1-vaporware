@@ -1,10 +1,9 @@
 <div class="columns is-multiline">
-	<div class="column is-one-quarter"><a href="{{@BASE}}{{@returnpath}}">{{@LN__ReturnToOverview}}</a></div>
-	<div class="column is-two-quarters"><h4>{{@data.title}}<br />{{@LN__by}} <a href="{{@BASE}}/member/{{@data.username}}">{{@data.username}}</a></h4></div>
-	<div class="column is-one-quarter">
-		<div class="is-pulled-right"><a href="{{@BASE}}/story/contests/id={{@data.id}}/entries">{{@data.entries}}</a></div>
+	<div class="column is-one-half"><a class="button" href="{{@BASE}}{{@returnpath}}">{{@LN__ReturnToOverview}}</a></div>
+	<div class="column is-one-half">
+		<div class="is-pulled-right"><a class="button" href="{{@BASE}}/story/contests/id={{@data.id}}/entries">{{@data.entries}} {{@LN__Entries}}</a></div>
 	</div>
-
+	<div class="column is-full"><h4>{{@data.title}}<br />{{@LN__by}} <a href="{{@BASE}}/member/{{@data.username}}">{{@data.username}}</a></h4></div>
 	<div class="column is-one-third">
 		<switch expr="{{ @data.active }}">
 			<case value="preparing" break="TRUE">

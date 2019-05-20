@@ -925,7 +925,7 @@ class UserCP extends Controlpanel
 	public function libraryBookFavDelete($params)
 	{
 		if ( empty($params['id'][0]) OR empty($params['id'][1]) ) return FALSE;
-		if ( in_array($params["id"][0],["AU","RC","SE","ST"]) )
+		if ( in_array($params["id"][0],["AU","RC","CO","SE","ST"]) )
 		{
 			$mapper=new \DB\SQL\Mapper($this->db, $this->prefix.'user_favourites');
 			$mapper->load(array("uid=? AND item=? AND type=? AND bookmark=?",$_SESSION['userID'], $params["id"][1], $params["id"][0], (array_key_exists("bookmark",$params))?1:0 ));
@@ -944,7 +944,7 @@ class UserCP extends Controlpanel
 		$limit = 10;
 		$pos = $page - 1;
 		
-		if ( in_array($params[1],["AU","RC","SE","ST"]) )
+		if ( in_array($params[1],["AU","RC","CO","SE","ST"]) )
 		{
 			$sql = $this->sqlMaker("bookfav", $params[1]) . 
 					"ORDER BY {$sort['order']} {$sort['direction']}
@@ -972,10 +972,15 @@ class UserCP extends Controlpanel
 			$sql = $this->sqlMaker("bookfav", "AU", FALSE) . 
 				"WHERE U.uid = :id ";
 		}
+		elseif ( $params['id'][0]=="CO" )
+		{
+			$sql = $this->sqlMaker("bookfav", "CO", FALSE) . 
+				"WHERE Coll.collid = :id ";
+		}
 		elseif ( $params['id'][0]=="SE" )
 		{
 			$sql = $this->sqlMaker("bookfav", "SE", FALSE) . 
-				"WHERE Ser.seriesid = :id ";
+				"WHERE Coll.collid = :id ";
 		}
 		elseif ( $params['id'][0]=="ST" )
 		{
@@ -1065,11 +1070,17 @@ class UserCP extends Controlpanel
 				"from"		=> "`tbl_stories`S",
 				"join"		=> "S.sid = Fav.item AND Fav.type='ST'"
 			],
-			"SC"	=>
+			"CO"	=>
 			[
-				"fields"	=> "'SC' as type, Coll.collid as id, Coll.title as name, Coll.cache_authors",
+				"fields"	=> "'CO' as type, Coll.collid as id, Coll.title as name, Coll.cache_authors",
 				"from"		=> "`tbl_collections`Coll",
-				"join"		=> "Coll.collid = Fav.item AND Fav.type='SC'"
+				"join"		=> "Coll.collid = Fav.item AND Fav.type='CO'"
+			],
+			"SE"	=>
+			[
+				"fields"	=> "'SE' as type, Coll.collid as id, Coll.title as name, Coll.cache_authors",
+				"from"		=> "`tbl_collections`Coll",
+				"join"		=> "Coll.collid = Fav.item AND Fav.type='SE'"
 			],
 			"RC"	=>
 			[
@@ -1108,12 +1119,18 @@ class UserCP extends Controlpanel
 									INNER JOIN `tbl_users`U ON ( U.uid = SA.aid ) 
 							LEFT JOIN `tbl_chapters`Ch ON ( F2.reference_sub = Ch.chapid ) 
 						WHERE F.writer_uid = {$_SESSION['userID']} AND F.type='C' ",
-			"SC"
+			"CO"
 				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Coll.collid as id, GROUP_CONCAT(DISTINCT U.username SEPARATOR ', ') as name, U.uid, F.text, Coll.title, UNIX_TIMESTAMP(F.datetime) as date 
 						FROM `tbl_feedback`F
 						INNER JOIN `tbl_collections`Coll ON ( F.reference = Coll.collid )
 							INNER JOIN `tbl_users`U ON ( U.uid = Coll.uid )
-						WHERE F.writer_uid = {$_SESSION['userID']} AND F.type='SC' ",
+						WHERE F.writer_uid = {$_SESSION['userID']} AND F.type='CO' ",
+			"SE"
+				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Coll.collid as id, GROUP_CONCAT(DISTINCT U.username SEPARATOR ', ') as name, U.uid, F.text, Coll.title, UNIX_TIMESTAMP(F.datetime) as date 
+						FROM `tbl_feedback`F
+						INNER JOIN `tbl_collections`Coll ON ( F.reference = Coll.collid )
+							INNER JOIN `tbl_users`U ON ( U.uid = Coll.uid )
+						WHERE F.writer_uid = {$_SESSION['userID']} AND F.type='SE' ",
 			"RC"
 				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Rec.recid as id, Rec.author as name, F.text, Rec.title, Rec.url, UNIX_TIMESTAMP(F.datetime) as date 
 						FROM `tbl_feedback`F
@@ -1131,12 +1148,18 @@ class UserCP extends Controlpanel
 							INNER JOIN `tbl_stories`S ON ( F.reference = S.sid )
 								LEFT JOIN `tbl_chapters`Ch ON ( F.reference_sub = Ch.chapid )
 						WHERE F.type='ST' ",
-			"SC"
+			"CO"
 				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Coll.collid as id, IF(F.writer_uid>0,U.username,F.writer_name) as name, U.uid, F.text, Coll.title, UNIX_TIMESTAMP(F.datetime) as date 
 						FROM `tbl_feedback`F
 							INNER JOIN `tbl_collections`Coll ON ( F.reference = Coll.collid AND Coll.uid = {$_SESSION['userID']} )
 							LEFT JOIN `tbl_users`U ON ( F.writer_uid = U.uid )
-						WHERE F.type='SC' ",
+						WHERE F.type='CO' ",
+			"SE"
+				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Coll.collid as id, IF(F.writer_uid>0,U.username,F.writer_name) as name, U.uid, F.text, Coll.title, UNIX_TIMESTAMP(F.datetime) as date 
+						FROM `tbl_feedback`F
+							INNER JOIN `tbl_collections`Coll ON ( F.reference = Coll.collid AND Coll.uid = {$_SESSION['userID']} )
+							LEFT JOIN `tbl_users`U ON ( F.writer_uid = U.uid )
+						WHERE F.type='SE' ",
 			"RC"
 				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Rec.recid as id, IF(F.writer_uid>0,U.username,F.writer_name) as name, U.uid, F.text, Rec.title, Rec.url, UNIX_TIMESTAMP(F.datetime) as date 
 						FROM `tbl_feedback`F
@@ -1157,7 +1180,7 @@ class UserCP extends Controlpanel
 			return TRUE;
 		}
 
-		if ( in_array($params['id'][0],["AU","RC","SC","ST"]) )
+		if ( in_array($params['id'][0],["AU","RC","CO","SE","ST"]) )
 		{
 			$insert = 
 			[

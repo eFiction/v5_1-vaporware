@@ -131,6 +131,7 @@ return array(
 
 // [7] Global -- Search 1
 'NoEntries'			=> 'No entries',
+'Entries'			=> 'Entries', //DB
 'NoRecordsInList'	=> 'No records in this list',
 
 // [8] Global -- Archiv Stats 10
