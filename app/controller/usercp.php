@@ -19,9 +19,9 @@ class UserCP extends Base
 
 	public function index(\Base $f3, array $params)//: void
 	{
-		$modules = [ "library", "messaging", "author", "feedback", "friends", "settings" ];
+		$modules = [ "library", "messaging", "author", "feedback", "friends", "settings", "polls" ];
 
-		if ( TRUE == @$this->config->optional_modules['shoutbox'] )
+		if ( TRUE == @$this->config['optional_modules']['shoutbox'] )
 			$modules[] = "shoutbox";
 
 		// grab the first parameter

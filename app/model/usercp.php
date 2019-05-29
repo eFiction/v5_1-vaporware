@@ -876,6 +876,29 @@ class UserCP extends Controlpanel
 		return NULL;
 	}
 	
+	public function pollsLoad(int $page, array $sort):array
+	{
+		$limit = 10;
+		$pos = $page - 1;
+		
+		$sql = "SELECT SQL_CALC_FOUND_ROWS
+					P.poll_id, P.question, P.options,
+					V.option
+					FROM `0518_poll`P
+						LEFT JOIN `0518_poll_votes`V ON ( P.poll_id = V.poll_id AND V.uid=:uid )
+					ORDER BY {$sort['order']} {$sort['direction']}
+					LIMIT ".(max(0,$pos*$limit)).",".$limit;
+
+		$data = $this->exec($sql, [":uid" => $_SESSION['userID'] ]);
+
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/userCP/polls",
+			$limit
+		);
+		return $data;
+	}
+	
 	public function shoutboxList($page,$user=FALSE)
 	{
 		$limit = 25;
