@@ -8,9 +8,9 @@
 		<tr><td>{{@LN__Stats_Reviews}}:</td><td>{{@archiveStats.reviews}}</td></tr>
 		<tr><td colspan="2">&nbsp;</td></tr>
 		<tr><td colspan="2">{{@LN__Stats_Online}}</td></tr>
-		<tr><td>{{@LN__Stats_Guests}}:</td><td>{{ @usercount['guest'] }}</td></tr>
-		<tr><td>{{@LN__Stats_Users}}:</td><td>{{ @usercount['member'] }}</td></tr>
+		<tr><td>{{@LN__Stats_Guests}}:</td><td>{{ @usercount.guest }}</td></tr>
+		<tr><td>{{@LN__Stats_Users}}:</td><td>{{ @usercount.member }}</td></tr>
 	</table>
 <br />
-{{@LN__Stats_LatestMember}}: <a href="{{@BASE}}/members/id={{@archiveStats.newmember.0}}">{{@archiveStats.newmember.1}}</a>.
+{{@LN__Stats_LatestMember}}: <a href="{{@BASE}}/member/{{@archiveStats.newmember.1}}">{{@archiveStats.newmember.1}}</a>.
 <br />

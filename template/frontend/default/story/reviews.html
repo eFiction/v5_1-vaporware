@@ -38,7 +38,7 @@
 		<div class="review-headline">
 			{* This is quite an abuse of the "check" function, but there is no other way for a dynamic assignment of variables *}
 			<check if="{{@item.uid>0}}">
-				<true><check if="{{@namelink='<a href=\''.@BASE.'/members/id='.@item.uid.'\'>'.@item.name.'</a>' }}"></check></true>
+				<true><check if="{{@namelink='<a href=\''.@BASE.'/member/'.@item.name.'\'>'.@item.name.'</a>' }}"></check></true>
 				<false><check if="{{@namelink='\''.@item.name.'\''}}"></check></false>
 			</check>
 			{* End of abuse, but this saves quite some work right below and keeps the link generation from the controller  *}

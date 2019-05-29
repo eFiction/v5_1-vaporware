@@ -5,10 +5,10 @@
 		<th>&nbsp;</th>
 		<th>&nbsp;</th>
 		<th><a href="{{@BASE}}/userCP/library/{{@extra.sub}}/{{@extra.type}}/order=id,
-			<check if="{{ @sort['link']!='id' }}">
+			<check if="{{ @sort.link!='id' }}">
 				<true>asc">{ICON:sort}</true>
 				<false>
-					<check if="{{ @sort['direction']=='desc' }}">
+					<check if="{{ @sort.direction=='desc' }}">
 						<true>asc">{ICON:sort-numeric-desc}</true>
 						<false>desc">{ICON:sort-numeric-asc}</false>
 					</check>
@@ -16,10 +16,10 @@
 			</check></a> {{@LN__Sort_ID}}
 		</th>
 		<th><a href="{{@BASE}}/userCP/library/{{@extra.sub}}/{{@extra.type}}/order=visibility,
-			<check if="{{ @sort['link']!='visibility' }}">
+			<check if="{{ @sort.link!='visibility' }}">
 				<true>asc">{ICON:sort}</true>
 				<false>
-					<check if="{{ @sort['direction']=='desc' }}">
+					<check if="{{ @sort.direction=='desc' }}">
 						<true>asc">{ICON:sort-alpha-desc}</true>
 						<false>desc">{ICON:sort-alpha-asc}</false>
 					</check>
@@ -27,10 +27,10 @@
 			</check></a> {{@LN__Sort_Visibility}}
 		</th>
 		<th><a href="{{@BASE}}/userCP/library/{{@extra.sub}}/{{@extra.type}}/order=name,
-			<check if="{{ @sort['link']!='name' }}">
+			<check if="{{ @sort.link!='name' }}">
 				<true>asc">{ICON:sort}</true>
 				<false>
-					<check if="{{ @sort['direction']=='desc' }}">
+					<check if="{{ @sort.direction=='desc' }}">
 						<true>asc">{ICON:sort-alpha-desc}</true>
 						<false>desc">{ICON:sort-alpha-asc}</false>
 					</check>
@@ -38,10 +38,10 @@
 			</check></a> {{@LN__Sort_Name}}/{{@LN__Sort_Title}}
 		</th>
 		<th><a href="{{@BASE}}/userCP/library/{{@extra.sub}}/{{@extra.type}}/order=comments,
-			<check if="{{ @sort['link']!='comments' }}">
+			<check if="{{ @sort.link!='comments' }}">
 				<true>asc">{ICON:sort}</true>
 				<false>
-					<check if="{{ @sort['direction']=='desc' }}">
+					<check if="{{ @sort.direction=='desc' }}">
 						<true>asc">{ICON:sort-alpha-desc}</true>
 						<false>desc">{ICON:sort-alpha-asc}</false>
 					</check>
@@ -51,22 +51,22 @@
 	</tr>
 	<repeat group="{{ @libraryEntries }}" value="{{ @row }}">
 	<tr>
-		<td><a href="{{@BASE}}/userCP/library/{{@extra.sub}}/edit/id={{@extra.type}},{{ @row['id'] }};returnpath=/userCP/library/{{@extra.sub}}/{{@extra.type}}/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
-		<td><a href="{{@BASE}}/userCP/library/{{@extra.sub}}/delete/id={{@extra.type}},{{ @row['id'] }};returnpath=/userCP/library/{{@extra.sub}}/{{@extra.type}}/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}" class="deleteItem" title="{{ @row['name'] }}">{ICON:trash}</a></td>
-		<td>{{ @row['id'] }}</td>
+		<td><a href="{{@BASE}}/userCP/library/{{@extra.sub}}/edit/id={{@extra.type}},{{ @row.id }};returnpath=/userCP/library/{{@extra.sub}}/{{@extra.type}}/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
+		<td><a href="{{@BASE}}/userCP/library/{{@extra.sub}}/delete/id={{@extra.type}},{{ @row.id }};returnpath=/userCP/library/{{@extra.sub}}/{{@extra.type}}/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}" class="deleteItem" title="{{ @row.name }}">{ICON:trash}</a></td>
+		<td>{{ @rowid }}</td>
 		<td>
-			<check if="{{ @row['visibility']==0 }}">{ICON:member}</check>
-			<check if="{{ @row['visibility']==1 }}">{ICON:members}</check>
-			<check if="{{ @row['visibility']==2 }}">{ICON:visible}</check>
+			<check if="{{ @row.visibility==0 }}">{ICON:member}</check>
+			<check if="{{ @row.visibility==1 }}">{ICON:members}</check>
+			<check if="{{ @row.visibility==2 }}">{ICON:visible}</check>
 		</td>
 		<td><a href="{{@BASE}}/
-			<check if="{{ @extra.type == 'AU' }}">members/id={{ @row['id'] }}"></check>
-			<check if="{{ @extra.type == 'RC' }}">story/read/{{ @row['id'] }}"></check>
-			<check if="{{ @extra.type == 'CO' }}">story/collections/id={{ @row['id'] }}"></check>
-			<check if="{{ @extra.type == 'SE' }}">story/series/id={{ @row['id'] }}"></check>
-			<check if="{{ @extra.type == 'ST' }}">story/read/{{ @row['id'] }}"></check>
-			{{ @row['name'] }}</a></td>
-		<td>{{ @row['comments'] }}</td>
+			<check if="{{ @extra.type == 'AU' }}">member/{{ @row.name }}"></check>
+			<check if="{{ @extra.type == 'RC' }}">story/read/{{ @row.id }}"></check>
+			<check if="{{ @extra.type == 'CO' }}">story/collections/id={{ @row.id }}"></check>
+			<check if="{{ @extra.type == 'SE' }}">story/series/id={{ @row.id }}"></check>
+			<check if="{{ @extra.type == 'ST' }}">story/read/{{ @row.id }}"></check>
+			{{ @row.name }}</a></td>
+		<td>{{ @row.comments }}</td>
 	</tr>
 	</repeat>
 </tbody>

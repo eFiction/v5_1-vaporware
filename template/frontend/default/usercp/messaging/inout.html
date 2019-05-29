@@ -44,22 +44,22 @@
 <repeat group="{{ @messages }}" value="{{ @pm_line }}">
 		<tr>
 			{* check if mail has been read *}
-			<td><check if="{{ @pm_line['date_read']!==NULL }}">
-					<true>{ICON:mail-read:{{ date(@CONFIG.date_format,@pm_line['date_read']) }}}</true>
+			<td><check if="{{ @pm_line.date_read!==NULL }}">
+					<true>{ICON:mail-read:{{ date(@CONFIG.date_format,@pm_line.date_read) }}}</true>
 					<false>{ICON:mail:{{@LN__PM_unread}}}</false>
 			</check></td>
-			<td>{{ date(@CONFIG.date_format,@pm_line['date_sent']) }}</td>
-			<td><a href="{{@BASE}}/userCP/messaging/read/id={{ @pm_line['mid'] }}">{{ @pm_line['subject'] }}</a></td>
-			<td><check if="{{ @pm_line['date_read']!==NULL }}">
-				<true><a href="{{@BASE}}/members/id={{ @pm_line['name_id'] }}">{{ @pm_line['name'] }}</a></true>
-				<false>{{ @pm_line['name'] }}</false>
+			<td>{{ date(@CONFIG.date_format,@pm_line.date_sent) }}</td>
+			<td><a href="{{@BASE}}/userCP/messaging/read/id={{ @pm_line.mid }}">{{ @pm_line.subject }}</a></td>
+			<td><check if="{{ @pm_line.date_read!==NULL }}">
+				<true><a href="{{@BASE}}/member/{{ @pm_line.name }}">{{ @pm_line.name }}</a></true>
+				<false>{{ @pm_line.name }}</false>
 			</check></td>
 			{* check if mail can be revoked (inbox always, outbox only if not read by recipient *}
-			<td><check if="{{ @pm_line['can_revoke'] }}">
-						<true><span class="delete" id="{{ @pm_line['mid'] }},r">{ICON:alert:revoke}</span></true>
+			<td><check if="{{ @pm_line.can_revoke }}">
+						<true><span class="delete" id="{{ @pm_line.mid }},r">{ICON:alert:revoke}</span></true>
 						<false>&nbsp;</false>
 			</check>
-			<span class="delete" id="{{ @pm_line['mid'] }},d">{ICON:trash:delete}</span></td>
+			<span class="delete" id="{{ @pm_line.mid }},d">{ICON:trash:delete}</span></td>
 		</tr>
 </repeat>
 {* END all messages *}

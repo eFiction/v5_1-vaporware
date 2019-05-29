@@ -60,8 +60,8 @@
 		</check>
 		</div>
 	
+		<check if="{{ @_SESSION['userID']>0 AND @userdata.uid != @_SESSION['userID'] }}">
 		<div class="navbar-end">
-			<check if="{{ @_SESSION['userID']>0 AND @userdata.uid != @_SESSION['userID'] }}">
 				<check if="{{ @userdata.friend==FALSE }}">
 				<true>
 				<a class="navbar-item button navmenu" href="{{@BASE}}/userCP/friends/update/add={{@userdata.username}};returnpath={{@current_path}}">
@@ -76,12 +76,12 @@
 				</a>
 				</false>
 				</check>
-			</check>
 			<a class="navbar-item button navmenu">
 				<span class="icon">{ICON:mail}</span>
 				<span>{{@LN__Contact}}</span>
 			</a>
 		</div>
+		</check>
 
 	</div>
 
