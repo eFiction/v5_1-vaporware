@@ -88,8 +88,9 @@ class UserCP extends Controlpanel
 
 				$this->menu[$selected]["sub"] = $menu;
 			}
-			else
-				$this->menu[$selected]["sub"] = $this->panelMenu($selected, $data);
+			// Add sub menu
+			elseif ( [] != $sub = $this->panelMenu($selected, $data) )
+				$this->menu[$selected]["sub"] = $sub;
 			
 			// will not work for sub menus yet
 			$this->menu[$selected]['selected'] = 1;
@@ -211,13 +212,27 @@ class UserCP extends Controlpanel
 				$user->save();
 			}
 			$this->menuCount['data']['feedback'] = $data;
-			//print_r($data);
+
 			$this->menuCount['FB']	=	[
 											"RW" => (int)$data['rw']['sum'],
 											"RR" => (int)$data['rr']['sum'],
 											"CW" => (int)$data['cw']['sum'],
 											"CR" => (int)$data['cr']['sum'],
 										];
+		}
+		elseif ( $module == "PL" )
+		{
+			if ( "" == $data = \Cache::instance()->get('openPolls') )
+			{
+				$sql = "SELECT UNIX_TIMESTAMP(`end_date`) as end FROM `tbl_poll` WHERE `start_date`IS NOT NULL AND (`end_date` IS NULL OR `end_date` > NOW()) ORDER BY `end_date` DESC;";
+				$probe = $this->exec($sql);
+				if ( 0 < $data = sizeof($probe) AND $probe[0]['end']>0 )
+				{
+					$seconds = $probe[0]['end']-time();
+				}
+				\Cache::instance()->set('openPolls', $data, $seconds??0);
+			}
+			$this->menuCount['PL'] = [ "PL" => $data ];
 		}
 	}
 	
@@ -876,16 +891,19 @@ class UserCP extends Controlpanel
 		return NULL;
 	}
 	
-	public function pollsLoad(int $page, array $sort):array
+	public function pollsList(int $page, array $sort):array
 	{
 		$limit = 10;
 		$pos = $page - 1;
 		
 		$sql = "SELECT SQL_CALC_FOUND_ROWS
-					P.poll_id, P.question, P.options,
-					V.option
-					FROM `0518_poll`P
-						LEFT JOIN `0518_poll_votes`V ON ( P.poll_id = V.poll_id AND V.uid=:uid )
+					P.poll_id, P.question, P.options, UNIX_TIMESTAMP(P.start_date) as start_date, UNIX_TIMESTAMP(P.end_date) as end_date, P.open_voting,
+					V.option,
+					U.username
+					FROM `tbl_poll`P
+						LEFT JOIN `tbl_poll_votes`V ON ( P.poll_id = V.poll_id AND V.uid=:uid )
+						LEFT JOIN `tbl_users`U ON ( P.uid = U.uid )
+					WHERE P.start_date IS NOT NULL AND (P.end_date IS NULL OR NOW()<P.end_date OR V.option IS NOT NULL)
 					ORDER BY {$sort['order']} {$sort['direction']}
 					LIMIT ".(max(0,$pos*$limit)).",".$limit;
 

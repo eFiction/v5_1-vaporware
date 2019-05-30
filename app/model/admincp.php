@@ -1369,10 +1369,18 @@ class AdminCP extends Controlpanel {
 
 		return $data;
 	}
-	
+
+	public function pollAdd(string $name): int
+	{
+		$poll=new \DB\SQL\Mapper($this->db, $this->prefix.'poll');
+		$poll->question = $name;
+		$poll->save();
+		return $poll->get('_id');
+	}
+
 	public function pollLoad(int $pollID): array
 	{
-		$sql = "SELECT P.poll_id as id, P.question, P.options, P.results, P.cache, UNIX_TIMESTAMP(P.start_date) as start_date, UNIX_TIMESTAMP(P.end_date) as end_date,
+		$sql = "SELECT P.poll_id as id, P.question, P.options, P.results, P.cache, P.start_date, P.end_date, P.open_voting,
 					U.uid, U.username
 				FROM `tbl_poll`P
 					LEFT JOIN `tbl_poll_votes`V ON ( P.poll_id = V.poll_id )
@@ -1389,9 +1397,65 @@ class AdminCP extends Controlpanel {
 		// build the result array from the cache field
 		else $data['cache'] = json_decode($data['cache'],TRUE);
 		
+		$data['options'] = json_decode($data['options'],TRUE);
+
+		// going with the preset date/time versions to make sure the datetimepicker is happy
+		$data['start_date'] = $data['start_date'] == ""
+								? ""
+								: $this->timeToUser($data['start_date'], $this->config['date_preset']." ".$this->config['time_preset']);
+								
+		$data['end_date'] = $data['end_date'] == ""
+								? ""
+								: $this->timeToUser($data['end_date'], $this->config['date_preset']." ".$this->config['time_preset']);
+		
 		return $data;
 	}
-	
+
+	public function pollSave(int $id, array $data)
+	{
+		$poll=new \DB\SQL\Mapper($this->db, $this->prefix.'poll');
+		$poll->load(array('poll_id=?',$id));
+
+		$poll->copyfrom( 
+			[ 
+				"question"		=> $data['question'], 
+				"start_date"	=> $data['start_date'] == ""
+									? NULL
+									: \DateTime::createFromFormat($this->config['date_preset']." ".$this->config['time_preset'], $data['start_date'])->format('Y-m-d H:i'),
+				"end_date"		=> $data['end_date'] == ""
+									? NULL
+									: \DateTime::createFromFormat($this->config['date_preset']." ".$this->config['time_preset'], $data['end_date'])->format('Y-m-d H:i'),
+				"options"		=> json_encode( explode("\n", $data['options']) ),
+				"open_voting"	=> (int)isset( $data['open_voting'] ),
+			]
+		);
+
+		$i  = $poll->changed("question");
+		$i += $poll->changed("start_date");
+		$i += $poll->changed("end_date");
+		$i += $poll->changed("options");
+		
+		// drop cache if the options were edited
+		if ( $poll->changed("options") )
+			$poll->cache = NULL;
+		
+		$poll->save();
+
+		return $i;
+	}
+
+	public function pollDelete(int $pollID)
+	{
+		$poll=new \DB\SQL\Mapper($this->db, $this->prefix.'poll');
+		$erase = $poll->erase(array('poll_id=?',$pollID));
+
+		$votes=new \DB\SQL\Mapper($this->db, $this->prefix.'poll_votes');
+		if (0 < $votes->count(array('poll_id=?',$pollID)))
+			$erase = $erase * $votes->erase(array('poll_id=?',$pollID));
+
+		$_SESSION['lastAction'] = [ "deleteResult" => $erase ];
+	}
+
 	public function ratingAdd($rating)
 	{
 		$ratings=new \DB\SQL\Mapper($this->db, $this->prefix.'ratings');
@@ -2220,7 +2284,6 @@ class AdminCP extends Controlpanel {
 		return $news->_id;
 	}
 
-//	public function saveNews(int $id, array $data)
 	public function newsSave(int $id, array $data)
 	{
 		if( empty($data['headline']) )

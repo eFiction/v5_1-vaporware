@@ -131,7 +131,6 @@ return array(
 
 // [7] Global -- Search 1
 'NoEntries'			=> 'No entries',
-'Entries'			=> 'Entries', //DB
 'NoRecordsInList'	=> 'No records in this list',
 
 // [8] Global -- Archiv Stats 10
@@ -292,7 +291,12 @@ return array(
 							'other	{Inbox (# new)} }',
 'UserMenu_PMOutbox' => 'Outbox',
 'UserMenu_PMWrite' => 'Write',
-'UserMenu_Shoutbox'			=> 'Shoutbox ({0})', 
+'UserMenu_Shoutbox'			=> '{0, plural,'.
+			'zero	{Shoutbox},'.
+			'other	{Shoutbox (#)} }',
+'UserMenu_Polls'			=> '{0, plural,'.
+			'zero	{Polls},'.
+			'other	{Polls (#)} }',
 	
 'UserMenu_Authoring' => 'Authoring',
 'UserMenu_AddStory' => 'Add Story',
@@ -776,6 +780,14 @@ return array(
 'PollOpenSince'	=> 'Poll is open since {0}',
 'PollOUFN'		=> 'Poll is open until further notice',
 'PollCloseOn'	=> 'Poll will close on {0}',
+'Poll_Question'		=> 'Question',
+'Poll_OpenVoting'	=> 'Open voting',
+'Poll_OpenVotingExplain'	=> 'Result is visible before the poll closes.',
+'Poll_Start'		=> 'Start',
+'Poll_StartExplain'	=> 'Check to hold back the poll. Once a start date is entered, the poll goes live.',
+'Poll_End'			=> 'End',
+'Poll_EndExplain'	=> 'Check to keep open indefinitely. Can be closed anytime.',
+'Poll_Options'		=> 'Reply options',
 
 // Archive News
 'News_Headline'	=> 'Headline',

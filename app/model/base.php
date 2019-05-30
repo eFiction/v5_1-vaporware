@@ -324,7 +324,13 @@ class Base extends \Prefab {
 	public function pollBuildCache(array $data): array
 	{
 		// we need the options array for both styles
-		$data['options'] = json_decode($data['options'], TRUE);
+		if ( "" == $data['options'] = json_decode($data['options'], TRUE) )
+		{
+			// empty poll
+			$this->update("tbl_poll", [ "cache" => json_encode(array()) ], "poll_id=".$data['id']);
+			
+			return array();
+		}
 
 		foreach ( $data['options'] as $key => $opt )
 			$data['cache'][$key]["opt"] = $opt;

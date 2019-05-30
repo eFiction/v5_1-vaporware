@@ -131,7 +131,6 @@ return array(
 
 // [7] Global -- Search
 'NoEntries'			=> 'Keine Einträge',
-'Entries'			=> 'Beiträge', //DB
 'NoRecordsInList'	=> 'Keine Einträge in dieser Liste',
 
 // [8] Global -- Archiv Stats'
@@ -292,7 +291,12 @@ return array(
 							'other	{Posteingang (# neu)} }',
 'UserMenu_PMOutbox' => 'Postausgang',
 'UserMenu_PMWrite' => 'Verfassen',
-'UserMenu_Shoutbox'			=> 'Shoutbox ({0})', 
+'UserMenu_Shoutbox'			=> '{0, plural,'.
+			'zero	{Shoutbox},'.
+			'other	{Shoutbox (#)} }',
+'UserMenu_Polls'			=> '{0, plural,'.
+			'zero	{Umfragen},'.
+			'other	{Umfragen (#)} }',
 
 'UserMenu_Authoring' => 'Authoring',
 'UserMenu_AddStory' => 'Geschichte hinzufügen',
@@ -776,6 +780,14 @@ return array(
 'PollOpenSince'	=> 'Umfrage ist seit {0} geöffnet',
 'PollOUFN'		=> 'Umfrage ist bis auf Weiteres geöffnet',
 'PollCloseOn'	=> 'Umfrage wird am {0} geschlossen',
+'Poll_Question'		=> 'Frage',
+'Poll_OpenVoting'	=> 'Offene Abstimmung',
+'Poll_OpenVotingExplain'	=> 'Das Ergebnis ist vor Ende der Umfrage sichtbar.',
+'Poll_Start'		=> 'Start',
+'Poll_StartExplain'	=> 'Markieren, um die Umfrage noch zurückzuhalten. Ist ein Start angegeben, wird die Umfrage sichtbar.',
+'Poll_End'			=> 'Ende',
+'Poll_EndExplain'	=> 'Markieren, um die Umfrage dauerhaft offen zu lassen. Kann jederzeit nachträglich geändert werden.',
+'Poll_Options'		=> 'Antwortmöglichkeiten',
 
 // Archiv News'
 'News_Headline'	=> 'Schlagzeile',

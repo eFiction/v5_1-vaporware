@@ -127,6 +127,13 @@ class UserCP extends Base
 		return $this->render('usercp/messaging/write.html');
 	}
 	
+	public function pollsList(array $data, array $sort)
+	{
+		$this->f3->set('polls', $data);
+		$this->f3->set('sort', $sort);
+		return $this->render('usercp/polls.list.html');
+	}
+	
 	public function shoutboxList($data)
 	{
 		//\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );

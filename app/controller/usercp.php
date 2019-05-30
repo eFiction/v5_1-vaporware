@@ -32,10 +32,10 @@ class UserCP extends Base
 
 		// run the module and let it show the module
 		if ( in_array($mod, $modules) )
-			$this->{$mod}($f3, $params);
+			$this->buffer( $this->{$mod}($f3, $params) ?? "" );
 		// Just show default menu
 		else
-			$this->start($f3, $params);
+			$this->buffer( $this->start($f3, $params) );
 	}
 
 	public function ajax(\Base $f3, array $params)//: void
@@ -68,7 +68,7 @@ class UserCP extends Base
 		// no additional work required here
 		$this->showMenu();
 		
-		$this->buffer ( $this->template->start() );
+		return $this->template->start();
 	}
 	
 	public function author(\Base $f3, array $params)//: void
@@ -80,35 +80,32 @@ class UserCP extends Base
 
 		$allowed_authors = $f3->get('allowed_authors');
 
-		$buffer = NULL;
-		
 		if ( $_SESSION['groups']&5 OR TRUE === $this->config['author_self'] )
 		{
 			if ( array_key_exists("curator", $params) )
-				$buffer = $this->authorCurator($f3, $params);
+				return $this->authorCurator($f3, $params);
 			
 			elseif ( array_key_exists("uid", $params) AND isset($allowed_authors[$params['uid']]) AND isset ($params[1]) )
 			{
 				switch ( $params[1] )
 				{
 					case "add":
-						$buffer = $this->authorStoryAdd($f3, $params['uid']);
+						return $this->authorStoryAdd($f3, $params['uid']);
 						break;
 					case "finished":
 					case "unfinished":
 					case "drafts":
 					case "deleted":
-						$buffer = $this->authorStorySelect($params);
+						return $this->authorStorySelect($params);
 						break;
 					case "edit":
-						$buffer = $this->authorStoryEdit($f3, $params);
+						return $this->authorStoryEdit($f3, $params);
 						break;
 				}
 			}
 		}
 		
-		$this->buffer ( ($buffer) ?: $this->authorHome( $f3, $params) );
-
+		return $this->authorHome( $f3, $params );
 	}
 	
 	protected function authorCurator(\Base $f3, array $params): string
@@ -311,10 +308,10 @@ class UserCP extends Base
 		switch ( $params[0] )
 		{
 			case "reviews":
-				$this->feedbackReviews($f3, $params);
+				return $this->feedbackReviews($f3, $params);
 				break;
 			case "comments":
-				$this->buffer ( \View\Base::stub("reviews") );
+				return \View\Base::stub("reviews");
 				break;
 			default:
 				$this->feedbackHome($f3, $params);
@@ -376,7 +373,7 @@ class UserCP extends Base
 
 			$extra = [ "sub" => [ $params[0], $params[1] ], "type" => $params[2] ];
 			
-			$this->buffer ( $this->template->feedbackListReviews($data, $sort, $extra) );
+			return $this->template->feedbackListReviews($data, $sort, $extra);
 		}
 	}
 	
@@ -766,6 +763,43 @@ class UserCP extends Base
 		}
 	}
 	
+	protected function polls(\Base $f3, array $params)//: void
+	{
+		$this->response->addTitle( $f3->get('LN__UserMenu_Polls') );
+		$this->showMenu("polls");
+		
+		if ( isset($params['id']) )
+		{
+			
+			
+			return $params['id'];
+		}
+		
+		// page will always be an integer > 0
+		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
+		
+		// search/browse
+		$allow_order = array (
+			"id"		=>	"poll_id",
+			"member"	=>	"username",
+			"start"		=>	"start_date",
+			"lable"		=>	"question",
+		);
+
+		// sort order
+		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "start";
+		$sort["order"]		= $allow_order[$sort["link"]];
+		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="desc") ?	"desc" : "asc";
+
+		// sort icons
+		$sort['data']['start'] = ( $sort['direction']=="desc" OR $sort['link']!='start' ) ? "asc" : "desc";
+		$sort['data']['member']= ( $sort['direction']=="desc" OR $sort['link']!='member' )? "asc" : "desc";
+
+		$polls = $this->model->pollsList($page, $sort);
+		
+		return $this->template->pollsList( $polls, $sort );
+	}
+	
 	protected function shoutbox(\Base $f3, array $params)//: void
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Shoutbox',0) );
@@ -802,6 +836,7 @@ class UserCP extends Base
 
 		}
 		
+
 		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
 		$data = $this->model->shoutboxList($page);
 		

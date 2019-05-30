@@ -828,29 +828,29 @@ class AdminCP extends Base
 		
 		if ( isset($params['delete']) )
 		{
-			//$this->model->characterDelete( (int)$params['delete'] );
-			//$f3->reroute('/adminCP/archive/characters', false);
+			$this->model->pollDelete( (int)$params['delete'] );
+			$f3->reroute('/adminCP/home/polls', false);
+			exit;
 		}
 		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
 		{
 			if ( isset($_POST['form_data']) )
 			{
-				/*
 				$f3->set
 				(
 					'form_changes',
-					$this->model->characterSave
+					$this->model->pollSave
 					(
 						$params['id'],
 						$f3->get('POST.form_data')
 					)
 				);
-				*/
 			}
 			elseif ( isset($_POST['newPoll']) )
 			{
-				//$newID = $this->model->characterAdd( $f3->get('POST.newCharacter') );
-				//$f3->reroute('/adminCP/archive/characters/id='.$newID, false);
+				$newID = $this->model->pollAdd( $f3->get('POST.newPoll') );
+				$f3->reroute('/adminCP/home/polls/id='.$newID, false);
+				exit;
 			}
 		}
 		
@@ -858,8 +858,7 @@ class AdminCP extends Base
 		{
 			$data = $this->model->pollLoad((int)$params['id']);
 			if ( sizeof($data)==0 ) $f3->reroute('/adminCP/home/polls', false);
-			return print_r($data,1);
-			//return $this->template->characterEdit($data, @$params['returnpath']);
+			return $this->template->pollEdit($data, @$params['returnpath']);
 		}
 
 		// search/browse

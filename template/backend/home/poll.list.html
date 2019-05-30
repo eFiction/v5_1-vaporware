@@ -54,11 +54,11 @@
 	<repeat group="{{ @data }}" value="{{ @row }}">
 	<tr>
 		<td><a href="{{@BASE}}/adminCP/home/polls/id={{ @row.id }};returnpath=/adminCP/home/polls/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
-		<td><a href="{{@BASE}}/adminCP/home/polls/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}/remove={{ @row.id }}" class="deleteItem" title="#{{ @row.id }}: {{ @row.question }}">{ICON:trash}</a></td>
+		<td><a href="{{@BASE}}/adminCP/home/polls/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}/delete={{ @row.id }}" class="deleteItem" title="#{{ @row.id }}: {{ @row.question }}">{ICON:trash}</a></td>
 		<td>{{ @row.id }}</td>
 		<td>{{ @row.username }}</td>
 		<td>{{ @row.question }}</td>
-		<td>{{ date(\Config::getPublic("datetime_format"), @row.start_date) }}</td>
+		<td>{{ @row.start_date==NULL ? "" : date(\Config::getPublic("datetime_format"), @row.start_date) }}</td>
 		<td>{{ @row.end_date==NULL ? "" : date(\Config::getPublic("datetime_format"), @row.end_date) }}</td>
 	</tr>
 	</repeat>

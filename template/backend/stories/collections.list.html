@@ -42,7 +42,7 @@
 	</repeat>
 </tbody>
 </table>
-<F3:check if="{{ sizeof($data) > 5 }}"><include href="paginate.html" /></F3:check>
+<F3:check if="{{isset(@paginate.firstPage) AND sizeof($data)>5}}"><include href="paginate.html" /></F3:check>
 	</true>
 	<false>
 		__noItems

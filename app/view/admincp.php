@@ -330,12 +330,25 @@ class AdminCP extends Base
 	
 	public function pollList(array $data, array $sort): string
 	{
+		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+
 		$this->f3->set('data', $data);
 		$this->f3->set('sort', $sort);
 
 		return $this->render('home/poll.list.html');
 	}
 	
+	public function pollEdit(array $data, string $returnpath)
+	{
+		$this->javascript( 'head', TRUE, "jquery.datetimepicker.js" );
+
+		$this->f3->set('data', 		 $data);
+		$this->f3->set('format', $this->config['date_preset']." ".$this->config['time_preset']);
+		$this->f3->set('returnpath', $returnpath);
+
+		return $this->render('home/poll.edit.html');
+	}
+
 	public function shoutEdit(array $data, array $sort, $page)
 	{
 		$this->f3->set('data', $data);
