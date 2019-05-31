@@ -770,6 +770,10 @@ class AdminCP extends Base
 		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "label";
 		$sort["order"]		= $allow_order[$sort["link"]];
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="desc") ?	"desc" : "asc";
+		// sort icons
+		$sort['data']['id'] = 	 ( $sort['direction']=="desc" OR $sort['link']!='id' ) ? "asc" : "desc";
+		$sort['data']['label'] = ( $sort['direction']=="desc" OR $sort['link']!='label' ) ? "asc" : "desc";
+		$sort['data']['title'] = ( $sort['direction']=="desc" OR $sort['link']!='title' ) ? "asc" : "desc";
 		
 		$data = $this->model->listCustompages($page, $sort);
 
@@ -933,6 +937,7 @@ class AdminCP extends Base
 		{
 			if ( $this->model->shoutDelete( (int)$params['delete'] ) )
 			{
+				$_SESSION['lastAction'] = [ "deleteResult" => 1 ];
 				$f3->reroute("/adminCP/home/shoutbox/order={$sort['order']},{$sort['direction']}/page={$page}", false);
 				exit;
 			}
@@ -986,7 +991,7 @@ class AdminCP extends Base
 		{
 			if ( $this->model->newsDelete( (int)$params['delete'] ) )
 			{
-				$f3->set('deleteResult', 1);
+				$_SESSION['lastAction'] = [ "deleteResult" => 1 ];
 				$f3->reroute('/adminCP/home/news', false);
 				exit;
 			}
@@ -1056,6 +1061,11 @@ class AdminCP extends Base
 		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "date";
 		$sort["order"]		= $allow_order[$sort["link"]];
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
+		// sort icons
+		$sort['data']['id'] =	  ( $sort['direction']=="desc" OR $sort['link']!='id' ) ? "asc" : "desc";
+		$sort['data']['date'] =   ( $sort['direction']=="desc" OR $sort['link']!='date' ) ? "asc" : "desc";
+		$sort['data']['title'] =  ( $sort['direction']=="desc" OR $sort['link']!='title' ) ? "asc" : "desc";
+		$sort['data']['author'] = ( $sort['direction']=="desc" OR $sort['link']!='author' ) ? "asc" : "desc";
 		
 		$this->buffer
 		(

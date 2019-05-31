@@ -2325,7 +2325,6 @@ class AdminCP extends Controlpanel {
 	public function newsDelete( int $id )
 	{
 		$delete = new \DB\SQL\Mapper($this->db, $this->prefix.'news');
-		if ( $delete->count( ["nid = ?", $id ] ) == 0 ) return FALSE;
 		return $delete->erase( ["nid = ?", $id ] );
 	}
 

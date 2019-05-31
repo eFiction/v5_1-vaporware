@@ -591,6 +591,7 @@ return array(
 'AdminMenu_Recommendations'	=> 'Empfehlungen',
 
 'CreateNewPoll'		=> 'Neue Umfrage erstellen',
+'Question'			=> 'Frage',
 'Error_PollNoQuestion'	=>	'Ohne Frage kann keine Umfrage angelegt werden',
 
 // Config explain

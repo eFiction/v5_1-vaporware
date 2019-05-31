@@ -591,6 +591,7 @@ return array(
 'AdminMenu_Recommendations'	=> 'Recommendations',
 
 'CreateNewPoll'		=> 'Create a new poll',
+'Question'			=> 'Question',
 'Error_PollNoQuestion'	=>	'Cannot create a poll without a question.',
 
 // Config explain
