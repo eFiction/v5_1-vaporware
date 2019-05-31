@@ -1,20 +1,6 @@
+<include href="header.list.html" />
+
 <check if="{{!empty(@returnpath)}}"><a href="{{@BASE}}{{@returnpath}}">{ICON:arrow-left} {{@LN__ReturnToOverview}}</a></check>
-<!-- error notification -->
-<check if="{{ isset(@form_error) }}">
-	<div class="notification is-warning">
-		<button class="delete"></button>
-		{{ @form_error }}
-	</div>
-</check>
-<!-- END: error notification -->
-<!-- success notification -->
-<check if="{{ isset(@form_changes) }}">
-	<div class="notification is-success">
-		<button class="delete"></button>
-		{{ @LN__Changes_saved }}
-	</div>
-</check>
-<!-- END: success notification -->
 
 <form action="{{@BASE}}/adminCP/home/custompages/id={{@data.id}}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
 <div class="field is-horizontal">

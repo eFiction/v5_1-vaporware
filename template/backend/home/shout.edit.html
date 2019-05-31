@@ -1,19 +1,4 @@
-<!-- error notification -->
-<check if="{{ isset(@form_error) }}">
-	<div class="notification is-warning">
-		<button class="delete"></button>
-		{{ @form_error }}
-	</div>
-</check>
-<!-- END: error notification -->
-<!-- success notification -->
-<check if="{{ isset(@form_changes) }}">
-	<div class="notification is-success">
-		<button class="delete"></button>
-		{{ @LN__Changes_saved }}
-	</div>
-</check>
-<!-- END: success notification -->
+<include href="header.list.html" />
 
 <form action="{{@BASE}}/adminCP/home/shoutbox/id={{@data.id}}/order={{@sort.order}},{{@sort.direction}}/page={{@page}}" method="post">
 <div class="field">

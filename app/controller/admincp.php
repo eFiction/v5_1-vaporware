@@ -828,9 +828,13 @@ class AdminCP extends Base
 		
 		if ( isset($params['delete']) )
 		{
-			$this->model->pollDelete( (int)$params['delete'] );
-			$f3->reroute('/adminCP/home/polls', false);
-			exit;
+			if ( $this->model->pollDelete( (int)$params['delete'] ) )
+			{
+				$_SESSION['lastAction'] = [ "deleteResult" => 1 ];
+				$f3->reroute('/adminCP/home/polls', false);
+				exit;
+			}
+			else $f3->set('deleteResult', 0);
 		}
 		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
 		{
@@ -838,7 +842,7 @@ class AdminCP extends Base
 			{
 				$f3->set
 				(
-					'form_changes',
+					'saveResult',
 					$this->model->pollSave
 					(
 						$params['id'],
@@ -848,9 +852,24 @@ class AdminCP extends Base
 			}
 			elseif ( isset($_POST['newPoll']) )
 			{
-				$newID = $this->model->pollAdd( $f3->get('POST.newPoll') );
-				$f3->reroute('/adminCP/home/polls/id='.$newID, false);
-				exit;
+				// form sent with empty field
+				if ( empty($_POST['newPoll']) )
+				{
+					$f3->set ( 'addResult', 0 );
+					$f3->set ( 'addReason', $f3->get('LN__Error_PollNoQuestion') );
+				}
+				// save data and reroute to edit form
+				elseif ( FALSE !== $newID = $this->model->pollAdd( $f3->get('POST.newPoll') ) )
+				{
+					$_SESSION['lastAction'] = [ "addResult" => 1 ];
+					$f3->reroute('/adminCP/home/polls/id='.$newID, false);
+					exit;
+				}
+				else
+				{
+					$f3->set ( 'addResult', 0 );
+					//$f3->set ( 'addReason', $f3->get('LN__') );
+				}
 			}
 		}
 		
@@ -917,8 +936,7 @@ class AdminCP extends Base
 				$f3->reroute("/adminCP/home/shoutbox/order={$sort['order']},{$sort['direction']}/page={$page}", false);
 				exit;
 			}
-			// old
-			else $f3->set('form_error', "__failedDelete");
+			else $f3->set('deleteResult', 0);
 		}
 		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
 		{
@@ -926,20 +944,17 @@ class AdminCP extends Base
 			{
 				$f3->set
 				(
-					'form_changes',
-					[
+					'saveResult',
+					$this->model->shoutSave
+					(
 						$params['id'],
-						$this->model->shoutSave
-						(
-							$params['id'],
-							$f3->get('POST.form_data')
-						)
-					]
+						$f3->get('POST.form_data')
+					)
 				);
 			}
 		}
 
-		if( isset ($params['id']) AND $f3->get('form_changes')=="" )
+		if( isset ($params['id']) AND $f3->get('saveResult')=="" )
 		{
 			if ( NULL !== $data = $this->model->shoutLoad($params['id']) )
 			{
@@ -947,8 +962,7 @@ class AdminCP extends Base
 				$this->buffer( $this->template->shoutEdit($data, $sort, $page) );
 				return;
 			}
-			// old
-			else $f3->set('form_error', "__failedLoad");
+			else $f3->set('loadResult', 0);
 		}
 		
 		$this->buffer
@@ -972,10 +986,11 @@ class AdminCP extends Base
 		{
 			if ( $this->model->newsDelete( (int)$params['delete'] ) )
 			{
+				$f3->set('deleteResult', 1);
 				$f3->reroute('/adminCP/home/news', false);
 				exit;
 			}
-			else $f3->set('form_error', "__failedDelete");
+			else $f3->set('deleteResult', 0);
 		}
 		elseif  ( isset($_POST) AND sizeof($_POST)>0 )
 		{
@@ -983,7 +998,7 @@ class AdminCP extends Base
 			{
 				$f3->set
 				(
-					'form_changes',
+					'saveResult',
 					$this->model->newsSave
 					(
 						$params['id'],
@@ -993,8 +1008,25 @@ class AdminCP extends Base
 			}
 			elseif ( isset($_POST['newHeadline']) )
 			{
-				if ( FALSE !== $newID = $this->model->newsAdd( $f3->get('POST.newHeadline') ) )
+				// form sent with empty field
+				if ( empty($_POST['newHeadline']) )
+				{
+					$f3->set ( 'addResult', 0 );
+					$f3->set ( 'addReason', $f3->get('LN__Error_NewsNoHeadline') );
+				}
+				// save data and reroute to edit form
+				elseif ( FALSE !== $newID = $this->model->newsAdd( $f3->get('POST.newHeadline') ) )
+				{
+					$_SESSION['lastAction'] = [ "addResult" => 1 ];
 					$f3->reroute('/adminCP/home/news/id='.$newID, false);
+					exit;
+				}
+				// recover from DB error
+				else
+				{
+					$f3->set ( 'addResult', 0 );
+					//$f3->set ( 'addReason', $f3->get('LN__') );
+				}
 			}
 		}
 		
@@ -1006,7 +1038,7 @@ class AdminCP extends Base
 				$this->buffer( $this->template->newsEdit($data, @$params['returnpath']) );
 				return;
 			}
-			else $f3->set('form_error', "__failedLoad");
+			else $f3->set('loadResult', 0);
 		}
 
 		// page will always be an integer > 0

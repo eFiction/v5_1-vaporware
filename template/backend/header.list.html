@@ -6,6 +6,7 @@
 		<div class="notification is-warning">
 			<button class="delete"></button>
 			{{@LN__FailedAdd}}
+			<check if="{{ isset(@addReason) }}">:<br />{{@addReason}}</check>
 		</div>
 	</check>
 	<!-- END: error notification -->
@@ -47,4 +48,15 @@
 		</div>
 	</check>
 	<!-- END: success notification -->
+</check>
+
+<check if="{{ isset(@loadResult) }}">
+	<!-- error notification -->
+	<check if="{{ @loadResult===0 }}">
+		<div class="notification is-warning">
+			<button class="delete"></button>
+			{{@LN__FailedLoad}}
+		</div>
+	</check>
+	<!-- END: error notification -->
 </check>

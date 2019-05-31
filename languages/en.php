@@ -20,8 +20,8 @@ return array(
 'Time'		=>	'Time',
 'DateTime'	=>	'Date and time',
 'Message'	=>	'Message',
-'UnknowError'	=> 'There was an unknown error',
-'MaintenanceMode'		=> 'Archive is in maintenance mode',
+'UnknowError'		=> 'There was an unknown error',
+'MaintenanceMode'	=> 'Archive is in maintenance mode',
 'monthly'		=> 'monthly',
 'weekly'		=> 'weekly',
 'daily'			=> 'daily',
@@ -542,7 +542,8 @@ return array(
 'ACP_RatingCount'		=> 'Number of stories with this rating',
 'ACP_RatingMove'		=> 'Move stories to this rating',
 
-'ACP_CreateNews'		=> 'Create a news entry',
+'CreateNews'			=> 'Create a news entry',
+'Error_NewsNoHeadline'	=> 'Cannot create a news entry without a headline',
 'ACP_NewsHeadline'		=> 'Enter the headline',
 
 'ACP_CanLinkPage'		=> 'Can link to this',
@@ -590,6 +591,7 @@ return array(
 'AdminMenu_Recommendations'	=> 'Recommendations',
 
 'CreateNewPoll'		=> 'Create a new poll',
+'Error_PollNoQuestion'	=>	'Cannot create a poll without a question.',
 
 // Config explain
 // archive_general
@@ -766,7 +768,6 @@ return array(
 'SearchUserAll' => 'Search in all user fields',
 'Tagcloud' => 'Tagcloud',
 'noTagcloud' => 'No tag cloud',
-
 
 // Feedback
 'Feedback_Not_Logged_In' => 'You need to be logged in to write a review or comment',

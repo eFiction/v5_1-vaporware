@@ -1374,6 +1374,8 @@ class AdminCP extends Controlpanel {
 	{
 		$poll=new \DB\SQL\Mapper($this->db, $this->prefix.'poll');
 		$poll->question = $name;
+		$poll->uid		= $_SESSION['userID'];
+		$poll->options	= '[""]';
 		$poll->save();
 		return $poll->get('_id');
 	}
@@ -1397,7 +1399,8 @@ class AdminCP extends Controlpanel {
 		// build the result array from the cache field
 		else $data['cache'] = json_decode($data['cache'],TRUE);
 		
-		$data['options'] = json_decode($data['options'],TRUE);
+		// each line is one option
+		$data['options'] = implode("\n", json_decode($data['options'],TRUE)??[]);
 
 		// going with the preset date/time versions to make sure the datetimepicker is happy
 		$data['start_date'] = $data['start_date'] == ""
@@ -1453,7 +1456,7 @@ class AdminCP extends Controlpanel {
 		if (0 < $votes->count(array('poll_id=?',$pollID)))
 			$erase = $erase * $votes->erase(array('poll_id=?',$pollID));
 
-		$_SESSION['lastAction'] = [ "deleteResult" => $erase ];
+		return $erase;
 	}
 
 	public function ratingAdd($rating)
@@ -2264,14 +2267,15 @@ class AdminCP extends Controlpanel {
 	public function newsLoad(int $id)
 	{
 		$sql = "SELECT N.nid as id, N.headline, N.newstext, N.datetime, UNIX_TIMESTAMP(N.datetime) as timestamp FROM `tbl_news`N WHERE `nid` = :nid";
-		$data = $this->exec($sql, [":nid" => $id ]);
-		if (sizeof($data)!=1) 
-			return NULL;
+		if ( NULL === $data = @$this->exec($sql, [":nid" => $id ])[0] )
+			return [];
 
 		// going with the preset date/time versions to make sure the datetimepicker is happy
-		$data[0]['datetime'] = $this->timeToUser($data[0]['datetime'], $this->config['date_preset']." ".$this->config['time_preset']);
+		$data['datetime'] = $data['datetime'] == ""
+								? ""
+								: $this->timeToUser($data['datetime'], $this->config['date_preset']." ".$this->config['time_preset']);
 
-		return $data[0];
+		return $data;
 	}
 
 	public function newsAdd( string $headline )
@@ -2303,7 +2307,9 @@ class AdminCP extends Controlpanel {
 			[ 
 				"headline"	=> $data['headline'], 
 				"newstext"	=> $data['newstext'],
-				"datetime"	=> \DateTime::createFromFormat($this->config['date_preset']." ".$this->config['time_preset'], $data['datetime'])->format('Y-m-d H:i'),
+				"datetime"	=> $data['datetime'] == ""
+									? NULL
+									: \DateTime::createFromFormat($this->config['datetime']." ".$this->config['time_preset'], $data['datetime'])->format('Y-m-d H:i'),
 			]
 		);
 
@@ -2316,13 +2322,11 @@ class AdminCP extends Controlpanel {
 		return $i;
 	}
 	
-//	public function deleteNews( int $id )
 	public function newsDelete( int $id )
 	{
 		$delete = new \DB\SQL\Mapper($this->db, $this->prefix.'news');
 		if ( $delete->count( ["nid = ?", $id ] ) == 0 ) return FALSE;
-		$delete->erase( ["nid = ?", $id ] );
-		return TRUE;
+		return $delete->erase( ["nid = ?", $id ] );
 	}
 
 /*	

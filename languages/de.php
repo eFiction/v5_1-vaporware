@@ -20,8 +20,8 @@ return array(
 'Time'		=>	'Uhrzeit',
 'DateTime'	=>	'Datum und Uhrzeit',
 'Message'	=>	'Nachricht',
-'UnknowError'	=> 'Ein unbekannter Fehler ist aufgetreten',
-'MaintenanceMode'		=> 'Archiv befindet sich in der Wartung',
+'UnknowError'		=> 'Ein unbekannter Fehler ist aufgetreten',
+'MaintenanceMode'	=> 'Archiv befindet sich in der Wartung',
 'monthly'		=> 'monthly',
 'weekly'		=> 'weekly',
 'daily'			=> 'daily',
@@ -542,7 +542,8 @@ return array(
 'ACP_RatingCount'		=> 'Anzahl der Geschichten mit diesem Rating',
 'ACP_RatingMove'		=> 'Neues Rating für diese Geschichten',
 
-'ACP_CreateNews'		=> 'News-Eintrag anlegen',
+'CreateNews'			=> 'News-Eintrag anlegen',
+'Error_NewsNoHeadline'	=> 'Ohne Schlagzeile kann kein News-Eintrag angelegt werden',
 'ACP_NewsHeadline'		=> 'Schlagzeile eingeben',
 
 'ACP_CanLinkPage'		=> 'Kann verlinkt werden',
@@ -590,6 +591,7 @@ return array(
 'AdminMenu_Recommendations'	=> 'Empfehlungen',
 
 'CreateNewPoll'		=> 'Neue Umfrage erstellen',
+'Error_PollNoQuestion'	=>	'Ohne Frage kann keine Umfrage angelegt werden',
 
 // Config explain
 // archive_general
@@ -766,7 +768,6 @@ return array(
 //'SearchUserAll' => 'Suche in allen Benutzerfeldern',
 'Tagcloud' => 'Tag-Cloud',
 'noTagcloud' => 'Keine Tag-Cloud',
-
 
 // Feedback
 'Feedback_Not_Logged_In' => 'Du musst angemeldet sein, um eine Review oder einen Kommentar zu verfassen.',
