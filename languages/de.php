@@ -779,9 +779,10 @@ return array(
 // Polls
 'PollBox'		=> 'Polls',
 'AllPolls'		=> 'Show all polls',
-'PollOpenSince'	=> 'Umfrage ist seit {0} geöffnet',
+'PollOpenSince'	=> 'Umfrage wurde am {0} gestartet',
 'PollOUFN'		=> 'Umfrage ist bis auf Weiteres geöffnet',
 'PollCloseOn'	=> 'Umfrage wird am {0} geschlossen',
+'PollClosedOn'	=> 'Umfrage wurde am {0} geschlossen',
 'Poll_Question'		=> 'Frage',
 'Poll_OpenVoting'	=> 'Offene Abstimmung',
 'Poll_OpenVotingExplain'	=> 'Das Ergebnis ist vor Ende der Umfrage sichtbar.',

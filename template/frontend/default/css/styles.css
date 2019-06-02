@@ -1,9 +1,10 @@
 /* import basic settings, IE-fixes and grids */
 @import url(bulma.css);
 @import url(bulma.tooltip.css);
-@import url(forms.css);
+/* @import url(forms.css); */
 @import url(typography.css);
 @import url(tokeninput.css);
+@import url(barfiller.css);
 @import url(jquery.datetimepicker.css);
 @import url(cookieconsent.css);
 
@@ -192,3 +193,4 @@ legend {
 	height: 2.25em;
 	line-height: 1.5;
 }
+

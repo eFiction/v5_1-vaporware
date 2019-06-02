@@ -1395,7 +1395,7 @@ class AdminCP extends Controlpanel {
 
 		// build a cache array
 		if ( $data['cache']==NULL )
-			$data['cache'] = $this->pollBuildCache($data);
+			$data['cache'] = $this->pollBuildCache($data['id']);
 		// build the result array from the cache field
 		else $data['cache'] = json_decode($data['cache'],TRUE);
 		

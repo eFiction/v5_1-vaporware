@@ -779,9 +779,10 @@ return array(
 // Polls
 'PollBox'		=> 'Polls',
 'AllPolls'		=> 'Show all polls',
-'PollOpenSince'	=> 'Poll is open since {0}',
+'PollOpenSince'	=> 'Poll was started on {0}',
 'PollOUFN'		=> 'Poll is open until further notice',
 'PollCloseOn'	=> 'Poll will close on {0}',
+'PollClosedOn'	=> 'Poll was closed on {0}',
 'Poll_Question'		=> 'Question',
 'Poll_OpenVoting'	=> 'Open voting',
 'Poll_OpenVotingExplain'	=> 'Result is visible before the poll closes.',

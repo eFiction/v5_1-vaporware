@@ -18,7 +18,7 @@ class Home extends Base {
 				$this->buffer( $this->news($f3, $params) );
 				break;
 			case "polls":
-				$this->poll($f3, $params);
+				$this->buffer( $this->poll($f3, $params) );
 				break;
 			default:
 				$this->buffer( $this->page($f3, $params) );
@@ -118,7 +118,7 @@ class Home extends Base {
 		}
 		elseif ( $select[0]=="poll" )
 		{
-			$data = $this->model->loadPolls();
+			$data = $this->model->listPolls();
 			return $this->template->pollBlock($data);
 		}
 	}
@@ -136,12 +136,33 @@ class Home extends Base {
 			Auth::instance()->logout($f3, $params);
 		// Show welcome page instead
 		else
-			return $this->template->render('main/welcome.html');
+			return $this->template->welcome();
 	}
 
 	public function poll(\Base $f3, array $params)//: void
 	{
+		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 		
+		// load a selected poll
+		if ( isset($params['id']) AND (int)$params['id']>0 )
+		{
+			if ( [] !== $data = $this->model->loadPoll((int)$params['id']) )
+				return $this->template->pollSingle($data);
+			//	tell the user that this request failed *todo*
+			//else 
+		}
+		
+		if ( isset($params['last']) )
+		{
+			$data = $this->model->loadPoll(0);
+			return $this->template->pollSingle($data);
+		}
+
+		// page will always be an integer > 0
+		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
+
+		$polls = $this->model->listPollArchive($page);
+		return $this->template->pollArchive($polls);
 	}
 	
 }

@@ -321,43 +321,62 @@ class Base extends \Prefab {
 		]);
 	}
 	
-	public function pollBuildCache(array $data): array
+	public function pollBuildCache(int $pollID): array
 	{
+		// create a db map
+		$poll = new \DB\SQL\Mapper($this->db, $this->prefix.'poll');
+		$poll->load(array('poll_id=?',$pollID));
+		
+		// attempt a safe retreat when there is no such poll
+		if ( NULL === $poll->poll_id )
+			return [];
+
 		// we need the options array for both styles
-		if ( "" == $data['options'] = json_decode($data['options'], TRUE) )
+		if ( "" == $options = json_decode($poll->options, TRUE) )
 		{
 			// empty poll
-			$this->update("tbl_poll", [ "cache" => json_encode(array()) ], "poll_id=".$data['id']);
-			
+			$poll->cache = json_encode(array());
+			$poll->save();
 			return array();
 		}
 
-		foreach ( $data['options'] as $key => $opt )
-			$data['cache'][$key]["opt"] = $opt;
+		foreach ( $options as $key => $opt )
+			$cache[$key]["opt"] = $opt;
 
-		if ( $data['results'] == NULL )
+		if ( $poll->results == NULL )
 		// new style poll
 		{
 			$sql = "SELECT V.option, COUNT(DISTINCT vote_id) as votes
 						FROM `tbl_poll_votes`V
-					WHERE V.poll_id = {$data['id']}
+					WHERE V.poll_id = {$poll->poll_id}
 					GROUP BY V.option;";
 			$votes = $this->exec($sql);
+			
+			$poll->votes = sizeof($votes);
 
 			if ( sizeof($votes)>0 )
 			foreach ( $votes as $vote )
 			// sql results start with index 1, so we have to adjust for the options that start with index 0
-				$data['cache'][($vote['option']-1)]["res"] = $vote['votes'];
+				$cache[($vote['option']-1)]["res"] = $vote['votes'];
 		}
 		else
-		// old style poll
+		// old style poll. this should have been done during upgrade, but just to be on the shaved side of things
 		{
-			$data['results'] = json_decode($data['results'], TRUE);
-			foreach ( $data['results'] as $key => $res )
-				$data['cache'][$key]["res"] = $res;
+			$results = json_decode($poll->results, TRUE);
+			foreach ( $results as $key => $res )
+				$cache[$key]["res"] = $res;
+			$poll->votes = array_sum($results);
 		}
+
+		// assign votes or "0" to the options
+		foreach ( $cache as $c )
+			$data['cache'][$c['opt']] = $c['res']??0;
+		// ... and sort by votes
+		arsort( $data['cache'], SORT_NUMERIC  );
+
 		// write the array to the database
-		$this->update("tbl_poll", [ "cache" => json_encode($data['cache']) ], "poll_id=".$data['id']);
+		$poll->cache = json_encode($data['cache']);
+		$poll->save();
 		
 		return $data['cache'];
 	}

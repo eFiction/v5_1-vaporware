@@ -50,44 +50,5 @@ function createPieChart() {
 	);
 	pieChart.draw();
 }
-/*
-$("#b1_not").css( "color", linkcolor );
-
-var myColor = [linkcolor,backcolor];
-var myData = [{{(int)@stats.storiesReviewedQ}},{{100-(int)@stats.storiesReviewedQ}}];
-
-function getTotal(){
-	var myTotal = 0;
-	for (var j = 0; j < myData.length; j++) {
-		myTotal += (typeof myData[j] == 'number') ? myData[j] : 0;
-	}
-	return myTotal;
-}
-
-function plotData() {
-	var canvas;
-	var ctx;
-	var lastend = 1;
-	var myTotal = getTotal();
-
-	canvas = document.getElementById("canvas");
-	ctx = canvas.getContext("2d");
-	ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-	for (var i = 0; i < myData.length; i++)
-	{
-	ctx.fillStyle = myColor[i];
-	ctx.beginPath();
-	ctx.moveTo(200,150);
-	ctx.arc(200,150,150,lastend,lastend+
-	  (Math.PI*2*(myData[i]/myTotal)),false);
-	ctx.lineTo(200,150);
-	ctx.fill();
-	lastend += Math.PI*2*(myData[i]/myTotal);
-	}
-}
-
-plotData();
-*/
 </script>
 </check>
