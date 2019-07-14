@@ -497,6 +497,8 @@ return array(
 'ACP_Categories_Error_DBError' => 'Konnte Kategorien "{0}" wegen Datenbankfehler nicht löschen!',
 'ACP_Categories_Error_badID' => 'Kann die Kategorien nicht löschen, keine gültige ID gefunden!',
 
+'ACP_NewMember'	=> 'Neues Mitglied hinzufügen',
+
 // 'ACP_Tags'				=> 'Tags',
 'ACP_NewTag'			=> 'Neuen Tag hinzufügen',
 'ACP_Character'			=> 'Charakter',

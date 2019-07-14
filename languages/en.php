@@ -497,6 +497,8 @@ return array(
 'ACP_Categories_Error_DBError'		=> 'Could not delete category "{0}", database error occured!',
 'ACP_Categories_Error_badID'		=> 'Could not delete category, ID not found in database!',
 
+'ACP_NewMember'	=> 'Add new member',
+
 'ACP_Tags'				=> 'Tags',
 'ACP_NewTag'			=> 'Add new tag',
 'ACP_Character'			=> 'Character',

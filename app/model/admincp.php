@@ -2091,6 +2091,26 @@ class AdminCP extends Controlpanel {
 		return $this->exec($sql);
 	}
 	
+	public function memberAdd(array $member)
+	{
+		// load member list
+		$members=new \DB\SQL\Mapper($this->db, $this->prefix.'users');
+		// return an error if a login like this already exists
+		if ( 1 == sizeof($members->find(array('login=?',$member['new_name']))) )
+			return 0;
+		if ( 1 == sizeof($members->find(array('username=?',$member['new_name']))) )
+			return 0;
+		
+		$kv = [
+			'login'		=> $member['new_name'],
+			'username'	=> $member['new_name'],
+			'email'		=> $member['new_mail'],
+			'groups'	=> $member['new_group'],
+		];
+
+		return $this->insertArray($this->prefix.'users', $kv );
+	}
+	
 	public function listUsers($page, array $sort, $search=NULL)
 	{
 		$limit = 20;

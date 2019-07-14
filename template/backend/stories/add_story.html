@@ -9,7 +9,7 @@
 				<div class="gb-1qrt"><h6>{{@LN__Title}}</h6></div>
 				<div class="gb-3qrt"><input class="input" placeholder="Your story title goes here" type="text" name="form[new_title]" value="{{@storyTitle}}"></div>
 {*		<!-- The next field will be filled by the javascript below, do not change the id! --> *}
-				<div class="gb-1qrt"><h6>{{@LN__MainAuthor}} <a class="contextual-popup" href="#mainauthorinfo">{ICON:info} <span> <b>Info:</b><br />{{@UCP_ExplainMainAuthor}}.</span></a></h6></div>
+				<div class="gb-1qrt"><h6>{{@LN__MainAuthor}} <a class="tooltip is-tooltip-multiline" data-tooltip="Info: {{@UCP_ExplainMainAuthor}}."><i class="fas fa-info-circle"></i></a></h6></div>
 				<div class="gb-3qrt"><input type="text" id="mainauthor-select" name="form[new_author]" /></div>
 				<check if="{{ isset(@storyLink) }}">
 				<div class="full"><div class="gb-90 alert-box warning"><input type="checkbox" name="form[confirmInsert]"/>{{@LN__StoryConfirmSimilar}}</div></div>

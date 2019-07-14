@@ -1086,8 +1086,11 @@ class AdminCP extends Base
 		// add module title
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Members') );
 
-		switch( $this->moduleInit([ "edit", "pending", "groups", "profile", "team" ], @$params['module']) )
+		switch( $this->moduleInit([ "add", "edit", "pending", "groups", "profile", "team" ], @$params['module']) )
 		{
+			case "add":
+				$this->buffer( $this->membersAdd($f3, $params) );
+				break;
 			case "edit":
 				$this->buffer( $this->membersEdit($f3, $params) );
 				break;
@@ -1123,6 +1126,17 @@ class AdminCP extends Base
 
 		echo json_encode($data);
 		exit;
+	}
+
+	protected function membersAdd(\Base $f3, array $params): string
+	{
+		if ( isset($_POST) )
+		{
+			$post = $f3->get('POST');
+			if ( !empty($post['new_name']) )
+				$_SESSION['lastAction'] = [ "addResult" => $this->model->memberAdd($post) ];
+		}
+		return $this->template->userAddForm();
 	}
 
 	protected function membersEdit(\Base $f3, array $params): string

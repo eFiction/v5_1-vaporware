@@ -501,13 +501,24 @@ class AdminCP extends Base
 	public function userFieldsList(array $fieldData)
 	{
 		$this->f3->set('data', $fieldData);
-		return $this->render('members/list_fields.html');
+		return $this->render('members/fields.list.html');
 	}
 	
 	public function userTeamList($teamData)
 	{
 		$this->f3->set('data', $teamData);
-		return $this->render('members/list_team.html');
+		return $this->render('members/team.list.html');
+	}
+	
+	public function userAddForm() //(array $post, int $result)
+	{
+		if( isset($_SESSION['lastAction']) )
+		{
+			$this->f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
+			unset($_SESSION['lastAction']);
+		}
+
+		return $this->render('members/member.add.html');
 	}
 	
 	public function userEditList(array $data, array $sort, $search)
@@ -515,14 +526,14 @@ class AdminCP extends Base
 		$this->f3->set('data', $data);
 		$this->f3->set('sort', $sort);
 		$this->f3->set('search', $search);
-		return $this->render('members/searchlist.html');
+		return $this->render('members/member.search.html');
 	}
 
-	public function userEdit(array $data, $returnpath)
+	public function userEdit(array $data, $returnpath): string
 	{
 		$this->f3->set('data', $data);
 		$this->f3->set('returnpath', $returnpath);
-		return $this->render('members/edit_member.html');
+		return $this->render('members/member.edit.html');
 	}
 
 }
