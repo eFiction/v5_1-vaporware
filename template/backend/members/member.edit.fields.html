@@ -1,19 +1,53 @@
-<fieldset>
-	<div class="gb-40">{{@LN__LoginName}}:</div>
-	<div class="gb-60"><input type="text" value="{{@data.login}}" readonly="readonly" /></div>
+<div class="field">
+  <label class="label">{{@LN__LoginName}}</label>
+  <div class="control has-icons-left has-icons-right">
+    <input class="input" type="text" value="{{@data.login}}" name="data[login]">
+	<span class="icon is-small is-left">
+      {ICON:member}
+    </span>
+  </div>
+</div>
 
-	<div class="gb-40">{{@LN__VisibleName}}:</div>
-	<div class="gb-60"><input type="text" value="{{@data.username}}" readonly="readonly" /></div>
+<div class="field">
+  <label class="label">{{@LN__VisibleName}}</label>
+  <div class="control has-icons-left has-icons-right">
+    <input class="input" type="text" value="{{@data.username}}" name="data[username]">
+	<span class="icon is-small is-left">
+      {ICON:member}
+    </span>
+  </div>
+</div>
 
-	<div class="gb-40">__realname</div>
-	<div class="gb-60"><input type="text" value="{{@data.realname}}" /></div>
+<div class="field">
+  <label class="label">{@LN__RealName}</label>
+  <div class="control has-icons-left has-icons-right">
+    <input class="input" type="text" value="{{@data.realname}}" name="data[realname]">
+	<span class="icon is-small is-left">
+      {ICON:member}
+    </span>
+  </div>
+</div>
 
-	<div class="gb-40">{{@LN__Email}}:</div>
-	<div class="gb-60"><input type="text" value="{{@data.email}}" /></div>
+<div class="field">
+  <label class="label">{{@LN__Email}}:</label>
+  <div class="control has-icons-left has-icons-right">
+    <input class="input" type="email" value="{{@data.email}}">
+    <span class="icon is-small is-left">
+      {ICON:mail}
+    </span>
+  </div>
+</div>
 
-	<div class="gb-40">{{@LN__Registered}}:</div>
-	<div class="gb-60">{{ date(@CONFIG.datetime_format, @data.registered) }}</div>
-</fieldset>
+<div class="field">
+  <label class="label">{{@LN__Registered}}:</label>
+  <div class="control has-icons-left has-icons-right">
+    <input class="input" type="email" value="{{ date(@CONFIG.datetime_format, @data.registered) }}">
+    <span class="icon is-small is-left">
+      {ICON:calendar}
+    </span>
+  </div>
+</div>
+
 {*
 	/*
 		1 = URL

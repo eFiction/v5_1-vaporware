@@ -430,12 +430,12 @@ class UserCP extends Controlpanel
 		// Check Authors:
 		$this->storyRelationAuthor( $story->sid, $post['mainauthor'], $post['supauthor'] );
 		
-		$series=new \DB\SQL\Mapper($this->db, $this->prefix.'series_stories');
-		$inSeries = $series->find(array('sid=?',$storyID));
+		$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories');
+		$inSeries = $collection->find(array('sid=?',$storyID));
 		foreach ( $inSeries as $in )
 		{
-			// Rebuild series cache based on new data
-			$this->rebuildStoryCache($in->seriesid);
+			// Rebuild collection/series cache based on new data
+			$this->rebuildSeriesCache($in->seriesid);
 		}
 
 		// Rebuild story cache based on new data

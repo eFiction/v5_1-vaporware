@@ -24,7 +24,7 @@ class Controlpanel extends Base {
 		}
 		
 		// Load all series that housed this story
-		$mapper = new \DB\SQL\Mapper($this->db, $this->prefix.'series_stories');
+		$mapper = new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories');
 		$deleted['series'] = 0;
 		while( $mapper->load(array('sid=?',$storyID)) )
 		{
