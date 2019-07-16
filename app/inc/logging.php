@@ -63,11 +63,14 @@ class Logging extends \DB\SQL\Mapper
 
 		switch ( $type )
 		{
+			case "RG":
+				$data = $logger->entryRG($logger->subtype, $action, $uid);
+				break;
 			case "VS":
 				$data = $logger->entryVS($logger->subtype, $action, $uid);
 				break;
 			default:
-				$data = $logger->entryGeneric($logger->subtype, $action, $uid);
+				$data = $logger->entryGeneric($action, $uid);
 		}
 
 		$geo = \Web\Geo::instance();
@@ -132,5 +135,25 @@ class Logging extends \DB\SQL\Mapper
 		// Whenever a story is validated, it is assumed to have changed in one way or another, so we delete the ePub cache
 		if ( FALSE !== $file = realpath("tmp/epub/s{$data[0]['sid']}.zip") )
 			unlink($file);
+	}
+	
+	protected function entryRG($subtype, $action, $uid)
+	{
+		// user registration
+		if ( !$uid ) $uid = $_SESSION['userID'];
+		$action = json_decode($action, TRUE);
+		// nothing being done yet
+
+		return $action;
+	}
+	
+	protected function entryGeneric($action, $uid)
+	{
+		// generic logging
+		if ( !$uid ) $uid = $_SESSION['userID'];
+		$action = json_decode($action, TRUE);
+		// nothing being done yet
+
+		return $action;
 	}
 }

@@ -84,7 +84,8 @@ if ($_SESSION['groups'] & 1)
 			'Controller\UserCP->index' );
 
 		// Ajax routes
-		$f3->route( ['POST /userCP/ajax/@module [ajax]', 'POST /userCP/ajax/@module/@sub [ajax]'], 'Controller\UserCP->ajax' );
+//		$f3->route( ['POST /userCP/ajax/@module [ajax]', 'POST /userCP/ajax/@module/@sub [ajax]'], 'Controller\UserCP->ajax' );
+		$f3->route( ['POST /userCP/ajax/@module [ajax]', 'POST /userCP/ajax/@module/* [ajax]'], 'Controller\UserCP->ajax' );
 
 		if ( $_SESSION['groups'] & 32 )
 		{

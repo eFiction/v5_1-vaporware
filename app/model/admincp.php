@@ -2107,8 +2107,21 @@ class AdminCP extends Controlpanel {
 			'email'		=> $member['new_mail'],
 			'groups'	=> $member['new_group'],
 		];
+		$userID = $this->insertArray($this->prefix.'users', $kv );
 
-		return $this->insertArray($this->prefix.'users', $kv );
+		// Log successful user creation
+		if ( $userID > 0 ) 
+			\Logging::addEntry(
+				"RG",
+				json_encode([
+					'name'		=> $member['new_name'],
+					'uid'		=> $userID,
+					'email'		=> $member['new_mail'],
+					'reason'	=> '',
+					'admin'		=> TRUE
+				])
+			);
+		return $userID;
 	}
 	
 	public function listUsers($page, array $sort, $search=NULL)

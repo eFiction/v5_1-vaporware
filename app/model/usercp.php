@@ -678,16 +678,42 @@ class UserCP extends Controlpanel
 			}
 			elseif(isset($data['character']))
 			{
-				$where[] = " Ch.catid=-1 ";
-				if ( $limitation )
+				if ( isset($params['categories']) )
+				{
+					$where = ( is_array($params['categories']) )
+						? "FIND_IN_SET(C.cid, :categories)"
+						: "C.cid = :categories";
+					$bind = ( is_array($params['categories']) )
+						? implode(",",$params['categories'])
+						: $params['categories'];
+					$c = [];
+					$this->getCategories
+					(
+						$c,
+						$this->exec("SELECT C.cid,C.parent_cid 
+										FROM `tbl_categories`C
+									WHERE {$where};", [ ":categories" => $bind ] )
+					);
+					
+					if ( sizeof($c) ) $categories = " OR rCC.catid IN (".implode(",",$c).")";
+				}
+				//$where[] = " Ch.catid=-1 ";
+				/*if ( $limitation )
 				{
 					$limitation = explode(",",$limitation);
 					foreach ( $limitation as $limit )
 						$where[] = " FIND_IN_SET({$limit}, Ch.catid)";
 				}
 				$where = " AND ( ".implode(" OR", $where) .") ";
+				*/
 				
-				$ajax_sql = "SELECT Ch.charname as name, Ch.charid as id from `tbl_characters`Ch WHERE Ch.charname LIKE :charname {$where} ORDER BY Ch.charname ASC LIMIT 5";
+				//$ajax_sql = "SELECT Ch.charname as name, Ch.charid as id from `tbl_characters`Ch WHERE Ch.charname LIKE :charname {$where} ORDER BY Ch.charname ASC LIMIT 5";
+				$ajax_sql = "SELECT Ch.charname as name, Ch.charid as id
+								FROM `tbl_characters`Ch 
+								LEFT JOIN `tbl_character_categories`rCC ON ( Ch.charid = rCC.charid )
+							WHERE Ch.charname LIKE :charname AND ( rCC.catid IS NULL ".($categories??"")." )
+							GROUP BY id
+							ORDER BY Ch.charname ASC LIMIT 5";
 				$bind = [ ":charname" =>  "%{$data['character']}%" ];
 			}
 			elseif(isset($data['chaptersort']))
