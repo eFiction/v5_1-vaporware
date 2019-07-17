@@ -100,7 +100,8 @@ class Iconset extends \DB\Jig\Mapper {
 	
 	static protected function rebuild($icon)
 	{
-		$set = $_SESSION['tpl'][1];
+		//$set = $_SESSION['tpl'][1];
+		$set = 1;
 		// ORDER BY forces key fields to be read first
 		$sql = "SELECT `name`, `value` FROM `tbl_iconsets` WHERE `set_id` = {$set} ORDER BY `name` ASC";
 		$data = \Model\Base::instance()->exec($sql);

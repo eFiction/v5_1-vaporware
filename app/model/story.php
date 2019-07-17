@@ -858,7 +858,7 @@ class Story extends Base
 		return $this->exec('SELECT S.sid, S.title, S.summary, 
 											S.cache_authors
 										FROM `tbl_stories`S
-										WHERE (datediff(S.updated,S.date) = 0)
+										WHERE (datediff(S.updated,S.date) = 0) AND S.completed >= 6 AND S.validated >= 30
 										ORDER BY S.updated DESC
 										LIMIT 0,'.(int)$items);
 	}

@@ -608,40 +608,50 @@ class AdminCP extends Controlpanel {
 			$i += $character->changed("biography");
 		$character->save();
 		
-		// Filter categories:
-		$categories = array_filter($data['categories']);
-
 		// open a db mapper to the relation table
 		$relations = new \DB\SQL\Mapper($this->db, $this->prefix.'character_categories');
 
-		// check all existing links
-		foreach ( $relations->find(array('`charid` = ?',$charid)) as $X )
+		if (isset($data['categories']))
 		{
-			$temp=array_search($X['catid'], $categories);
-			if ( $temp===FALSE )
-			// Excess relation, drop from table
+			// Filter categories:
+			$categories = array_filter($data['categories']);
+
+			// check all existing links
+			foreach ( $relations->find(array('`charid` = ?',$charid)) as $X )
 			{
-				$recounts[] = $X['catid'];
-				$relations->erase(['lid=?',$X['lid']]);
+				$temp=array_search($X['catid'], $categories);
+				if ( $temp===FALSE )
+				// Excess relation, drop from table
+				{
+					$recounts[] = $X['catid'];
+					$relations->erase(['lid=?',$X['lid']]);
+				}
+				// already in database
+				else unset($categories[$temp]);
 			}
-			// already in database
-			else unset($categories[$temp]);
+			
+			// Insert any character/category relations not already present
+			if ( sizeof($categories)>0 )
+			{
+				foreach ( $categories as $temp)
+				{
+					// Add relation to table
+					$relations->reset();
+					$relations->charid = $charid;
+					$relations->catid = $temp;
+					$relations->save();
+					$recounts[] = $temp;
+				}
+			}
+			$i+=sizeof($recounts??[]);
+		}
+		else
+		{
+			// drop all relations for this character
+			$i += $relations->erase(array('`charid` = ?',$charid));
 		}
 		
-		// Insert any character/category relations not already present
-		if ( sizeof($categories)>0 )
-		{
-			foreach ( $categories as $temp)
-			{
-				// Add relation to table
-				$relations->reset();
-				$relations->charid = $charid;
-				$relations->catid = $temp;
-				$relations->save();
-				$recounts[] = $temp;
-			}
-		}
-		return ($i+sizeof($recounts??[]));
+		return $i;
 	}
 
 	public function characterDelete(int $charid)
@@ -2373,18 +2383,21 @@ class AdminCP extends Controlpanel {
 		return $story;
 	}
 	
-	//public function saveChapterChanges( int $chapterID, array $post )
-	public function saveChapterChanges( $chapterID, array $post )
+	public function saveChapterChanges( int $chapterID, array $post )
 	{
+		// plain and visual return different newline representations, this will bring things to standard.
+		$chaptertext = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $post['chapter_text']);
+
 		$chapter=new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
 		$chapter->load(array('chapid=?',$chapterID));
 		
-		// remember old validation status
-		$oldValidated = $chapter->validated;
+		$chapter->title 	= $post['chapter_title'];
+		$chapter->notes 	= $post['chapter_notes'];
+		$chapter->wordcount	= max(count(preg_split("/\p{L}[\p{L}\p{Mn}\p{Pd}'\x{2019}]{0,}/u",$chaptertext))-1, 0);
 
-		$chapter->title 		= $post['chapter_title'];
-		$chapter->notes 		= $post['chapter_notes'];
-		$chapter->validated 	= $post['validated'].$post['valreason'];
+		// remember old validation status
+		$oldValidated 		= $chapter->validated;
+		$chapter->validated = $post['validated'].$post['valreason'];
 
 		if ( $chapter->changed("validated") )
 		{
@@ -2393,15 +2406,15 @@ class AdminCP extends Controlpanel {
 			\Logging::addEntry(['VS','c'], [ $chapter->sid, $chapter->inorder] );
 		}
 
+		// save chapter information
 		$chapter->save();
-		
-		// plain and visual return different newline representations, this will bring things to standard.
-		$post['chapter_text'] = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $post['chapter_text']);
-		parent::saveChapter($chapterID, $post['chapter_text']);
+		// save the chapter text
+		parent::saveChapter($chapterID, $chaptertext, $chapter);
+		// recount words for entire story
+		$this->rebuildStoryWordcount($chapter->sid);
 	}
 	
-	//public function addChapter ( int $storyID )
-	public function addChapter ( $storyID )
+	public function addChapter ( int $storyID )
 	{
 		$location = $this->config['chapter_data_location'];
 		

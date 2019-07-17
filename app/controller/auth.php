@@ -41,6 +41,15 @@ class Auth extends Base {
 				$f3->set('SESSION.session_id', $session_id);
 		}
 		else $session_id = \Model\Auth::instance()->createSession();
+		
+		// define a fallback for the user preferences
+		$session_preferences = 
+		[
+			'layout' 		=> $f3->get('CONFIG.layout_default'),
+			'language' 		=> $f3->get('CONFIG.language_default'),
+			'ageconsent'	=> 0,
+			'showTOC'		=> 'toc',
+		];
 
 		if ( $f3->get('AJAX') AND isset($session_id) AND $user = \Model\Auth::instance()->validateAJAXSession($session_id) AND $user['userID']>0 )
 		{
@@ -55,7 +64,10 @@ class Auth extends Base {
 											],
 					'allowed_authors'	=> 	explode(",",$user['allowed_authors']),
 					'preferences'		=> 	$user['preferences'],
-					'tpl'				=> 	[ "default", 1],
+					//'tpl'				=> 	[ "default", 1],
+				],
+				[
+					'preferences'		=>	$session_preferences,
 				]
 			);
 
@@ -74,7 +86,10 @@ class Auth extends Base {
 											],
 					'allowed_authors'	=> 	explode(",",$user['allowed_authors']),
 					'preferences'		=> 	$user['preferences'],
-					'tpl'				=> 	[ "default", 1],
+					//'tpl'				=> 	[ "default", 1],
+				],
+				[
+					'preferences'		=>	$session_preferences,
 				]
 			);
 
@@ -90,11 +105,8 @@ class Auth extends Base {
 					'userID'			=> 	0,
 					'mail'				=> 	FALSE,
 					'allowed_authors'	=>  [],
-					'preferences'		=>	[
-												'language' 		=> $f3->get('CONFIG.language_default'),
-												'ageconsent'	=> 0,
-											],
-					'tpl'				=> 	[ "default", 1]
+					'preferences'		=>	$session_preferences,
+					//'tpl'				=> 	[ "default", 1]
 				]
 			);
 			

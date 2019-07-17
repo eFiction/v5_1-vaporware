@@ -447,7 +447,7 @@ class UserCP extends Controlpanel
 		return parent::storyChapterAdd($sid, $uid);
 	}
 
-	public function authorStoryChapterSave( $chapterID, array $post )
+	public function authorStoryChapterSave( int $chapterID, array $post )
 	{
 		// plain and visual return different newline representations, this will bring things to standard.
 		$chaptertext = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $post['chapter_text']);
@@ -490,7 +490,7 @@ class UserCP extends Controlpanel
 		// save chapter information
 		$chapter->save();
 		// save the chapter text
-		parent::saveChapter($chapterID, $chaptertext);
+		$this->saveChapter($chapterID, $chaptertext, $chapter);
 		// recount words for entire story
 		$this->rebuildStoryWordcount($chapter->sid);
 	}

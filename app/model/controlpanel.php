@@ -264,7 +264,7 @@ class Controlpanel extends Base {
 		return $data[0];
 	}
 
-	public function saveChapter( $chapterID, $chapterText )
+	public function saveChapter( int $chapterID, string $chapterText, \DB\SQL\Mapper $mapper )
 	{
 		if ( $this->config['chapter_data_location'] == "local" )
 		{
@@ -273,7 +273,9 @@ class Controlpanel extends Base {
 		}
 		else
 		{
-			$chapterSave = $this->exec('UPDATE `tbl_chapters` SET `chaptertext` = :chaptertext WHERE `chapid` = :chapid', array(':chapid' => $chapterID, ':chaptertext' => $chapterText ));
+			$mapper->chaptertext = $chapterText;
+			$chapterSave = (int)$mapper->changed();
+			$mapper->save();
 		}
 
 		return $chapterSave;
@@ -340,18 +342,24 @@ class Controlpanel extends Base {
 		);
 	}
 	
-	public function rebuildStoryWordcount($sid)
+	public function rebuildStoryWordcount(int $sid)
 	{
 		$this->exec("UPDATE `tbl_stories`S
 						INNER JOIN
 						(
-							SELECT sid, SUM(wordcount)'wordcount' FROM `tbl_chapters`
+							SELECT 
+								sid,
+								COUNT(DISTINCT chapid)'chapters',
+								SUM(wordcount)'wordcount' 
+							FROM `tbl_chapters`
 							WHERE sid = :sid AND validated >= 30
 							GROUP BY sid
 						) Ch ON ( S.sid = Ch.sid  )
-					SET S.wordcount = Ch.wordcount;",
+					SET S.wordcount = Ch.wordcount, S.chapters = Ch.chapters;",
 					[ ":sid" => $sid ]
 					);
+		// drop stats cache to make changes visible
+		\Cache::instance()->clear('statsCache');
 	}
 
 	public function rebuildSeriesCache($collID)

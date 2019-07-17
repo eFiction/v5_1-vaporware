@@ -139,6 +139,7 @@ return array(
 'Stats_Authors' => 'Autoren',
 'Stats_Stories' => 'Stories',
 'Stats_Chapters' => 'Kapitel',
+'Stats_Words'	=> 'Worte',
 'Stats_Reviews' => 'Reviews',
 'Stats_Online' => 'Wer online ist',
 'Stats_Guests' => 'Gäste',
