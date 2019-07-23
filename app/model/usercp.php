@@ -301,7 +301,7 @@ class UserCP extends Controlpanel
 	}
 	
 /*	
-	public function loadChapterList($sid)
+	public function chapterLoadList($sid)
 	moved to parent
 */
 
@@ -487,12 +487,18 @@ class UserCP extends Controlpanel
 			\Logging::addEntry(['VS','c'], [$chapter->sid,$chapterID]);
 		}
 
+		if ( $chapter->changed("validated") OR $chapter->changed("wordcount") )
+			// mark recount chapters and words for entire story
+			$recount = 1;
+
 		// save chapter information
 		$chapter->save();
 		// save the chapter text
-		$this->saveChapter($chapterID, $chaptertext, $chapter);
-		// recount words for entire story
-		$this->rebuildStoryWordcount($chapter->sid);
+		$this->chapterSave($chapterID, $chaptertext, $chapter);
+
+		if ( isset($recount) )
+		// perform recount, this has to take place after save();
+			$this->recountStory($chapter->sid);
 	}
 
 	public function authorCuratorRemove($uid=NULL)

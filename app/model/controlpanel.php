@@ -236,7 +236,7 @@ class Controlpanel extends Base {
 		return $chapterID;
 	}
 
-	public function loadChapterList($sid)
+	public function chapterLoadList($sid)
 	{
 		$data = $this->exec
 		(
@@ -249,7 +249,7 @@ class Controlpanel extends Base {
 		return [];
 	}
 
-	public function loadChapter( $story, $chapter )
+	public function chapterLoad( $story, $chapter )
 	{
 		$data = $this->exec
 		(
@@ -264,7 +264,7 @@ class Controlpanel extends Base {
 		return $data[0];
 	}
 
-	public function saveChapter( int $chapterID, string $chapterText, \DB\SQL\Mapper $mapper )
+	public function chapterSave( int $chapterID, string $chapterText, \DB\SQL\Mapper $mapper )
 	{
 		if ( $this->config['chapter_data_location'] == "local" )
 		{
@@ -342,7 +342,7 @@ class Controlpanel extends Base {
 		);
 	}
 	
-	public function rebuildStoryWordcount(int $sid)
+	public function recountStory(int $sid)
 	{
 		$this->exec("UPDATE `tbl_stories`S
 						INNER JOIN
@@ -468,55 +468,50 @@ class Controlpanel extends Base {
 		);
 	}
 
-//	public function cacheCategories(int $catID=0)
-	public function cacheCategories($catID=0)
+	public function cacheCategories(int $catID)
 	{
-		// clear stats of affected categories
-		$sql = "UPDATE `tbl_categories` SET `stats` = NULL";
-		if ($catID>0) $sql .=  " WHERE `cid` = {$catID};";
-		$this->exec($sql);
-		
 		$categories = new \DB\SQL\Mapper($this->db, $this->prefix.'categories' );
-		
-		$sql = "SELECT C.cid, C.category, COUNT(DISTINCT S.sid) as counted, 
+		$categories->load(array('cid=?',$catID));
+
+		// recover from bad category ID
+		if( empty($categories->cid) ) return FALSE;
+
+		$sql = "SELECT C.cid, C.category, COUNT(DISTINCT S.sid) as counted, C.parent_cid as parent,
 					GROUP_CONCAT(DISTINCT C1.category SEPARATOR '||' ) as sub_categories, 
 					GROUP_CONCAT(DISTINCT C1.stats SEPARATOR '||' ) as sub_stats
 			FROM `tbl_categories`C 
-				INNER JOIN (SELECT leveldown FROM `tbl_categories` WHERE `stats` = '' ORDER BY leveldown DESC LIMIT 0,1) c2 ON ( C.leveldown = c2.leveldown )
 				LEFT JOIN `tbl_stories_categories`SC ON ( C.cid = SC.cid )
 				LEFT JOIN `tbl_stories`S ON ( S.sid = SC.sid )
 				LEFT JOIN `tbl_categories`C1 ON ( C.cid = C1.parent_cid )
+			WHERE C.cid = :cid
 			GROUP BY C.cid";
-			
-		do {
-			$items = $this->exec( $sql );
-			$change = FALSE;
-			foreach ( $items as $item)
-			{
-				if ( $item['sub_categories']==NULL ) $sub = NULL;
-				else
-				{
-					$sub_categories = explode("||", $item['sub_categories']);
-					$sub_stats = explode("||", $item['sub_stats']);
-					$sub_stats = array_map("json_decode", $sub_stats);
-					foreach( $sub_categories as $key => $value )
-					{
-						$item['counted'] += $sub_stats[$key]->count;
-						$sub[$value] = $sub_stats[$key]->count;
-					}
-				}
-				$stats = json_encode([ "count" => (int)$item['counted'], "cid" => $item['cid'], "sub" => $sub ]);
-				unset($sub);
-				
-				$categories->load(array('cid=?',$item['cid']));
-				$categories->stats = $stats;
-				$categories->save();
-				
-				$change = ($change) ? : $categories->changed();
-			}
-		} while ( $change != FALSE );
-	}
+		$item = $this->exec($sql, [":cid" => $catID])[0];
 
+		if ( $item['sub_categories']==NULL ) $sub = NULL;
+		else
+		{
+			$sub_categories = explode("||", $item['sub_categories']);
+			$sub_stats = explode("||", $item['sub_stats']);
+			$sub_stats = array_map("json_decode", $sub_stats);
+
+			foreach( $sub_categories as $key => $value )
+			{
+				if ($sub_stats[$key]!=NULL)
+				{
+					$item['counted'] += $sub_stats[$key]->count;
+					$sub[$value] = $sub_stats[$key]->count;
+				}
+			}
+		}
+		$categories->stats = json_encode([ "count" => (int)$item['counted'], "cid" => $item['cid'], "sub" => $sub ]);
+		$categories->save();
+		
+		if ( $categories->parent_cid > 0 )
+			$this->cacheCategories( $categories->parent_cid );
+		
+		return TRUE;
+	}
+	
 	public function storyRelationCategories( $sid, $data )
 	{
 		$data = array_filter(explode(",",$data));

@@ -242,7 +242,7 @@ class UserCP extends Base
 			}
 
 			// Chapter list is always needed, load after POST to catch chapter name changes
-			$chapterList = $this->model->loadChapterList($storyData['sid']);
+			$chapterList = $this->model->chapterLoadList($storyData['sid']);
 
 			if ( isset($params['chapter']) )
 			{
@@ -253,7 +253,7 @@ class UserCP extends Base
 					$f3->reroute($reroute, false);
 					exit;
 				}
-				$chapterData = $this->model->loadChapter($storyData['sid'],(int)$params['chapter']);
+				$chapterData = $this->model->chapterLoad($storyData['sid'],(int)$params['chapter']);
 				// abusing $chapterData to carry a few more details
 				$chapterData['form'] = [ "uid" => $params['uid'], "returnpath" => $params['returnpath'], "storytitle" => $storyData['title'] ];
 				// figure out if we want a visual editor

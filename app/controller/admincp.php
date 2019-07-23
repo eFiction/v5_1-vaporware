@@ -1631,7 +1631,7 @@ class AdminCP extends Base
 				
 				if ( isset($params['chapter']) )
 				{
-					$this->model->saveChapterChanges($params['chapter'], $post['form']);
+					$this->model->chapterSaveChanges($params['chapter'], $post['form']);
 					$f3->reroute("/adminCP/stories/edit/story={$storyInfo['sid']};chapter={$params['chapter']}", false);
 					exit;
 				}
@@ -1644,19 +1644,19 @@ class AdminCP extends Base
 			}
 
 			// Chapter list is always needed, load after POST to catch chapter name changes
-			$chapterList = $this->model->loadChapterList($storyInfo['sid']);
+			$chapterList = $this->model->chapterLoadList($storyInfo['sid']);
 
 			if ( isset($params['chapter']) )
 			{
 				if ( $params['chapter']=="new" )
 				{
-					$newChapterID = $this->model->addChapter($storyInfo['sid']);
+					$newChapterID = $this->model->chapterAdd($storyInfo['sid']);
 					$reroute = "/adminCP/stories/edit/story={$storyInfo['sid']}/chapter={$newChapterID}"; //;returnpath=".$params['returnpath'];
 					$f3->reroute($reroute, false);
 					exit;
 				}
 				
-				$chapterInfo = $this->model->loadChapter($storyInfo['sid'],(int)$params['chapter']);
+				$chapterInfo = $this->model->chapterLoad($storyInfo['sid'],(int)$params['chapter']);
 				// abusing $chapterData to carry a few more details
 				$chapterInfo['storytitle'] = $storyInfo['title'];
 				// figure out if we want a visual editor
@@ -1670,7 +1670,7 @@ class AdminCP extends Base
 				// figure out if we want a visual editor
 				$storyInfo['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
 
-				$chapterList = $this->model->loadChapterList($storyInfo['sid']);
+				$chapterList = $this->model->chapterLoadList($storyInfo['sid']);
 				$prePopulate = $this->model->storyEditPrePop($storyInfo);
 				$this->buffer( $this->template->storyMetaEdit($storyInfo,$chapterList,$prePopulate) );
 			}

@@ -62,7 +62,8 @@ class Iconset extends \DB\Jig\Mapper {
 	public function __construct()
 	{
 		$db = new \DB\Jig('tmp/');
-		parent::__construct($db,"iconset.{$_SESSION['tpl'][1]}.json");
+		parent::__construct($db,"iconset.1.json");
+		//parent::__construct($db,"iconset.{$_SESSION['tpl'][1]}.json");
 		$this->load();
 	}
 	

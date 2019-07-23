@@ -88,7 +88,7 @@ class AdminCP extends Controlpanel {
 							WHERE Ch.charname LIKE :charname AND ( rCC.catid IS NULL ".($categories??"")." )
 							GROUP BY id
 							ORDER BY Ch.charname ASC LIMIT 5";
-//echo $ajax_sql;
+
 				$bind = [ ":charname" =>  "%{$data['character']}%" ];
 			}
 		}
@@ -143,7 +143,6 @@ class AdminCP extends Controlpanel {
 	
 	protected function getCategories(array &$c, array $data)
 	{
-//		print_r ( $data);
 		foreach ( $data as $d )
 		{
 			// take note of this category
@@ -1871,7 +1870,7 @@ class AdminCP extends Controlpanel {
 			if ( $jobs[0]['chapid']!==NULL )
 			// Only build a chapter list if there are chapters that require validation
 			{
-				$data['chapterList'] = $this->loadChapterList($sid);
+				$data['chapterList'] = $this->chapterLoadList($sid);
 				$first  = 0;
 				$closed = 0;
 				
@@ -1944,6 +1943,98 @@ class AdminCP extends Controlpanel {
 			\Logging::addEntry('VS', $sid);
 		}
 		return $result;
+	}
+
+/*	
+	public function chapterLoadList($sid)
+	moved to parent
+*/
+	
+	public function loadStoryMapper($sid)
+	{
+		$story=new \DB\SQL\Mapper($this->db, $this->prefix.'stories');
+		$story->load(array('sid=?',$sid));
+		return $story;
+	}
+	
+	public function chapterAdd ( int $storyID )
+	{
+		$location = $this->config['chapter_data_location'];
+		
+		// Get current chapter count and raise
+		if ( FALSE === $chapterCount = @$this->exec("SELECT COUNT(chapid) as chapters FROM `tbl_chapters` WHERE `sid` = :sid ", [ ":sid" => $storyID ])[0]['chapters'] )
+			return FALSE;
+		$chapterCount++;
+		
+		$kv = [
+			'title'			=> \Base::instance()->get('LN__Chapter')." #{$chapterCount}",
+			'inorder'		=> $chapterCount,
+			'validated'		=> "1".($_SESSION['groups']&128)?"3":"2",
+			'wordcount'		=> 0,
+			'rating'		=> "0", // allow rating later
+			'sid'			=> $storyID,
+		];
+
+		$chapterID = $this->insertArray($this->prefix.'chapters', $kv );
+
+		if ( $location == "local" )
+		{
+			$db = \storage::instance()->localChapterDB();
+			$chapterAdd= @$db->exec('INSERT INTO "chapters" ("chapid","sid","inorder","chaptertext") VALUES ( :chapid, :sid, :inorder, :chaptertext )', 
+								[
+									':chapid' 		=> $chapterID,
+									':sid' 			=> $storyID,
+									':inorder' 		=> $chapterCount,
+									':chaptertext'	=> '',
+								]
+			);
+		}
+		
+		$this->rebuildStoryCache($storyID);
+		
+		return $chapterID;
+	}
+
+	public function chapterSaveChanges( int $chapterID, array $post )
+	{
+		// plain and visual return different newline representations, this will bring things to standard.
+		$chaptertext = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $post['chapter_text']);
+
+		$chapter=new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
+		$chapter->load(array('chapid=?',$chapterID));
+		
+		$chapter->title 	= $post['chapter_title'];
+		$chapter->notes 	= $post['chapter_notes'];
+		$chapter->wordcount	= max(count(preg_split("/\p{L}[\p{L}\p{Mn}\p{Pd}'\x{2019}]{0,}/u",$chaptertext))-1, 0);
+
+		// remember old validation status
+		$oldValidated 		= $chapter->validated;
+		$chapter->validated = $post['validated'].$post['valreason'];
+
+		if ( $chapter->changed("validated") )
+		{
+			if ( $post['validated'] == 3 AND substr($oldValidated,0,1)!=3 )
+			// story got validated
+			\Logging::addEntry(['VS','c'], [ $chapter->sid, $chapter->inorder] );
+
+			elseif ( $post['validated'] < 3 AND substr($oldValidated,0,1)==3 )
+			// story got invalidated
+			// need better logging here
+			\Logging::addEntry(['VS','c'], [ $chapter->sid, $chapter->inorder] );
+		}
+		
+		if ( $chapter->changed("validated") OR $chapter->changed("wordcount") )
+			// mark recount chapters and words for entire story
+			$recount = 1;
+
+		// save chapter information
+		$chapter->save();
+		// save the chapter text
+		$this->chapterSave($chapterID, $chaptertext, $chapter);
+
+		if ( isset($recount) )
+		// perform recount, this has to take place after save();
+			$this->recountStory($chapter->sid);
 	}
 
 //	public function tagAdd(string $name) : int
@@ -2371,92 +2462,6 @@ class AdminCP extends Controlpanel {
 		return $delete->erase( ["nid = ?", $id ] );
 	}
 
-/*	
-	public function loadChapterList($sid)
-	moved to parent
-*/
-	
-	public function loadStoryMapper($sid)
-	{
-		$story=new \DB\SQL\Mapper($this->db, $this->prefix.'stories');
-		$story->load(array('sid=?',$sid));
-		return $story;
-	}
-	
-	public function saveChapterChanges( int $chapterID, array $post )
-	{
-		// plain and visual return different newline representations, this will bring things to standard.
-		$chaptertext = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $post['chapter_text']);
-
-		$chapter=new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
-		$chapter->load(array('chapid=?',$chapterID));
-		
-		$chapter->title 	= $post['chapter_title'];
-		$chapter->notes 	= $post['chapter_notes'];
-		$chapter->wordcount	= max(count(preg_split("/\p{L}[\p{L}\p{Mn}\p{Pd}'\x{2019}]{0,}/u",$chaptertext))-1, 0);
-
-		// remember old validation status
-		$oldValidated 		= $chapter->validated;
-		$chapter->validated = $post['validated'].$post['valreason'];
-
-		if ( $chapter->changed("validated") )
-		{
-			if ( $post['validated'] == 3 AND substr($oldValidated,0,1)!=3 )
-			// story got validated
-			\Logging::addEntry(['VS','c'], [ $chapter->sid, $chapter->inorder] );
-		}
-
-		// save chapter information
-		$chapter->save();
-		// save the chapter text
-		parent::saveChapter($chapterID, $chaptertext, $chapter);
-		// recount words for entire story
-		$this->rebuildStoryWordcount($chapter->sid);
-	}
-	
-	public function addChapter ( int $storyID )
-	{
-		$location = $this->config['chapter_data_location'];
-		
-		// Get current chapter count and raise
-		if ( FALSE === $chapterCount = @$this->exec("SELECT COUNT(chapid) as chapters FROM `tbl_chapters` WHERE `sid` = :sid ", [ ":sid" => $storyID ])[0]['chapters'] )
-			return FALSE;
-		$chapterCount++;
-		
-		$kv = [
-			'title'			=> \Base::instance()->get('LN__Chapter')." #{$chapterCount}",
-			'inorder'		=> $chapterCount,
-			'validated'		=> "1".($_SESSION['groups']&128)?"3":"2",
-			'wordcount'		=> 0,
-			'rating'		=> "0", // allow rating later
-			'sid'			=> $storyID,
-		];
-
-		$chapterID = $this->insertArray($this->prefix.'chapters', $kv );
-
-		if ( $location == "local" )
-		{
-			$db = \storage::instance()->localChapterDB();
-			$chapterAdd= @$db->exec('INSERT INTO "chapters" ("chapid","sid","inorder","chaptertext") VALUES ( :chapid, :sid, :inorder, :chaptertext )', 
-								[
-									':chapid' 		=> $chapterID,
-									':sid' 			=> $storyID,
-									':inorder' 		=> $chapterCount,
-									':chaptertext'	=> '',
-								]
-			);
-		}
-		
-		$this->rebuildStoryCache($storyID);
-		
-		return $chapterID;
-	}
-
-	public function addChapterText( $chapterData )
-	{
-		return parent::addChapterText( $chapterData );
-	}
-	
 	public function shoutList(int $page, array $sort)
 	{
 		$limit = 20;
@@ -2594,6 +2599,71 @@ class AdminCP extends Controlpanel {
 		$sql = "DELETE FROM `tbl_stories_tags`
 					WHERE NOT EXISTS (SELECT * FROM `tbl_stories` WHERE `tbl_stories_tags`.`sid` = `tbl_stories`.`sid`);";
 		
+	}
+	
+	public function maintenanceRecountChapters()
+	{
+		return $this->exec
+		("UPDATE `tbl_stories`S
+			SET chapters = 
+				( SELECT COUNT(DISTINCT chapid) as chapters
+					FROM `tbl_chapters`C WHERE C.sid = S.sid AND C.validated >= 30
+				);"
+		);
+	}
+
+	// former recount function
+	// did more than required - recycle as maintenance?
+	public function maintenanceRecountCategories()
+	{
+		// clear stats of affected categories
+		$sql = "UPDATE `tbl_categories` SET `stats` = NULL";
+		if ($catID>0) $sql .=  " WHERE `cid` = {$catID};";
+		$this->exec($sql);
+		
+		$categories = new \DB\SQL\Mapper($this->db, $this->prefix.'categories' );
+		
+		$sql = "SELECT C.cid, C.category, COUNT(DISTINCT S.sid) as counted, C.parent_cid as parent,
+					GROUP_CONCAT(DISTINCT C1.category SEPARATOR '||' ) as sub_categories, 
+					GROUP_CONCAT(DISTINCT C1.stats SEPARATOR '||' ) as sub_stats
+			FROM `tbl_categories`C 
+				INNER JOIN (SELECT leveldown FROM `tbl_categories` WHERE `stats` = '' ORDER BY leveldown DESC LIMIT 0,1) c2 ON ( C.leveldown = c2.leveldown )
+				LEFT JOIN `tbl_stories_categories`SC ON ( C.cid = SC.cid )
+				LEFT JOIN `tbl_stories`S ON ( S.sid = SC.sid )
+				LEFT JOIN `tbl_categories`C1 ON ( C.cid = C1.parent_cid )
+			GROUP BY C.cid";
+			
+		do {
+			$items = $this->exec( $sql );
+			print_r($items);exit;
+			$change = FALSE;
+			foreach ( $items as $item)
+			{
+				if ( $item['sub_categories']==NULL ) $sub = NULL;
+				else
+				{
+					$sub_categories = explode("||", $item['sub_categories']);
+					$sub_stats = explode("||", $item['sub_stats']);
+					$sub_stats = array_map("json_decode", $sub_stats);
+					foreach( $sub_categories as $key => $value )
+					{
+						if ($sub_stats[$key]!=NULL)
+						{
+							$item['counted'] += $sub_stats[$key]->count;
+							$sub[$value] = $sub_stats[$key]->count;
+						}
+					}
+				}
+				$stats = json_encode([ "count" => (int)$item['counted'], "cid" => $item['cid'], "sub" => $sub ]);
+				unset($sub);
+				
+				$categories->load(array('cid=?',$item['cid']));
+				$categories->stats = $stats;
+				$categories->save();
+				
+				$change = ($change) ? : $categories->changed();
+			}
+		} while ( $change != FALSE );
 	}
 
 }

@@ -47,7 +47,7 @@ class Auth extends Base {
 		[
 			'layout' 		=> $f3->get('CONFIG.layout_default'),
 			'language' 		=> $f3->get('CONFIG.language_default'),
-			'ageconsent'	=> 0,
+			'ageconsent'	=> (int)(!$f3->get('CONFIG.agestatement')),
 			'showTOC'		=> 'toc',
 		];
 
