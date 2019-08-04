@@ -17,8 +17,8 @@
 		<br />
 		<check if="{{@element.stats.count}}"><div class="buttons-alignment"><a class="button" href="{{@BASE}}/story/browse/category={{@element.cid}}">{{ @LN__BrowseStories, @element.stats.count | format }}</a></div><br /><br /></check>
 		<check if="{{ sizeof(@element.stats.sub)}}">
-			<repeat group="{{ array_splice(@element['stats']['sub'],0,5) }}" key="{{@name}}" value="{{ @count }}" counter="{{@line}}">
-				{ICON:folder} {{@name}} [{{ @count }}]<br />
+			<repeat group="{{ array_splice(@element['stats']['sub'],0,5) }}" value="{{ @sub }}" counter="{{@line}}">
+				{ICON:folder} <a href="{{@BASE}}/story/browse/category={{@sub.id}}">{{@sub.name}}</a> [{{ @sub.count }}]<br />
 			</repeat>
 			<check if="{{ sizeof(@element.stats.sub) }}">and {{ sizeof(@element.stats.sub) }} more subs</check>
 		</check>

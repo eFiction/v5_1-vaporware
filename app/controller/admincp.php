@@ -646,7 +646,7 @@ class AdminCP extends Base
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Home') );
 		$f3->set('title_h1', $f3->get('LN__AdminMenu_Home') );
 
-		switch( $this->moduleInit([ "manual", "custompages", "news", "logs", "shoutbox", "polls" ], @$params['module']) )
+		switch( $this->moduleInit([ "custompages", "logs", "manual", "news", "shoutbox", "polls", "maintenance" ], @$params['module']) )
 		{
 			case "custompages":
 				$this->homeCustompages( $f3, $params );
@@ -669,8 +669,8 @@ class AdminCP extends Base
 			case "polls":
 				$this->buffer( $this->homePolls( $f3, $params ) );
 				break;
-			case "stories":
-				$this->homeStories($f3, $params);
+			case "maintenance":
+				$this->buffer( $this->homeMaintenance( $f3, $params ) );
 				break;
 			default:
 				$this->buffer( $this->template->access() );
@@ -978,6 +978,12 @@ class AdminCP extends Base
 				$sort
 			)
 		);
+	}
+	
+	protected function homeMaintenance(\Base $f3, array $params): string
+	{
+		$this->model->maintenanceRecountCategories();
+		return "";
 	}
 	
 	protected function homeNews(\Base $f3, array $params)//: void

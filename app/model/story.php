@@ -523,9 +523,9 @@ class Story extends Base
 		foreach ( $data['elements'] as &$entry )
 		{
 			if ( is_array($entry['stats']['sub']) )
-			foreach ( $entry['stats']['sub'] as $name => $count )
+			foreach ( $entry['stats']['sub'] as $sub )
 			{
-				$entry['stats']['count'] -= $count;
+				$entry['stats']['count'] -= $sub['count'];
 			}
 		}
 		
