@@ -162,7 +162,7 @@ class Story extends Base
 		
 		$replacements =
 		[
-			"ORDER"	=> ($_SESSION['userID']>0 AND 0===$_SESSION['preferences']['sortNew']) ? "ORDER BY S.title ASC" : "ORDER BY updated DESC",
+			"ORDER"	=> ( $_SESSION['userID']>0 AND empty($_SESSION['preferences']['sortNew']) ) ? "ORDER BY S.title ASC" : "ORDER BY updated DESC",
 			"LIMIT" => "LIMIT ".(max(0,$pos*$limit)).",".$limit,
 			"JOIN"	=> isset($join) ? implode("\n",$join) : "",
 			"WHERE"	=> implode(" ", $where),
