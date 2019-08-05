@@ -395,6 +395,22 @@ class AdminCP extends Controlpanel {
 		);
 
 		$i = $category->changed("category");
+
+		if ( $i )
+		{
+			// drop category cache for all stories that use this category
+			$this->exec("UPDATE `tbl_stories`S
+							INNER JOIN
+							(
+								SELECT rSC.sid
+								FROM `tbl_stories_categories`rSC
+								WHERE rSC.cid = :catID
+							) AS C ON C.sid = S.sid
+						SET S.cache_categories = NULL;", [":catID" => $cid]);
+			
+			$recache = TRUE;
+		}
+
 		$i += $category->changed("description");
 		$i += $category->changed("locked");
 		if ( $category->changed("parent_cid") )
@@ -416,6 +432,34 @@ class AdminCP extends Controlpanel {
 			$this->cacheCategories($data['parent_cid']);
 		}
 		else $category->save();
+
+		// do we need to regenerate story cache?
+		if ( isset($recache) )
+		{
+			$story=new \DB\SQL\Mapper($this->db, $this->prefix.'stories');
+
+			$items = $this->exec("
+				SELECT SELECT_OUTER.sid,
+					GROUP_CONCAT(DISTINCT cid,',',category ORDER BY category ASC SEPARATOR '||' ) as categoryblock
+					FROM
+					(
+						SELECT S.sid,
+								Cat.cid, Cat.category
+							FROM `tbl_stories` S
+								LEFT JOIN `tbl_stories_categories`rSC ON ( rSC.sid = S.sid )
+									LEFT JOIN `tbl_categories` Cat ON ( rSC.cid = Cat.cid )
+							WHERE S.cache_categories IS NULL
+					)AS SELECT_OUTER
+				GROUP BY sid ORDER BY sid ASC;
+			");
+
+			foreach ( $items as $item )
+			{
+				$story->load(array('sid=?',$item['sid']));
+				$story->cache_categories = json_encode($this->cleanResult($item['categoryblock']));
+				$story->save();
+			}
+		}
 
 		return $i;
 	}

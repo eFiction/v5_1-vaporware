@@ -12,7 +12,7 @@
 </check>
 <!-- END: error notification -->
 <!-- success notification -->
-<check if="{{ isset(@form_changes) }}">
+<check if="{{ isset(@form_changes) AND @form_changes>0 }}">
 	<div class="notification is-success">
 		<button class="delete"></button>
 		{{ @LN__Changes_saved }}
