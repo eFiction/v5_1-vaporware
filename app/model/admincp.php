@@ -2088,16 +2088,60 @@ class AdminCP extends Controlpanel {
 		//if ( TRUE === $i = $tag->changed("tgid") ) $this->tagGroupRecount();
 		$i = $tag->changed("tgid");
 		$i += $tag->changed("label");
-		$i += $tag->changed("description");
 		
-		if ( $tag->changed("label") )
+		if ( $i )
 		{
 			// drop tag cache for all stories that use this tag
+			$this->exec("UPDATE `tbl_stories`S
+							INNER JOIN
+							(
+								SELECT rST.sid
+								FROM `tbl_stories_tags`rST
+								WHERE rST.tid = :tagID
+							) AS T ON T.sid = S.sid
+						SET S.cache_tags = NULL;", [":tagID" => $tid]);
 			
-			
+			$recache = TRUE;
+		}
+		
+		$i += $tag->changed("description");
+		$tag->save();
+
+		// do we need to regenerate story cache?
+		if ( isset($recache) )
+		{
+			$story=new \DB\SQL\Mapper($this->db, $this->prefix.'stories');
+
+			$items = $this->exec("
+				SELECT SELECT_OUTER.sid,
+					GROUP_CONCAT(DISTINCT tid,',',tag,',',description,',',tgid ORDER BY `order`,tgid,tag ASC SEPARATOR '||') AS tagblock
+					FROM
+					(
+						SELECT S.sid,
+								TG.description,TG.order,TG.tgid,T.label as tag,T.tid,
+								Ch.charid, Ch.charname
+							FROM `tbl_stories` S
+								LEFT JOIN `tbl_stories_tags`rST ON ( rST.sid = S.sid )
+									LEFT JOIN `tbl_tags` T ON ( T.tid = rST.tid AND rST.character = 0 )
+										LEFT JOIN `tbl_tag_groups` TG ON ( TG.tgid = T.tgid )
+									LEFT JOIN `tbl_characters` Ch ON ( Ch.charid = rST.tid AND rST.character = 1 )
+							WHERE S.cache_tags IS NULL
+					)AS SELECT_OUTER
+				GROUP BY sid ORDER BY sid ASC;
+			");
+
+			foreach ( $items as $item )
+			{
+				$tagblock['simple'] = $this->cleanResult($item['tagblock']);
+				if($tagblock['simple']!==NULL) foreach($tagblock['simple'] as $t)
+					$tagblock['structured'][$t[2]][] = [ $t[0], $t[1], $t[2], $t[3] ];
+
+				$story->load(array('sid=?',$item['sid']));
+				$story->cache_tags = json_encode($tagblock);
+				$story->save();
+			}
 		}
 
-		$tag->save();
 		return $i;
 	}
 	
