@@ -85,6 +85,9 @@ class Story extends Base
 		$storyData['cache_authors'] = json_decode($storyData['cache_authors'],TRUE);
 		$storyData['published'] = date( $this->config['date_format'], $storyData['published']);
 		$storyData['modified']  = date( $this->config['date_format'], $storyData['modified']);
+		
+		// fix for <b> not showing with bulma, might have to find a better one for this
+		$content = str_replace(["<b>","</b>"], ["<strong>","</strong>"], $content);
 
 		$this->f3->set('data', [
 											"story" 	=> $storyData,
@@ -97,7 +100,7 @@ class Story extends Base
 										]);
 		$this->f3->set('returnpath', \Base::instance()->get('PATH') );
 		
-		return parent::render('story/single.html');
+		return $this->render('story/single.html');
 	}
 	
 	public function buildReviews($storyData, $reviewData, $chapter, $selected)

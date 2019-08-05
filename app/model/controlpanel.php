@@ -499,7 +499,12 @@ class Controlpanel extends Base {
 				if ($sub_stats[$key]!=NULL)
 				{
 					$item['counted'] += $sub_stats[$key]->count;
-					$sub[$value] = $sub_stats[$key]->count;
+					$sub[] =
+					[ 
+						'id' 	=> $sub_stats[$key]->cid,
+						'count' => $sub_stats[$key]->count,
+						'name'	=> $value,
+					];
 				}
 			}
 		}

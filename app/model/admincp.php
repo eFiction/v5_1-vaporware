@@ -2089,6 +2089,13 @@ class AdminCP extends Controlpanel {
 		$i = $tag->changed("tgid");
 		$i += $tag->changed("label");
 		$i += $tag->changed("description");
+		
+		if ( $tag->changed("label") )
+		{
+			// drop tag cache for all stories that use this tag
+			
+			
+		}
 
 		$tag->save();
 		return $i;
@@ -2619,6 +2626,7 @@ class AdminCP extends Controlpanel {
 		$sql = "UPDATE `tbl_categories` SET `stats` = NULL";
 		$this->exec($sql);
 		
+		$fw->exec("SET SESSION group_concat_max_len = 1000000;");
 		$categories = new \DB\SQL\Mapper($this->db, $this->prefix.'categories' );
 		
 		// start with lowest level and work up all the way to the root
