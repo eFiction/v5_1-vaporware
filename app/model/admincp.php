@@ -647,8 +647,24 @@ class AdminCP extends Controlpanel {
 		$character=new \DB\SQL\Mapper($this->db, $this->prefix.'characters');
 		$character->load(array('charid=?',$charid));
 		$character->copyfrom( [ "charname" => $data['charname'], "biography" => $data['biography'] ]);
-			$i =  $character->changed("charname");
-			$i += $character->changed("biography");
+		$i =  $character->changed("charname");
+
+		if ( $i )
+		{
+			// drop cache field for all stories that use this character
+			$this->exec("UPDATE `tbl_stories`S
+							INNER JOIN
+							(
+								SELECT rST.sid
+								FROM `tbl_stories_tags`rST
+								WHERE rST.tid = :tagID AND rST.character = 1
+							) AS T ON T.sid = S.sid
+						SET S.cache_characters = NULL;", [":tagID" => $charid]);
+			
+			$recache = TRUE;
+		}
+
+		$i += $character->changed("biography");
 		$character->save();
 		
 		// open a db mapper to the relation table
@@ -694,6 +710,34 @@ class AdminCP extends Controlpanel {
 			$i += $relations->erase(array('`charid` = ?',$charid));
 		}
 		
+		// do we need to regenerate story cache?
+		if ( isset($recache) )
+		{
+			$story=new \DB\SQL\Mapper($this->db, $this->prefix.'stories');
+
+			$items = $this->exec("
+				SELECT SELECT_OUTER.sid,
+					GROUP_CONCAT(DISTINCT charid,',',charname ORDER BY charname ASC SEPARATOR '||') AS characterblock
+					FROM
+					(
+						SELECT S.sid,
+								Ch.charid, Ch.charname
+							FROM `tbl_stories` S
+								LEFT JOIN `tbl_stories_tags`rST ON ( rST.sid = S.sid )
+									LEFT JOIN `tbl_characters` Ch ON ( Ch.charid = rST.tid AND rST.character = 1 )
+							WHERE S.cache_characters IS NULL
+					)AS SELECT_OUTER
+				GROUP BY sid ORDER BY sid ASC;
+			");
+
+			foreach ( $items as $item )
+			{
+				$story->load(array('sid=?',$item['sid']));
+				$story->cache_characters = json_encode($this->cleanResult($item['characterblock']));
+				$story->save();
+			}
+		}
+
 		return $i;
 	}
 
@@ -2141,7 +2185,7 @@ class AdminCP extends Controlpanel {
 							(
 								SELECT rST.sid
 								FROM `tbl_stories_tags`rST
-								WHERE rST.tid = :tagID
+								WHERE rST.tid = :tagID AND rST.character = 0
 							) AS T ON T.sid = S.sid
 						SET S.cache_tags = NULL;", [":tagID" => $tid]);
 			
@@ -2162,13 +2206,11 @@ class AdminCP extends Controlpanel {
 					FROM
 					(
 						SELECT S.sid,
-								TG.description,TG.order,TG.tgid,T.label as tag,T.tid,
-								Ch.charid, Ch.charname
+								TG.description,TG.order,TG.tgid,T.label as tag,T.tid
 							FROM `tbl_stories` S
 								LEFT JOIN `tbl_stories_tags`rST ON ( rST.sid = S.sid )
 									LEFT JOIN `tbl_tags` T ON ( T.tid = rST.tid AND rST.character = 0 )
 										LEFT JOIN `tbl_tag_groups` TG ON ( TG.tgid = T.tgid )
-									LEFT JOIN `tbl_characters` Ch ON ( Ch.charid = rST.tid AND rST.character = 1 )
 							WHERE S.cache_tags IS NULL
 					)AS SELECT_OUTER
 				GROUP BY sid ORDER BY sid ASC;
