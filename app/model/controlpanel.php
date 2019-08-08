@@ -711,6 +711,174 @@ class Controlpanel extends Base {
 		}
 		unset($mainDB);
 	}
+
+	public function collectionLoad(int $collid, int $userID=0)
+	{
+		// if not coming from the admin panel, restrict to self
+		$where = ($userID) ? "AND Coll.uid = {$userID}" : "";
+		
+		$sql = "SELECT Coll.collid, Coll.title, Coll.summary, Coll.ordered, Coll.status, 
+				--	Coll.cache_tags, Coll.cache_characters, Coll.cache_categories,
+					GROUP_CONCAT(DISTINCT Ch.charid,',',Ch.charname ORDER BY Ch.charname ASC SEPARATOR '||') AS characterblock,
+					GROUP_CONCAT(DISTINCT U.uid,',',U.username ORDER BY U.username ASC SEPARATOR '||' ) as authorblock,
+					GROUP_CONCAT(DISTINCT T.tid,',',T.label ORDER BY TG.order,T.label ASC SEPARATOR '||') AS tagblock,
+					GROUP_CONCAT(DISTINCT Cat.cid,',',Cat.category ORDER BY Cat.category ASC SEPARATOR '||' ) as categoryblock
+					FROM `tbl_collections`Coll
+						LEFT JOIN `tbl_collection_stories`rCS ON ( Coll.collid = rCS.collid )
+						LEFT JOIN `tbl_collection_properties`pColl ON ( pColl.collid = Coll.collid )
+							LEFT JOIN `tbl_users`U ON ( U.uid = pColl.relid AND pColl.type = 'A' )
+							LEFT JOIN `tbl_characters`Ch ON ( Ch.charid = pColl.relid AND pColl.type = 'CH' )
+							LEFT JOIN `tbl_tags`T ON ( T.tid = pColl.relid AND pColl.type = 'T' )
+								LEFT JOIN `tbl_tag_groups`TG ON ( TG.tgid = T.tgid )
+							LEFT JOIN `tbl_categories`Cat ON ( Cat.cid = pColl.relid AND pColl.type = 'CA' )
+					WHERE Coll.collid = :collid @WHERE@
+					GROUP BY Coll.collid";
+//echo str_replace("@WHERE@", $where, $sql);					
+		$tmp = $this->exec(str_replace("@WHERE@", $where, $sql), [":collid" => $collid ])[0] ?? [];
+		
+		if (sizeof($tmp)==0) 
+			return NULL;
+
+		$data =
+		[
+			"collid"			=> $tmp['collid'],
+			"title"				=> $tmp['title'],
+			"summary"			=> $tmp['summary'],
+			"ordered"			=> $tmp['ordered'],
+			"status"			=> $tmp['status'],
+			"authorblock"		=> parent::cleanResult($tmp['authorblock']),
+			"characterblock"	=> parent::cleanResult($tmp['characterblock']),
+			"tagblock"			=> parent::cleanResult($tmp['tagblock']),
+			"categoryblock"		=> parent::cleanResult($tmp['categoryblock']),
+			// inject possible collection states
+			"states"			=> ['H','F','P','A']
+		];
+		
+		// Compile currently used tags and characters from stories in this collection
+		$data['unused'] =
+		[
+			"tags"			=> $this->collectionCountTags($collid,$data['tagblock']),
+			"characters"	=> $this->collectionCountCharacters($collid,$data['characterblock']),
+			"categories"	=> $this->collectionCountCategories($collid,$data['categoryblock']),
+			"authors"		=> $this->collectionCountAuthors($collid,$data['authorblock']),
+		];
+
+		return $data;
+	}
+
+	protected function collectionCountCharacters(int $collid, &$used)
+	{
+		
+		$sql = "SELECT Ch.charid as id, Ch.charname as name, COUNT(rST.sid) AS counted
+					FROM `tbl_collection_stories`rCS
+						LEFT JOIN `tbl_stories`S ON ( S.sid = rCS.sid )
+							LEFT JOIN `tbl_stories_tags`rST ON ( S.sid = rST.sid AND rST.character = 1 )
+								LEFT JOIN `tbl_characters`Ch ON ( rST.tid = Ch.charid )
+				WHERE collid = :collid AND Ch.charname IS NOT NULL
+				GROUP BY Ch.charid
+				ORDER BY counted DESC;";
+		
+		$tmp = $this->exec( $sql, [ ":collid" => $collid ] );
+		
+		if (sizeof($used))
+		{
+			foreach ( $used as $U )
+			{
+				$key = array_search($U[0], array_column($tmp, 'id'));
+				$newU[] = [ 'id' => $U[0], 'name' => $U[1], 'counted' => ($key===FALSE)?"":$tmp[$key]['counted'] ];
+				if ( $key!==FALSE ) array_splice($tmp, $key, 1);
+			}
+			$used = json_encode($newU);
+		}
+		else $used = '""';
+		
+		return $tmp;
+	}
+	
+	protected function collectionCountTags(int $collid, array &$used)
+	{
+		$sql = "SELECT T.tid as id, T.label as name, COUNT(rST.sid) AS counted
+					FROM `tbl_collection_stories`rCS
+						LEFT JOIN `tbl_stories`S ON ( S.sid = rCS.sid )
+							LEFT JOIN `tbl_stories_tags`rST ON ( S.sid = rST.sid AND rST.character = 0 )
+								LEFT JOIN `tbl_tags`T ON ( rST.tid = T.tid )
+				WHERE collid = :collid AND T.label IS NOT NULL
+				GROUP BY T.tid
+				ORDER BY counted DESC;";
+		
+		$tmp = $this->exec( $sql, [ ":collid" => $collid ] );
+		
+		if (sizeof($used))
+		{
+			foreach ( $used as $U )
+			{
+				$key = array_search($U[0], array_column($tmp, 'id'));
+				$newU[] = [ 'id' => $U[0], 'name' => $U[1], 'counted' => ($key===FALSE)?"":$tmp[$key]['counted'] ];
+				if ( $key!==FALSE ) array_splice($tmp, $key, 1);
+			}
+			$used = json_encode($newU);
+		}
+		else $used = '""';
+		
+		return $tmp;
+	}
+
+	protected function collectionCountCategories(int $collid, array &$used)
+	{
+		$sql = "SELECT Cat.cid as id, Cat.category as name, COUNT(rSC.sid) AS counted
+					FROM `tbl_collection_stories`rCS
+						LEFT JOIN `tbl_stories`S ON ( S.sid = rCS.sid )
+							LEFT JOIN `tbl_stories_categories`rSC ON ( S.sid = rSC.sid )
+								LEFT JOIN `tbl_categories`Cat ON ( rSC.cid = Cat.cid )
+				WHERE collid = :collid AND Cat.description IS NOT NULL
+				GROUP BY Cat.cid
+				ORDER BY counted DESC;";
+		
+		$tmp = $this->exec( $sql, [ ":collid" => $collid ] );
+
+		if (sizeof($used))
+		{
+			foreach ( $used as $U )
+			{
+				$key = array_search($U[0], array_column($tmp, 'id'));
+				$newU[] = [ 'id' => $U[0], 'name' => $U[1], 'counted' => ($key===FALSE)?"":$tmp[$key]['counted'] ];
+				if ( $key!==FALSE ) array_splice($tmp, $key, 1);
+			}
+			$used = json_encode($newU);
+		}
+		else $used = '""';
+		
+		return $tmp;
+	}
+
+	protected function collectionCountAuthors(int $collid, array &$used)
+	{
+		$sql = "SELECT U.uid as id, U.username as name, COUNT(rSA.sid) AS counted
+					FROM `tbl_collection_stories`rCS
+						LEFT JOIN `tbl_stories`S ON ( S.sid = rCS.sid )
+							LEFT JOIN `tbl_stories_authors`rSA ON ( S.sid = rSA.sid )
+								LEFT JOIN `tbl_users`U ON ( rSA.aid = U.uid )
+				WHERE collid = :collid AND U.username IS NOT NULL
+				GROUP BY U.uid
+				ORDER BY counted DESC;";
+		
+		$tmp = $this->exec( $sql, [ ":collid" => $collid ] );
+
+		if (sizeof($used))
+		{
+			foreach ( $used as $U )
+			{
+				$key = array_search($U[0], array_column($tmp, 'id'));
+				$newU[] = [ 'id' => $U[0], 'name' => $U[1], 'counted' => ($key===FALSE)?"":$tmp[$key]['counted'] ];
+				if ( $key!==FALSE ) array_splice($tmp, $key, 1);
+			}
+			$used = json_encode($newU);
+		}
+		else $used = '""';
+		
+		return $tmp;
+	}
+
 }
 
 ?>

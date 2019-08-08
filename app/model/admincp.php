@@ -1694,65 +1694,12 @@ class AdminCP extends Controlpanel {
 		return $data;
 	}
 	
-	public function collectionLoad(int $collid)
-	{
-		$sql = "SELECT Coll.collid, Coll.title, Coll.summary, Coll.ordered, Coll.status, Coll.cache_tags, Coll.cache_characters, Coll.cache_categories
-					FROM `tbl_collections`Coll
-						LEFT JOIN `tbl_collection_stories`rCS ON ( Coll.collid = rCS.collid )
-				
-					WHERE Coll.collid = :collid
-					GROUP BY Coll.collid";
-		$data = $this->exec($sql, [":collid" => $collid ])[0] ?? [];
-
-		if (sizeof($data)==0) 
-			return NULL;
-
-		// Compile currently used tags and characters from stories in this collection
-		$data['current'] =
-		[
-			"tags"			=> $this->collectionCountTags($collid),
-			"characters"	=> $this->collectionCountCharacters($collid),
-		];
-		// inject possible collection states
-		$data['states'] = ['H','F','P','A'];
-
-		return $data;
-	}
-
 	public function collectionSave(int $collid, array $data)
 	{
 		print_r($data);
 		exit;
 	}
 	
-	protected function collectionCountCharacters(int $collid)
-	{
-		$sql = "SELECT Ch.charname as name, COUNT(rST.sid) AS counted
-					FROM `tbl_collection_stories`rCS
-				LEFT JOIN `tbl_stories`S ON ( S.sid = rCS.sid )
-					LEFT JOIN `tbl_stories_tags`rST ON ( S.sid = rST.sid AND rST.character = 1 )
-						LEFT JOIN `tbl_characters`Ch ON ( rST.tid = Ch.charid )
-				WHERE collid = :collid AND Ch.charname IS NOT NULL
-				GROUP BY Ch.charid
-				ORDER BY counted DESC;";
-		
-		return $this->exec( $sql, [ ":collid" => $collid ] );
-	}
-	
-	protected function collectionCountTags(int $collid)
-	{
-		$sql = "SELECT T.label as name, COUNT(rST.sid) AS counted
-					FROM `tbl_collection_stories`rCS
-				LEFT JOIN `tbl_stories`S ON ( S.sid = rCS.sid )
-					LEFT JOIN `tbl_stories_tags`rST ON ( S.sid = rST.sid AND rST.character = 0 )
-						LEFT JOIN `tbl_tags`T ON ( rST.tid = T.tid )
-				WHERE collid = :collid AND T.label IS NOT NULL
-				GROUP BY T.tid
-				ORDER BY counted DESC;";
-		
-		return $this->exec( $sql, [ ":collid" => $collid ] );
-	}
-
 	public function storyAdd(array $data)
 	{
 		$newStory = new \DB\SQL\Mapper($this->db, $this->prefix."stories");

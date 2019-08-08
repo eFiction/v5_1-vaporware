@@ -1795,8 +1795,7 @@ class AdminCP extends Base
 			if ( NULL !== $data = $this->model->collectionLoad($params['id']) )
 			{
 				$data['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
-				$prePopulate = $this->model->storyEditPrePop($data);
-				$this->buffer( $this->template->collectionEdit($data, $prePopulate, @$params['returnpath']) );
+				$this->buffer( $this->template->collectionEdit($data, @$params['returnpath']) );
 				return;
 			}
 			else $f3->set('form_error', "__failedLoad");

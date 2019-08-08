@@ -64,8 +64,8 @@
 	<div class="field-label is-normal"><label class="label">{{@LN__usedInStories}}</label></div>
 	<div class="field-body">
 		<div class="field"><div class="control">
-			<div class="buttons are-small"><repeat group="{{ @data.current.tags }}" value="{{ @currentTag }}">
-				<a class="button">{{ @currentTag.name }} ({{ @currentTag.counted }}x)</a>
+			<div class="buttons are-small"><repeat group="{{ @data.unused.tags }}" value="{{ @unusedTag }}">
+				<a class="button">{{ @unusedTag.name }} ({{ @unusedTag.counted }}x)</a>
 			</repeat>
 			</div>
 		</div></div>
@@ -85,8 +85,8 @@
 	<div class="field-label is-normal"><label class="label">{{@LN__usedInStories}}</label></div>
 	<div class="field-body">
 		<div class="field"><div class="control">
-			<div class="buttons are-small"><repeat group="{{ @data.current.characters }}" value="{{ @currentCharacters }}">
-				<a class="button">{{ @currentCharacters.name }} ({{ @currentCharacters.counted }}x)</a>
+			<div class="buttons are-small"><repeat group="{{ @data.unused.characters }}" value="{{ @unusedCharacters }}">
+				<a class="button">{{ @unusedCharacters.name }} ({{ @unusedCharacters.counted }}x)</a>
 			</repeat>
 			</div>
 		</div></div>
@@ -171,7 +171,7 @@ $(document).ready(function() {
     	method: "post",
     	queryParam: "category",
     	preventDuplicates: true,
-    	prePopulate: {{@prePop.cat | raw}}
+    	prePopulate: {{@data.categoryblock | raw}}
     });
 });
 
@@ -180,7 +180,7 @@ $(document).ready(function() {
     	method: "post",
     	queryParam: "user",
     	preventDuplicates: true,
-    	prePopulate: {{@prePop.maintainer | raw}}
+    	prePopulate: {{@data.authorblock | raw}}
     });
 });
 
@@ -189,7 +189,7 @@ $(document).ready(function() {
     	method: "post",
     	queryParam: "tag",
     	preventDuplicates: true,
-    	prePopulate: {{@prePop.tag | raw}}
+    	prePopulate: {{@data.tagblock | raw}}
     });
 });
 
@@ -198,7 +198,7 @@ $(document).ready(function() {
     	method: "post",
     	queryParam: "character",
     	preventDuplicates: true,
-    	prePopulate: {{@prePop.char | raw}}
+    	prePopulate: {{@data.characterblock | raw}}
     });
 });
 
