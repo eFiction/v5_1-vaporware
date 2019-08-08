@@ -205,17 +205,17 @@ return array(
 'MainAuthorNotEmpty' => 'Die Liste der Autoren kann nicht leer sein',
 'SupAuthor'		=> 'Nebenautor',
 'SupAuthors'	=> 'Nebenautoren',
-// 'StoryNotes'			=>
-'StoryNotesExplained'	=>	'Platz für Widmungen und Anmerkungen',
-// 'StorySummary'			=>
+'StoryForewordExplained'	=>	'Platz für Widmungen und Anmerkungen',
 // 'StorySummaryExplained'	=>
 // 'ChapterTextExplained' =>
 'ReturnToOverview'		=> 'Zurück zur Übersicht',
 'StoryAddSimilar'		=> 'Eine ähnliche Story scheint bereits zu existieren, <a href="{0}">diese stattdessen bearbeiten</a>',
 'StoryConfirmSimilar'	=> 'Trotzdem anlegen',
-'StoryTitle'	=>	'Titel der Geschichte',
-'ChapterTitle'	=>	'Titel des Kapitels',
-'ChapterText'	=>	'Text des Kapitels',
+'StoryTitle'		=>	'Titel der Geschichte',
+'ChapterTitle'		=>	'Titel des Kapitels',
+'ChapterText'		=>	'Text des Kapitels',
+//'ChapterNotes'	=>	'Notes',
+//'ChapterEndnotes'	=>	'Endnotes',
 'AddChapter'	=> 'Kapitel hinzufügen',
 'EditHeader'	=> 'Kopfdaten bearbeiten',
 'DragdropSort'	=> 'Ziehen, um zu sortieren',
@@ -843,10 +843,12 @@ return array(
 'NeverShowMessageAgain'	=> 'Zeige diesen Hinweis nicht mehr an',
 
 // Collections
-//'CollectionStatus_H'	=> 'H',
-//'CollectionStatus_F'	=> 'F',
-//'CollectionStatus_P'	=> 'P',
-//'CollectionStatus_A'	=> 'A',
+'CollectionMaintainer'	=> 'Verwalter',
+'usedInStories'			=> 'in Geschichten',
+'CollectionStatus_H'	=> 'Versteckt',
+'CollectionStatus_F'	=> 'Für Freunde sichtbar',
+'CollectionStatus_P'	=> 'Öffentlich',
+'CollectionStatus_A'	=> 'Hervorgehoben',
 'CollectionOpen_0'	=> 'Geschlossen',
 'CollectionOpen_1'	=> 'Moderiert',
 'CollectionOpen_2'	=> 'Offen',

@@ -457,6 +457,7 @@ class UserCP extends Controlpanel
 		
 		$chapter->title 	= $post['chapter_title'];
 		$chapter->notes 	= $post['chapter_notes'];
+		$chapter->endnotes 	= $post['chapter_endnotes'];
 		$chapter->wordcount	= max(count(preg_split("/\p{L}[\p{L}\p{Mn}\p{Pd}'\x{2019}]{0,}/u",$chaptertext))-1, 0);
 		
 		// Toggle validation request, keeping the reason part untouched

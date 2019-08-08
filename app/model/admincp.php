@@ -1718,6 +1718,12 @@ class AdminCP extends Controlpanel {
 
 		return $data;
 	}
+
+	public function collectionSave(int $collid, array $data)
+	{
+		print_r($data);
+		exit;
+	}
 	
 	protected function collectionCountCharacters(int $collid)
 	{
@@ -2093,6 +2099,7 @@ class AdminCP extends Controlpanel {
 		
 		$chapter->title 	= $post['chapter_title'];
 		$chapter->notes 	= $post['chapter_notes'];
+		$chapter->endnotes 	= $post['chapter_endnotes'];
 		$chapter->wordcount	= max(count(preg_split("/\p{L}[\p{L}\p{Mn}\p{Pd}'\x{2019}]{0,}/u",$chaptertext))-1, 0);
 
 		// remember old validation status

@@ -16,9 +16,8 @@
 
 				<div class="column is-full"><h6>{{@LN__ChapterTitle}}:</h6><input class="input" placeholder="Your chapter title goes here" type="text" name="form[chapter_title]" value="{{@data.title}}"></div>
 
-				<div class="column is-one-third"><h6>{{@LN__StoryNotes}}</h6><textarea class="textarea" placeholder="Notes and dedications go here" name="form[chapter_notes]">{{@data.notes}}</textarea></div>
 {*		<!-- story status fields -->	*}
-				<div class="column is-one-third">
+				<div class="column is-half">
 					<h6>{{@LN__UCP_statusValidated}}:<br/>
 					<strong>{{ ${"LN__UCP_statusValidated_".@data.validated.0} }}</strong></h6>
 					<check if="{{@data.validated.0<3}}">
@@ -32,7 +31,7 @@
 						</check>
 					</check>
 				</div>
-				<div class="column is-one-third">
+				<div class="column is-half">
 					<h6>{{@LN__UCP_statusValidatedReason}}:<br/>
 					<strong>{{ ${"LN__UCP_statusValReason_".@data.validated.1} }}</strong></h6>
 				</div>
@@ -52,6 +51,9 @@
 					</span>
 					<textarea class="textarea" placeholder="{{@LN__ChapterTextExplained}}" name="form[chapter_text]" id="tinymce" rows="10">{{@data.chaptertext}}</textarea>
 				</div>
+
+				<div class="column is-half"><h6>{{@LN__ChapterNotes}}</h6><textarea class="textarea" placeholder="Notes and dedications go here" name="form[chapter_notes]">{{@data.notes}}</textarea></div>
+				<div class="column is-half"><h6>{{@LN__ChapterEndnotes}}</h6><textarea class="textarea" placeholder="Commenting on this chapter" name="form[chapter_endnotes]">{{@data.endnotes}}</textarea></div>
 
 				<div class="column is-full" align="right">
 				<div class="field is-grouped">

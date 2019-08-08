@@ -1787,7 +1787,8 @@ class AdminCP extends Base
 
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 		
-
+		if (isset($_POST['form_data']))
+			$this->model->collectionSave($params['id'], $f3->get('POST.form_data') );
 
 		if( isset ($params['id']) )
 		{

@@ -253,7 +253,7 @@ class Controlpanel extends Base {
 	{
 		$data = $this->exec
 		(
-			"SELECT Ch.sid,Ch.chapid,Ch.inorder,Ch.title,Ch.notes,Ch.validated,Ch.rating
+			"SELECT Ch.sid,Ch.chapid,Ch.inorder,Ch.title,Ch.notes,Ch.endnotes,Ch.validated,Ch.rating
 				FROM `tbl_chapters`Ch
 			WHERE Ch.sid = :sid AND Ch.chapid = :chapter",
 			[":sid" => $story, ":chapter" => $chapter ]
