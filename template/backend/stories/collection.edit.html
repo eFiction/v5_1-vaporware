@@ -1,5 +1,12 @@
 {* provide a return link if a path exists *}
-<check if="{{!empty(@returnpath)}}"><a href="{{@BASE}}{{@returnpath}}">__return</a></check>
+<div class="columns">
+	<div class="column">
+		<check if="{{!empty(@returnpath)}}">{ICON:arrow-left} <a href="{{@BASE}}{{@returnpath}}">{{@LN__Return}}</a></check>&nbsp;
+	</div>
+	<div class="column">
+		<a href="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @data['collid'] }}/items/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">{@LN*__EditStories}</a> {ICON:arrow-right}
+	</div>
+</div>
 
 <!-- error notification -->
 <check if="{{ isset(@form_error) }}">
@@ -18,7 +25,7 @@
 </check>
 <!-- END: success notification -->
 {* <h2><check if="{{@data.ordered==1}}"><true>{{@LN__Series}}</true><false>{@LN_Collection}</false></check></h2> *}
-<form action="{{@BASE}}/adminCP/stories/<check if="{{@data.ordered==1}}"><true>series</true><false>collections</false></check>/id={{ @data['collid'] }}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
+<form action="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @data['collid'] }}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
 <div class="field is-horizontal">
   <div class="field-label is-normal">
     <label class="label">{{@LN__Title}}</label>
@@ -199,10 +206,6 @@
 		</div>
 	</div>
 </div>
-
-<repeat group="{{@data.storyblock}}" value="{{@story}}">
-{{@story.1}}<br/>
-</repeat>
 
 <script type="text/javascript">
 $(document).ready(function() {

@@ -1,0 +1,56 @@
+{* provide a return link if a path exists *}
+<div class="columns">
+	<div class="column">
+		<check if="{{!empty(@returnpath)}}">{ICON:arrow-left} <a href="{{@BASE}}{{@returnpath}}">{{@LN__Return}}</a></check>&nbsp;
+	</div>
+	<div class="column">
+		<a href="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @data['collid'] }}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">{@LN*__EditHeader}</a> {ICON:arrow-right}
+	</div>
+</div>
+
+<ul id="story-sort" class="box">
+		<repeat group="{{ @data.storyblock }}" value="{{ @row }}" counter="{{ @ctr }}">
+			<li id="{{ @row.0 }}">
+				{ICON:arrow-vert} {{ @ctr }}: {{ @row.1 }} 
+			</li>
+		</repeat>
+</ul>
+
+<div class="columns">
+	<div class="column is-half">
+	<div class="notification">
+	<form action="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @data['collid'] }}/items/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
+		{{@LN__Search}}<br />
+		Type <b>title</b> or story <b>id</b>
+		<input type="text" id="story-select" name="story-add" />
+		<input id="search" class="button is-success" type="submit" />
+		<input class="button is-danger" type="reset" /> 
+	</form>
+	</div></div>
+	<div class="column"></div>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+	$("#story-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/search",{
+		method: "post",
+		queryParam: "storyID",
+		hintText: "{{@LN__Token_StartTyping}}.",
+		noResultsText: "{{@LN__Token_NoMatches}}.",
+	});
+
+	$("#story-sort").sortable({
+		cursor: "move",
+		placeholder: "ui-state-highlight",
+		update: function () {
+			var neworder = $('#story-sort').sortable('toArray');
+			$.ajax({
+				type: "post",
+				url: "{{@BASE}}/adminCP/ajax/archive/collectionsort",
+				data: { collection: {{@data.collid}}, neworder: neworder },
+				dataType: "html"
+			});
+		}
+	});
+});
+</script>

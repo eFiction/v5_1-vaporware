@@ -108,9 +108,10 @@ class AdminCP extends Base
 			$data = $this->model->ajax("editMeta", $post);
 
 		elseif ( $params['module']=="ratingsort" )
-		{
 			$data = $this->model->ajax("ratingsort", $post);
-		}
+
+		elseif ( $params['module']=="collectionsort" )
+			$data = $this->model->ajax("collectionsort", $post);
 
 		echo json_encode($data);
 		exit;
@@ -1807,6 +1808,10 @@ class AdminCP extends Base
 		{
 			$params['id'] = $this->model->collectionAdd($f3->get('POST.new_data') );
 		}
+		elseif (isset($_POST['story-add']))
+		{
+			$this->model->collectionItemsAdd($params['id'], $f3->get('POST.story-add') );
+		}
 
 		if( isset ($params['id']) )
 		{
@@ -1815,10 +1820,16 @@ class AdminCP extends Base
 				$this->buffer( $this->template->collectionAdd($module) );
 				return;
 			}
+			elseif ( isset ($params['items']) AND NULL !== $data = $this->model->collectionLoadItems($params['id']) )
+			{
+				$data['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
+				$this->buffer( $this->template->collectionItems($data, $module, @$params['returnpath']) );
+				return;
+			}
 			elseif ( NULL !== $data = $this->model->collectionLoad($params['id']) )
 			{
 				$data['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
-				$this->buffer( $this->template->collectionEdit($data, @$params['returnpath']) );
+				$this->buffer( $this->template->collectionEdit($data, $module, @$params['returnpath']) );
 				return;
 			}
 			else $f3->set('form_error', "__failedLoad");

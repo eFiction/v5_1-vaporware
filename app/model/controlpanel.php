@@ -728,12 +728,9 @@ class Controlpanel extends Base {
 					GROUP_CONCAT(DISTINCT Ch.charid,',',Ch.charname ORDER BY Ch.charname ASC SEPARATOR '||') AS characterblock,
 					GROUP_CONCAT(DISTINCT U.uid,',',U.username ORDER BY U.username ASC SEPARATOR '||' ) as authorblock,
 					GROUP_CONCAT(DISTINCT T.tid,',',T.label ORDER BY TG.order,T.label ASC SEPARATOR '||') AS tagblock,
-					GROUP_CONCAT(DISTINCT Cat.cid,',',Cat.category ORDER BY Cat.category ASC SEPARATOR '||') as categoryblock,
-					GROUP_CONCAT(DISTINCT S.sid,',',S.title ORDER BY (rCS.inorder*Coll.ordered),S.title ASC SEPARATOR '||') as storyblock
+					GROUP_CONCAT(DISTINCT Cat.cid,',',Cat.category ORDER BY Cat.category ASC SEPARATOR '||') as categoryblock
 					FROM `tbl_collections`Coll
 						LEFT JOIN `tbl_users`U1 ON ( U1.uid = Coll.uid )
-						LEFT JOIN `tbl_collection_stories`rCS ON ( Coll.collid = rCS.collid )
-							LEFT JOIN `tbl_stories`S ON ( rCS.sid = S.sid )
 						LEFT JOIN `tbl_collection_properties`pColl ON ( pColl.collid = Coll.collid )
 							LEFT JOIN `tbl_users`U ON ( U.uid = pColl.relid AND pColl.type = 'A' )
 							LEFT JOIN `tbl_characters`Ch ON ( Ch.charid = pColl.relid AND pColl.type = 'CH' )
@@ -759,7 +756,6 @@ class Controlpanel extends Base {
 			"characterblock"	=> parent::cleanResult($tmp['characterblock']),
 			"tagblock"			=> parent::cleanResult($tmp['tagblock']),
 			"categoryblock"		=> parent::cleanResult($tmp['categoryblock']),
-			"storyblock"		=> parent::cleanResult($tmp['storyblock']),
 			"maintainerblock"	=> json_encode( [[ "id" => $tmp['uid'], "name" => $tmp['username'] ]] ),
 			// inject possible collection states
 			"states"			=> ['H','F','P','A']
@@ -772,6 +768,35 @@ class Controlpanel extends Base {
 			"characters"	=> $this->collectionCountCharacters($collid,$data['characterblock']),
 			"categories"	=> $this->collectionCountCategories($collid,$data['categoryblock']),
 			"authors"		=> $this->collectionCountAuthors($collid,$data['authorblock']),
+		];
+
+		return $data;
+	}
+
+	public function collectionLoadItems(int $collid, int $userID=0)
+	{
+		// if not coming from the admin panel, restrict to self
+		$where = ($userID) ? "AND Coll.uid = {$userID}" : "";
+		
+		$sql = "SELECT Coll.collid, Coll.title, Coll.ordered, 
+					GROUP_CONCAT(DISTINCT S.sid,',',S.title ORDER BY (rCS.inorder*Coll.ordered),S.title ASC SEPARATOR '||') as storyblock
+					FROM `tbl_collections`Coll
+						LEFT JOIN `tbl_collection_stories`rCS ON ( Coll.collid = rCS.collid )
+							LEFT JOIN `tbl_stories`S ON ( rCS.sid = S.sid )
+					WHERE Coll.collid = :collid @WHERE@
+					GROUP BY Coll.collid";
+
+		$tmp = $this->exec(str_replace("@WHERE@", $where, $sql), [":collid" => $collid ])[0] ?? [];
+
+		if (sizeof($tmp)==0) 
+			return NULL;
+
+		$data =
+		[
+			"collid"			=> $tmp['collid'],
+			"title"				=> $tmp['title'],
+			"ordered"			=> $tmp['ordered'],
+			"storyblock"		=> parent::cleanResult($tmp['storyblock']),
 		];
 
 		return $data;

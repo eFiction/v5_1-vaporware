@@ -320,7 +320,7 @@ class AdminCP extends Base
 		return $this->render('stories/collections.list.html');
 	}
 	
-	public function collectionEdit(array $data, string $returnpath="" ) : string
+	public function collectionEdit(array $data, string $module, string $returnpath="" ) : string
 	{
 		if($data['editor']=="visual" AND $this->config['advanced_editor']==TRUE )
 		{
@@ -329,9 +329,19 @@ class AdminCP extends Base
 		}
 		$this->dataProcess($data);
 		$this->f3->set('data', 		$data);
+		$this->f3->set('module', 		$module);
 		$this->f3->set('returnpath', $returnpath);
 
 		return $this->render('stories/collection.edit.html');
+	}
+	
+	public function collectionItems(array $data, string $module, string $returnpath="" ) : string
+	{
+		$this->f3->set('data', 			$data);
+		$this->f3->set('module', 		$module);
+		$this->f3->set('returnpath',	$returnpath);
+
+		return $this->render('stories/collection.items.html');
 	}
 	
 	public function pollList(array $data, array $sort) : string

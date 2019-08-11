@@ -126,10 +126,23 @@ class AdminCP extends Controlpanel {
 			$chapters = new \DB\SQL\Mapper($this->db, $this->prefix.'ratings');
 			foreach ( $data["neworder"] as $order => $id )
 			{
-				echo $order."#".$id."*";
 				if ( is_numeric($order) && is_numeric($id) )
 				{
 					$chapters->load(array('rid = ?',$id));
+					$chapters->inorder = $order+1;
+					$chapters->save();
+				}
+			}
+			exit;
+		}
+		elseif ( $key == "collectionsort" )
+		{
+			$chapters = new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories');
+			foreach ( $data["neworder"] as $order => $id )
+			{
+				if ( is_numeric($order) && is_numeric($id) && is_numeric($data["collection"]) )
+				{
+					$chapters->load(array('collid = ? AND sid = ?', $data['collection'], $id));
 					$chapters->inorder = $order+1;
 					$chapters->save();
 				}
@@ -1765,6 +1778,26 @@ class AdminCP extends Controlpanel {
 			}
 		}
 		unset($relations);
+	}
+	
+	public function collectionItemsAdd(int $collid, string $data)
+	{
+		$items = explode(",",$data);
+		$newItem = new \DB\SQL\Mapper($this->db, $this->prefix."collection_stories");
+		$count = $newItem->count(array('collid=?',$collid));
+		
+		foreach ( $items as $item )
+		{
+			if(is_numeric($item))
+			{
+				$newItem->reset();
+				$newItem->collid	= $collid;
+				$newItem->sid 		= $item;
+				$newItem->confirmed	= $item;
+				$newItem->inorder	= ++$count;
+				$newItem->save();
+			}
+		}
 	}
 	
 	public function storyAdd(array $data)
