@@ -53,7 +53,7 @@ class AdminCP extends Controlpanel {
 			elseif(isset($data['user']))
 			{
 				$ajax_sql = "SELECT U.username as name, U.uid as id from `tbl_users`U WHERE U.username LIKE :username AND ( U.groups & 1 ) ORDER BY U.username ASC LIMIT 5";
-				$bind = [ ":username" =>  "%{$data['author']}%" ];
+				$bind = [ ":username" =>  "%{$data['user']}%" ];
 			}
 			elseif(isset($data['tag']))
 			{
@@ -1663,9 +1663,16 @@ class AdminCP extends Controlpanel {
 			return "[]";
 	}
 	
-	public function collectionAdd()
+	public function collectionAdd(array $data) : int
 	{
+		$newCollection = new \DB\SQL\Mapper($this->db, $this->prefix."collections");
+		$newCollection->title	= $data['title'];
+		$newCollection->open	= 0;
+		$newCollection->status	= "H";
+		$newCollection->save();
 		
+		$newID = $newCollection->_id;
+		return $newID;
 	}
 	
 	public function collectionsList(int $page, array $sort, string $module) : array
@@ -1674,10 +1681,11 @@ class AdminCP extends Controlpanel {
 		$pos = $page - 1;
 		
 		$sql = 	"SELECT SQL_CALC_FOUND_ROWS
-					Coll.collid, Coll.title, Coll.cache_authors,
+					Coll.collid, Coll.title, U.username,
 					COUNT(DISTINCT rCS.sid) as stories
 				FROM `tbl_collections`Coll
 					LEFT JOIN `tbl_collection_stories`rCS ON ( Coll.collid = rCS.collid )
+					LEFT JOIN `tbl_users`U ON ( Coll.uid = U.uid )
 				WHERE Coll.ordered = ".(int)($module!="collections")."
 				GROUP BY Coll.collid
 				ORDER BY {$sort['order']} {$sort['direction']}
@@ -1696,8 +1704,67 @@ class AdminCP extends Controlpanel {
 	
 	public function collectionSave(int $collid, array $data)
 	{
-		print_r($data);
-		exit;
+		$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collections');
+		$collection->load(array('collid=?',$collid));
+
+		$collection->copyfrom( 
+			[
+				"title"		=> $data['title'],
+				"ordered"	=> (isset($data['changetype'])) ? !$collection->ordered : $collection->ordered,
+				"summary"	=> $data['summary'],
+				"uid"		=> $data['maintainer'],
+			]
+		);
+
+		$i  = $collection->changed("title");
+		$i += $collection->changed("summary");
+		
+		$collection->save();
+		
+		// update relation table
+		$this->collectionProperties( $collid, $data['author'], "A" );
+		$this->collectionProperties( $collid, $data['tag'], "T" );
+		$this->collectionProperties( $collid, $data['character'], "CH" );
+		$this->collectionProperties( $collid, $data['category'], "CA" );
+
+		$this->rebuildCollectionCache($collection->collid);
+
+		return $i;
+	}
+	
+	private function collectionProperties( $collid, $data, $type )
+	{
+		// Check tags:
+		$data = explode(",",$data);
+		$relations = new \DB\SQL\Mapper($this->db, $this->prefix.'collection_properties');
+
+		foreach ( $relations->find(array('`collid` = ? AND `type` = ?',$collid,$type)) as $X )
+		{
+			if ( FALSE === $temp = array_search($X['relid'], $data) )
+			{
+				// Excess relation, drop from table
+				$relations->erase(['lid=?',$X['lid']]);
+			}
+			else unset($data[$temp]);
+		}
+		
+		// Insert any tag IDs not already present
+		if ( sizeof($data)>0 )
+		{
+			foreach ( $data as $temp )
+			{
+				if ( !empty($temp) )		// Fix adding empty entries
+				{
+					// Add relation to table
+					$relations->reset();
+					$relations->collid = $collid;
+					$relations->relid = $temp;
+					$relations->type = $type;
+					$relations->save();
+				}
+			}
+		}
+		unset($relations);
 	}
 	
 	public function storyAdd(array $data)

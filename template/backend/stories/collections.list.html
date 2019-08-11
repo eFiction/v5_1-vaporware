@@ -28,7 +28,8 @@
 				</false>
 			</check></a> {{@LN__Sort_Title}}
 		</th>
-		<th>&nbsp;</th>
+		<th>{{@LN__CollectionMaintainer}}</th>
+		<th>{{@LN__Stories}}</th>
 	</tr>
 </thead>
 <tbody>
@@ -37,7 +38,8 @@
 		<td><a href="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @row['collid'] }};returnpath=/adminCP/stories/{{@module}}/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
 		<td>{{ @row.collid }}</td>
 		<td>{{ @row.title }}</td>
-		<td>{{ is_array(@row.authors)?implode(", ",@row.authors):"&nbsp;" }}</td>
+		<td>{{ @row.username }}</td>
+		<td>{{ @row.stories }}</td>
 	</tr>
 	</repeat>
 </tbody>

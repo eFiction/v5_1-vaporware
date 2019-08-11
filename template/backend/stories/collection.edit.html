@@ -17,9 +17,8 @@
 	</div>
 </check>
 <!-- END: success notification -->
-
-<h2><check if="{{@data.ordered==1}}"><true>{{@LN__Series}}</true><false>{@LN_Collection}</false></check></h2>
-<form action="{{@BASE}}/adminCP/stories/series/id={{ @data['collid'] }}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
+{* <h2><check if="{{@data.ordered==1}}"><true>{{@LN__Series}}</true><false>{@LN_Collection}</false></check></h2> *}
+<form action="{{@BASE}}/adminCP/stories/<check if="{{@data.ordered==1}}"><true>series</true><false>collections</false></check>/id={{ @data['collid'] }}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
 <div class="field is-horizontal">
   <div class="field-label is-normal">
     <label class="label">{{@LN__Title}}</label>
@@ -43,6 +42,29 @@
 </div>
 
 <div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__Authors}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<input class="input" type="text" id="author-select" name="form_data[author]" />
+		</div></div>
+	</div>
+</div>
+
+<check if="{{ sizeof(@data.unused.authors) }}">
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__usedInStories}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<div class="buttons are-small"><repeat group="{{ @data.unused.authors }}" value="{{ @unusedAuthors }}">
+				<a class="button">{{ @unusedAuthors.name }} ({{ @unusedAuthors.counted }}x)</a>
+			</repeat>
+			</div>
+		</div></div>
+	</div>
+</div>
+</check>
+
+<div class="field is-horizontal">
 	<div class="field-label is-normal"><label class="label">{{@LN__Categories}}</label></div>
 	<div class="field-body">
 		<div class="field"><div class="control">
@@ -55,11 +77,12 @@
 	<div class="field-label is-normal"><label class="label">{{@LN__Tags}}</label></div>
 	<div class="field-body">
 		<div class="field"><div class="control">
-			<input class="input" type="text" id="tag-select" name="form_data[tags]" />
+			<input class="input" type="text" id="tag-select" name="form_data[tag]" />
 		</div></div>
 	</div>
 </div>
 
+<check if="{{ sizeof(@data.unused.tags) }}">
 <div class="field is-horizontal">
 	<div class="field-label is-normal"><label class="label">{{@LN__usedInStories}}</label></div>
 	<div class="field-body">
@@ -71,27 +94,31 @@
 		</div></div>
 	</div>
 </div>
+</check>
 
 <div class="field is-horizontal">
 	<div class="field-label is-normal"><label class="label">{{@LN__Characters}}</label></div>
 	<div class="field-body">
 		<div class="field"><div class="control">
-			<input class="input" type="text" id="character-select" name="form_data[characters]" />
+			<input class="input" type="text" id="character-select" name="form_data[character]" />
 		</div></div>
 	</div>
 </div>
 
+<check if="{{ sizeof(@data.unused.characters) }}">
 <div class="field is-horizontal">
 	<div class="field-label is-normal"><label class="label">{{@LN__usedInStories}}</label></div>
 	<div class="field-body">
 		<div class="field"><div class="control">
+{*			<input class="input" type="text" id="character-unused" />	*}
 			<div class="buttons are-small"><repeat group="{{ @data.unused.characters }}" value="{{ @unusedCharacters }}">
-				<a class="button">{{ @unusedCharacters.name }} ({{ @unusedCharacters.counted }}x)</a>
+				<a class="button">{{ @unusedCharacters.name }} ({{ @unusedCharacters.counted }}x)</a>	
 			</repeat>
 			</div>
 		</div></div>
 	</div>
 </div>
+</check>
 
 <div class="field is-horizontal">
 	<div class="field-label is-normal"><label class="label">{{@LN__Visibility}}</label></div>
@@ -135,6 +162,14 @@
 	<div class="field-body">
 		<div class="field"><div class="control">
 			<input type="checkbox" name="form_data[changetype]" />
+			<check if="{{ @data.ordered==1 }}">
+				<true>
+					{@*LN__makeCollection}
+				</true>
+				<false>
+					{@*LN__makeSeries}
+				</false>
+			</check>
 		</div></div>
 	</div>
 </div>
@@ -151,7 +186,7 @@
 			</p>				
 			<p class="control">
 				<button class="button is-primary" type="submit">
-					<span class="icon"><i class="fas fa-save"></i></span>
+					<span class="icon">{ICON:save}</span>
 					<span>{{@LN__Submit}}</span>
 				</button>
 			</p>
@@ -165,6 +200,10 @@
 	</div>
 </div>
 
+<repeat group="{{@data.storyblock}}" value="{{@story}}">
+{{@story.1}}<br/>
+</repeat>
+
 <script type="text/javascript">
 $(document).ready(function() {
     $("#category-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
@@ -176,11 +215,22 @@ $(document).ready(function() {
 });
 
 $(document).ready(function() {
+    $("#author-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "author",
+		minChars: 0,
+    	preventDuplicates: true,
+    	prePopulate: {{@data.authorblock | raw}}
+    });
+});
+
+$(document).ready(function() {
     $("#maintainer-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
     	method: "post",
     	queryParam: "user",
     	preventDuplicates: true,
-    	prePopulate: {{@data.authorblock | raw}}
+		tokenLimit: 1,
+    	prePopulate: {{@data.maintainerblock | raw}}
     });
 });
 
@@ -195,11 +245,31 @@ $(document).ready(function() {
 
 $(document).ready(function() {
     $("#character-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+	{*
+		save for later
+                onDelete: function (item) {
+					$("#character-unused").tokenInput("add", {id: item.id, name: item.name});
+                },
+	*}
     	method: "post",
     	queryParam: "character",
     	preventDuplicates: true,
     	prePopulate: {{@data.characterblock | raw}}
     });
 });
+
+{*
+$(document).ready(function() {
+    $("#character-unused").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+                onDelete: function (item) {
+					$("#character-select").tokenInput("add", {id: item.id, name: item.name});
+                },
+    	method: "post",
+    	queryParam: "character",
+    	preventDuplicates: true,
+    	prePopulate: {{@data.unused.characters | raw}}
+    });
+});
+*}
 
 </script>

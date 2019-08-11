@@ -468,6 +468,11 @@ class Controlpanel extends Base {
 		);
 	}
 
+	public function rebuildCollectionCache($collid)
+	{
+		
+	}
+
 	public function cacheCategories(int $catID)
 	{
 		$categories = new \DB\SQL\Mapper($this->db, $this->prefix.'categories' );
@@ -717,14 +722,18 @@ class Controlpanel extends Base {
 		// if not coming from the admin panel, restrict to self
 		$where = ($userID) ? "AND Coll.uid = {$userID}" : "";
 		
-		$sql = "SELECT Coll.collid, Coll.title, Coll.summary, Coll.ordered, Coll.status, 
+		$sql = "SELECT Coll.collid, Coll.title, Coll.summary, Coll.ordered, Coll.status, Coll.uid,
+					U1.username,
 				--	Coll.cache_tags, Coll.cache_characters, Coll.cache_categories,
 					GROUP_CONCAT(DISTINCT Ch.charid,',',Ch.charname ORDER BY Ch.charname ASC SEPARATOR '||') AS characterblock,
 					GROUP_CONCAT(DISTINCT U.uid,',',U.username ORDER BY U.username ASC SEPARATOR '||' ) as authorblock,
 					GROUP_CONCAT(DISTINCT T.tid,',',T.label ORDER BY TG.order,T.label ASC SEPARATOR '||') AS tagblock,
-					GROUP_CONCAT(DISTINCT Cat.cid,',',Cat.category ORDER BY Cat.category ASC SEPARATOR '||' ) as categoryblock
+					GROUP_CONCAT(DISTINCT Cat.cid,',',Cat.category ORDER BY Cat.category ASC SEPARATOR '||') as categoryblock,
+					GROUP_CONCAT(DISTINCT S.sid,',',S.title ORDER BY (rCS.inorder*Coll.ordered),S.title ASC SEPARATOR '||') as storyblock
 					FROM `tbl_collections`Coll
+						LEFT JOIN `tbl_users`U1 ON ( U1.uid = Coll.uid )
 						LEFT JOIN `tbl_collection_stories`rCS ON ( Coll.collid = rCS.collid )
+							LEFT JOIN `tbl_stories`S ON ( rCS.sid = S.sid )
 						LEFT JOIN `tbl_collection_properties`pColl ON ( pColl.collid = Coll.collid )
 							LEFT JOIN `tbl_users`U ON ( U.uid = pColl.relid AND pColl.type = 'A' )
 							LEFT JOIN `tbl_characters`Ch ON ( Ch.charid = pColl.relid AND pColl.type = 'CH' )
@@ -733,7 +742,7 @@ class Controlpanel extends Base {
 							LEFT JOIN `tbl_categories`Cat ON ( Cat.cid = pColl.relid AND pColl.type = 'CA' )
 					WHERE Coll.collid = :collid @WHERE@
 					GROUP BY Coll.collid";
-//echo str_replace("@WHERE@", $where, $sql);					
+
 		$tmp = $this->exec(str_replace("@WHERE@", $where, $sql), [":collid" => $collid ])[0] ?? [];
 		
 		if (sizeof($tmp)==0) 
@@ -750,6 +759,8 @@ class Controlpanel extends Base {
 			"characterblock"	=> parent::cleanResult($tmp['characterblock']),
 			"tagblock"			=> parent::cleanResult($tmp['tagblock']),
 			"categoryblock"		=> parent::cleanResult($tmp['categoryblock']),
+			"storyblock"		=> parent::cleanResult($tmp['storyblock']),
+			"maintainerblock"	=> json_encode( [[ "id" => $tmp['uid'], "name" => $tmp['username'] ]] ),
 			// inject possible collection states
 			"states"			=> ['H','F','P','A']
 		];
@@ -785,17 +796,25 @@ class Controlpanel extends Base {
 			foreach ( $used as $U )
 			{
 				$key = array_search($U[0], array_column($tmp, 'id'));
-				$newU[] = [ 'id' => $U[0], 'name' => $U[1], 'counted' => ($key===FALSE)?"":$tmp[$key]['counted'] ];
+				$newU[] = [ 'id' => $U[0], 'name' => $U[1].(($key===FALSE)?"":" ({$tmp[$key]['counted']}x)") ];
 				if ( $key!==FALSE ) array_splice($tmp, $key, 1);
 			}
 			$used = json_encode($newU);
 		}
 		else $used = '""';
 		
+		/*
+		// for use as a token pre-pop
+		foreach ( $tmp as $T )
+		{
+			$J[] = [ "id" => $T['id'], "name" => $T['name'] ];
+		}
+		return json_encode($J);
+		*/
 		return $tmp;
-	}
+}
 	
-	protected function collectionCountTags(int $collid, array &$used)
+	protected function collectionCountTags(int $collid, &$used)
 	{
 		$sql = "SELECT T.tid as id, T.label as name, COUNT(rST.sid) AS counted
 					FROM `tbl_collection_stories`rCS
@@ -813,7 +832,7 @@ class Controlpanel extends Base {
 			foreach ( $used as $U )
 			{
 				$key = array_search($U[0], array_column($tmp, 'id'));
-				$newU[] = [ 'id' => $U[0], 'name' => $U[1], 'counted' => ($key===FALSE)?"":$tmp[$key]['counted'] ];
+				$newU[] = [ 'id' => $U[0], 'name' => $U[1].(($key===FALSE)?"":" ({$tmp[$key]['counted']}x)") ];
 				if ( $key!==FALSE ) array_splice($tmp, $key, 1);
 			}
 			$used = json_encode($newU);
@@ -823,7 +842,7 @@ class Controlpanel extends Base {
 		return $tmp;
 	}
 
-	protected function collectionCountCategories(int $collid, array &$used)
+	protected function collectionCountCategories(int $collid, &$used)
 	{
 		$sql = "SELECT Cat.cid as id, Cat.category as name, COUNT(rSC.sid) AS counted
 					FROM `tbl_collection_stories`rCS
@@ -841,7 +860,7 @@ class Controlpanel extends Base {
 			foreach ( $used as $U )
 			{
 				$key = array_search($U[0], array_column($tmp, 'id'));
-				$newU[] = [ 'id' => $U[0], 'name' => $U[1], 'counted' => ($key===FALSE)?"":$tmp[$key]['counted'] ];
+				$newU[] = [ 'id' => $U[0], 'name' => $U[1].(($key===FALSE)?"":" ({$tmp[$key]['counted']}x)") ];
 				if ( $key!==FALSE ) array_splice($tmp, $key, 1);
 			}
 			$used = json_encode($newU);
@@ -851,7 +870,7 @@ class Controlpanel extends Base {
 		return $tmp;
 	}
 
-	protected function collectionCountAuthors(int $collid, array &$used)
+	protected function collectionCountAuthors(int $collid, &$used)
 	{
 		$sql = "SELECT U.uid as id, U.username as name, COUNT(rSA.sid) AS counted
 					FROM `tbl_collection_stories`rCS
@@ -869,7 +888,7 @@ class Controlpanel extends Base {
 			foreach ( $used as $U )
 			{
 				$key = array_search($U[0], array_column($tmp, 'id'));
-				$newU[] = [ 'id' => $U[0], 'name' => $U[1], 'counted' => ($key===FALSE)?"":$tmp[$key]['counted'] ];
+				$newU[] = [ 'id' => $U[0], 'name' => $U[1].(($key===FALSE)?"":" ({$tmp[$key]['counted']}x)") ];
 				if ( $key!==FALSE ) array_splice($tmp, $key, 1);
 			}
 			$used = json_encode($newU);
