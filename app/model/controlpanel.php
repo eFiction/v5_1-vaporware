@@ -359,7 +359,7 @@ class Controlpanel extends Base {
 					[ ":sid" => $sid ]
 					);
 		// drop stats cache to make changes visible
-		\Cache::instance()->clear('statsCache');
+		\Cache::instance()->clear('stats');
 	}
 
 	public function rebuildSeriesCache($collID)

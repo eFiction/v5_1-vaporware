@@ -112,6 +112,7 @@ require('app/routes.php');
 $f3->set('ENCODING','UTF-8');
 $f3->set('LANGUAGE',$_SESSION['preferences']['language']);
 setlocale(LC_ALL, $f3->get('LN____transLocale'));		// http://www.php.net/setlocale
+
 //$f3->set('DEBUG', 1);
 /** Knock on wood and set sails **/
 $f3->run();

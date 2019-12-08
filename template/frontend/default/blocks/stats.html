@@ -5,7 +5,7 @@
 		<tr><td colspan="2">&nbsp;</td></tr>
 		<tr><td>{{@LN__Stats_Stories}}:</td><td>{{@archiveStats.stories}}</td></tr>
 		<tr><td>{{@LN__Stats_Chapters}}:</td><td>{{@archiveStats.chapters}}</td></tr>
-		<tr><td>{{@LN__Stats_Words}}:</td><td>{{@archiveStats.words}}</td></tr>
+		<tr><td>{{@LN__Stats_Words}}:</td><td>{{  \Base::instance()->format( '{0,number}', @archiveStats.words )}}</td></tr>
 		<tr><td>{{@LN__Stats_Reviews}}:</td><td>{{@archiveStats.reviews}}</td></tr>
 		<tr><td colspan="2">&nbsp;</td></tr>
 		<tr><td colspan="2">{{@LN__Stats_Online}}</td></tr>

@@ -1,6 +1,7 @@
 <?php
 return array(
-'__transLocale' => 'en_GB',
+//'__transLocale' => [ 'en_GB.UTF8', 'en_GB@euro', 'en_GB', 'en' ],
+'__transLocale' => [ 'en_US.UTF8', 'en_US', 'en' ],
 
 // [1] Global -- General 36
 'Welcome' => 'Welcome',

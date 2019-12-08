@@ -822,7 +822,7 @@ class Story extends Base
 
 	public function blockStats()
 	{
-		if ( "" == $stats = \Cache::instance()->get('statsCache') )
+		if ( "" == $stats = \Cache::instance()->get('stats') )
 		{
 			$statSQL = [
 				"SET @users = (SELECT COUNT(*) FROM `tbl_users`U WHERE U.groups > 0);",
@@ -847,7 +847,7 @@ class Story extends Base
 				$stats[$statKey] = ($statKey=="newmember") ? explode(",",$statValue) : $statValue;
 			}
 			// Cache stats for 1 hour
-			\Cache::instance()->set('statsCache', $stats, 3600);
+			\Cache::instance()->set('stats', $stats, 3600);
 		}
 
 		return $stats;

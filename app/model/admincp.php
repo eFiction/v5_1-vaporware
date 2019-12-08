@@ -2810,7 +2810,8 @@ class AdminCP extends Controlpanel {
 		$sql = "UPDATE `tbl_categories` SET `stats` = NULL";
 		$this->exec($sql);
 		
-		$fw->exec("SET SESSION group_concat_max_len = 1000000;");
+		// mySQL runs on a pretty tight CONCAT limit, better make some room here ...
+		$this->exec("SET SESSION group_concat_max_len = 1000000;");
 		$categories = new \DB\SQL\Mapper($this->db, $this->prefix.'categories' );
 		
 		// start with lowest level and work up all the way to the root
