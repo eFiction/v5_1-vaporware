@@ -24,7 +24,7 @@
 // MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\
 // GNU General Public License for more details.\
 //\
-// To read the license please visit http://www.gnu.org/copyleft/gpl.html\
+// To read the license please visit http://www.gnu.org/copyleft/gpl.html  \
 // ----------------------------------------------------------------------\
 \
 This is an initial work, slowly trying to build a base that can work with existing\
