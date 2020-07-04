@@ -6,7 +6,7 @@
 // Copyright (c) 2007 by Tammy Keefer,\
 // which was based on eFiction 1.1\
 // Copyright (C) 2003 by Rebecca Smallwood.\
-// https://github.com/eFiction\
+// https://github.com/eFiction  \
 //\
 // For over one decade, you shaped the way fanfiction sites were run.\
 // Humbly trying to pick up from where you left - because nobody else did.\
