@@ -98,7 +98,8 @@ class AdminCP extends Base
 	{
 		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 
-		while ( list($key, $value) = each($data) )
+		//while ( list($key, $value) = each($data) )
+		foreach ( $data as $key => $value )
 			$this->dataProcess($data[$key], $key);
 
 		if( isset($_SESSION['lastAction']) )
@@ -288,7 +289,7 @@ class AdminCP extends Base
 		return $this->render('archive/rating.delete.html');
 	}
 	
-	public function ratingList(array $data) : string
+	public function ratingList(array $data)
 	{
 		if( isset($_SESSION['lastAction']) )
 		{
@@ -300,18 +301,11 @@ class AdminCP extends Base
 		return $this->render('archive/rating.list.html');
 	}
 	
-	public function collectionAdd (string $module, string $returnpath="") : string
-	{
-		$this->f3->set('module', 	$module);
-		$this->f3->set('returnpath', $returnpath);
-
-		return $this->render('stories/collection.add.html');
-	}
-
 	public function collectionsList(array $data, array $sort, string $module) : string
 	{
-		/*while ( list($key, $value) = each($data) )
-			$this->dataProcess($data[$key], $key);*/
+		//while ( list($key, $value) = each($data) )
+		foreach ( $data as $key => $value )
+			$this->dataProcess($data[$key], $key);
 
 		$this->f3->set('data', 		$data);
 		$this->f3->set('module', 	$module);
@@ -320,7 +314,7 @@ class AdminCP extends Base
 		return $this->render('stories/collections.list.html');
 	}
 	
-	public function collectionEdit(array $data, string $module, string $returnpath="" ) : string
+	public function collectionEdit(array $data, array $prePop, string $returnpath="" )
 	{
 		if($data['editor']=="visual" AND $this->config['advanced_editor']==TRUE )
 		{
@@ -328,23 +322,15 @@ class AdminCP extends Base
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
 		}
 		$this->dataProcess($data);
+		$this->f3->set('prePop', $prePop);
 		$this->f3->set('data', 		$data);
-		$this->f3->set('module', 		$module);
 		$this->f3->set('returnpath', $returnpath);
 
 		return $this->render('stories/collection.edit.html');
+		return "Edit";
 	}
 	
-	public function collectionItems(array $data, string $module, string $returnpath="" ) : string
-	{
-		$this->f3->set('data', 			$data);
-		$this->f3->set('module', 		$module);
-		$this->f3->set('returnpath',	$returnpath);
-
-		return $this->render('stories/collection.items.html');
-	}
-	
-	public function pollList(array $data, array $sort) : string
+	public function pollList(array $data, array $sort): string
 	{
 		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 
@@ -354,7 +340,7 @@ class AdminCP extends Base
 		return $this->render('home/poll.list.html');
 	}
 	
-	public function pollEdit(array $data, string $returnpath) : string
+	public function pollEdit(array $data, string $returnpath)
 	{
 		$this->javascript( 'head', TRUE, "jquery.datetimepicker.js" );
 

@@ -30,7 +30,7 @@ class Auth extends Base {
 		- author (regular)	 4
 		- user (trusted)	 2
 		- user (active)		 1
-		- guest				 0
+		- guest/banned		 0
 		*/
 
 		if ( $f3->exists('SESSION.session_id') )

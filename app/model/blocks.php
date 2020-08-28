@@ -54,10 +54,10 @@ class Blocks extends Base
 				"year"	=> date("Y",time())
 			];
 		}
-		
+
 		$target=explode("-",@$params['*']); // 3.6
 
-		if ( sizeof($target>1 ) )
+		if ( sizeof($target)>1 )
 		{
 			if ( (($target[0]>2000) && ($target[0]<=date("Y"))) && (($target[1]>0) && ($target[1]<13)) )
 			{
@@ -82,7 +82,7 @@ class Blocks extends Base
 			}
 		}
 		\Base::instance()->set('SESSION.lastCalendar', $c['year']."-".$c['month']);
-		
+
 		$this->prepare ( "queryEvents", "SELECT COUNT( S.title ) AS per_day, DAY( S.updated ) AS day_nr
 												FROM `tbl_stories` S
 												WHERE MONTH(S.updated) = :month AND YEAR(S.updated) = :year AND S.validated >= 30

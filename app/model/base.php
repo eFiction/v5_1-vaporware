@@ -111,7 +111,8 @@ class Base extends \Prefab {
 		$keys = array();
 		$values = array();
 
-		while (list($key, $value) = each($kvpair))
+		//while (list($key, $value) = each($kvpair))
+		foreach( $kvpair as $key => $value )
 		{
 			$keys[] 	= $key;
 			if ($value===NULL)

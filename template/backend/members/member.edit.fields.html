@@ -31,7 +31,7 @@
 <div class="field">
   <label class="label">{{@LN__Email}}:</label>
   <div class="control has-icons-left has-icons-right">
-    <input class="input" type="email" value="{{@data.email}}">
+    <input class="input" type="email" value="{{@data.email}}" name="data[email]">
     <span class="icon is-small is-left">
       {ICON:mail}
     </span>
@@ -41,7 +41,7 @@
 <div class="field">
   <label class="label">{{@LN__Registered}}:</label>
   <div class="control has-icons-left has-icons-right">
-    <input class="input" type="email" value="{{ date(@CONFIG.datetime_format, @data.registered) }}">
+    <input class="input" type="datetime" value="{{ date(@CONFIG.datetime_format, @data.registered) }}" name="data[registered]">
     <span class="icon is-small is-left">
       {ICON:calendar}
     </span>

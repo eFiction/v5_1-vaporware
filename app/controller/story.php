@@ -138,9 +138,9 @@ class Story extends Base
 			$query = $f3->get('POST');
 			$item = NULL;
 
-			if ( is_array($query) ) list ( $item, $bind ) = each ( $query );
-
-			$data = $this->model->searchAjax($item, $bind);
+			//if ( is_array($query) ) list ( $item, $bind ) = each ( $query );
+			if ( is_array($query) )
+				$data = $this->model->searchAjax( key($query), value($query) );
 			echo json_encode($data);
 
 			exit;

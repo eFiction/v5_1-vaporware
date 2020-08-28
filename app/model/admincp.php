@@ -1785,6 +1785,11 @@ class AdminCP extends Controlpanel {
 		$items = explode(",",$data);
 		$newItem = new \DB\SQL\Mapper($this->db, $this->prefix."collection_stories");
 		$count = $newItem->count(array('collid=?',$collid));
+  
+													   
+	  
+   
+		
 		
 		foreach ( $items as $item )
 		{
@@ -2414,6 +2419,87 @@ class AdminCP extends Controlpanel {
 				])
 			);
 		return $userID;
+	}
+	
+	public function memberDataSave(int $uid, array $data)
+	{
+		$member=new \DB\SQL\Mapper($this->db, $this->prefix.'users');
+		$member->load(array('uid=?',$uid));
+		
+		if(NULL === $member->uid) return FALSE;
+		
+		$member->copyfrom( 
+			[ 
+				"login"			=> $data['login'], 
+				"username"		=> $data['username'],
+				"realname"		=> $data['realname'],
+				"email"			=> $data['email'],
+				"registered"	=> \DateTime::createFromFormat($this->config['datetime_format'], $data['registered'])->format('Y-m-d H:i'),
+			]
+		);
+
+		$i  = $member->changed("login");
+		$i += $member->changed("username");
+		$i += $member->changed("realname");
+		$i += $member->changed("email");
+		$i += $member->changed("registered");
+		
+		$member->save();
+		
+		return $i;
+	}
+	
+	public function memberGroupSave(int $uid, array $groups)
+	{
+		$member=new \DB\SQL\Mapper($this->db, $this->prefix.'users');
+		$member->load(array('uid=?',$uid));
+
+		if(NULL === $member->uid) return FALSE;
+
+		if(isset($groups[0]))
+			$member->groups = 0;
+		else
+		{
+			$g = 0;
+			
+			// user
+			if ( isset($groups[1]) )	$g = $g | 1;
+			// trusted user (includes user)
+			if ( isset($groups[2]) )	$g = $g | 3;
+			
+			// author
+			if ( isset($groups[4]) )	$g = $g | 4;
+			// trusted author (includes author)
+			if ( isset($groups[8]) )	$g = $g | 12;
+			
+			// lector (includes trusted user)
+			if ( isset($groups[16]) )	$g = $g | 19;
+			// moderator (includes trusted lector)
+			if ( isset($groups[32]) )	$g = $g | 51;
+			// super-moderator (includes all below)
+			if ( isset($groups[64]) )	$g = $g | 127;
+			// admin (includes all below)
+			if ( isset($groups[128]) )	$g = $g | 255;
+			
+			/*
+			Session mask (bit-wise)
+
+			- admin			   128
+			- super mod			64
+			- story mod 		32
+			- lector			16
+			- author (trusted)	 8
+			- author (regular)	 4
+			- user (trusted)	 2
+			- user (active)		 1
+			- guest/banned		 0
+			*/			
+			$member->groups = $g;
+			
+		}
+	
+		$member->save();
+		return $member->changed("groups");
 	}
 	
 	public function listUsers($page, array $sort, $search=NULL)

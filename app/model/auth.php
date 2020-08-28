@@ -151,7 +151,7 @@ class Auth extends Base
 						@guests, @members
 							FROM `tbl_sessions`S 
 							INNER JOIN `tbl_users` U ON ( IF(S.user,S.user = U.uid,U.uid=0) )
-								LEFT JOIN `tbl_users`U2 ON ( (U.uid = U2.uid OR U.uid = U2.curator) AND U.groups&5 )
+								LEFT JOIN `tbl_users`U2 ON ( (U.uid = U2.uid OR U.uid = U2.curator) AND (U.groups&4) )
 						WHERE S.session = '{$session_id}' AND S.ip = INET_ATON('{$_SERVER['REMOTE_ADDR']}');";
 						
 /*

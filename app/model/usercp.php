@@ -582,7 +582,7 @@ class UserCP extends Controlpanel
 		);
 		// drop user feedback stat cache
 		\Model\Routines::dropUserCache("feedback");
-		// purge stats cache, forcing re-cache
+		// purce stats cache, forcing re-cache
 		\Cache::instance()->clear('stats');
 	}
 	

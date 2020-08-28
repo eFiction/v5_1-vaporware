@@ -113,24 +113,21 @@ class Controlpanel extends Base {
 	
 	public function storyEditPrePop(array $storyData)
 	{
-		$categories = json_decode($storyData['cache_categories']??"null");
-		if(sizeof($categories))
+		if ( NULL != $categories = json_decode($storyData['cache_categories']) )
 		{
 			foreach ( $categories as $tmp ) $pre['cat'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
 			$pre['cat'] = json_encode($pre['cat']);
 		}
 		else $pre['cat'] = '""';
 
-		$tags = json_decode($storyData['cache_tags']??"null",TRUE);
-		if(sizeof($tags)>0)
+		if ( NULL != $tags = json_decode($storyData['cache_tags'],TRUE) )
 		{
 			foreach ( $tags['simple']??$tags as $tmp ) $pre['tag'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
 			$pre['tag'] = json_encode($pre['tag']);
 		}
 		else $pre['tag'] = '""';
 
-		$characters = json_decode($storyData['cache_characters']??"null");
-		if(sizeof($characters))
+		if ( NULL != $characters = json_decode($storyData['cache_characters']) )
 		{
 			foreach ( $characters as $tmp ) $pre['char'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
 			$pre['char'] = json_encode($pre['char']);
@@ -236,7 +233,7 @@ class Controlpanel extends Base {
 		return $chapterID;
 	}
 
-	public function chapterLoadList($sid)
+	public function chapterLoadList($sid): array
 	{
 		$data = $this->exec
 		(

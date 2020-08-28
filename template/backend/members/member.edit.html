@@ -1,5 +1,7 @@
 <a href="{{@BASE}}{{@returnpath}}">{ICON:arrow-left} {{@LN__ReturnToOverview}}</a>
 
+<form action="{{@BASE}}/adminCP/members/edit/uid={{ @data['uid'] }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
+
 <div class="columns">
 	<div class="column is-two-thirds">
 		<include href="members/member.edit.fields.html" with="data={{@data}}" />
@@ -8,3 +10,29 @@
 		<include href="members/member.edit.groups.html" with="data={{@data}}" />
 	</div>
 </div>
+
+<div class="field is-horizontal">
+	<div class="field-label"><!-- Left empty for spacing --></div>
+	<div class="field-body">
+		<div class="field">
+			<div class="control">
+				<div class="field is-grouped">
+					<p class="control">
+						<button class="button is-primary" type="submit">
+							<span class="icon">{ICON:save}</span>
+							<span>{{@LN__Submit}}</span>
+						</button>
+					</p>
+					<p class="control">
+						<button class="button is-light" type="reset">
+							<span class="icon">{ICON:undo}</span>
+							<span>{{@LN__Reset}}</span>
+						</button>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+</form>

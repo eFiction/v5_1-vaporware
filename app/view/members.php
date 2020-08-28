@@ -14,7 +14,7 @@ class Members extends Base
 				$this->f3->set($key,$value);
 			unset($_SESSION['lastAction']);
 		}
-		
+
 		$this->javascript( 'body', FALSE, 'document.addEventListener(\'DOMContentLoaded\', () => {
 								  (document.querySelectorAll(\'.notification .delete\') || []).forEach(($delete) => {
 									$notification = $delete.parentNode;
@@ -25,7 +25,7 @@ class Members extends Base
 								});'
 		);
 	}
-	
+
 	public function profile(array $data)
 	{
 		$this->f3->set('data', $data);
@@ -36,21 +36,22 @@ class Members extends Base
 	public function stories(array $userdata, array $extradata)
 	{
 		$this->f3->set('userdata', $userdata);
-		
+
 		if ( sizeof(@$extradata['stories']) )
-			while ( list($key, $value) = each($extradata['stories']) )
+			foreach ( $extradata['stories'] as $key => $value )
 				$this->dataProcess($extradata['stories'][$key], $key);
 
 		$this->f3->set('extradata', $extradata);
 		return $this->render('members/stories.html');
 	}
-	
+
 	public function collections(array $userdata, string $type, array $collections)
 	{
 		$this->f3->set('userdata', $userdata);
-		
+
 		if ( sizeof($collections) )
-			while ( list($key, $value) = each($collections) )
+			//while ( list($key, $value) = each($collections) )
+			foreach ( $collections as $key => $value )
 				$this->dataProcess($collections[$key], $key);
 
 		$this->f3->set('type', $type);

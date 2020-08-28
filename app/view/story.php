@@ -5,14 +5,14 @@ class Story extends Base
 {
 	public function viewList($data)
 	{
-		while ( list($key, $value) = each($data) )
+		foreach ( $data as $key => $value )
 			$this->dataProcess($data[$key], $key);
 
 		$this->f3->set('stories', $data);
-		
+
 		return $this->render( 'story/listing.html' );
 	}
-	
+
 	public function searchHead($terms=array(), $return=NULL, $search=NULL)
 	{
 		$this->f3->set('searchForm', $terms);
@@ -28,13 +28,13 @@ class Story extends Base
 	{
 		$this->javascript('body', TRUE, 'jquery.columnizer.js' );
 		$this->javascript('body', FALSE, "$(function(){ $('.columnize').columnize({ columns: 2 }); });" );
-		
+
 		$this->f3->set('tocData', $tocData);
 		$this->f3->set('storyID', $storyData['sid']);
-		
+
 		return $this->buildInfoblock($storyData) . $this->render('story/toc.html');
 	}
-	
+
 	public function buildInfoblock($storyData)
 	{
 		$storyData['cache_categories'] = json_decode($storyData['cache_categories'],TRUE);
@@ -55,7 +55,7 @@ class Story extends Base
 					"subelement"	=> $in_structure['chapter'],
 					"childof"		=> $in_structure['childof'],
 				];
-		
+
 		$data = [ 
 					"cancel" 				=> TRUE,
 					"feedback_form_label"	=> ($in_structure['level'] > 0) ? $this->f3->get("LN__Comment") : $this->f3->get("LN__Review"),
@@ -323,9 +323,11 @@ class Story extends Base
 
 		if ( in_array($type, $blocks) )
 		{
-			while ( list($key, ) = each($stories) )
-				$this->dataProcess($stories[$key]);
-
+	//		if(sizeof($stories))
+	//		{
+				foreach(array_keys($stories) as $key)
+					$this->dataProcess($stories[$key]);
+	//		}
 			$this->f3->set('renderData', $stories);
 			$this->f3->set('extra', $extra);
 
