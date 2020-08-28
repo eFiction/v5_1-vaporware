@@ -1682,6 +1682,7 @@ class AdminCP extends Controlpanel {
 	{
 		$newCollection = new \DB\SQL\Mapper($this->db, $this->prefix."collections");
 		$newCollection->title	= $data['title'];
+		$newCollection->uid		= $_SESSION['userID'];
 		$newCollection->open	= 0;
 		$newCollection->status	= "H";
 		$newCollection->save();

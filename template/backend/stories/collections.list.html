@@ -1,3 +1,5 @@
+<a href="{{@BASE}}/adminCP/stories/{{@module}}/id=new">*** Add new</a>
+
 <check if="{{sizeof(@data)}}">
 	<true>
 <check if="{{ isset(@form_error) }}"><div class="gb-full alert-box error">{{ @form_error }}</div></check>
@@ -28,6 +30,8 @@
 				</false>
 			</check></a> {{@LN__Sort_Title}}
 		</th>
+		<th>{{@LN__CollectionMaintainer}}</th>
+		<th>{{@LN__Stories}}</th>
 		<th>&nbsp;</th>
 	</tr>
 </thead>
@@ -37,7 +41,9 @@
 		<td><a href="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @row['collid'] }};returnpath=/adminCP/stories/{{@module}}/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
 		<td>{{ @row.collid }}</td>
 		<td>{{ @row.title }}</td>
-		<td>{{ is_array(@row.authors)?implode(", ",@row.authors):"&nbsp;" }}</td>
+		<td>{{ @row.username }}</td>
+		<td>{{ @row.stories }}</td>
+		<td>{{ isset(@row.authors)?implode(", ",@row.authors):"&nbsp;" }}</td>
 	</tr>
 	</repeat>
 </tbody>

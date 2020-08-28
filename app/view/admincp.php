@@ -302,6 +302,14 @@ class AdminCP extends Base
 		return $this->render('archive/rating.list.html');
 	}
 	
+	public function collectionAdd (string $module, string $returnpath="") : string
+	{
+		$this->f3->set('module', 	$module);
+		$this->f3->set('returnpath', $returnpath);
+
+		return $this->render('stories/collection.add.html');
+	}
+
 	public function collectionsList(array $data, array $sort, string $module) : string
 	{
 		//while ( list($key, $value) = each($data) )
@@ -315,7 +323,7 @@ class AdminCP extends Base
 		return $this->render('stories/collections.list.html');
 	}
 	
-	public function collectionEdit(array $data, array $prePop, string $returnpath="" )
+	public function collectionEdit(array $data, array $prePop, string $module, string $returnpath="" )
 	{
 		if($data['editor']=="visual" AND $this->config['advanced_editor']==TRUE )
 		{
@@ -323,7 +331,8 @@ class AdminCP extends Base
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
 		}
 		$this->dataProcess($data);
-		$this->f3->set('prePop', $prePop);
+		$this->f3->set('module', 	$module);
+		$this->f3->set('prePop', 	$prePop);
 		$this->f3->set('data', 		$data);
 		$this->f3->set('returnpath', $returnpath);
 
@@ -331,7 +340,16 @@ class AdminCP extends Base
 		return "Edit";
 	}
 	
-	public function pollList(array $data, array $sort): string
+	public function collectionItems(array $data, string $module, string $returnpath="" ) : string
+	{
+		$this->f3->set('data', 			$data);
+		$this->f3->set('module', 		$module);
+		$this->f3->set('returnpath',	$returnpath);
+
+		return $this->render('stories/collection.items.html');
+	}
+
+	public function pollList(array $data, array $sort) : string
 	{
 		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 

@@ -113,21 +113,21 @@ class Controlpanel extends Base {
 	
 	public function storyEditPrePop(array $storyData)
 	{
-		if ( NULL != $categories = json_decode($storyData['cache_categories']) )
+		if ( NULL != $categories = json_decode(@$storyData['cache_categories']) )
 		{
 			foreach ( $categories as $tmp ) $pre['cat'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
 			$pre['cat'] = json_encode($pre['cat']);
 		}
 		else $pre['cat'] = '""';
 
-		if ( NULL != $tags = json_decode($storyData['cache_tags'],TRUE) )
+		if ( NULL != $tags = json_decode(@$storyData['cache_tags'],TRUE) )
 		{
 			foreach ( $tags['simple']??$tags as $tmp ) $pre['tag'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
 			$pre['tag'] = json_encode($pre['tag']);
 		}
 		else $pre['tag'] = '""';
 
-		if ( NULL != $characters = json_decode($storyData['cache_characters']) )
+		if ( NULL != $characters = json_decode(@$storyData['cache_characters']) )
 		{
 			foreach ( $characters as $tmp ) $pre['char'][] = [ "id" => $tmp[0], "name" => $tmp[1] ];
 			$pre['char'] = json_encode($pre['char']);
@@ -813,7 +813,7 @@ class Controlpanel extends Base {
 		
 		$tmp = $this->exec( $sql, [ ":collid" => $collid ] );
 		
-		if (sizeof($used))
+		if (is_array($used) AND sizeof($used))
 		{
 			foreach ( $used as $U )
 			{
@@ -849,7 +849,7 @@ class Controlpanel extends Base {
 		
 		$tmp = $this->exec( $sql, [ ":collid" => $collid ] );
 		
-		if (sizeof($used))
+		if (is_array($used) AND sizeof($used))
 		{
 			foreach ( $used as $U )
 			{
@@ -877,7 +877,7 @@ class Controlpanel extends Base {
 		
 		$tmp = $this->exec( $sql, [ ":collid" => $collid ] );
 
-		if (sizeof($used))
+		if (is_array($used) AND sizeof($used))
 		{
 			foreach ( $used as $U )
 			{
@@ -905,7 +905,7 @@ class Controlpanel extends Base {
 		
 		$tmp = $this->exec( $sql, [ ":collid" => $collid ] );
 
-		if (sizeof($used))
+		if (is_array($used) AND sizeof($used))
 		{
 			foreach ( $used as $U )
 			{

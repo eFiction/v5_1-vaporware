@@ -1799,15 +1799,49 @@ class AdminCP extends Base
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 		
 		if (isset($_POST['form_data']))
+		{
 			$this->model->collectionSave($params['id'], $f3->get('POST.form_data') );
+			if ( isset($_POST['form_data']['changetype']) )
+			{
+				$reroute = "/adminCP/stories";
+				$reroute .= ( $module=="collections" ) ? "/series" : "/collections";
+				foreach($params as $key => $param)
+				{
+					if ($key!="returnpath")
+						$reroute .= "/{$key}={$param}";
+				}
+				$f3->reroute($reroute,FALSE);
+				exit;
+			}
+		}
+		elseif (isset($_POST['new_data']))
+		{
+			$params['id'] = $this->model->collectionAdd($f3->get('POST.new_data') );
+		}
+		elseif (isset($_POST['story-add']))
+		{
+			$this->model->collectionItemsAdd($params['id'], $f3->get('POST.story-add') );
+		}
 
 		if( isset ($params['id']) )
 		{
-			if ( NULL !== $data = $this->model->collectionLoad($params['id']) )
+			if ( $params['id']=="new" )
+			{
+				$this->buffer( $this->template->collectionAdd($module) );
+				return;
+			}
+			elseif ( isset ($params['items']) AND NULL !== $data = $this->model->collectionLoadItems($params['id']) )
 			{
 				$data['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
-				$prePopulate = $this->model->storyEditPrePop($data);
-				$this->buffer( $this->template->collectionEdit($data, $prePopulate, @$params['returnpath']) );
+				$this->buffer( $this->template->collectionItems($data, $module, @$params['returnpath']) );
+				return;
+			}
+			elseif ( NULL !== $data = $this->model->collectionLoad($params['id']) )
+			{
+				$data['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
+				$this->buffer( $this->template->collectionEdit($data, $this->model->storyEditPrePop($data), $module, @$params['returnpath']) );
+				//$prePopulate = $this->model->storyEditPrePop($data);
+				//$this->buffer( $this->template->collectionEdit($data, $prePopulate, @$params['returnpath']) );
 				return;
 			}
 			else $f3->set('form_error', "__failedLoad");
