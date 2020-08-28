@@ -43,6 +43,7 @@ return array(
 //'MoveDown'	=> 'Move downwards', //db
 'ShowDetails'	=> 'Details zeigen',
 'HideDetails'	=> 'Details verbergen',
+'Entries' 		=> '{0, plural, zero {Keine Einträge}, one	{Ein Eintrag}, other	{# Einträge} }',
 
 // [2] Global -- Login related
 'Login'			=> 'Anmelden',

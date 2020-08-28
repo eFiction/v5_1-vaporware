@@ -120,6 +120,7 @@ class AdminCP extends Base
 		{
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
+			$data['description'] = nl2br($data['description']);
 		}
 		$this->javascript( 'head', TRUE, "jquery.datetimepicker.js" );
 

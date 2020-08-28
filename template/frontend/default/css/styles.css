@@ -4,16 +4,11 @@
 /* @import url(forms.css); */
 @import url(typography.css);
 @import url(tokeninput.css);
+@import url(barfiller.css);
 @import url(jquery.datetimepicker.css);
 @import url(cookieconsent.css);
 
 /* --------------- listing --------------- */
-
-.box .sortable
-{
-	padding: 3px;
-	border: 1px solid #efefef;
-}
 
 .story-box, .contest-box {
 	margin: 6px 8px;

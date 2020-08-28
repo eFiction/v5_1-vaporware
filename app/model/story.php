@@ -318,11 +318,17 @@ class Story extends Base
 				FROM `tbl_contests`C
 					LEFT JOIN `tbl_users`U ON ( C.uid = U.uid )
 					LEFT JOIN `tbl_contest_relations`R ON ( C.conid = R.conid AND R.type='ST' )
-				WHERE concealed = 0 @WHERE@
+				@WHERE@
 				GROUP BY C.conid
 				ORDER BY active ASC, votable ASC, C.conid DESC
 				LIMIT ".(max(0,$pos*$limit)).",".$limit;
-		if ( 1 ) $sql = str_replace("@WHERE@", "AND ((C.active='date' AND C.date_open<=NOW()) OR C.active>2)", $sql);
+		if ( 1 ) $sql = str_replace("@WHERE@", 
+									(
+										($_SESSION['groups']&64)?
+										"":
+										"WHERE concealed = 0 AND ((C.active='date' AND C.date_open<=NOW()) OR C.active>2)"
+									),
+									$sql);
 
 		$data = $this->exec($sql);
 				
@@ -336,7 +342,6 @@ class Story extends Base
 		{
 			
 		}*/
-
 		return $data;
 	}
 
@@ -352,22 +357,27 @@ class Story extends Base
 					FROM `tbl_contests`C
 						LEFT JOIN `tbl_users`U ON ( C.uid=U.uid )
 						LEFT JOIN `tbl_contest_relations`rC ON ( C.conid = rC.conid and rC.type = 'ST' )
-					WHERE 
-						C.concealed = 0 @WHERE@
-						AND C.conid = :conid";
-		if ( 1 ) $sql = str_replace("@WHERE@", "AND ((C.active='date' AND C.date_open<=NOW()) OR C.active>2)", $sql);
+					WHERE @WHERE@ C.conid = :conid";
+		if ( 1 ) $sql = str_replace("@WHERE@", 
+									(
+										($_SESSION['groups']&64)?
+										"":
+										"concealed = 0 AND ((C.active='date' AND C.date_open<=NOW()) OR C.active>2) AND"
+									),
+									$sql);
 
 		$data = $this->exec($sql, [":conid" => $conid ]);
-		if (sizeof($data)==1) 
+
+		if (sizeof($data)==1 AND !empty($data[0]['id'])) 
 		{
 			$data[0]['date_open'] = ($data[0]['date_open']>0)
-				? $this->timeToUser($data[0]['date_open'],  $this->config['date_format'])
+				? $this->timeToUser("@".$data[0]['date_open'],  $this->config['date_format'])
 				: "";
 			$data[0]['date_close'] = ($data[0]['date_close']>0)
-				? $this->timeToUser($data[0]['date_close'], $this->config['date_format'])
+				? $this->timeToUser("@".$data[0]['date_close'], $this->config['date_format'])
 				: "";
 			$data[0]['vote_close'] = ($data[0]['vote_close']>0)
-				? $this->timeToUser($data[0]['vote_close'], $this->config['date_format'])
+				? $this->timeToUser("@".$data[0]['vote_close'], $this->config['date_format'])
 				: "";
 
 			return $data[0];

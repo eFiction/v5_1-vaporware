@@ -854,6 +854,7 @@ class AdminCP extends Controlpanel {
 				"title"			=> $data['title'],
 				"concealed"		=> isset($data['concealed']) ? 1 : 0,
 				"summary"		=> $data['summary'],
+				"description"	=> preg_replace("/<br\\s*\\/>\\s*/i", "\n", $data['description']),
 				"active"		=> $data['active'],
 				"date_open"		=> empty($data['date_open']) ?
 										NULL :
@@ -871,6 +872,7 @@ class AdminCP extends Controlpanel {
 		$i  = $contest->changed("title");
 		$i += $contest->changed("concealed");
 		$i += $contest->changed("summary");
+		$i += $contest->changed("description");
 		$i += $contest->changed("date_open");
 		$i += $contest->changed("date_close");
 		$i += $contest->changed("vote_close");
@@ -1864,8 +1866,7 @@ class AdminCP extends Controlpanel {
 		return [ "storyInfo" => $similarExists[0], "preAuthor" => json_encode($authors) ];
 	}
 
-//	public function storyLoadInfo(int $sid)
-	public function storyLoadInfo($sid)
+	public function storyLoadInfo(int $sid)
 	{
 		$data = $this->exec
 		(

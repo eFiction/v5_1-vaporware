@@ -1,12 +1,5 @@
 {* provide a return link if a path exists *}
-<div class="columns">
-	<div class="column">
-		<check if="{{!empty(@returnpath)}}">{ICON:arrow-left} <a href="{{@BASE}}{{@returnpath}}">{{@LN__Return}}</a></check>&nbsp;
-	</div>
-	<div class="column">
-		<a href="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @data['collid'] }}/items/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">{@LN*__EditStories}</a> {ICON:arrow-right}
-	</div>
-</div>
+<check if="{{!empty(@returnpath)}}"><a href="{{@BASE}}{{@returnpath}}">__return</a></check>
 
 <!-- error notification -->
 <check if="{{ isset(@form_error) }}">
@@ -24,8 +17,9 @@
 	</div>
 </check>
 <!-- END: success notification -->
-{* <h2><check if="{{@data.ordered==1}}"><true>{{@LN__Series}}</true><false>{@LN_Collection}</false></check></h2> *}
-<form action="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @data['collid'] }}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
+
+<h2><check if="{{@data.ordered==1}}"><true>{{@LN__Series}}</true><false>{@LN_Collection}</false></check></h2>
+<form action="{{@BASE}}/adminCP/stories/series/id={{ @data['collid'] }}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
 <div class="field is-horizontal">
   <div class="field-label is-normal">
     <label class="label">{{@LN__Title}}</label>
@@ -49,29 +43,6 @@
 </div>
 
 <div class="field is-horizontal">
-	<div class="field-label is-normal"><label class="label">{{@LN__Authors}}</label></div>
-	<div class="field-body">
-		<div class="field"><div class="control">
-			<input class="input" type="text" id="author-select" name="form_data[author]" />
-		</div></div>
-	</div>
-</div>
-
-<check if="{{ sizeof(@data.unused.authors) }}">
-<div class="field is-horizontal">
-	<div class="field-label is-normal"><label class="label">{{@LN__usedInStories}}</label></div>
-	<div class="field-body">
-		<div class="field"><div class="control">
-			<div class="buttons are-small"><repeat group="{{ @data.unused.authors }}" value="{{ @unusedAuthors }}">
-				<a class="button">{{ @unusedAuthors.name }} ({{ @unusedAuthors.counted }}x)</a>
-			</repeat>
-			</div>
-		</div></div>
-	</div>
-</div>
-</check>
-
-<div class="field is-horizontal">
 	<div class="field-label is-normal"><label class="label">{{@LN__Categories}}</label></div>
 	<div class="field-body">
 		<div class="field"><div class="control">
@@ -84,48 +55,43 @@
 	<div class="field-label is-normal"><label class="label">{{@LN__Tags}}</label></div>
 	<div class="field-body">
 		<div class="field"><div class="control">
-			<input class="input" type="text" id="tag-select" name="form_data[tag]" />
+			<input class="input" type="text" id="tag-select" name="form_data[tags]" />
 		</div></div>
 	</div>
 </div>
 
-<check if="{{ sizeof(@data.unused.tags) }}">
 <div class="field is-horizontal">
 	<div class="field-label is-normal"><label class="label">{{@LN__usedInStories}}</label></div>
 	<div class="field-body">
 		<div class="field"><div class="control">
-			<div class="buttons are-small"><repeat group="{{ @data.unused.tags }}" value="{{ @unusedTag }}">
-				<a class="button">{{ @unusedTag.name }} ({{ @unusedTag.counted }}x)</a>
+			<div class="buttons are-small"><repeat group="{{ @data.current.tags }}" value="{{ @currentTag }}">
+				<a class="button">{{ @currentTag.name }} ({{ @currentTag.counted }}x)</a>
 			</repeat>
 			</div>
 		</div></div>
 	</div>
 </div>
-</check>
 
 <div class="field is-horizontal">
 	<div class="field-label is-normal"><label class="label">{{@LN__Characters}}</label></div>
 	<div class="field-body">
 		<div class="field"><div class="control">
-			<input class="input" type="text" id="character-select" name="form_data[character]" />
+			<input class="input" type="text" id="character-select" name="form_data[characters]" />
 		</div></div>
 	</div>
 </div>
 
-<check if="{{ sizeof(@data.unused.characters) }}">
 <div class="field is-horizontal">
 	<div class="field-label is-normal"><label class="label">{{@LN__usedInStories}}</label></div>
 	<div class="field-body">
 		<div class="field"><div class="control">
-{*			<input class="input" type="text" id="character-unused" />	*}
-			<div class="buttons are-small"><repeat group="{{ @data.unused.characters }}" value="{{ @unusedCharacters }}">
-				<a class="button">{{ @unusedCharacters.name }} ({{ @unusedCharacters.counted }}x)</a>	
+			<div class="buttons are-small"><repeat group="{{ @data.current.characters }}" value="{{ @currentCharacters }}">
+				<a class="button">{{ @currentCharacters.name }} ({{ @currentCharacters.counted }}x)</a>
 			</repeat>
 			</div>
 		</div></div>
 	</div>
 </div>
-</check>
 
 <div class="field is-horizontal">
 	<div class="field-label is-normal"><label class="label">{{@LN__Visibility}}</label></div>
@@ -169,14 +135,6 @@
 	<div class="field-body">
 		<div class="field"><div class="control">
 			<input type="checkbox" name="form_data[changetype]" />
-			<check if="{{ @data.ordered==1 }}">
-				<true>
-					{@*LN__makeCollection}
-				</true>
-				<false>
-					{@*LN__makeSeries}
-				</false>
-			</check>
 		</div></div>
 	</div>
 </div>
@@ -193,7 +151,7 @@
 			</p>				
 			<p class="control">
 				<button class="button is-primary" type="submit">
-					<span class="icon">{ICON:save}</span>
+					<span class="icon"><i class="fas fa-save"></i></span>
 					<span>{{@LN__Submit}}</span>
 				</button>
 			</p>
@@ -213,17 +171,7 @@ $(document).ready(function() {
     	method: "post",
     	queryParam: "category",
     	preventDuplicates: true,
-    	prePopulate: {{@data.categoryblock | raw}}
-    });
-});
-
-$(document).ready(function() {
-    $("#author-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
-    	method: "post",
-    	queryParam: "author",
-		minChars: 0,
-    	preventDuplicates: true,
-    	prePopulate: {{@data.authorblock | raw}}
+    	prePopulate: {{@prePop.cat | raw}}
     });
 });
 
@@ -232,8 +180,7 @@ $(document).ready(function() {
     	method: "post",
     	queryParam: "user",
     	preventDuplicates: true,
-		tokenLimit: 1,
-    	prePopulate: {{@data.maintainerblock | raw}}
+    	prePopulate: {{@prePop.maintainer | raw}}
     });
 });
 
@@ -242,37 +189,17 @@ $(document).ready(function() {
     	method: "post",
     	queryParam: "tag",
     	preventDuplicates: true,
-    	prePopulate: {{@data.tagblock | raw}}
+    	prePopulate: {{@prePop.tag | raw}}
     });
 });
 
 $(document).ready(function() {
     $("#character-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
-	{*
-		save for later
-                onDelete: function (item) {
-					$("#character-unused").tokenInput("add", {id: item.id, name: item.name});
-                },
-	*}
     	method: "post",
     	queryParam: "character",
     	preventDuplicates: true,
-    	prePopulate: {{@data.characterblock | raw}}
+    	prePopulate: {{@prePop.char | raw}}
     });
 });
-
-{*
-$(document).ready(function() {
-    $("#character-unused").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
-                onDelete: function (item) {
-					$("#character-select").tokenInput("add", {id: item.id, name: item.name});
-                },
-    	method: "post",
-    	queryParam: "character",
-    	preventDuplicates: true,
-    	prePopulate: {{@data.unused.characters | raw}}
-    });
-});
-*}
 
 </script>

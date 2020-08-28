@@ -1,7 +1,6 @@
 <?php
 return array(
-//'__transLocale' => [ 'en_GB.UTF8', 'en_GB@euro', 'en_GB', 'en' ],
-'__transLocale' => [ 'en_US.UTF8', 'en_US', 'en' ],
+'__transLocale' => 'en_GB',
 
 // [1] Global -- General 36
 'Welcome' => 'Welcome',
@@ -44,6 +43,7 @@ return array(
 'MoveDown'		=> 'Move downwards',
 'ShowDetails'	=> 'Show details',
 'HideDetails'	=> 'Hide details',
+'Entries' 		=> '{0, plural, zero {No entries}, one	{One entry}, other	{# entries} }', //db
 
 // [2] Global -- Login related 20
 'Login'			=> 'Login',
