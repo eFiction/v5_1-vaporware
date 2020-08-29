@@ -47,3 +47,8 @@ dl.settings dt.settings_title {
 	font-weight: bold;
 	clear: both;
 }
+
+/* required for drag&drop */
+ul#chapter-sort {
+	margin: 5px;
+}

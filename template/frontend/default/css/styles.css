@@ -194,3 +194,7 @@ legend {
 	line-height: 1.5;
 }
 
+/* required for drag&drop */
+ul#chapter-sort {
+	margin: 5px;
+}
