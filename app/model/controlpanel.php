@@ -22,7 +22,7 @@ class Controlpanel extends Base {
 			$mapper->erase();
 			$deleted['reviews']++;
 		}
-		
+
 		// Load all series that housed this story
 		$mapper = new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories');
 		$deleted['series'] = 0;
@@ -34,7 +34,7 @@ class Controlpanel extends Base {
 			$mapper->erase();
 			$deleted['series']++;
 		}
-		
+
 		// Faster with a direct SQL call, delete all user-story relations for this story
 		$this->exec
 		(
@@ -42,7 +42,7 @@ class Controlpanel extends Base {
 			[ ":sid" => $storyID ]
 		);
 		$deleted['authors'] = $this->db->count();
-		
+
 		// get a tag relation mapper
 		$mapper = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_tags');
 		$deleted['tags'] = 0;
@@ -84,7 +84,7 @@ class Controlpanel extends Base {
 			[ ":sid" => $storyID ]
 		);
 		$deleted['tracker'] = $this->db->count();
-		
+
 		// Delete chapters form local storag if required
 		if ( $this->config['chapter_data_location'] == "local" )
 		{
@@ -107,10 +107,10 @@ class Controlpanel extends Base {
 			[ ":sid" => $storyID ]
 		);
 		$deleted['story'] = $this->db->count();
-		
+
 		return $deleted;
 	}
-	
+
 	public function storyEditPrePop(array $storyData)
 	{
 		if ( NULL != $categories = json_decode(@$storyData['cache_categories']) )
@@ -164,9 +164,9 @@ class Controlpanel extends Base {
 									INNER JOIN `tbl_users`U ON ( (rSA.aid = U.uid) AND (U.uid=:uidU OR U.curator=:uidC) )
 						WHERE S.sid = :sid ";
 			$countBind = [ ":sid" => $storyID, ":uidU" => $userID, ":uidC" => $userID ];
-			
+
 			$chapterCount = $this->exec($countSQL, $countBind);
-			
+
 			if ( empty($chapterCount) OR  $chapterCount[0]['uid']==NULL )
 				return FALSE;
 
@@ -183,17 +183,17 @@ class Controlpanel extends Base {
 			$chapterCount = $this->exec("SELECT COUNT(Ch.chapid) as chapters
 											FROM `tbl_chapters`Ch
 										WHERE `sid` = :sid ", [ ":sid" => $storyID ])[0]['chapters'];
-			
+
 			if ( empty($chapterCount) )
 				return FALSE;
 
 			// Get current chapter count and raise
 			$chapterCount++;
-			
+
 			// coming from adminCP, we set the chapter to active assuming them people know what they are doing
 			if ( $_SESSION['groups']&32 )	$validated = 32;	// added by mod
 			if ( $_SESSION['groups']&128 )	$validated = 33;	// added by admin
-			
+
 			// date is NULL when adding additional chapters, in this context we also update the story entry
 			if ( !$date )
 			{
@@ -203,7 +203,7 @@ class Controlpanel extends Base {
 				);
 			}
 		}
-		
+
 		$newChapter = new \DB\SQL\Mapper($this->db, $this->prefix."chapters");
 		$newChapter->sid		= $storyID;
 		$newChapter->title		= \Base::instance()->get('LN__Chapter')." #{$chapterCount}";
@@ -211,14 +211,14 @@ class Controlpanel extends Base {
 		$newChapter->validated	= $validated;
 		$newChapter->created	= 'CURRENT_TIMESTAMP';
 		$newChapter->save();
-		
+
 		$chapterID = $newChapter->_id;
 
 		// if using local storage, create a chapter entry in SQLite
 		if ( "local" == $this->config['chapter_data_location'] )
 		{
 			$db = \storage::instance()->localChapterDB();
-			$chapterAdd= @$db->exec('INSERT INTO "chapters" ("chapid","sid","inorder") VALUES ( :chapid, :sid, :inorder )', 
+			$chapterAdd= @$db->exec('INSERT INTO "chapters" ("chapid","sid","inorder") VALUES ( :chapid, :sid, :inorder )',
 								[
 									':chapid' 		=> $chapterID,
 									':sid' 			=> $storyID,
@@ -229,7 +229,7 @@ class Controlpanel extends Base {
 
 		// rebuild the story cache
 		$this->rebuildStoryCache($storyID);
-		
+
 		return $chapterID;
 	}
 
@@ -257,7 +257,7 @@ class Controlpanel extends Base {
 		);
 		if (empty($data)) return FALSE;
 		$data[0]['chaptertext'] = parent::getChapterText( $story, $data[0]['inorder'], FALSE );
-		
+
 		return $data[0];
 	}
 
@@ -312,16 +312,21 @@ class Controlpanel extends Base {
 							WHERE S.sid = :sid
 					)AS SELECT_OUTER
 				GROUP BY sid ORDER BY sid ASC";
-		
+
 		$item = $this->exec($sql, [':sid' => $sid] );
-		
+
 		if ( empty($item) ) return FALSE;
-		
+
 		$item = $item[0];
 
-		$tagblock['simple'] = $this->cleanResult($item['tagblock']);
-		if($tagblock['simple']!==NULL) foreach($tagblock['simple'] as $t)
-			$tagblock['structured'][$t[2]][] = [ $t[0], $t[1], $t[2], $t[3] ];
+		// only build tag tree when there is a tag set
+		if($item['tagblock']!==NULL)
+		{
+			$tagblock['simple'] = $this->cleanResult($item['tagblock']);
+			foreach($tagblock['simple'] as $t)
+				$tagblock['structured'][$t[2]][] = [ $t[0], $t[1], $t[2], $t[3] ];
+		}
+		else $tagblock = NULL;
 
 		$this->update
 		(
@@ -338,16 +343,16 @@ class Controlpanel extends Base {
 			['sid=?',$sid]
 		);
 	}
-	
+
 	public function recountStory(int $sid)
 	{
 		$this->exec("UPDATE `tbl_stories`S
 						INNER JOIN
 						(
-							SELECT 
+							SELECT
 								sid,
 								COUNT(DISTINCT chapid)'chapters',
-								SUM(wordcount)'wordcount' 
+								SUM(wordcount)'wordcount'
 							FROM `tbl_chapters`
 							WHERE sid = :sid AND validated >= 30
 							GROUP BY sid
@@ -361,16 +366,16 @@ class Controlpanel extends Base {
 
 	public function rebuildSeriesCache($collID)
 	{
-		$sql = "SELECT 
-					SERIES.collid, 
-					SERIES.tagblock, 
-					SERIES.characterblock, 
-					SERIES.authorblock, 
-					SERIES.categoryblock, 
+		$sql = "SELECT
+					SERIES.collid,
+					SERIES.tagblock,
+					SERIES.characterblock,
+					SERIES.authorblock,
+					SERIES.categoryblock,
 					CONCAT(rating,'||',max_rating_id) as max_rating
 				FROM
 					(
-						SELECT 
+						SELECT
 							Coll.collid,
 							MAX(Ra.rid) as max_rating_id,
 							GROUP_CONCAT(DISTINCT U.uid,',',U.username ORDER BY username ASC SEPARATOR '||' ) as authorblock,
@@ -394,9 +399,9 @@ class Controlpanel extends Base {
 					) AS SERIES
 				LEFT JOIN `tbl_ratings`R ON (R.rid = max_rating_id);";
 		$item = $this->exec($sql, [':collection' => $collID] );
-		
+
 		if ( empty($item) ) return FALSE;
-		
+
 		$item = $item[0];
 
 		$tagblock['simple'] = $this->cleanResult($item['tagblock']);
@@ -426,7 +431,7 @@ class Controlpanel extends Base {
 					GROUP_CONCAT(DISTINCT sid,',',title ORDER BY title ASC SEPARATOR '||' ) as storyblock
 					FROM
 					(
-						SELECT C.conid, 
+						SELECT C.conid,
 								TG.description,TG.order,TG.tgid,T.label as tag,T.tid,
 								Cat.cid, Cat.category,
 								S.sid, S.title,
@@ -441,11 +446,11 @@ class Controlpanel extends Base {
 							WHERE C.conid = :conid
 					)AS SELECT_OUTER
 				GROUP BY conid ORDER BY conid ASC";
-		
+
 		$item = $this->exec($sql, [':conid' => $conid] );
-		
+
 		if ( empty($item) ) return FALSE;
-		
+
 		$item = $item[0];
 
 		$tagblock['simple'] = $this->cleanResult($item['tagblock']);
@@ -467,7 +472,7 @@ class Controlpanel extends Base {
 
 	public function rebuildCollectionCache($collid)
 	{
-		
+
 	}
 
 	public function cacheCategories(int $catID)
@@ -479,9 +484,9 @@ class Controlpanel extends Base {
 		if( empty($categories->cid) ) return FALSE;
 
 		$sql = "SELECT C.cid, C.category, COUNT(DISTINCT S.sid) as counted, C.parent_cid as parent,
-					GROUP_CONCAT(DISTINCT C1.category SEPARATOR '||' ) as sub_categories, 
+					GROUP_CONCAT(DISTINCT C1.category SEPARATOR '||' ) as sub_categories,
 					GROUP_CONCAT(DISTINCT C1.stats SEPARATOR '||' ) as sub_stats
-			FROM `tbl_categories`C 
+			FROM `tbl_categories`C
 				LEFT JOIN `tbl_stories_categories`SC ON ( C.cid = SC.cid )
 				LEFT JOIN `tbl_stories`S ON ( S.sid = SC.sid )
 				LEFT JOIN `tbl_categories`C1 ON ( C.cid = C1.parent_cid )
@@ -502,7 +507,7 @@ class Controlpanel extends Base {
 				{
 					$item['counted'] += $sub_stats[$key]->count;
 					$sub[] =
-					[ 
+					[
 						'id' 	=> $sub_stats[$key]->cid,
 						'count' => $sub_stats[$key]->count,
 						'name'	=> $value,
@@ -512,13 +517,13 @@ class Controlpanel extends Base {
 		}
 		$categories->stats = json_encode([ "count" => (int)$item['counted'], "cid" => $item['cid'], "sub" => $sub ]);
 		$categories->save();
-		
+
 		if ( $categories->parent_cid > 0 )
 			$this->cacheCategories( $categories->parent_cid );
-		
+
 		return TRUE;
 	}
-	
+
 	public function storyRelationCategories( $sid, $data )
 	{
 		$data = array_filter(explode(",",$data));
@@ -536,7 +541,7 @@ class Controlpanel extends Base {
 			}
 			else unset($data[$temp]);
 		}
-		
+
 		// Insert any category IDs not already present
 		if ( sizeof($data)>0 )
 		{
@@ -553,7 +558,7 @@ class Controlpanel extends Base {
 		}
 		unset($categories);
 	}
-	
+
 	// wrapper for storyRelationTag
 	public function storyRelationCharacter( $sid, $data )
 	{
@@ -577,7 +582,7 @@ class Controlpanel extends Base {
 			}
 			else unset($data[$temp]);
 		}
-		
+
 		// Insert any tag/character IDs not already present
 		if ( sizeof($data)>0 )
 		{
@@ -593,25 +598,25 @@ class Controlpanel extends Base {
 			}
 		}
 		unset($relations);
-		
+
 		// call recount function
 		if ( isset( $recounts ) )
 			$this->storyRecountTags( $recounts, $character );
 	}
-	
+
 	public function storyRecountTags( $tags, $character = 0 )
 	{
 		// tags is either an array
 		if ( is_array($tags) ) $tags = implode(",",$tags);
 		// or a plain numeric
 		elseif ( !is_numeric($tags) ) return FALSE;
-		
+
 		if ( $character == 1 )
 		{
-			$this->exec("UPDATE `tbl_characters`C 
+			$this->exec("UPDATE `tbl_characters`C
 							LEFT JOIN
 							(
-								SELECT C.charid, COUNT( DISTINCT RT.sid ) AS counter 
+								SELECT C.charid, COUNT( DISTINCT RT.sid ) AS counter
 								FROM `tbl_characters`C
 								LEFT JOIN `tbl_stories_tags`RT ON (RT.tid = C.charid AND RT.character = 1)
 									WHERE C.charid IN ({$tags})
@@ -621,11 +626,11 @@ class Controlpanel extends Base {
 		}
 		else
 		{
-			$this->exec("UPDATE `tbl_tags`T1 
+			$this->exec("UPDATE `tbl_tags`T1
 							LEFT JOIN
 							(
-								SELECT T.tid, COUNT( DISTINCT RT.sid ) AS counter 
-								FROM `tbl_tags`T 
+								SELECT T.tid, COUNT( DISTINCT RT.sid ) AS counter
+								FROM `tbl_tags`T
 								LEFT JOIN `tbl_stories_tags`RT ON (RT.tid = T.tid AND RT.character = 0)
 									WHERE T.tid IN ({$tags})
 									GROUP BY T.tid
@@ -634,7 +639,7 @@ class Controlpanel extends Base {
 		}
 		return $this->db->count();
 	}
-	
+
 	public function storyRelationAuthor ( $storyID, $mainauthor, $supauthor, $allowEmptyAuthor = FALSE )
 	{
 		// Author and co-Author preparation:
@@ -645,43 +650,31 @@ class Controlpanel extends Base {
 
 		// Check co-Authors:
 		$supDB = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors');
-
-		foreach ( $supDB->find(array('`sid` = ? AND `type` = ?',$storyID,'S')) as $X )
-		{
-			// delete entry if is no longer a supporting author or
-			$isSup=array_search($X['aid'], $supauthor);
-			// delete if is now a main author
-			$isMain=array_search($X['aid'], $mainauthor);
-			
-			if ( $isSup===FALSE OR $isMain===TRUE )
-			{
-				// Excess relation, drop from table
-				$supDB->erase(['lid=?',$X['lid']]);
-			}
-			else unset($supauthor[$isSup]);
-		}
-
-		// Insert any supporting author IDs not already present
-		if ( sizeof($supauthor)>0 )
-		{
-			foreach ( $supauthor as $temp)
-			{
-				// Add relation to table
-				$supDB->reset();
-				$supDB->sid = $storyID;
-				$supDB->aid = $temp;
-				$supDB->type = 'S';
-				$supDB->save();
-			}
-		}
-		unset($supDB);
-
 		// Check Authors:
 		$mainDB = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors');
 
-		// refuse to leave an empty author list behind
-		if(sizeof($mainauthor))
+
+		// refuse to leave an empty author list behind (unless stated otherwise)
+		if(sizeof($mainauthor) or ($allowEmptyAuthor))
 		{
+
+			// clean up supporting authors
+			foreach ( $supDB->find(array('`sid` = ? AND `type` = ?',$storyID,'S')) as $X )
+			{
+				// delete entry if is no longer a supporting author or
+				$isSup=array_search($X['aid'], $supauthor);
+				// delete if is now a main author
+				$isMain=array_search($X['aid'], $mainauthor);
+
+				if ( $isSup===FALSE OR $isMain===TRUE )
+				{
+					// Excess relation, drop from table
+					$supDB->erase(['lid=?',$X['lid']]);
+				}
+				else unset($supauthor[$isSup]);
+			}
+
+			// clean up main authors,
 			foreach ( $mainDB->find(array('`sid` = ? AND `type` = ?',$storyID,'M')) as $X )
 			{
 				$isMain=array_search($X['aid'], $mainauthor);
@@ -692,33 +685,48 @@ class Controlpanel extends Base {
 				}
 				else unset($mainauthor[$isMain]);
 			}
+
+			// Insert any supporting author IDs not already present
+			if ( sizeof($supauthor)>0 )
+			{
+				foreach ( $supauthor as $temp)
+				{
+					// Add relation to table
+					$supDB->reset();
+					$supDB->sid = $storyID;
+					$supDB->aid = $temp;
+					$supDB->type = 'S';
+					$supDB->save();
+				}
+			}
+			unset($supDB);
+
+			// Insert any author IDs not already present
+			if ( sizeof($mainauthor)>0 )
+			{
+				foreach ( $mainauthor as $temp)
+				{
+					// Add relation to table
+					$mainDB->reset();
+					$mainDB->sid = $storyID;
+					$mainDB->aid = $temp;
+					$mainDB->type = 'M';
+					$mainDB->save();
+				}
+			}
+			unset($mainDB);
 		}
 		else
 		{
 			$_SESSION['lastAction'] = [ "deleteWarning" => \Base::instance()->get('LN__MainAuthorNotEmpty') ];
 		}
-
-		// Insert any author IDs not already present
-		if ( sizeof($mainauthor)>0 )
-		{
-			foreach ( $mainauthor as $temp)
-			{
-				// Add relation to table
-				$mainDB->reset();
-				$mainDB->sid = $storyID;
-				$mainDB->aid = $temp;
-				$mainDB->type = 'M';
-				$mainDB->save();
-			}
-		}
-		unset($mainDB);
 	}
 
 	public function collectionLoad(int $collid, int $userID=0)
 	{
 		// if not coming from the admin panel, restrict to self
 		$where = ($userID) ? "AND Coll.uid = {$userID}" : "";
-		
+
 		$sql = "SELECT Coll.collid, Coll.title, Coll.summary, Coll.ordered, Coll.status, Coll.uid,
 					U1.username,
 				--	Coll.cache_tags, Coll.cache_characters, Coll.cache_categories,
@@ -738,8 +746,8 @@ class Controlpanel extends Base {
 					GROUP BY Coll.collid";
 
 		$tmp = $this->exec(str_replace("@WHERE@", $where, $sql), [":collid" => $collid ])[0] ?? [];
-		
-		if (sizeof($tmp)==0) 
+
+		if (sizeof($tmp)==0)
 			return NULL;
 
 		$data =
@@ -757,7 +765,7 @@ class Controlpanel extends Base {
 			// inject possible collection states
 			"states"			=> ['H','F','P','A']
 		];
-		
+
 		// Compile currently used tags and characters from stories in this collection
 		$data['unused'] =
 		[
@@ -774,8 +782,8 @@ class Controlpanel extends Base {
 	{
 		// if not coming from the admin panel, restrict to self
 		$where = ($userID) ? "AND Coll.uid = {$userID}" : "";
-		
-		$sql = "SELECT Coll.collid, Coll.title, Coll.ordered, 
+
+		$sql = "SELECT Coll.collid, Coll.title, Coll.ordered,
 					GROUP_CONCAT(DISTINCT S.sid,',',S.title ORDER BY (rCS.inorder*Coll.ordered),S.title ASC SEPARATOR '||') as storyblock
 					FROM `tbl_collections`Coll
 						LEFT JOIN `tbl_collection_stories`rCS ON ( Coll.collid = rCS.collid )
@@ -785,7 +793,7 @@ class Controlpanel extends Base {
 
 		$tmp = $this->exec(str_replace("@WHERE@", $where, $sql), [":collid" => $collid ])[0] ?? [];
 
-		if (sizeof($tmp)==0) 
+		if (sizeof($tmp)==0)
 			return NULL;
 
 		$data =
@@ -801,7 +809,7 @@ class Controlpanel extends Base {
 
 	protected function collectionCountCharacters(int $collid, &$used)
 	{
-		
+
 		$sql = "SELECT Ch.charid as id, Ch.charname as name, COUNT(rST.sid) AS counted
 					FROM `tbl_collection_stories`rCS
 						LEFT JOIN `tbl_stories`S ON ( S.sid = rCS.sid )
@@ -810,9 +818,9 @@ class Controlpanel extends Base {
 				WHERE collid = :collid AND Ch.charname IS NOT NULL
 				GROUP BY Ch.charid
 				ORDER BY counted DESC;";
-		
+
 		$tmp = $this->exec( $sql, [ ":collid" => $collid ] );
-		
+
 		if (is_array($used) AND sizeof($used))
 		{
 			foreach ( $used as $U )
@@ -824,7 +832,7 @@ class Controlpanel extends Base {
 			$used = json_encode($newU);
 		}
 		else $used = '""';
-		
+
 		/*
 		// for use as a token pre-pop
 		foreach ( $tmp as $T )
@@ -835,7 +843,7 @@ class Controlpanel extends Base {
 		*/
 		return $tmp;
 }
-	
+
 	protected function collectionCountTags(int $collid, &$used)
 	{
 		$sql = "SELECT T.tid as id, T.label as name, COUNT(rST.sid) AS counted
@@ -846,9 +854,9 @@ class Controlpanel extends Base {
 				WHERE collid = :collid AND T.label IS NOT NULL
 				GROUP BY T.tid
 				ORDER BY counted DESC;";
-		
+
 		$tmp = $this->exec( $sql, [ ":collid" => $collid ] );
-		
+
 		if (is_array($used) AND sizeof($used))
 		{
 			foreach ( $used as $U )
@@ -860,7 +868,7 @@ class Controlpanel extends Base {
 			$used = json_encode($newU);
 		}
 		else $used = '""';
-		
+
 		return $tmp;
 	}
 
@@ -874,7 +882,7 @@ class Controlpanel extends Base {
 				WHERE collid = :collid AND Cat.description IS NOT NULL
 				GROUP BY Cat.cid
 				ORDER BY counted DESC;";
-		
+
 		$tmp = $this->exec( $sql, [ ":collid" => $collid ] );
 
 		if (is_array($used) AND sizeof($used))
@@ -888,7 +896,7 @@ class Controlpanel extends Base {
 			$used = json_encode($newU);
 		}
 		else $used = '""';
-		
+
 		return $tmp;
 	}
 
@@ -902,7 +910,7 @@ class Controlpanel extends Base {
 				WHERE collid = :collid AND U.username IS NOT NULL
 				GROUP BY U.uid
 				ORDER BY counted DESC;";
-		
+
 		$tmp = $this->exec( $sql, [ ":collid" => $collid ] );
 
 		if (is_array($used) AND sizeof($used))
@@ -916,7 +924,7 @@ class Controlpanel extends Base {
 			$used = json_encode($newU);
 		}
 		else $used = '""';
-		
+
 		return $tmp;
 	}
 
