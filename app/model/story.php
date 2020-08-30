@@ -727,21 +727,24 @@ class Story extends Base
 		}
 		unset($reviews,$items);
 
-		$comments=new \DB\SQL\Mapper($this->db,'v_loadStoryReviewComments');
-		$items=$comments->paginate(0,$limit,array('review_id IN ('.implode(",",$parents).')'));
-		foreach($items['subset'] as $comment)
+		if(isset($parents))
 		{
-			$r[] =
-			[
-				"id" 		=> $comment['comment_id'],
-				"parent" 	=> $comment['review_id'],
-				"created"	=> date( 'Y-m-d', 
-									$comment['date_comment']!=NULL?:$datesave[$comment['review_id']]
-									),
-				"content"	=> preg_replace("/<br\\s*\\/>\\s*/i", "\n", $comment['comment_text']),
-				"creator"	=> $comment['comment_writer_uid'],
-				"fullname"	=> $comment['comment_writer_name'],
-			];
+			$comments=new \DB\SQL\Mapper($this->db,'v_loadStoryReviewComments');
+			$items=$comments->paginate(0,$limit,array('review_id IN ('.implode(",",$parents).')'));
+			foreach($items['subset'] as $comment)
+			{
+				$r[] =
+				[
+					"id" 		=> $comment['comment_id'],
+					"parent" 	=> $comment['review_id'],
+					"created"	=> date( 'Y-m-d', 
+										$comment['date_comment']!=NULL?:$datesave[$comment['review_id']]
+										),
+					"content"	=> preg_replace("/<br\\s*\\/>\\s*/i", "\n", $comment['comment_text']),
+					"creator"	=> $comment['comment_writer_uid'],
+					"fullname"	=> $comment['comment_writer_name'],
+				];
+			}
 		}
 
 		// WHERE F2.type='C' AND F2.reference IN (".implode(",",$parents).")
