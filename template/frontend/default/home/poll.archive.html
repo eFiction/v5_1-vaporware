@@ -6,8 +6,8 @@
 		<check if="{{ @poll.votes>0 }}">
 		<true>
 			<span class="polltoggle">
-				<span class="polltoggle_more"><i class="fas fa-caret-square-down fa-fw"></i> {@LN__*ShowDetails}</span>
-				<span class="polltoggle_less" style="display:none"><i class="fas fa-caret-square-up fa-fw"></i> {@LN__*HideDetails}</span>
+				<span class="polltoggle_more"><i class="fas fa-caret-square-down fa-fw"></i> {@LN__ShowDetails}</span>
+				<span class="polltoggle_less" style="display:none"><i class="fas fa-caret-square-up fa-fw"></i> {@LN__HideDetails}</span>
 			</span>
 			<span class="polltoggle_container" style="display:none">
 			<repeat group="{{@poll.cache}}" key="{{ @option }}" value="{{@res}}" counter="{{ @ctr }}">
