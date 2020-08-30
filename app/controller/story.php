@@ -195,6 +195,14 @@ class Story extends Base
 			if(empty($view)) $view = $this->template->commentForm($structure, $f3->get('POST.write'));
 			$this->buffer( [ "", $view, $relocate, ($_SESSION['userID']==0) ], "BODY", TRUE );
 		}
+
+		elseif ( isset($params['segment']) AND $params['segment']=="getreviews" )
+		{
+			$reviews = $this->model->loadReviewsArray($f3->get('POST.sid'), $f3->get('POST.chapid'));
+
+			echo json_encode($reviews);
+			exit;
+		}
 	}
 	
 	protected function validateReview(array $data): array

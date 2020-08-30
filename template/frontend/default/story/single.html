@@ -63,3 +63,68 @@
 	</div>
 </div>
 
+<script type="text/javascript">
+			$(function() {
+				$('#comments-container').comments({
+					profilePictureURL: '',
+					currentUserId: 1,
+					roundProfilePictures: true,
+					textareaRows: 1,
+					enableAttachments: false,
+					enableHashtags: false,
+					enablePinging: false,
+					enableNavigation: false,
+					enableUpvoting: false,
+					scrollContainer: $(window),
+					searchUsers: function(term, success, error) {
+						success([]);
+					},
+					getComments: function(success, error) {
+						setTimeout(function() {
+						$.ajax({
+							type: 'POST',
+							url: '{{@BASE}}/story/ajax/getreviews',
+							data: { sid: {{@data.story.sid}}<check if="isset(@data.story.chapid)">, chapid: {{@data.story.chapid}}</check> },
+							datatype: 'JSON',
+							success: function(commentsArray2) {
+								comments = JSON.parse(commentsArray2);
+								parser = new DOMParser();
+								comments.forEach(function(item,index,arr) {
+									arr[index]['content'] = parser.parseFromString(arr[index]['content'],'text/html').documentElement.textContent;
+								});
+								success(comments);
+							},
+							error: error
+						});
+						}, 500);
+					},
+					postComment: function(data, success, error) {
+						setTimeout(function() {
+							success(saveComment(data));
+						}, 500);
+					},
+					putComment: function(data, success, error) {
+						setTimeout(function() {
+							success(saveComment(data));
+						}, 500);
+					},
+					deleteComment: function(data, success, error) {
+						setTimeout(function() {
+							success();
+						}, 500);
+					},
+					upvoteComment: function(data, success, error) {
+						setTimeout(function() {
+							success(data);
+						}, 500);
+					},
+					validateAttachments: function(attachments, callback) {
+						setTimeout(function() {
+							callback(attachments);
+						}, 500);
+					},
+				});
+			});
+		</script>
+
+<div id="comments-container"></div>

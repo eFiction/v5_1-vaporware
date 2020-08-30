@@ -79,6 +79,7 @@ class Story extends Base
 
 	public function buildStory($storyData,$content,$dropdown,$view=1)
 	{
+		$this->javascript('body', TRUE, 'jquery.comments.min.js' );
 		$this->javascript('body', TRUE, 'chapter.js?' );
 		$this->javascript('body', FALSE, "var url='".\Base::instance()->get('BASE')."/story/read/{$storyData['sid']},'" );
 

@@ -548,7 +548,7 @@ class Story extends Base
 		$tree = [];
 
 		/*
-			get the amount of reviews defines by $limit (offset to come) and count the total amount for pagination setup
+			get the amount of reviews defined by $limit (offset to come) and count the total amount for pagination setup
 		*/
 		$sql = "SELECT 
 					SQL_CALC_FOUND_ROWS F.fid as review_id, 
@@ -696,6 +696,56 @@ class Story extends Base
 		});
 		
 		return $indexFlat;
+	}
+	
+	public function loadReviewsArray(int $sid, $chapid) : array
+	{
+		$r = [];
+		$limit=20;
+		
+		$reviews=new \DB\SQL\Mapper($this->db,'v_loadStoryReviews');
+		$items = is_numeric($chapid)?
+			$items=$reviews->paginate(0,$limit,array('review_story=? AND review_chapter=?',$sid, $chapid)):
+			$items=$reviews->paginate(0,$limit,array('review_story=?',$sid));
+
+		foreach($items['subset'] as $review)
+		{
+			$parents[] = $review['review_id'];
+			// jQuery.comments requires comments to have a date at least of the parent
+			// eFiction 3 did not record reply dates, so we'll have to fake this
+			$datesave[$review['review_id']] = $review['date_review'];
+			$r[] =
+			[
+				"id" 		=> $review['review_id'],
+				"parent" 	=> NULL,
+				"created"	=> date( 'Y-m-d', $review['date_review']),
+				"content"	=> preg_replace("/<br\\s*\\/>\\s*/i", "\n", $review['review_text']),
+				"creator"	=> $review['review_writer_uid'],
+				"fullname"	=> $review['review_writer_name'],
+			];
+			
+		}
+		unset($reviews,$items);
+
+		$comments=new \DB\SQL\Mapper($this->db,'v_loadStoryReviewComments');
+		$items=$comments->paginate(0,$limit,array('review_id IN ('.implode(",",$parents).')'));
+		foreach($items['subset'] as $comment)
+		{
+			$r[] =
+			[
+				"id" 		=> $comment['comment_id'],
+				"parent" 	=> $comment['review_id'],
+				"created"	=> date( 'Y-m-d', 
+									$comment['date_comment']!=NULL?:$datesave[$comment['review_id']]
+									),
+				"content"	=> preg_replace("/<br\\s*\\/>\\s*/i", "\n", $comment['comment_text']),
+				"creator"	=> $comment['comment_writer_uid'],
+				"fullname"	=> $comment['comment_writer_name'],
+			];
+		}
+
+		// WHERE F2.type='C' AND F2.reference IN (".implode(",",$parents).")
+		return $r;
 	}
 
 	public function saveReview($structure, $data)
