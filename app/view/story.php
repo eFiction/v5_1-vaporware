@@ -190,10 +190,10 @@ class Story extends Base
 		$this->dataProcess($collection['data']);
 
 		$this->f3->set('type', 		"collections");
-		$this->f3->set('entry', 	$collection['data']);
+		$this->f3->set('data', 		[$collection['data']]);
 		$this->f3->set('stories', 	$collection['stories']);
 		
-		return ($this->render('story/coll-ser.head.html').$this->render('story/listing.html'));
+		return ($this->render('story/coll-ser.item.html').$this->render('story/listing.html'));
 	}
 	
 	public function seriesList(array $data)
@@ -214,10 +214,10 @@ class Story extends Base
 		$this->dataProcess($series['data']);
 
 		$this->f3->set('type', 		"stories");
-		$this->f3->set('entry', 	$series['data']);
+		$this->f3->set('data', 		[$series['data']]);
 		$this->f3->set('stories', 	$series['stories']);
 		
-		return ($this->render('story/coll-ser.head.html').$this->render('story/listing.html'));
+		return ($this->render('story/coll-ser.item.html').$this->render('story/listing.html'));
 	}
 
 	public function epubXMLtag()

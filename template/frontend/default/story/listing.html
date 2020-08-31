@@ -12,7 +12,7 @@
 	<div class="column">
 <repeat group="{{ @stories }}" value="{{ @story }}" counter="{{ @ctr }}">
 	<div class="story-box">
-		<div class="story-list-head"><check if="{{ isset(@story.inorder) }}">{{@story.inorder}}:&nbsp;</check><a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a> {{@LN__by}} <repeat group="{{@story.cache_authors}}" value="{{@author}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check><a href="{{@BASE}}/authors/{{@author.0}}">{{@author.1}}</a></repeat></div>
+		<div class="story-list-head"><check if="{{ isset(@story.inorder) }}"><span class="tag is-medium">{{@story.inorder}}</span>&nbsp;</check><a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a> {{@LN__by}} <repeat group="{{@story.cache_authors}}" value="{{@author}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check><a href="{{@BASE}}/authors/{{@author.0}}">{{@author.1}}</a></repeat></div>
 		<div class="story-list-actions">
 			&nbsp;
 			<check if="{{ @SESSION['userID']>0 }}">
