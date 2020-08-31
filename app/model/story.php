@@ -253,30 +253,57 @@ class Story extends Base
 		return $data;
 	}
 
-	// wrapper for collectionsList
-	public function seriesList()
-	{
-		return $this->collectionsList(TRUE);
-	}
-
 	public function collectionsLoad(int $collID, bool $ordered = FALSE)
 	{
 		$sql = "SELECT SQL_CALC_FOUND_ROWS
 					C.collid, C.parent_collection, C.title, C.summary, C.open, C.max_rating,
-					C.chapters, C.wordcount,
+					COUNT(DISTINCT rCS.sid) as stories, C.chapters, C.wordcount, C.reviews,
 					C.cache_authors, C.cache_tags, C.cache_characters, C.cache_categories,
 					C2.title as parent_title
 				FROM `tbl_collections`C 
 					LEFT JOIN `tbl_collections`C2 ON ( C.parent_collection = C2.collid )
+					LEFT JOIN `tbl_collection_stories`rCS ON ( C.collid = rCS.collid AND rCS.confirmed = 1 )
 				WHERE C.collid=:collid AND C.ordered=".(int)$ordered." AND C.chapters>0 AND C.status IN ('P','A')
 				GROUP BY C.collid;";
 		$data = $this->exec($sql, [":collid" => $collID ]);
 		if ( sizeof($data)==1 )
 		{
-			
-			return $data[0];
+			return [ "data" => $data[0], "stories" => $this->collectionStories($collID, $ordered) ];
 		}
 		return NULL;
+	}
+	
+	private function collectionStories(int $collID, bool $ordered)
+	{
+		$bind = [ ":collid" => $collID ];
+		$join[] = "INNER JOIN `tbl_collection_stories`rCollS ON ( rCollS.sid = S.sid AND rCollS.collid = :collid )";
+		
+		$limit = $this->config['stories_per_page'];
+		$pos = (int)\Base::instance()->get('paginate.page') - 1;
+
+		$replacements =
+		[
+			"EXTRA"	=> ", rCollS.inorder",
+			"ORDER"	=> ( $ordered ) ? "ORDER BY rCollS.inorder ASC" : "ORDER BY updated DESC",
+			"LIMIT" => "LIMIT ".(max(0,$pos*$limit)).",".$limit,
+			"JOIN"	=> isset($join) ? implode("\n",$join) : "",
+			"COMPLETED" => isset($terms['exclude_wip']) ? ">" : ">=",
+		];
+
+		$data = $this->storyData($replacements, $bind);
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/story/".($ordered?'series':'collections')."/id={$collID}",
+			$limit
+		);
+		
+		return $data;
+	}
+	
+	// wrapper for collectionsList
+	public function seriesList()
+	{
+		return $this->collectionsList(TRUE);
 	}
 
 	// wrapper for collectionsLoad
@@ -284,7 +311,7 @@ class Story extends Base
 	{
 		return $this->collectionsLoad($collID, TRUE);
 	}
-	
+
 	public function contestsList() : array
 	{
 		$limit = 5;

@@ -183,6 +183,19 @@ class Story extends Base
 		return $this->render('story/coll-ser.list.html');
 	}
 	
+	public function collectionsShow(array $collection)
+	{
+		foreach ( $collection['stories'] as $key => $value )
+			$this->dataProcess($collection['stories'][$key], $key);
+		$this->dataProcess($collection['data']);
+
+		$this->f3->set('type', 		"collections");
+		$this->f3->set('entry', 	$collection['data']);
+		$this->f3->set('stories', 	$collection['stories']);
+		
+		return ($this->render('story/coll-ser.head.html').$this->render('story/listing.html'));
+	}
+	
 	public function seriesList(array $data)
 	{
 		foreach ( $data as &$dat )
@@ -194,6 +207,18 @@ class Story extends Base
 		return $this->render('story/coll-ser.list.html');
 	}
 	
+	public function seriesShow(array $series)
+	{
+		foreach ( $series['stories'] as $key => $value )
+			$this->dataProcess($series['stories'][$key], $key);
+
+		$this->f3->set('type', 		"stories");
+		$this->f3->set('entry', 	$this->dataProcess($series['data']));
+		$this->f3->set('stories', 	$series['stories']);
+		
+		return ($this->render('story/coll-ser.head.html').$this->render('story/listing.html'));
+	}
+
 	public function epubXMLtag()
 	{
 		return "<?xml version='1.0' encoding='utf-8'?>\n";

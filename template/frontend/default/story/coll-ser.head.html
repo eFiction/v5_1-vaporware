@@ -1,8 +1,5 @@
-<F3:check if="{{isset(@paginate.firstPage)}}"><include href="main/paginate.html" /></F3:check>
-
 <div class="columns">
 	<div class="column">
-<repeat group="{{ @data }}" value="{{ @entry }}" counter="{{ @ctr }}">
 	<div class="story-box">
 		<div class="story-list-head"><a href="{{@BASE}}/story/{{@type}}/id={{@entry.collid}}">{{@entry.title}}</a> {{@LN__by}} <repeat group="{{@entry.cache_authors}}" value="{{@author}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check><a href="{{@BASE}}/authors/{{@author.0}}">{{@author.1}}</a></repeat></div>
 		<div class="story-list-actions">
@@ -47,8 +44,4 @@
 
 		<div class="story-list-info">{{ @type=='collections' ? @LN__Stories : @LN__Episodes }}: {{@entry.stories}} &bull; {{@LN__Chapters}}: {{@entry.chapters}} &bull; {{@LN__Words}}: {{@entry.wordcount}} &bull; {{@LN__MaxRating}}: {{@entry.max_rating.0}}<check if="{{ @type=='collections' }}"> &bull; {{ ${"LN__CollectionOpen_".@entry.open} }}</check></div>
 	</div>
-</repeat>
-
 </div></div>
-
-<F3:check if="{{isset(@paginate.firstPage) AND sizeof(@data)>2}}"><include href="main/paginate.html" /></F3:check>

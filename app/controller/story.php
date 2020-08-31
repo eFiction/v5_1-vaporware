@@ -516,12 +516,7 @@ class Story extends Base
 				\Base::instance()->reroute("/story/".$type, false);
 				exit;			
 			}
-			if ( isset($params['entries']) )
-			{
-				//$entries = $this->model->contestEntries($contest['id']);
-				//$buffer = $this->template->contestEntries($contest, $entries);
-			}
-			return print_r($collection,TRUE);
+			return $this->template->{$type."Show"}($collection);
 			//else $buffer = $this->template->contestShow($contest,$params['returnpath']);
 		}
 		else
