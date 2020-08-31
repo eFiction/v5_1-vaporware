@@ -211,9 +211,10 @@ class Story extends Base
 	{
 		foreach ( $series['stories'] as $key => $value )
 			$this->dataProcess($series['stories'][$key], $key);
+		$this->dataProcess($series['data']);
 
 		$this->f3->set('type', 		"stories");
-		$this->f3->set('entry', 	$this->dataProcess($series['data']));
+		$this->f3->set('entry', 	$series['data']);
 		$this->f3->set('stories', 	$series['stories']);
 		
 		return ($this->render('story/coll-ser.head.html').$this->render('story/listing.html'));

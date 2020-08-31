@@ -283,7 +283,7 @@ class Story extends Base
 
 		$replacements =
 		[
-			"EXTRA"	=> ", rCollS.inorder",
+			"EXTRA"	=> ( $ordered ) ? ", rCollS.inorder" : "",
 			"ORDER"	=> ( $ordered ) ? "ORDER BY rCollS.inorder ASC" : "ORDER BY updated DESC",
 			"LIMIT" => "LIMIT ".(max(0,$pos*$limit)).",".$limit,
 			"JOIN"	=> isset($join) ? implode("\n",$join) : "",
