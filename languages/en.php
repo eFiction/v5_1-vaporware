@@ -1,6 +1,7 @@
 <?php
 return array(
-'__transLocale' => 'en_GB',
+//'__transLocale' => [ 'en_GB.UTF8', 'en_GB@euro', 'en_GB', 'en' ],
+'__transLocale' => [ 'en_US.UTF8', 'en_US', 'en' ],
 
 // [1] Global -- General 36
 'Welcome' => 'Welcome',
@@ -340,6 +341,8 @@ return array(
 			'zero	{No stories},'.
 			'one	{One story},'.
 			'other	{# Stories} }',
+	'Library_Series' 		=> 'Series ({0})',
+	'Library_Collections'	=> 'Collections ({0})',
 
 'UserMenu_Feedback' => 'Feedback',
 'UserMenu_Reviews' => 'Reviews',

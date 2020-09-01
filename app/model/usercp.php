@@ -151,19 +151,24 @@ class UserCP extends Controlpanel
 	{
 		if ( $module == "LIB" )
 		{
-			$sql[]= "SET @bms  := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_user_favourites`F WHERE F.uid={$_SESSION['userID']} AND F.bookmark=1 GROUP BY F.type) AS F1);";
-			$sql[]= "SET @favs := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_user_favourites`F WHERE F.uid={$_SESSION['userID']} AND F.bookmark=0 GROUP BY F.type) AS F1);";
-			if(array_key_exists("recommendations", $this->config['optional_modules']))
+			// look for cached data
+			if ( FALSE === \Cache::instance()->exists("menuUCPCountLib.{$_SESSION['userID']}", $counter) )
 			{
-				$sql[]= "SET @recs := (SELECT COUNT(1) FROM `tbl_recommendations` WHERE `uid` = {$_SESSION['userID']});";
-			}
-			else $sql[]= "SET @recs := NULL";
-			$sql[]= "SELECT @bms as bookmark,@favs as favourite,@recs as recommendation;";
+				// prepare query
+				$sql[]= "SET @bms  := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_user_favourites`F WHERE F.uid={$_SESSION['userID']} AND F.bookmark=1 GROUP BY F.type) AS F1);";
+				$sql[]= "SET @favs := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_user_favourites`F WHERE F.uid={$_SESSION['userID']} AND F.bookmark=0 GROUP BY F.type) AS F1);";
+				if(array_key_exists("recommendations", $this->config['optional_modules']))
+				{
+					$sql[]= "SET @recs := (SELECT COUNT(1) FROM `tbl_recommendations` WHERE `uid` = {$_SESSION['userID']});";
+				}
+				else $sql[]= "SET @recs := NULL";
+				$sql[]= "SET @ser  := (SELECT COUNT(1) FROM `tbl_collections` WHERE `ordered` = 1 and `uid` = {$_SESSION['userID']});";
+				$sql[]= "SET @coll := (SELECT COUNT(1) FROM `tbl_collections` WHERE `ordered` = 0 and `uid` = {$_SESSION['userID']});";
+				
+				$sql[]= "SELECT @bms as bookmark,@favs as favourite,@recs as recommendation,@ser as series,@coll as collection;";
 
-			$data = $this->exec($sql)[0];
+				$data = $this->exec($sql)[0];
 
-			if ( isset($data) )
-			{
 				foreach( $data as $key => $count )
 					list($counter[$key]['sum'], $counter[$key]['details']) = array_pad(explode("//",$count), 2, '');
 
@@ -177,14 +182,19 @@ class UserCP extends Controlpanel
 					}
 					else $count['details'] = "";
 				}
-				$this->menuCount['data']['library'] = $counter;
-				
-				$this->menuCount['LIB']  = 	[
-												"BMS"	=> $counter['bookmark']['sum'],
-												"FAVS"	=> $counter['favourite']['sum'],
-												"RECS"	=> is_numeric($counter['recommendation']['sum']) ? $counter['recommendation']['sum'] : FALSE,
-											];
+				// cache the result for max 10 minutes or changes occur
+				\Cache::instance()->set("menuUCPCountLib.{$_SESSION['userID']}", $counter, 600);
 			}
+
+			$this->menuCount['data']['library'] = $counter;
+			
+			$this->menuCount['LIB']  = 	[
+											"BMS"	=> $counter['bookmark']['sum'],
+											"FAVS"	=> $counter['favourite']['sum'],
+											"RECS"	=> is_numeric($counter['recommendation']['sum']) ? $counter['recommendation']['sum'] : FALSE,
+											"SER"	=> $counter['series']['sum'],
+											"COLL"	=> $counter['collection']['sum'],
+										];
 		}
 		elseif ( $module == "MSG" OR $module == "SB" )
 		{

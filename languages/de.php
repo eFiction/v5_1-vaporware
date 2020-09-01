@@ -1,5 +1,6 @@
 <?php
 return array(
+//
 '__transLocale' => [ 'de_DE.UTF8', 'de_DE@euro', 'de_DE', 'de', 'ge' ],
 
 // [1] Global -- General
@@ -340,6 +341,8 @@ return array(
 			'zero	{Keine Geschichten},'.
 			'one	{Eine Geschichte},'.
 			'other	{# Geschichten} }',
+	'Library_Series' 		=> 'Serien ({0})',
+	'Library_Collections'	=> 'Sammlungen ({0})',
 			
 'UserMenu_Feedback' => 'Feedback',
 'UserMenu_Reviews' => 'Bewertungen',
