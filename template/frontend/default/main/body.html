@@ -9,8 +9,6 @@
 		<section class="hero is-warning is-small"><div class="hero-body"><div class="container"><h2 class="subtitle">{{@LN__MaintenanceMode}}!</h2></div></div></section>
 	</check>
 
-	
-	<section class="hero">
 	<div class="container"><!-- start container -->
 	<div class="columns">
 		<div class="column"><a href="{{@BASE}}"><h1>{{@CONFIG.page_title}}</h1></a> {{@CONFIG.page_slogan}}</div>
@@ -24,8 +22,8 @@
 		<true>
 	<!-- layout for system pages (admin panel, error pages, ...) -->
 		<true>
-		<div class="column is-2">{{@LEFT|raw}}</div>
-		<div class="column is-10"><!-- start content -->
+		<div class="column is-3">{{@LEFT|raw}}</div>
+		<div class="column is-7"><!-- start content -->
 		</true>
 		
 	<!-- regular pages -->
@@ -67,7 +65,6 @@
 	</div><!-- end columns -->
 	
 	</div><!-- end container -->
-	</section>
 {*	
 </div><!-- end hero container -->
 </div><!-- END Hero content: will be in the middle -->
