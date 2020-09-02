@@ -4,7 +4,7 @@
 		<check if="{{!empty(@returnpath)}}">{ICON:arrow-left} <a href="{{@BASE}}{{@returnpath}}">{{@LN__Return}}</a></check>&nbsp;
 	</div>
 	<div class="column">
-		<a href="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @data['collid'] }}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">{@LN*__EditHeader}</a> {ICON:arrow-right}
+		<a href="{{@BASE}}/userCP/library/{{@module}}/id={{ @data['collid'] }}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">{@LN*__EditHeader}</a> {ICON:arrow-right}
 	</div>
 </div>
 
@@ -19,7 +19,7 @@
 <div class="columns">
 	<div class="column is-half">
 	<div class="notification">
-	<form action="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @data['collid'] }}/items/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
+	<form action="{{@BASE}}/userCP/library/{{@module}}/id={{ @data['collid'] }}/items/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
 		{{@LN__Search}}<br />
 		Type <b>title</b> or story <b>id</b>
 		<input type="text" id="story-select" name="story-add" />
@@ -32,7 +32,7 @@
 
 <script type="text/javascript">
 $(document).ready(function() {
-	$("#story-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/search",{
+	$("#story-select").tokenInput("{{$BASE}}/userCP/ajax/stories/search",{
 		method: "post",
 		queryParam: "storyID",
 		hintText: "{{@LN__Token_StartTyping}}.",
@@ -46,7 +46,7 @@ $(document).ready(function() {
 			var neworder = $('#story-sort').sortable('toArray');
 			$.ajax({
 				type: "post",
-				url: "{{@BASE}}/adminCP/ajax/stories/sort",
+				url: "{{@BASE}}/userCP/ajax/library",
 				data: { collectionsort: {{@data.collid}}, neworder: neworder },
 				dataType: "html"
 			});

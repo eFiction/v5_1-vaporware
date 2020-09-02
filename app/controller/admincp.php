@@ -1507,9 +1507,9 @@ class AdminCP extends Base
 		elseif ( $params['module']=="featured" )
 			$data = $this->model->ajax("storySearch", $post);
 
-		elseif ( $params['module']=="chaptersort" )
+		elseif ( $params['module']=="sort" )
 		{
-			$data = $this->model->ajax("chaptersort", $post);
+			$data = $this->model->ajax("storySort", $post);
 		}
 		
 		echo json_encode($data);
@@ -1830,18 +1830,18 @@ class AdminCP extends Base
 				$this->buffer( $this->template->collectionAdd($module) );
 				return;
 			}
+			// edit the elements of the collection/series
 			elseif ( isset ($params['items']) AND NULL !== $data = $this->model->collectionLoadItems($params['id']) )
 			{
 				$data['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
 				$this->buffer( $this->template->collectionItems($data, $module, @$params['returnpath']) );
 				return;
 			}
+			// edit the collection/series
 			elseif ( NULL !== $data = $this->model->collectionLoad($params['id']) )
 			{
 				$data['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
 				$this->buffer( $this->template->collectionEdit($data, $this->model->storyEditPrePop($data), $module, @$params['returnpath']) );
-				//$prePopulate = $this->model->storyEditPrePop($data);
-				//$this->buffer( $this->template->collectionEdit($data, $prePopulate, @$params['returnpath']) );
 				return;
 			}
 			else $f3->set('form_error', "__failedLoad");
@@ -1874,12 +1874,6 @@ class AdminCP extends Base
 		);
 	}
 	
-	protected function storiesCollectionsEdit(array $series)
-	{
-		
-	}
-	
-
 	protected function storiesRecommendations(\Base $f3, array $params)
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Recommendations') );

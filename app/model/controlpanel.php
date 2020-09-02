@@ -722,6 +722,46 @@ class Controlpanel extends Base {
 		}
 	}
 
+	public function collectionAdd(array $data) : int
+	{
+		$newCollection = new \DB\SQL\Mapper($this->db, $this->prefix."collections");
+		$newCollection->title	= $data['title'];
+		$newCollection->uid		= $_SESSION['userID'];
+		$newCollection->open	= 0;
+		$newCollection->status	= "H";
+		$newCollection->save();
+		
+		$newID = $newCollection->_id;
+		return $newID;
+	}
+	
+	public function collectionsList(int $page, array $sort, string $module, int $userid=0) : array
+	{
+		$limit = 20;
+		$pos = $page - 1;
+		
+		$sql = 	"SELECT SQL_CALC_FOUND_ROWS
+					Coll.collid, Coll.title, U.username,
+					COUNT(DISTINCT rCS.sid) as stories
+				FROM `tbl_collections`Coll
+					LEFT JOIN `tbl_collection_stories`rCS ON ( Coll.collid = rCS.collid )
+					LEFT JOIN `tbl_users`U ON ( Coll.uid = U.uid )
+				WHERE Coll.ordered = ".(int)($module!="collections").(($userid>0)?" AND Coll.uid = {$userid}":"")."
+				GROUP BY Coll.collid
+				ORDER BY {$sort['order']} {$sort['direction']}
+				LIMIT ".(max(0,$pos*$limit)).",".$limit;
+		
+		$data = $this->exec( $sql );
+
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/adminCP/stories/".(($module=="collections")?"collections":"series")."/order={$sort['link']},{$sort['direction']}",
+			$limit
+		);
+		
+		return $data;
+	}
+
 	public function collectionLoad(int $collid, int $userID=0)
 	{
 		// if not coming from the admin panel, restrict to self
@@ -784,7 +824,7 @@ class Controlpanel extends Base {
 		$where = ($userID) ? "AND Coll.uid = {$userID}" : "";
 
 		$sql = "SELECT Coll.collid, Coll.title, Coll.ordered,
-					GROUP_CONCAT(DISTINCT S.sid,',',S.title ORDER BY (rCS.inorder*Coll.ordered),S.title ASC SEPARATOR '||') as storyblock
+					GROUP_CONCAT(DISTINCT S.sid,',',S.title ORDER BY (rCS.inorder),S.title ASC SEPARATOR '||') as storyblock
 					FROM `tbl_collections`Coll
 						LEFT JOIN `tbl_collection_stories`rCS ON ( Coll.collid = rCS.collid )
 							LEFT JOIN `tbl_stories`S ON ( rCS.sid = S.sid )
@@ -928,6 +968,121 @@ class Controlpanel extends Base {
 		return $tmp;
 	}
 
-}
+	public function collectionSave(int $collid, array $data, int $userID=0)
+	{
+		$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collections');
+		$collection->load(array('collid=?',$collid));
 
+		$collection->copyfrom( 
+			[
+				"title"		=> $data['title'],
+				"ordered"	=> (isset($data['changetype'])) ? !$collection->ordered : $collection->ordered,
+				"summary"	=> $data['summary'],
+				"uid"		=> ($userID==0)?$data['maintainer']:$_SESSION['userID'],
+			]
+		);
+
+		$i  = $collection->changed("title");
+		$i += $collection->changed("summary");
+		
+		$collection->save();
+		
+		// update relation table
+		$this->collectionProperties( $collid, $data['author'], "A" );
+		$this->collectionProperties( $collid, $data['tag'], "T" );
+		$this->collectionProperties( $collid, $data['character'], "CH" );
+		$this->collectionProperties( $collid, $data['category'], "CA" );
+
+		$this->rebuildCollectionCache($collection->collid);
+		
+		// drop menu cache if type changed:
+		if(isset($data['changetype'])) \Cache::instance()->reset("menuUCPCountLib.{$_SESSION['userID']}");
+
+		return $i;
+	}
+	
+	private function collectionProperties( $collid, $data, $type )
+	{
+		// Check tags:
+		$data = explode(",",$data);
+		$relations = new \DB\SQL\Mapper($this->db, $this->prefix.'collection_properties');
+
+		foreach ( $relations->find(array('`collid` = ? AND `type` = ?',$collid,$type)) as $X )
+		{
+			if ( FALSE === $temp = array_search($X['relid'], $data) )
+			{
+				// Excess relation, drop from table
+				$relations->erase(['lid=?',$X['lid']]);
+			}
+			else unset($data[$temp]);
+		}
+		
+		// Insert any tag IDs not already present
+		if ( sizeof($data)>0 )
+		{
+			foreach ( $data as $temp )
+			{
+				if ( !empty($temp) )		// Fix adding empty entries
+				{
+					// Add relation to table
+					$relations->reset();
+					$relations->collid = $collid;
+					$relations->relid = $temp;
+					$relations->type = $type;
+					$relations->save();
+				}
+			}
+		}
+		unset($relations);
+	}
+	
+	public function collectionItemsAdd(int $collid, string $data, int $userID=0)
+	{
+		// make sure the user actuall owns this collection
+		if ( ($userID==0) OR  (1 == (new \DB\SQL\Mapper($this->db, $this->prefix."collections"))->count(['collid=? AND uid=?', $collid, $userID])) )
+		{
+			$items = explode(",",$data);
+			$newItem = new \DB\SQL\Mapper($this->db, $this->prefix."collection_stories");
+			$count = $newItem->count(array('collid=?',$collid));
+	  
+			foreach ( $items as $item )
+			{
+				if(is_numeric($item))
+				{
+					$newItem->reset();
+					$newItem->collid	= $collid;
+					$newItem->sid 		= $item;
+					$newItem->confirmed	= $item;
+					$newItem->inorder	= ++$count;
+					$newItem->save();
+				}
+			}
+		}
+		else
+		{
+			// Access violation *todo*
+			
+		}
+	}
+	
+	public function collectionAjaxItemsort(array $data, int $userID = 0)
+	{
+		// quietly drop out on user mismatch
+		if ( ($userID==0) OR  (1 == (new \DB\SQL\Mapper($this->db, $this->prefix."collections"))->count(['collid=? AND uid=?', $data['collectionsort'], $userID])) )
+		{
+			$stories = new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories');
+			foreach ( $data["neworder"] as $order => $id )
+			{
+				if ( is_numeric($order) && is_numeric($id) && is_numeric($data["collectionsort"]) )
+				{
+					$stories->load(array('collid = ? AND sid = ?', $data['collectionsort'], $id));
+					$stories->inorder = $order+1;
+					$stories->save();
+				}
+			}
+		}
+		exit;
+	}
+
+}
 ?>

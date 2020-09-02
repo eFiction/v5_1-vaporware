@@ -48,15 +48,14 @@ class UserCP extends Base
 		switch ( $params['module'] )
 		{
 			case "messaging":
-			case "curator":
 				$data = $this->model->ajax("messaging", $post);
 				break;
+			//case "curator":
 			case "stories":
-				//$data = $this->model->ajax("stories", $post, @$params['sub']);
 				$data = $this->model->ajax("stories", $post, $this->parametric($params['*']??""));
 				break;
-			case "chaptersort":
-				$data = $this->model->ajax("chaptersort", $post);
+			case "library":
+				$data = $this->model->ajax("library", $post);
 				break;
 		}
 
@@ -565,7 +564,7 @@ class UserCP extends Base
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_MyLibrary') );
 
-		$sub = [ "bookmark", "favourite", "recommendation" ];
+		$sub = [ "bookmark", "favourite", "recommendation", "series", "collections" ];
 		if ( !in_array(@$params[0], $sub) ) $params[0] = "";
 		
 		// delete function get's accompanied by a pseudo-post, this doesn't count here. Sorry dude
@@ -607,6 +606,10 @@ class UserCP extends Base
 				break;
 			case "recommendation":
 				$this->libraryRecommendations($f3, $params);
+				break;
+			case "series":
+			case "collections":
+				$this->libraryCollections($f3, $params);
 				break;
 			default:
 				$this->buffer ( "Empty page");
@@ -657,16 +660,11 @@ class UserCP extends Base
 			
 			$extra = [ "sub" => $params[0], "type" => $params[1] ];
 			
-			$this->buffer ( $this->template->libraryListBookFav($data, $sort, $extra) );
+			$this->buffer ( $this->template->libraryBookFavList($data, $sort, $extra) );
 		}
 	}
 	
-	private function libraryRecommendations(\Base $f3, $params)
-	{
-		
-	}
-	
-	private function libraryBookFavEdit(\Base $f3, array $params)//: void
+	private function libraryBookFavEdit(\Base $f3, array $params) : void
 	{
 		if ( FALSE !== $data = $this->model->loadBookFav($params) )
 		{
@@ -674,7 +672,102 @@ class UserCP extends Base
 		}
 	}
 	
-	public function messaging(\Base $f3, array $params)//: void
+	private function libraryCollections(\Base $f3, array $params) : void
+	{
+		if ( $params[0]=="collections" )
+		{
+			$this->response->addTitle( $f3->get('LN__AdminMenu_Collections') );
+			$f3->set('title_h3', $f3->get('LN__AdminMenu_Collections') );
+			$module = "collections";
+		}
+		else
+		{
+			$this->response->addTitle( $f3->get('LN__AdminMenu_Series') );
+			$f3->set('title_h3', $f3->get('LN__AdminMenu_Series') );
+			$module = "series";
+		}
+
+		if (isset($_POST['form_data']))
+		{
+			$this->model->collectionSave($params['id'], $f3->get('POST.form_data'), $_SESSION['userID'] );
+			if ( isset($_POST['form_data']['changetype']) )
+			{
+				$reroute = "/userCP/library/".$module;
+				foreach($params as $key => $param)
+				{
+					if ($key!="returnpath")
+						$reroute .= "/{$key}={$param}";
+				}
+				$f3->reroute($reroute,FALSE);
+				exit;
+			}
+		}
+		elseif (isset($_POST['new_data']))
+		{
+			$params['id'] = $this->model->collectionAdd($f3->get('POST.new_data') );
+		}
+		elseif (isset($_POST['story-add']))
+		{
+			$this->model->collectionItemsAdd($params['id'], $f3->get('POST.story-add'), $_SESSION['userID'] );
+		}
+
+
+		if( isset ($params['id']) )
+		{
+			if ( $params['id']=="new" )
+			{
+				$this->buffer( $this->template->libraryCollectionAdd($module) );
+				return;
+			}
+			// edit the elements of the collection/series
+			elseif ( isset ($params['items']) AND NULL !== $data = $this->model->collectionLoadItems($params['id']) )
+			{
+				$data['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
+				$this->buffer( $this->template->collectionItems($data, $module, @$params['returnpath']) );
+				return;
+			}
+			// edit the collection/series
+			elseif ( NULL !== $data = $this->model->collectionLoad($params['id'], $_SESSION['userID']) )
+			{
+				$data['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
+				$this->buffer( $this->template->collectionEdit($data, $this->model->storyEditPrePop($data), $module, @$params['returnpath']) );
+				return;
+			}
+			else $f3->set('form_error', "__failedLoad");
+		}
+
+		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
+
+		// search/browse
+		$allow_order = array (
+				"id"		=>	"Coll.collid",
+				"date"		=>	"date",
+				"title"		=>	"title",
+				"author"	=>	"author",
+		);
+
+		// sort order
+		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "id";
+		$sort["order"]		= $allow_order[$sort["link"]];
+		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
+
+		$this->buffer
+		(
+			$this->template->libraryCollectionsList
+			(
+				$this->model->collectionsList($page, $sort, $module, $_SESSION['userID']),
+				$sort,
+				$module
+			)
+		);
+	}
+
+	private function libraryRecommendations(\Base $f3, $params)
+	{
+		
+	}
+	
+	public function messaging(\Base $f3, array $params) : void
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Message') );
 		

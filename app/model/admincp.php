@@ -108,19 +108,6 @@ class AdminCP extends Controlpanel {
 				$bind = [ ":user" =>  "%{$data['userID']}%", ":uid" =>  $data['userID'] ];
 			}
 		}
-		elseif ( $key == "chaptersort" )
-		{
-			$chapters = new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
-			foreach ( $data["neworder"] as $order => $id )
-			{
-				if ( is_numeric($order) && is_numeric($id) && is_numeric($data["story"]) )
-				{
-					$chapters->load(array('chapid = ? AND sid = ?',$id, $data['story']));
-					$chapters->inorder = $order+1;
-					$chapters->save();
-				}
-			}
-		}
 		elseif ( $key == "ratingsort" )
 		{
 			$chapters = new \DB\SQL\Mapper($this->db, $this->prefix.'ratings');
@@ -135,19 +122,25 @@ class AdminCP extends Controlpanel {
 			}
 			exit;
 		}
-		elseif ( $key == "collectionsort" )
+		elseif ( $key == "storySort" )
 		{
-			$chapters = new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories');
-			foreach ( $data["neworder"] as $order => $id )
+			// unified
+			if(isset($data['collectionsort']))
+				$this->collectionAjaxItemsort($data);
+			
+			elseif(isset($data['chaptersort']))
 			{
-				if ( is_numeric($order) && is_numeric($id) && is_numeric($data["collection"]) )
+				$chapters = new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
+				foreach ( $data["neworder"] as $order => $id )
 				{
-					$chapters->load(array('collid = ? AND sid = ?', $data['collection'], $id));
-					$chapters->inorder = $order+1;
-					$chapters->save();
+					if ( is_numeric($order) && is_numeric($id) && is_numeric($data["chaptersort"]) )
+					{
+						$chapters->load(array('chapid = ? AND sid = ?',$id, $data['chaptersort']));
+						$chapters->inorder = $order+1;
+						$chapters->save();
+					}
 				}
 			}
-			exit;
 		}
 
 		if ( isset($ajax_sql) ) return $this->exec($ajax_sql, $bind);
@@ -1676,136 +1669,6 @@ class AdminCP extends Controlpanel {
 			return json_encode(explode(",",$data[0]['rating']));
 		else
 			return "[]";
-	}
-	
-	public function collectionAdd(array $data) : int
-	{
-		$newCollection = new \DB\SQL\Mapper($this->db, $this->prefix."collections");
-		$newCollection->title	= $data['title'];
-		$newCollection->uid		= $_SESSION['userID'];
-		$newCollection->open	= 0;
-		$newCollection->status	= "H";
-		$newCollection->save();
-		
-		$newID = $newCollection->_id;
-		return $newID;
-	}
-	
-	public function collectionsList(int $page, array $sort, string $module) : array
-	{
-		$limit = 20;
-		$pos = $page - 1;
-		
-		$sql = 	"SELECT SQL_CALC_FOUND_ROWS
-					Coll.collid, Coll.title, U.username,
-					COUNT(DISTINCT rCS.sid) as stories
-				FROM `tbl_collections`Coll
-					LEFT JOIN `tbl_collection_stories`rCS ON ( Coll.collid = rCS.collid )
-					LEFT JOIN `tbl_users`U ON ( Coll.uid = U.uid )
-				WHERE Coll.ordered = ".(int)($module!="collections")."
-				GROUP BY Coll.collid
-				ORDER BY {$sort['order']} {$sort['direction']}
-				LIMIT ".(max(0,$pos*$limit)).",".$limit;
-		
-		$data = $this->exec( $sql );
-
-		$this->paginate(
-			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
-			"/adminCP/stories/".(($module=="collections")?"collections":"series")."/order={$sort['link']},{$sort['direction']}",
-			$limit
-		);
-		
-		return $data;
-	}
-	
-	public function collectionSave(int $collid, array $data)
-	{
-		$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collections');
-		$collection->load(array('collid=?',$collid));
-
-		$collection->copyfrom( 
-			[
-				"title"		=> $data['title'],
-				"ordered"	=> (isset($data['changetype'])) ? !$collection->ordered : $collection->ordered,
-				"summary"	=> $data['summary'],
-				"uid"		=> $data['maintainer'],
-			]
-		);
-
-		$i  = $collection->changed("title");
-		$i += $collection->changed("summary");
-		
-		$collection->save();
-		
-		// update relation table
-		$this->collectionProperties( $collid, $data['author'], "A" );
-		$this->collectionProperties( $collid, $data['tag'], "T" );
-		$this->collectionProperties( $collid, $data['character'], "CH" );
-		$this->collectionProperties( $collid, $data['category'], "CA" );
-
-		$this->rebuildCollectionCache($collection->collid);
-
-		return $i;
-	}
-	
-	private function collectionProperties( $collid, $data, $type )
-	{
-		// Check tags:
-		$data = explode(",",$data);
-		$relations = new \DB\SQL\Mapper($this->db, $this->prefix.'collection_properties');
-
-		foreach ( $relations->find(array('`collid` = ? AND `type` = ?',$collid,$type)) as $X )
-		{
-			if ( FALSE === $temp = array_search($X['relid'], $data) )
-			{
-				// Excess relation, drop from table
-				$relations->erase(['lid=?',$X['lid']]);
-			}
-			else unset($data[$temp]);
-		}
-		
-		// Insert any tag IDs not already present
-		if ( sizeof($data)>0 )
-		{
-			foreach ( $data as $temp )
-			{
-				if ( !empty($temp) )		// Fix adding empty entries
-				{
-					// Add relation to table
-					$relations->reset();
-					$relations->collid = $collid;
-					$relations->relid = $temp;
-					$relations->type = $type;
-					$relations->save();
-				}
-			}
-		}
-		unset($relations);
-	}
-	
-	public function collectionItemsAdd(int $collid, string $data)
-	{
-		$items = explode(",",$data);
-		$newItem = new \DB\SQL\Mapper($this->db, $this->prefix."collection_stories");
-		$count = $newItem->count(array('collid=?',$collid));
-  
-													   
-	  
-   
-		
-		
-		foreach ( $items as $item )
-		{
-			if(is_numeric($item))
-			{
-				$newItem->reset();
-				$newItem->collid	= $collid;
-				$newItem->sid 		= $item;
-				$newItem->confirmed	= $item;
-				$newItem->inorder	= ++$count;
-				$newItem->save();
-			}
-		}
 	}
 	
 	public function storyAdd(array $data)

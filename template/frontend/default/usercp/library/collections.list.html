@@ -1,4 +1,4 @@
-<a href="{{@BASE}}/adminCP/stories/{{@module}}/id=new">*** Add new</a>
+<a href="{{@BASE}}/userCP/library/{{@module}}/id=new">*** Add new</a>
 
 <check if="{{sizeof(@data)}}">
 	<true>
@@ -8,7 +8,7 @@
 <thead>
 	<tr>
 		<th>&nbsp;</th>
-		<th><a href="{{@BASE}}/adminCP/stories/{{@module}}/order=id,
+		<th><a href="{{@BASE}}/userCP/library/{{@module}}/order=id,
 			<check if="{{ @sort['link']!='id' }}">
 				<true>asc">{ICON:sort}</true>
 				<false>
@@ -19,7 +19,7 @@
 				</false>
 			</check></a> {{@LN__Sort_ID}}
 		</th>
-		<th><a href="{{@BASE}}/adminCP/stories/{{@module}}/order=title,
+		<th><a href="{{@BASE}}/userCP/library/{{@module}}/order=title,
 			<check if="{{ @sort['link']!='title' }}">
 				<true>asc">{ICON:sort}</true>
 				<false>
@@ -38,7 +38,7 @@
 <tbody>
 	<repeat group="{{ @data }}" value="{{ @row }}">
 	<tr>
-		<td><a href="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @row['collid'] }};returnpath=/adminCP/stories/{{@module}}/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
+		<td><a href="{{@BASE}}/userCP/library/{{@module}}/id={{ @row['collid'] }};returnpath=/userCP/library/{{@module}}/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
 		<td>{{ @row.collid }}</td>
 		<td>{{ @row.title }}</td>
 		<td>{{ @row.username }}</td>

@@ -10,6 +10,16 @@ class UserCP extends Base
 		return $this->render('usercp/menu.html');
 	}
 	
+	public function upperMenu(array $menu, $counter, $path, $sub)
+	{
+		$this->f3->set('menu_upper', $menu);
+		$this->f3->set('counter', $counter);
+		$this->f3->set('sub', $sub);
+		$this->f3->set('path', $path);
+
+		return $this->render('usercp/menu.upper.html');
+	}
+	
 	public function start ()
 	{
 		return $this->render('usercp/start.html');
@@ -148,6 +158,16 @@ class UserCP extends Base
 		return $this->render('usercp/shoutbox.list.html');
 	}
 	
+	public function libraryBookFavList(array $data, array $sort, array $extra)
+	{
+		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+
+		$this->f3->set('libraryEntries', $data);
+		$this->f3->set('sort', $sort);
+		$this->f3->set('extra', $extra);
+		return $this->render('usercp/library/bookFavList.html');
+	}
+	
 	public function libraryBookFavEdit($data, $params)
 	{
 		$this->f3->set('data', $data);
@@ -155,29 +175,55 @@ class UserCP extends Base
 		$this->f3->set('returnpath', $params['returnpath']);
 		$this->f3->set('saveError', @$params['error']);
 		
-		return $this->render('usercp/library.editBookFav.html');
+		return $this->render('usercp/library/bookFavEdit.html');
 	}
 	
-	public function libraryListBookFav(array $data, array $sort, array $extra)
+	public function libraryCollectionAdd (string $module, string $returnpath="") : string
 	{
-		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+		$this->f3->set('module', 	$module);
+		$this->f3->set('returnpath', $returnpath);
 
-		$this->f3->set('libraryEntries', $data);
+		return $this->render('usercp/library/collection.add.html');
+	}
+
+	public function libraryCollectionsList(array $data, array $sort, string $module) : string
+	{
+		//while ( list($key, $value) = each($data) )
+		foreach ( $data as $key => $value )
+			$this->dataProcess($data[$key], $key);
+
+		$this->f3->set('data', 		$data);
+		$this->f3->set('module', 	$module);
 		$this->f3->set('sort', $sort);
-		$this->f3->set('extra', $extra);
-		return $this->render('usercp/library.html');
+		
+		return $this->render('usercp/library/collections.list.html');
 	}
-	
-	public function upperMenu(array $menu, $counter, $path, $sub)
-	{
-		$this->f3->set('menu_upper', $menu);
-		$this->f3->set('counter', $counter);
-		$this->f3->set('sub', $sub);
-		$this->f3->set('path', $path);
 
-		return $this->render('usercp/menu.upper.html');
+	public function collectionEdit(array $data, array $prePop, string $module, string $returnpath="" ) : string
+	{
+		if($data['editor']=="visual" AND $this->config['advanced_editor']==TRUE )
+		{
+			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
+			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
+		}
+		$this->dataProcess($data);
+		$this->f3->set('module', 	$module);
+		$this->f3->set('prePop', 	$prePop);
+		$this->f3->set('data', 		$data);
+		$this->f3->set('returnpath', $returnpath);
+
+		return $this->render('usercp/library/collection.edit.html');
 	}
-	
+
+	public function collectionItems(array $data, string $module, string $returnpath="" ) : string
+	{
+		$this->f3->set('data', 			$data);
+		$this->f3->set('module', 		$module);
+		$this->f3->set('returnpath',	$returnpath);
+
+		return $this->render('usercp/library/collection.items.html');
+	}
+
 	public function feedbackHome(array $data)
 	{
 		$this->javascript( 'head', TRUE, "piechart.js" );

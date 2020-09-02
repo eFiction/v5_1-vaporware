@@ -1,0 +1,260 @@
+{* provide a return link if a path exists *}
+<div class="columns">
+	<div class="column">
+		<check if="{{!empty(@returnpath)}}">{ICON:arrow-left} <a href="{{@BASE}}{{@returnpath}}">{{@LN__Return}}</a></check>&nbsp;
+	</div>
+	<div class="column">
+		<a href="{{@BASE}}/userCP/library/{{@module}}/id={{ @data['collid'] }}/items/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">{@LN*__EditStories}</a> {ICON:arrow-right}
+	</div>
+</div>
+
+<!-- error notification -->
+<check if="{{ isset(@form_error) }}">
+	<div class="notification is-warning">
+		<button class="delete"></button>
+		{{ @form_error }}
+	</div>
+</check>
+<!-- END: error notification -->
+<!-- success notification -->
+<check if="{{ isset(@form_changes) }}">
+	<div class="notification is-success">
+		<button class="delete"></button>
+		{{ @LN__Changes_saved }}
+	</div>
+</check>
+<!-- END: success notification -->
+
+<h2><check if="{{@data.ordered==1}}"><true>{{@LN__Series}}</true><false>{@LN_Collection}</false></check></h2>
+<form action="{{@BASE}}/userCP/library/{{@module}}/id={{ @data['collid'] }}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
+<div class="field is-horizontal">
+  <div class="field-label is-normal">
+    <label class="label">{{@LN__Title}}</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <div class="control">
+        <input class="input" type="text" name="form_data[title]" value="{{ @data['title'] }}" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__Authors}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<input class="input" type="text" id="author-select" name="form_data[author]" />
+		</div></div>
+	</div>
+</div>
+
+<check if="{{ sizeof(@data.unused.authors) }}">
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__usedInStories}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<div class="buttons are-small"><repeat group="{{ @data.unused.authors }}" value="{{ @unusedAuthors }}">
+				<a class="button">{{ @unusedAuthors.name }} ({{ @unusedAuthors.counted }}x)</a>
+			</repeat>
+			</div>
+		</div></div>
+	</div>
+</div>
+</check>
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__Categories}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<input class="input" type="text" id="category-select" name="form_data[category]" />
+		</div></div>
+	</div>
+</div>
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__Tags}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<input class="input" type="text" id="tag-select" name="form_data[tag]" />
+		</div></div>
+	</div>
+</div>
+
+<check if="{{ sizeof(@data.unused.tags) }}">
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__usedInStories}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<div class="buttons are-small"><repeat group="{{ @data.unused.tags }}" value="{{ @unusedTag }}">
+				<a class="button">{{ @unusedTag.name }} ({{ @unusedTag.counted }}x)</a>
+			</repeat>
+			</div>
+		</div></div>
+	</div>
+</div>
+</check>
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__Characters}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<input class="input" type="text" id="character-select" name="form_data[character]" />
+		</div></div>
+	</div>
+</div>
+
+<check if="{{ sizeof(@data.unused.characters) }}">
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__usedInStories}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+{*			<input class="input" type="text" id="character-unused" />	*}
+			<div class="buttons are-small"><repeat group="{{ @data.unused.characters }}" value="{{ @unusedCharacters }}">
+				<a class="button">{{ @unusedCharacters.name }} ({{ @unusedCharacters.counted }}x)</a>	
+			</repeat>
+			</div>
+		</div></div>
+	</div>
+</div>
+</check>
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__Visibility}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<div class="select">
+				<select name="form_data[status]">
+					<repeat group="{{ @data.states }}" value="{{ @status }}">
+						<option value="{{ @status }}"<check if="{{ @status==@data.status }}"> selected="selected"</check>>{{ ${"LN__CollectionStatus_".@status} }}</option>
+					</repeat>
+				</select>
+			</div>
+		</div></div>
+	</div>
+</div>
+
+<check if="\Config::getPublic('advanced_editor') == TRUE ">
+<div class="field is-horizontal">
+	<div class="field-label is-normal"></div>
+	<div class="field-body">
+		<div class="field">
+			<check if="{{@data.editor=='visual'}}">
+				<true> <a href="{{@BASE}}/userCP/library/series/id={{@data.collid}}/editor=plain<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">{{@LN__SwitchPlainHTML}}</a></true>
+				<false> <a href="{{@BASE}}/userCP/library/series/id={{@data.collid}}/editor=visual<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">{{@LN__SwitchVisual}}</a></false>
+			</check>
+		</div>
+	</div>
+</div>
+</check>
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__Description}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<textarea class="textarea" name="form_data[summary]" id="tinymce" rows="10" cols="80">{{ @data.summary | raw }}</textarea>
+		</div></div>
+	</div>
+</div>
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{@LN__Convert}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<input type="checkbox" name="form_data[changetype]" />
+			<check if="{{ @data.ordered==1 }}">
+				<true>
+					{@*LN__makeCollection}
+				</true>
+				<false>
+					{@*LN__makeSeries}
+				</false>
+			</check>
+		</div></div>
+	</div>
+</div>
+
+<div class="field is-horizontal">
+	<div class="field-label">&nbsp;</div>
+	<div class="field-body">
+		<div class="field is-grouped">
+			<p class="control">
+				<a class="button is-danger" href="{{@BASE}}/userCP/library/series/id={{@data.collid}}">
+					<span class="icon">{ICON:remove}</span>
+					<span>{{@LN__Delete}}</span>
+				</a>
+			</p>				
+			<p class="control">
+				<button class="button is-primary" type="submit">
+					<span class="icon">{ICON:save}</span>
+					<span>{{@LN__Submit}}</span>
+				</button>
+			</p>
+			<p class="control">
+				<button class="button is-light" type="reset">
+					<span class="icon"><i class="fas fa-undo-alt"></i></span>
+					<span>{{@LN__Reset}}</span>
+				</button>
+			</p>
+		</div>
+	</div>
+</div>
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#category-select").tokenInput("{{$BASE}}/userCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "category",
+    	preventDuplicates: true,
+    	prePopulate: {{@data.categoryblock | raw}}
+    });
+});
+
+$(document).ready(function() {
+    $("#author-select").tokenInput("{{$BASE}}/userCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "author",
+		minChars: 0,
+    	preventDuplicates: true,
+    	prePopulate: {{@data.authorblock | raw}}
+    });
+});
+
+$(document).ready(function() {
+    $("#tag-select").tokenInput("{{$BASE}}/userCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "tag",
+    	preventDuplicates: true,
+    	prePopulate: {{@data.tagblock | raw}}
+    });
+});
+
+$(document).ready(function() {
+    $("#character-select").tokenInput("{{$BASE}}/userCP/ajax/stories/editMeta",{
+	{*
+		save for later
+                onDelete: function (item) {
+					$("#character-unused").tokenInput("add", {id: item.id, name: item.name});
+                },
+	*}
+    	method: "post",
+    	queryParam: "character",
+    	preventDuplicates: true,
+    	prePopulate: {{@data.characterblock | raw}}
+    });
+});
+
+{*
+$(document).ready(function() {
+    $("#character-unused").tokenInput("{{$BASE}}/userCP/ajax/stories/editMeta",{
+                onDelete: function (item) {
+					$("#character-select").tokenInput("add", {id: item.id, name: item.name});
+                },
+    	method: "post",
+    	queryParam: "character",
+    	preventDuplicates: true,
+    	prePopulate: {{@data.unused.characters | raw}}
+    });
+});
+*}
+
+</script>

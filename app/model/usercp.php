@@ -667,7 +667,7 @@ class UserCP extends Controlpanel
 	public function ajax($key, $data, $limitation=NULL)
 	{
 		$bind = NULL;
-		
+
 		if ( $key == "messaging" )
 		{
 			if(isset($data['namestring']))
@@ -760,6 +760,13 @@ class UserCP extends Controlpanel
 						}
 					}
 				}
+			}
+		}
+		elseif ( $key == "library" )
+		{
+			if(isset($data['collectionsort']))
+			{
+				$this->collectionAjaxItemsort($data, $_SESSION['userID']);
 			}
 		}
 
