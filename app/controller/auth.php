@@ -57,6 +57,9 @@ class Auth extends Base {
 			$_SESSION = array_merge (
 				$_SESSION,
 				[
+					'preferences'		=>	$session_preferences,
+				],
+				[
 					'groups' 			=> 	$user['groups'],
 					'username'			=> 	$user['username'],
 					'mail'				=> 	[ 
@@ -66,9 +69,6 @@ class Auth extends Base {
 					'allowed_authors'	=> 	explode(",",$user['allowed_authors']),
 					'preferences'		=> 	$user['preferences'],
 					//'tpl'				=> 	[ "default", 1],
-				],
-				[
-					'preferences'		=>	$session_preferences,
 				]
 			);
 
@@ -79,6 +79,9 @@ class Auth extends Base {
 			$_SESSION = array_merge (
 				$_SESSION,
 				[
+					'preferences'		=>	$session_preferences,
+				],
+				[
 					'groups' 			=> 	$user['groups'],
 					'username'			=> 	$user['username'],
 					'mail'				=> 	[ 
@@ -88,12 +91,8 @@ class Auth extends Base {
 					'allowed_authors'	=> 	explode(",",$user['allowed_authors']),
 					'preferences'		=> 	$user['preferences'],
 					//'tpl'				=> 	[ "default", 1],
-				],
-				[
-					'preferences'		=>	$session_preferences,
 				]
 			);
-
 			return TRUE;
 		}
 		else

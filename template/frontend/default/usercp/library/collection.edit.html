@@ -12,10 +12,11 @@
 <check if="{{ isset(@delete_error) }}">
 	<div class="notification is-danger">
 		<button class="delete"></button>
-		**LN__DeleteError
+		{{ @LN__FailedDelete }}
 	</div>
 </check>
-<!-- END: success notification --><!-- success notification + -->
+<!-- END: error notification -->
+<!-- success notification + -->
 <check if="{{ isset(@save_success) }}">
 	<div class="notification is-success">
 		<button class="delete"></button>

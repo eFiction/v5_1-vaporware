@@ -1385,7 +1385,12 @@ class UserCP extends Controlpanel
 											"layout"		=> $data['p']['layout'],
 											"hideTags"		=> @$data['p']['hideTags'],
 										]);
+		$i = $mapper->changed();
+
 		$mapper->save();
+
+		$_SESSION['preferences']['language'] = $data['p']['language'];
+		return $i;
 	}
 
 }

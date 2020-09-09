@@ -161,7 +161,6 @@ class Auth extends Base
 // IF(admin,IF(TIMESTAMPDIFF(MINUTE,`admin`,NOW())<15,1,0),0) as admin_active, 
 
 		$user = $this->exec($sql)[0];
-
 		if ( $user['session'] > '' && $user['userID'] > 0 )
 		{
 			$_SESSION['userID']	= $user['userID'];
@@ -185,6 +184,7 @@ class Auth extends Base
 			}
 
 			$user['preferences'] = json_decode($user['preferences'],TRUE);
+
 			// Check if language is available
 			$user['preferences']['language'] = ( FALSE===$this->f3->get('CONFIG.language_forced') AND array_key_exists($user['preferences']['language'], $this->f3->get('CONFIG.language_available' )) )
 									? $user['preferences']['language']

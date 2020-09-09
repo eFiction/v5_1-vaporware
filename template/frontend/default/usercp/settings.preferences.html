@@ -1,3 +1,12 @@
+<!-- success notification + -->
+<check if="{{ isset(@save_success) }}">
+	<div class="notification is-success">
+		<button class="delete"></button>
+		{{ @LN__Changes_saved }}
+	</div>
+</check>
+<!-- END: success notification -->
+
 <form class="form-horizontal" method="post" action="{{@BASE}}/userCP/settings/preferences">
 	<fieldset>
 	<legend>{{@LN__UCP_Pref_Alerts}}</legend>

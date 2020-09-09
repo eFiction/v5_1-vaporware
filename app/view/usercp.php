@@ -3,6 +3,17 @@ namespace View;
 
 class UserCP extends Base
 {
+	public function __construct()
+	{
+		parent::__construct();
+
+		if( isset($_SESSION['lastAction']) )
+		{
+			foreach( $_SESSION['lastAction'] as $key => $value )
+				$this->f3->set($key,$value);
+			unset($_SESSION['lastAction']);
+		}
+	}
 
 	public function showMenu(array $menu=[]): string
 	{
@@ -34,13 +45,6 @@ class UserCP extends Base
 	public function authorStoryList(array $data, array $sort, array $params)
 	{
 		//\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
-
-		if( isset($_SESSION['lastAction']) )
-		{
-			foreach( $_SESSION['lastAction'] as $key => $value )
-				$this->f3->set($key,$value);
-			unset($_SESSION['lastAction']);
-		}
 
 		$this->f3->set('storyEntries', $data);
 		$this->f3->set('sort', $sort);
@@ -180,13 +184,6 @@ class UserCP extends Base
 	
 	public function libraryCollectionsList(array $data, array $sort, string $module) : string
 	{
-		if( isset($_SESSION['lastAction']) )
-		{
-			foreach( $_SESSION['lastAction'] as $key => $value )
-				$this->f3->set($key,$value);
-			unset($_SESSION['lastAction']);
-		}
-
 		foreach ( $data as $key => $value )
 			$this->dataProcess($data[$key], $key);
 
@@ -199,13 +196,6 @@ class UserCP extends Base
 
 	public function collectionEdit(array $data, array $prePop, string $module, string $returnpath="" ) : string
 	{
-		if( isset($_SESSION['lastAction']) )
-		{
-			foreach( $_SESSION['lastAction'] as $key => $value )
-				$this->f3->set($key,$value);
-			unset($_SESSION['lastAction']);
-		}
-
 		if($data['editor']=="visual" AND $this->config['advanced_editor']==TRUE )
 		{
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );

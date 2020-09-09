@@ -523,12 +523,11 @@ class UserCP extends Base
 	{
 		if( NULL != $post = $f3->get('POST') )
 		{
-			$this->model->settingsSavePreferences($post['form']);
+			if ( 0 < $i = $this->model->settingsSavePreferences($post['form']) )
+				$_SESSION['lastAction']['save_success'] = $i;
 			// At this point, the view is already set up.
 			// We need to reload the page or the user may think that changes did not apply
-			print_r($_SESSION);print_r($post);exit;
-			if ( $_SESSION['preferences']['layout'] != $post['form']['p']['layout'] OR $_SESSION['preferences']['language'] != $post['form']['p']['language'] )
-				$f3->reroute("/userCP/settings/preferences", false);
+			$f3->reroute("/userCP/settings/preferences", false);
 		}
 		$preferences = $this->model->settingsLoadPreferences();
 		
