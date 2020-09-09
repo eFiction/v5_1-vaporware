@@ -1201,7 +1201,7 @@ class AdminCP extends Controlpanel {
 	public function logGetCount()
 	{
 		$count = [];
-		$countSQL = "SELECT L.type, COUNT(L.id) as items FROM `tbl_log`L @WHERE@ GROUP BY L.type;";
+		$countSQL = "SELECT IF(L.type='','X',L.type)as type, COUNT(L.id) as items FROM `tbl_log`L @WHERE@ GROUP BY L.type;";
 		$data = $this->exec(str_replace("@WHERE@","",$countSQL));
 		if ( sizeof($data) )
 		{
@@ -1221,7 +1221,7 @@ class AdminCP extends Controlpanel {
 	{
 		$limit = 50;
 		$pos = $page - 1;
-
+		// view: v_ACPlogData *todo*
 		$sql = "SELECT SQL_CALC_FOUND_ROWS U.uid, U.username, 
 					L.uid as uid_reg, L.id, L.action, L.ip, UNIX_TIMESTAMP(L.timestamp) as timestamp, L.type, L.subtype, L.version, L.new
 				FROM `tbl_log`L LEFT JOIN `tbl_users`U ON L.uid=U.uid ";

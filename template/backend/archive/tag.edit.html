@@ -16,6 +16,9 @@
 </check>
 <!-- END: success notification -->
 
+<div class="columns">
+<div class="column is-half">
+
 <form action="{{@BASE}}/adminCP/archive/tags/edit/id={{ @data['id'] }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
 
 <div class="field is-horizontal">
@@ -58,7 +61,7 @@
 			<div class="control">
 				<div class="field is-grouped">
 					<p class="control">
-						<button class="button is-primary" type="submit">
+						<button class="button is-success" type="submit">
 							<span class="icon">{ICON:save}</span>
 							<span>{{@LN__Submit}}</span>
 						</button>
@@ -75,3 +78,5 @@
 	</div>
 </div>
 </form>
+
+</div></div>

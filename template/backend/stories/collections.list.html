@@ -1,4 +1,50 @@
-<a href="{{@BASE}}/adminCP/stories/{{@module}}/id=new">*** Add new</a>
+<div class="box">
+	<form action="{{@BASE}}/adminCP/stories/{{@module}}/id=newreturnpath=/adminCP/stories/{{@module}}/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}" method="post">
+		<div class="field is-horizontal">
+		  <div class="field-label is-normal">
+			<label class="label">{{@LN__Title}}</label>
+		  </div>
+		  <div class="field-body">
+			<div class="field">
+			  <div class="control">
+				<input class="input" type="text" name="new_data[title]" />
+			  </div>
+			</div>
+		  </div>
+		</div>
+
+		<div class="field is-horizontal">
+			<div class="field-label is-normal">&nbsp;</div>
+			<div class="field-body">
+				<div class="field"><div class="control">
+					{@*LN_collectionTypeSelect}:<br/>
+					<label class="radio">
+						<input type="radio" <check if="{{ @module=='series' }}">checked="checked"</check> name="new_data[ordered]" value="1">
+						{@*LN_collectionTypeSeries} <a class="tooltip is-tooltip-multiline" data-tooltip="Info: {@*LN_ExplainSeries}.">{ICON:info}</a>
+					</label><br/>
+					<label class="radio">
+						<input type="radio" <check if="{{ @module=='collections' }}">checked="checked"</check> name="new_data[ordered]" value="0">
+						{@*LN_collectionTypeCollection} <a class="tooltip is-tooltip-multiline" data-tooltip="Info: {@*LN_ExplainCollection}.">{ICON:info}</a>
+					</label>
+				</div></div>
+			</div>
+		</div>
+
+		<div class="field is-horizontal">
+			<div class="field-label">&nbsp;</div>
+			<div class="field-body">
+				<div class="field is-grouped">
+					<p class="control">
+						<button class="button is-primary" type="submit">
+							<span class="icon"><i class="fas fa-save"></i></span>
+							<span>{{@LN__Submit}}</span>
+						</button>
+					</p>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
 
 <check if="{{sizeof(@data)}}">
 	<true>
@@ -7,6 +53,7 @@
 <table class="table is-striped is-hoverable is-fullwidth">
 <thead>
 	<tr>
+		<th>&nbsp;</th>
 		<th>&nbsp;</th>
 		<th><a href="{{@BASE}}/adminCP/stories/{{@module}}/order=id,
 			<check if="{{ @sort['link']!='id' }}">
@@ -39,6 +86,7 @@
 	<repeat group="{{ @data }}" value="{{ @row }}">
 	<tr>
 		<td><a href="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @row['collid'] }};returnpath=/adminCP/stories/{{@module}}/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
+		<td><a href="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @row['collid'] }}/items;returnpath=/adminCP/stories/{{@module}}/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:list}</a></td>
 		<td>{{ @row.collid }}</td>
 		<td>{{ @row.title }}</td>
 		<td>{{ @row.username }}</td>

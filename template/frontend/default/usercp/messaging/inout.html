@@ -20,6 +20,11 @@
 		</case>
 	</switch>
 </check>
+<article class="message is-info">
+  <div class="message-body">
+    You have <a href="{{ @BASE }}/userCP/messaging/inbox">{{ @SESSION['mail'][1] }} {{@LN__PM_unread}}</a> messages in your inbox.
+  </div>
+</article>
 <fieldset>
 	<legend>{{ ${"LN__PM_".@WHICH} }}</legend>
 	<table class="pm-box" width="100%">
@@ -51,7 +56,7 @@
 			<td>{{ date(@CONFIG.date_format,@pm_line.date_sent) }}</td>
 			<td><a href="{{@BASE}}/userCP/messaging/read/id={{ @pm_line.mid }}">{{ @pm_line.subject }}</a></td>
 			<td><check if="{{ @pm_line.date_read!==NULL }}">
-				<true><a href="{{@BASE}}/member/{{ @pm_line.name }}">{{ @pm_line.name }}</a></true>
+				<true><a href="{{@BASE}}/members/{{ @pm_line.name }}">{{ @pm_line.name }}</a></true>
 				<false>{{ @pm_line.name }}</false>
 			</check></td>
 			{* check if mail can be revoked (inbox always, outbox only if not read by recipient *}

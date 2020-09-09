@@ -1,3 +1,19 @@
+<check if="{{ isset(@error.closed) }}">
+<true>
+	<section class="hero is-medium is-warning is-bold">
+	  <div class="hero-body">
+		<div class="container">
+		  <p class="title is-1 is-spaced">
+			**Registration is currently closed
+		  </h1>
+		  <p class="subtitle is-3">
+			**Sorry
+		  </h2>
+		</div>
+	  </div>
+	</section>
+</true>
+<false>
 <check if="{{isset(@registered)}}">
 <true>
 	<switch expr="{{ @registered }}">
@@ -20,50 +36,92 @@
 	</switch>
 </true>
 <false>
+
 <form method="post" action="{{@BASE}}/register">
-	<fieldset>
-		<legend>{{@LN__Registration}}</legend>
-		<div class="grid-wrapper">
-				<div class="gb-full">{PAGE:tos}</div>
+<h2>{{@LN__Registration}}</h2>
+		<div class="container">
+				<div class="column">{PAGE:tos}</div>
 				<check if="{{ isset(@error.accept) }}">
-					<div class="grid-wrapper"><div class="note alert-box error">{{ @LN__Reg_AcceptTOS_Error }}</div></div>
+					<div class="column">
+						<div class="notification is-warning"><button class="delete"></button>{{ @LN__Reg_AcceptTOS_Error }}</div>
+					</div>
 				</check>
-				<div class="gb-full"><input class="field input" type="checkbox" name="form[accept]" <check if="{{ isset(@_POST.form.accept) }}">checked="checked" </check>/>  {{ @LN__Reg_AcceptTOS }}</div>
+				<div class="column">
+				<label class="checkbox">
+					<input type="checkbox" name="form[accept]" <check if="{{ isset(@_POST.form.accept) }}">checked="checked" </check>/>  {{ @LN__Reg_AcceptTOS }}
+				</label>
+				</div>
+				
+<hr />
 			<check if="{{ isset(@error.login) }}">
-				<div class="grid-wrapper"><div class="note alert-box
-					<check if="{{ @error.login == 'missing' }}"> error">{{ @LN__Reg_UsernameEmpty }}</check>
-					<check if="{{ @error.login == 'taken' }}"> warning">{{ @LN__Reg_UsernameTaken }}</check>
-					<check if="{{ @error.login == 'member' }}"> info">{{ @LN__Reg_AlreadyMember }}</check>
-				</div></div>
+				<div class="notification 
+					<check if="{{ @error.login == 'missing' }}"> is-danger">{{ @LN__Reg_UsernameEmpty }}</check>
+					<check if="{{ @error.login == 'taken' }}"> is-warning">{{ @LN__Reg_UsernameTaken }}</check>
+					<check if="{{ @error.login == 'member' }}"> is-info">{{ @LN__Reg_AlreadyMember }}</check>
+					<button class="delete"></button>
+				</div>
 			</check>
-			<div class="gb-1qrt">{{@LN__Username}}</div><div class="gb-3qrt"><input class="half" type="text" name="form[login]" value="{{ @@data['login'] }}"></div>
+			<div class="field">
+				<label class="label">{{@LN__Username}}</label>
+				<div class="control">
+					<input class="input" type="text" name="form[login]" value="{{ @@data['login'] }}">
+				</div>
+			</div>
+
 			<check if="{{ isset(@error.email) }}">
-				<div class="grid-wrapper"><div class="note alert-box
-					<check if="{{ @error.email == 'missing' }}"> error">{{ @LN__Reg_EmailEmpty }}</check>
-					<check if="{{ @error.email == 'taken' }}"> warning">{{ @LN__Reg_EmailTaken }}</check>
-				</div></div>
+				<div class="notification
+					<check if="{{ @error.email == 'missing' }}"> is-danger">{{ @LN__Reg_EmailEmpty }}</check>
+					<check if="{{ @error.email == 'taken' }}"> is-warning">{{ @LN__Reg_EmailTaken }}</check>
+				</div>
 			</check>
-			<div class="gb-1qrt">{{@LN__Email}}</div><div class="gb-3qrt"><input class="half" type="text" name="form[email]" value="{{ @@data['email'] }}"></div>
+			<div class="field">
+				<label class="label">{{@LN__Email}}</label>
+				<div class="control">
+					<input class="input" type="text" name="form[email]" value="{{ @@data['email'] }}">
+				</div>
+			</div>
 			<check if="{{ isset(@error.password) }}">
-				<div class="grid-wrapper"><div class="note alert-box error">
+				<div class="notification is-warning">
 					<check if="{{ @error.password == 'missing' }}">{{ @LN__Reg_PasswordTwice }}!</check>
 					<check if="{{ @error.password == 'mismatch' }}">{{ @LN__Reg_PasswordMismatch }}</check>
 					<check if="{{ @error.password == 'criteria' }}">
-						{{ @LN__Reg_PasswordCriteria }}:<br/>
-						- {{ \CONFIG::getPublic('reg_min_password') }} __characters<br/>
+						{{ @LN__Reg_PasswordCriteria }}:<br />
+						- {{ \CONFIG::getPublic('reg_min_password') }} __characters<br />
 						<check if="{{ 1 < \CONFIG::getPublic('reg_password_complexity') }}">
 							- {{ \CONFIG::getPublic('reg_password_complexity') }} __complex
 						</check>
 					</check>
-				</div></div>
+				</div>
 			</check>
-			<div class="gb-1qrt">{{@LN__Password}}</div><div class="gb-3qrt"><input class="half" type="password" name="form[password1]" value=""></div>
-			<div class="gb-1qrt">{{@LN__Reg_PasswordRepeat}}</div><div class="gb-3qrt"><input class="half" type="password" name="form[password2]" value=""></div>
-			<div class="gb-1qrt"><div class="captchaBox">&nbsp;**cap**</div></div><div class="gb-3qrt"><input type="text" name="write[captcha]" class="half" placeholder="captcha" value=""></div>
-			<div class="gb-full"><input class="button" type="submit" value="{{@LN__RegisterNow}}"></div>
-		</div>
-	</fieldset>
+
+<div class="field">
+  <label class="label">{{@LN__Password}}</label>
+  <div class="control">
+    <input class="input" type="password" placeholder="Password" name="form[password1]">
+  </div>
+</div>
+
+<div class="field">
+  <label class="label">{{@LN__Reg_PasswordRepeat}}</label>
+  <div class="control">
+    <input class="input" type="password" placeholder="Repeat password" name="form[password2]">
+  </div>
+</div>
+
+			<check if="{{ isset(@error.captcha) }}">
+				<div class="notification is-warning">{{ @LN__Reg_CaptchaMismatch }}</div>
+			</check>
+<div class="field">
+  <label class="label"><div class="captchaBox">&nbsp;**cap**</div></label>
+  <div class="control">
+    <input class="input" type="password" placeholder="Captcha" name="form[captcha]">
+  </div>
+</div>
+
+<input class="button" type="submit" value="{{@LN__RegisterNow}}">
+</div>
 </form>
+
 <script type="text/javascript">
 $( document ).ready(function() {
 	getCaptchaImage();
@@ -71,5 +129,7 @@ $( document ).ready(function() {
 	$('.captchaBox').click(getCaptchaImage);
 });
 </script>
+</false>
+</check>
 </false>
 </check>

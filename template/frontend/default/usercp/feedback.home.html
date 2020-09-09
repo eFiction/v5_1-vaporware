@@ -1,12 +1,42 @@
 <check if="{{@stats.stories>0}}">
-<div class="grid-wrapper">
-	<div class="gb-full">
+<div class="columns">
+	<div class="column is-full">
 		{{@LN__Welcome}} {{@_SESSION['username']}}<br />
 		{{@LN__FB_Stats}}:
 	</div>
 </div>
-<div class="grid-wrapper">
-	<div class="gb-half">
+<div class="column">
+	<div class="column">
+		<nav class="level">
+		<div class="level-item has-text-centered">
+			<div>
+			<p class="heading">Reviews received</p>
+			<p class="title">3,456</p>
+			</div>
+		</div>
+		<div class="level-item has-text-centered">
+			<div>
+			<p class="heading">Reviews written</p>
+			<p class="title">123</p>
+			</div>
+		</div>
+		<div class="level-item has-text-centered">
+			<div>
+			<p class="heading">Comments received</p>
+			<p class="title">456K</p>
+			</div>
+		</div>
+		<div class="level-item has-text-centered">
+			<div>
+			<p class="heading">Comments written</p>
+			<p class="title">789</p>
+			</div>
+		</div>
+		</nav>
+	</div>
+</div>
+<div class="columns">
+	<div class="column">
 		<h3>{{@LN__FB_ReviewRatio}}</h3>
 		<canvas id="chart1" width="200" height="200" style="float: left;">
 			This would have shown a pie chart of the ratio of reviewed stories.
@@ -17,13 +47,13 @@
 		{{ @LN__FB_ReviewsPerStory, @stats.reviewsPerStoryTotal | format }}<br/>
 		({{ @LN__FB_orReviewsPerChapter, @stats.reviewsPerChapter | format }})</div>
 	</div>
-	<div class="gb-half">
+	<div class="column">
 	<h3>"more"</h3>
 	</div>
-	<div class="gb-half">
+	<div class="column">
 	<h3>"to"</h3>
 	</div>
-	<div class="gb-half">
+	<div class="column">
 	<h3>"come"</h3>
 	</div>
 </div>

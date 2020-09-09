@@ -7,6 +7,7 @@ class Auth extends Base {
 	{
 		$this->model = \Model\Auth::instance();
 		$this->config = \Base::instance()->get('CONFIG');
+		$this->template = new \View\Auth();
 		
 		\Base::instance()->set('AUTHPAGE', TRUE);
 	}
@@ -116,7 +117,7 @@ class Auth extends Base {
 	
 	public function login(\Base $f3, array $params)//: void
 	{
-		if ( isset($params['*']) ) $params = ($this->parametric($params['*']));  // 3.6
+		if ( isset($params['*']) ) $params = ($this->parametric($params['*']));
 		\Registry::get('VIEW')->addTitle( $f3->get('LN__Login') );
 
 		if( $f3->exists('POST.login') && $f3->exists('POST.password') )
@@ -126,7 +127,7 @@ class Auth extends Base {
 				$f3->reroute($f3->get('POST')['returnpath'], false);
 				exit;
 			}
-			$this->buffer( \View\Auth::loginError($f3) );
+			$this->buffer( $this->template->loginForm($f3) );
 		}
 		elseif( ($f3->exists('POST.username') OR $f3->exists('POST.email')) AND $f3->get('POST.username').$f3->get('POST.email')>"" )
 		{
@@ -151,7 +152,7 @@ class Auth extends Base {
 		}
 
 		else
-			$this->buffer( \View\Auth::loginError($f3) );
+			$this->buffer( $this->template->loginForm($f3) );
 	}
 	
 	protected function recoveryMail(\Base $f3): bool
@@ -217,13 +218,11 @@ class Auth extends Base {
 	
 	public function register(\Base $f3)//: void
 	{
+		// check['next']	-	text the user will see on next page
+		
 		// check if configuration is disabled
 		if( FALSE == \Config::getPublic('allow_registration') )
-			$this->buffer( "stub *controller-auth-register* denied" );
-		
-		// check if user is already logged in
-		elseif ( empty($_SESSION['session_id']) )
-			$this->buffer( "stub *controller-auth-register* registered" );
+			$this->buffer( $this->template->register([], ["closed"=>1]) );
 		
 		// start registration process
 		else
@@ -232,16 +231,20 @@ class Auth extends Base {
 			if(empty($_POST['form']))
 			{
 				// No data yet, just create an empty form
-				$this->buffer( \View\Auth::register() ); //. "stub *controller-auth-register* proceed" );
+				$this->buffer( $this->template->register() );
 			}
 			else
 			{
 				// We have received a form, let's work through it
-				$formData = $f3->get('POST')['form'];
+				$formData = $f3->get('POST.form');
 
+				// Send to data check
 				$check = $this->model->registerCheckInput($formData);
+				// 'count' is the errors encountered, anything above 0 will get sent back to the form, informing what went wrong.
 				if ( $check['count']==0 )
 				{
+					// 'status' refers to the SFS check, where 0 is 'good', 1 is 'moderation' and 2 is 'rejected'
+					// here: rejected
 					if ( $check['status']==2 )
 					{
 						// kicked by SFS check
@@ -256,34 +259,37 @@ class Auth extends Base {
 						$token = md5(time());
 						$formData['groups'] = 0;
 
-						if ( $check['status']<1 AND FALSE == \Config::getPublic('reg_require_mod') )
+						// either passed SFS check, or SFS is disabled
+						if ( $check['status']==0 AND FALSE == \Config::getPublic('reg_require_mod') )
 						{
-							// either passed SFS check, or SFS is disabled
 							if( TRUE == \Config::getPublic('reg_require_email') )
 							{
+								// require email validation
 								$status = -2;
 								$check['next'] = "mail";
 							}
 							else
 							{
+								// pass without mail validation
 								$status = FALSE;
 								$formData['groups'] = 1;
 								$check['next'] = "done";
 							}
 						}
+						// put on moderation by SFS check or by admin setting
 						else
 						{
-							// put on moderation by SFS check or by admin setting
 							$status = -3;
 							$check['next'] = "moderation";
 						}
 						
 						$userID = $this->model->addUser($formData);
 
+						// send an email with a confirmation link
 						if ( $status == -2 )
 						{
 							$token =  md5(time()+mt_rand());
-							$mailText = \View\Auth::registerMail($formData, $userID.",".$token);
+							$mailText = $this->template->registerMail($formData, $userID.",".$token);
 
 							if ( TRUE == $this->mailman($f3->get('LN__Registration'), $mailText, $formData['email'], $formData['login']) )
 							{
@@ -292,12 +298,12 @@ class Auth extends Base {
 							else
 							{
 								$check['reason'] = "mailfail";
-								$mod = json_encode($moderation);
-								$status = -3;
 								$check['next'] = "mailfail";
+								$status = -3;
+								$mod = json_encode($check);
 							}
 						}
-						else $mod = json_encode($moderation);
+						else $mod = json_encode($check);
 
 						if ( $status!==FALSE )
 							$this->model->newuserSetStatus($userID, $status, $mod);
@@ -313,7 +319,7 @@ class Auth extends Base {
 					
 				}
 
-				$this->buffer( \View\Auth::register($formData, $check) );
+				$this->buffer( $this->template->register($formData, $check) );
 			}
 		}
 	}

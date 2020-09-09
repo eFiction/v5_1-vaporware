@@ -1,0 +1,75 @@
+<div class="columns">
+	<div class="column">
+		<check if="{{ @data.dropdown }}">
+			<div class="select">
+				<select class='select chap-change' id='chap_change' onchange="changeChapter();">
+					<repeat group="{{ @data.dropdown }}" value="{{ @item }}"><option <check if="{{ @item[0] }}">selected="selected" </check> value="{{ @item[1] }}"><check if="{{ @item[2] }}">{{ @item[2] }}) </check>{{ @item[3] }}</option></repeat>
+				</select>
+			</div>
+		</check>
+	</div>
+	<div class="column">
+		<include href="story/read.icons.html" />
+	</div>
+</div>
+
+<check if="{{ isset(@data.story.infoblock) }}">
+	<include href="story/read.info.html" />
+</check>
+
+<div class="columns">	
+	<div class="column">
+		<h4>{{@data.story.title}}<br />
+			{* prepare for translation functionality *}
+			<check if="{{ @data.story.translation }}">
+				<true>
+				{{@LN__translatedBy}} <repeat group="{{@data.story.cache_authors}}" value="{{@author}}" counter="{{ @i }}">
+														<check if="{{ @i>1 }}">, </check>
+														<check if="{{ @_SESSION.userID == @author[0] }}"><set no_review="1" /></check>
+														<a href="{{@BASE}}/members/{{@author.1}}">{{@author.1}}</a>
+													</repeat><br />
+				{{@LN__translatedFrom}} {{ locale_get_display_language(@data.story.trans_from, @_SESSION['preferences']['language']) }} {{@LN__translatedTo}} {{ locale_get_display_language(@data.story.trans_to, @_SESSION['preferences']['language']) }}
+				</true>
+				<false>
+				{{@LN__by}} <repeat group="{{@data.story.cache_authors}}" value="{{@author}}" counter="{{ @i }}">
+														<check if="{{ @i>1 }}">, </check>
+														<check if="{{ @_SESSION.userID == @author[0] }}"><set no_review="1" /></check>
+														<a href="{{@BASE}}/members/{{@author.1}}">{{@author.1}}</a>
+													</repeat>
+				</false>
+			</check>
+		</h4>
+		<check if="{{ !isset(@data.story.infoblock) }}">
+			{{@data.story.chapterTitle}}
+		</check>
+	</div>
+</div>
+
+
+<div class="columns">
+	<div class="column">
+	<check if="{{@data.story.chapter_notes>''}}">
+		{{@data.story.chapter_notes}}
+		<hr>
+	</check>
+		<a name="rev"></a>
+			{{@data.content | raw }}
+	<check if="{{@data.story.chapter_endnotes>''}}">
+		<hr>
+		{{@data.story.chapter_endnotes}}
+	</check>
+	</div>
+</div>
+
+<div class="columns">
+	<div class="column">
+		<check if="isset(@data.story.chapternr)">
+			<check if="@data.story.chapternr > 1">
+				<a class="button" href="{{@BASE}}/story/read/{{@data.story.sid}},{{@data.story.chapternr-1}}">{{@LN__back}}</a>
+			</check>
+			<check if="@data.story.chapternr < @data.story.chapters">
+				<a class="button is-pulled-right" href="{{@BASE}}/story/read/{{@data.story.sid}},{{@data.story.chapternr+1}}">{{@LN__next}}</a>
+			</check>
+		</check>
+	</div>
+</div>

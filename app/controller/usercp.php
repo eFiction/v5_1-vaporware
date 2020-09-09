@@ -567,6 +567,28 @@ class UserCP extends Base
 		$sub = [ "bookmark", "favourite", "recommendation", "series", "collections" ];
 		if ( !in_array(@$params[0], $sub) ) $params[0] = "";
 		
+		$this->showMenu("library");
+
+		switch ( $params[0] )
+		{
+			case "bookmark":
+			case "favourite":
+				$this->libraryBookFav($f3, $params);
+				break;
+			case "recommendation":
+				$this->libraryRecommendations($f3, $params);
+				break;
+			case "series":
+			case "collections":
+				$this->libraryCollections($f3, $params);
+				break;
+			default:
+				$this->buffer ( "Empty page");
+		}
+	}
+	
+	private function libraryBookFav(\Base $f3, array $params)//: void
+	{
 		// delete function get's accompanied by a pseudo-post, this doesn't count here. Sorry dude
 		if( NULL != $post = $f3->get('POST') )
 		{
@@ -596,28 +618,6 @@ class UserCP extends Base
 			}
 		}
 
-		$this->showMenu("library");
-
-		switch ( $params[0] )
-		{
-			case "bookmark":
-			case "favourite":
-				$this->libraryBookFav($f3, $params);
-				break;
-			case "recommendation":
-				$this->libraryRecommendations($f3, $params);
-				break;
-			case "series":
-			case "collections":
-				$this->libraryCollections($f3, $params);
-				break;
-			default:
-				$this->buffer ( "Empty page");
-		}
-	}
-	
-	private function libraryBookFav(\Base $f3, array $params)//: void
-	{
 		// Build upper micro-menu
 		$counter = $this->counter[$params[0]]['details'];
 		$menu_upper = [];
@@ -689,7 +689,40 @@ class UserCP extends Base
 
 		if (isset($_POST['form_data']))
 		{
-			$this->model->collectionSave($params['id'], $f3->get('POST.form_data'), $_SESSION['userID'] );
+			if( isset($params['delete']) )
+			{
+				if ( ""!=$f3->get('POST.confirm_delete') )
+				{
+					if ( 0 == $i = $this->model->collectionDelete($params['id'], $f3->get('POST.form_data'), $_SESSION['userID'] ) )
+					{
+						// failed to delete this item
+						$reroute  = "/userCP/library/{$module}/id={$params['id']}/editor=";
+						$reroute .= $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
+						if ( isset($params['returnpath']) ) $reroute .= ";returnpath=".$params['returnpath'];
+						$_SESSION['lastAction']['delete_error'] = TRUE;
+					}
+					else
+					{
+						// successfully deleted the item
+						$_SESSION['lastAction']['delete_success'] = TRUE;
+						$reroute = isset($params['returnpath']) ? $params['returnpath'] : "/userCP/library/".$module;
+					}
+				}
+				else
+				{
+					$reroute  = "/userCP/library/{$module}/id={$params['id']}/editor=";
+					$reroute .= $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
+					if ( isset($params['returnpath']) ) $reroute .= ";returnpath=".$params['returnpath'];
+					$_SESSION['lastAction']['delete_confirm'] = TRUE;
+				}
+				$f3->reroute($reroute,FALSE);
+				exit;
+			}
+
+			// save data and report success to the user
+			if ( 0 < $i = $this->model->collectionSave($params['id'], $f3->get('POST.form_data'), $_SESSION['userID'] ) )
+				$_SESSION['lastAction']['save_success'] = $i;
+
 			if ( isset($_POST['form_data']['changetype']) )
 			{
 				$reroute = "/userCP/library/".$module;
@@ -705,22 +738,30 @@ class UserCP extends Base
 		elseif (isset($_POST['new_data']))
 		{
 			$params['id'] = $this->model->collectionAdd($f3->get('POST.new_data') );
+			if ( is_numeric($params['id']) AND $params['id']>0 )
+			{
+				$reroute = "/userCP/library/".(($f3->get('POST.new_data.ordered')==0)?"collections":"series");
+				$reroute .= "/id={$params['id']};returnpath=".$params['returnpath'];
+				$f3->reroute($reroute,FALSE);
+			}
 		}
 		elseif (isset($_POST['story-add']))
 		{
 			$this->model->collectionItemsAdd($params['id'], $f3->get('POST.story-add'), $_SESSION['userID'] );
 		}
 
-
 		if( isset ($params['id']) )
 		{
-			if ( $params['id']=="new" )
+			// delete an element from the collection/series
+			if ( isset ($params['delete']) )
 			{
-				$this->buffer( $this->template->libraryCollectionAdd($module) );
-				return;
+				$delete = $this->model->libraryCollectionItemDelete($params['id'], $params['delete'], $_SESSION['userID']);
+				// session to report deleted item *todo*
+				$params['items'] = 1;
 			}
+
 			// edit the elements of the collection/series
-			elseif ( isset ($params['items']) AND NULL !== $data = $this->model->collectionLoadItems($params['id']) )
+			if ( isset ($params['items']) AND NULL !== $data = $this->model->collectionLoadItems($params['id']) )
 			{
 				$data['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
 				$this->buffer( $this->template->collectionItems($data, $module, @$params['returnpath']) );
@@ -733,7 +774,7 @@ class UserCP extends Base
 				$this->buffer( $this->template->collectionEdit($data, $this->model->storyEditPrePop($data), $module, @$params['returnpath']) );
 				return;
 			}
-			else $f3->set('form_error', "__failedLoad");
+			else $f3->set('load_error', TRUE);
 		}
 
 		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];

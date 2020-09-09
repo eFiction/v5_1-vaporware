@@ -91,6 +91,7 @@ return array(
 
 // [4] Global -- User registration 15
 'Registration'			=> 'Registration',
+'Register'				=> 'Register',
 'RegisterNow'			=> 'Register now',
 'Reg_AcceptTOS'			=> 'I accept these terms!',
 'Reg_AcceptTOS_Error'	=> 'You have to accept the terms of use',
@@ -103,6 +104,7 @@ return array(
 'Reg_PasswordTwice'		=> 'Enter your password twice',
 'Reg_PasswordMismatch'	=> 'Your passwords do not match',
 'Reg_PasswordCriteria'	=> 'Your desired password does not match the requirements',
+'Reg_CaptchaMismatch'	=> 'The security code did not match or was not entered.',
 'Reg_Failed'			=> 'Registration failed!',
 'Reg_FailedSorry'		=> 'Sorry, can\'t complete registration at this point.',
 	'Reg_Moderation'		=> 'Registration completed, however it requires moderation',
@@ -220,6 +222,8 @@ return array(
 'ChapterEndnotes'	=>	'Endnotes',			//db
 'AddChapter'	=> 'Add chapter',
 'EditHeader'	=> 'Edit header',
+'EditItems'		=> 'Edit items',			// db
+'DeleteItems'	=> 'Delete items',			// db
 'DragdropSort'	=> 'Drag and drop to sort',
 'SwitchPlainHTML'	=> 'Switch to HTML mode',
 'SwitchVisual'		=> 'Switch to visual editor',
@@ -227,6 +231,11 @@ return array(
 // [14] Authors
 'NoAuthorsListed'	=> 'Currently, there are no authors to be listed',
 'Overview'			=> 'Overview',
+
+// Library
+'ChangeType'			=> 'Change type',
+'ChangeTypeSeries'		=> '... to series',
+'ChangeTypeCollection'	=> '... to collection',
 
 ///DB
 // User panel - PM
@@ -435,6 +444,7 @@ return array(
 'AdminMenu_News' => 'News',
 'AdminMenu_Modules' => 'Modules',
 'AdminMenu_Logs' => 'Logs',
+	'AdminMenu_Logs_X' => 'Other',
 	'AdminMenu_Logs_AM' => 'Admin Maintenance',
 	'AdminMenu_Logs_DL' => 'Deletions',
 	'AdminMenu_Logs_EB' => 'Edit Member',
@@ -484,6 +494,7 @@ return array(
 'AdminMenu_Archive' => 'Archive',
 	'AdminMenu_Intro' => 'Intro',
 	'AdminMenu_Authors' => 'Author page',
+	'AdminMenu_Ebook'	=> 'eBooks',
 'AdminMenu_Submission' => 'Submissions',
 	'AdminMenu_Stories' => 'Stories',
 	'AdminMenu_Images' => 'Cover art',
@@ -606,7 +617,10 @@ return array(
 	'CFG_stories_per_page'		=> 'Stories per page in the Archive.',
 	'CFG_stories_recent'		=> 'Days for recent stories',
 	'CFG_stories_default_order'	=> 'Default sorting for stories',
+	'CFG_stories_default_order_date'	=> 'by date',
+	'CFG_stories_default_order_title'	=> 'by title',
 	'CFG_story_toc_default'		=> 'Show to table of contents by default for stories with multiple chapters.',
+	'CFG_epub_version'			=> 'ePub version@SMALL@v2 is older, but should work on all devices.',
 	'CFG_epub_domain'			=> 'ePub Domain@SMALL@Used to calculate your epub UUID v5. Leave blank for default (Archive URL)',
 // archive_images
 	'CFG_images_allowed' 		=> 'Allow posting of story images (cover art)',
@@ -615,6 +629,8 @@ return array(
 // archive_intro
 	'CFG_story_intro_items' 	=> 'Stories to show on the archive entry page.',
 	'CFG_story_intro_order' 	=> 'Order in which stories appear on the archive entry page.',
+	'CFG_story_intro_order_modified' 	=> 'last modified',
+	'CFG_story_intro_order_published' 	=> 'first published',
 // archive_authors
 	'CFG_author_overview_columns' 	=> 'Columns to show on the overview.',
 	'CFG_author_letter_columns' 	=> 'Maximum column count when selecting a letter.',
@@ -754,7 +770,7 @@ return array(
 
 'NoElements'	=> 'There are no elements in this view',
 
-'CheckToDelete'	=> 'Check this box to delele',
+'CheckBoxToDelete'	=> 'Check the confirmation box to delele this element',
 
 'TOC'	=> 'Table of content',
 'NoTags' => 'No tags defined',

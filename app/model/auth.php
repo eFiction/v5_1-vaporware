@@ -238,20 +238,20 @@ class Auth extends Base
 
 	public function registerCheckInput(&$register )
 	{
-		// check if registrar has agreed to the TOS
-		if ( !isset($register['accept']) )
-		{
-			// no further checks happening if not accepted
-			return [ 'accept' => 1 ];
-		}
-		
 		/*
 		 	$register: registration form data
 
-			returns TRUE if all checks pass
+			returns 'count' = 0 if no errors were found
 		*/
 		$error = [ "count" => 0 ];
 
+		// check if registrar has agreed to the TOS
+		if ( !isset($register['accept']) )
+		{
+			$error['count']++;
+			$error['accept'] = TRUE;
+		}
+		
 		// Check data entered
 		if(empty($register['login']) OR trim($register['login'])=="" )
 		{
@@ -304,6 +304,15 @@ class Auth extends Base
 			$error['count']++;
 			$error['password'] = $pw_error;
 		}
+		
+		/*
+			Captcha check
+		*/
+		if ( FALSE === password_verify($register['captcha'], $_SESSION['captcha']))
+		{
+			$error['count']++;
+			$error['captcha'] = TRUE;
+		}
 
 		if ( $error['count']==0 )
 		{
@@ -311,7 +320,6 @@ class Auth extends Base
 			if ( $this->config['reg_sfs_usage'] == TRUE )
 			{
 				$register['ip'] = $_SERVER['REMOTE_ADDR'];
-				$check = $this->checkInputSFS($register);
 				
 				$error = array_merge ( $error, $this->checkInputSFS($register) );
 			}
@@ -326,8 +334,12 @@ class Auth extends Base
 
 	protected function checkInputSFS($data)
 	{
-		// return: TRUE - everything fine
-		// return [int @status (1 or 2),str @reason] - something wrong (or everything)
+		/* return
+				[
+					int @status (0, 1 or 2),      (0: accepted, 1: moderated, 2: rejected)
+					str @reason
+				]
+		*/
 		$url = "http://api.stopforumspam.org/api?f=json";
 		
 		if ( $this->config['reg_sfs_check_mail'] 		== TRUE ) $url .= "&email=".$data['email'];
@@ -375,7 +387,7 @@ class Auth extends Base
 				  $sfs['success'] = 0;
 				}
 				else {
-				  $sfs = json_decode(stream_get_contents($handle));
+				  $sfs = json_decode(stream_get_contents($handle),TRUE);
 				}
 			}
 		}

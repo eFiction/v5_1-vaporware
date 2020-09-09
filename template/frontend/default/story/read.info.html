@@ -1,0 +1,34 @@
+<div class="columns">
+	<div class="column is-half">{ICON:calendar} {{@data.story.published}} <check if="{{ @data.story.published != @data.story.modified}}">
+		<br />{ICON:update} {{@data.story.modified}}</check>
+	</div>
+</div>
+
+<check if="{{!empty(@data.story.rating_name)}}">
+	<div class="story-info2"><strong>{{@LN__Rating}}:</strong> {{@data.story.rating_name}}</div>
+</check>
+<check if="{{!empty(@data.story.cache_categories)}}">
+	<div class="story-info2"><strong>{{@LN__Categories}}:</strong> <repeat group="{{ @data.story.cache_categories }}" value="{{ @group }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check><a href="{{@BASE}}/story/search/category={{ @group[0] }}">{{ @group[1] }}</a></repeat></div>
+</check>
+<div class="story-info2"><strong>{{@LN__Status}}:</strong> <check if="{{@data.story.completed==1}}"><true>{{@LN__Completed}}</true><false>{{@LN__WIP}}</false></check></div>
+<div class="story-info2"><strong>{{@LN__Reviews}}:</strong> <a href="{{@BASE}}/story/reviews/{{ @data.story.sid}}">{{ @LN__Review_Link, @data.story['reviews'] | format }}</a></div>
+{* Different tag views: uncomment the one you prefer *}
+{* Simple view, all tags in one list *}
+{* 
+	<check if="{{ isset(@data.story.cache_tags.simple) }}">
+		<div class="story-info2"><strong>{{@LN__Tags}}:</strong> <repeat group="{{ @data.story.cache_tags.simple }}" value="{{ @tag }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check><a href="{{@BASE}}/story/search/tagIn={{ @tag[0] }}">{{ @tag[1] }}</a></repeat></div>
+	</check>
+*}
+{* Structured, tags by tag group *}
+	<check if="{{ isset(@data.story.cache_tags.structured) }}">
+		<div class="story-info2"><strong>{{@LN__Tags}}:</strong> <repeat group="{{ @data.story.cache_tags.structured }}" value="{{ @tags }}" counter="{{ @i }}"><check if="{{ @i }}>1"> * </check><repeat group="{{ @tags }}" value="{{ @tag }}" counter="{{ @j }}"><check if="{{ @j>1 }}">, </check><a href="{{@BASE}}/story/search/tagIn={{ @tag[0] }}">{{ @tag[1] }}</a></repeat></repeat></div>
+	</check>
+{* end tags *}
+<check if="{{ isset(@data.story.cache_characters.0.1) }}">
+		<div class="story-info2"><strong>{{@LN__Characters}}:</strong> <repeat group="{{ @data.story.cache_characters }}" value="{{ @tag }}" counter="{{ @i }}"><check if="{{ @i }}>1">, </check><a href="{{@BASE}}/story/search/characters={{ @tag[0] }}">{{ @tag[1] }}</a></repeat></div>
+</check>
+<div class="story-info2"><strong>{{@LN__Summary}}:</strong> {{@data.story.summary | raw}}</div>
+<br />
+<check if="{{ @data.story.storynotes > '' }}">
+	<div class="story-info2"><strong>{{@LN__Foreword}}:</strong> {{ @data.story.storynotes | raw}}</div>
+</check>

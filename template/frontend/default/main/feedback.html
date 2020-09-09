@@ -3,7 +3,7 @@
 	{* BEGIN: Error reporting *}
 		<check if="{{sizeof(@formError)>0}}">
 			<true>
-				<div class="note alert-box error">{{ @LN__FormErrors, sizeof(@formError) | format }}:<br>
+				<div class="note alert-box error">{{ @LN__FormErrors, sizeof(@formError) | format }}:<br />
 				<repeat group="{{@formError}}" value="{{@error}}">{ICON:close} {{ ${'LN__'.@error} }}<br /></repeat>
 			</true>
 			<false>

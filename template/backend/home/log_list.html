@@ -14,8 +14,8 @@
 <table>
 <repeat group="{{ @logEntries }}" value="{{ @row }}">
 <tr>
-	<td>{{ date( \Config::getPublic('date_format'), @row.timestamp) }}</td>
-	<td><check if="{{NULL===@row.uid}}"><true><del>{{@row.action.name}}</del></true><false>{{@row.username}}</false></check></td>
+	<td>{{ date( \Config::getPublic('date_format'), @row.timestamp) }}&nbsp;</td>
+	<td><check if="{{NULL===@row.uid}}"><true><del>{{@row.action.name}}</del></true><false>{{@row.username}}</false></check>&nbsp;</td>
 	<check if="{{is_array(@row.action)}}">
 		<true>
 			<switch expr="{{ @row.type }}">

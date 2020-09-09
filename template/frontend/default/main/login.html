@@ -1,4 +1,5 @@
 <check if="{{ isset(@lostpw) }}">
+
 <div class="alert-box info">
 	{{@LN__ResetPWMail}}.<br/>
 	<br/>
@@ -35,32 +36,54 @@ Good!
 <check if ="{{ isset(@loginform)}}">
 	<check if="{{ isset(@error) }}"><div class="gb-full"><div class="alert-box error">{{ ${'LN__'.@error} }}</div></div></check>
 	<check if="{{ isset(@login.info) }}"><div class="gb-full"><div class="alert-box info">{{@login.info}}</div></div></check>
+
 <div class="columns">
-	<div class="column is-half">
+	<div class="column">
 			<fieldset>
 				<legend>{{ @LN__Login }}</legend>
 				<form method="post" action="{{ @BASE }}/login">
-				<div class="field"><span class="icon">{ICON:member}</span><input class="field input" placeholder="{{@LN__Username}}" type="text" name="login"></div>
-				<div class="field"><span class="icon">{ICON:key}</span><input class="field input" placeholder="{{@LN__Password}}" type="password" name="password"></div>
-				<input class="button" type="submit" value="{{@LN__Login}}"><input type="hidden" name="returnpath" value="{{ @returnpath }}">
+
+				<div class="field">
+					<p class="control has-icons-left">
+						<input class="input" type="text" placeholder="{{@LN__Username}}" name="login" />
+						<span class="icon is-small is-left">{ICON:member}</span>
+					</p>
+				</div>
+
+				<div class="field">
+ 					<p class="control has-icons-left">
+						<input class="input" type="password" placeholder="{{@LN__Password}}" name="password" />
+						<span class="icon is-small is-left">{ICON:lock}</span>
+					</p>
+				</div>
+				<input class="button is-primary" type="submit" value="{{@LN__Login}}"><input type="hidden" name="returnpath" value="{{ @returnpath }}">
 				</form>
 			</fieldset>
 	</div>
-	<div class="column is-half">
+
+	<div class="column">
 			<fieldset>
 				<legend>{{@LN__ForgotPW}}?</legend>
 				<form method="post" action="{{ @BASE }}/login">
-				<div class="field"><span class="icon">{ICON:member}</span><input class="field input" placeholder="{{@LN__Username}}" type="text" name="username"></div>
+
+				<div class="field">
+					<p class="control has-icons-left">
+						<input class="input" type="text" placeholder="{{@LN__Username}}" name="username" />
+						<span class="icon is-small is-left">{ICON:member}</span>
+					</p>
+				</div>
 				<div>or</div>
-				<div class="field"><span class="icon">{ICON:mail}</span><input class="field input" placeholder="{{@LN__Email}}"  type="text" name="email"></div>
-				<input class="button" type="submit" value="{{@LN__ResetPW}}"><input type="hidden" name="returnpath" value="{{ @returnpath }}">
+				<div class="field">
+ 					<p class="control has-icons-left">
+						<input class="input" type="password" placeholder="{{@LN__Email}}" name="email" />
+						<span class="icon is-small is-left">{ICON:mail}</span>
+					</p>
+				</div>
+				<input class="button is-primary" type="submit" value="{{@LN__ResetPW}}"><input type="hidden" name="returnpath" value="{{ @returnpath }}">
 				</form>
 			</fieldset>
 	</div>
 </div>
-<check if="{{ @CONFIG.allow_registration }}">
-<div class="columns">
-	<div class="columns"><a href="{{ @BASE }}/register">{{@LN__RegisterNow}}</a></div>
-</div>
-</check>
+
+<check if="{{ @CONFIG.allow_registration AND @CONFIG.maintenance==FALSE}}">&nbsp;<a class="button" href="{{ @BASE }}/register">{{@LN__RegisterNow}}</a></check>
 </check>

@@ -2,7 +2,7 @@
 <repeat group="{{ @newsItems }}" value="{{ @news }}" counter="{{ @ctr }}">
 	<div class="news-box">
 		<h3><a href='{{@BASE}}/home/news/id={{ @news.nid }}'>{{ @news.headline }}</a></h3>
-		<div class="news-date-author">{{@LN__News_writtenby}} <a href='{{@BASE}}/member/{{ @news.username }}'>{{ @news.username }}</a> @ {{ date(@CONFIG.datetime_format, @news.timestamp) }}</div>
+		<div class="news-date-author">{{@LN__News_writtenby}} <a href='{{@BASE}}/members/{{ @news.username }}'>{{ @news.username }}</a> @ {{ date(@CONFIG.datetime_format, @news.timestamp) }}</div>
 		{{ @news.newstext | raw}}
 {*		<div class="news-full">{NEWSMORE}</div> *}
 		<div align="right"><a href='{{@BASE}}/home/news/id={{ @news.nid }}#comments'><input class="button" type="submit" value="{{ @LN__CommentsC, @news.comments | format }}"></a></div>

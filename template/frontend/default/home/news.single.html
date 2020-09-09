@@ -2,7 +2,7 @@
 <check if="{{isset(@formError)}}"><article class="message is-danger"><div class="message-body">{{ @LN__FormErrors, sizeof(@formError) | format }}:<br /><repeat group="{{@formError}}" value="{{@error}}">{ICON:close} {{ ${'LN__'.@error} }}<br /></repeat></div></article></check>
 <div class="news-box">
 	<h3><a href='{{@BASE}}/home/news/id={{ @news.nid }}'>{{ @news.headline }}</a></h3>
-	<div class="news-date-author">{{@LN__News_writtenby}} <a href='{{@BASE}}/member/{{ @news.username }}'>{{ @news.username }}</a> @ {{ date(@CONFIG.datetime_format, @news.timestamp) }} <check if="{{@canAdmin['home/news']}}"><a href="{{@BASE}}/adminCP/home/news/id={{@news.nid}}" target="_blank">{ICON:edit}</a></check></div>
+	<div class="news-date-author">{{@LN__News_writtenby}} <a href='{{@BASE}}/members/{{ @news.username }}'>{{ @news.username }}</a> @ {{ date(@CONFIG.datetime_format, @news.timestamp) }} <check if="{{@canAdmin['home/news']}}"><a href="{{@BASE}}/adminCP/home/news/id={{@news.nid}}" target="_blank">{ICON:edit}</a></check></div>
 	{{ nl2br(@news.newstext) | raw}}
 </div>
 
@@ -10,7 +10,7 @@
 <div class="news-comments">
 	<check if="{{@comment.writer_uid}}">
 	<true>
-		&nbsp;{ICON:member} <a href="{{@BASE}}/member/{{@comment.comment_writer_name}}">{{@comment.comment_writer_name}}</a> <check if="{{@comment.writer_uid==$_SESSION['userID']}}">{ICON:edit}</check>
+		&nbsp;{ICON:member} <a href="{{@BASE}}/members/{{@comment.comment_writer_name}}">{{@comment.comment_writer_name}}</a> <check if="{{@comment.writer_uid==$_SESSION['userID']}}">{ICON:edit}</check>
 	</true>
 	<false>
 		&nbsp;{ICON:member} {{@comment.comment_writer_name}}

@@ -1,6 +1,6 @@
 <h4>
 	<a href="{{@BASE}}/story/contests/id={{@contest.id}}">{{@contest.title}}</a><br />
-	{{@LN__by}} <a href="{{@BASE}}/member/{{@contest.username}}">{{@contest.username}}</a>
+	{{@LN__by}} <a href="{{@BASE}}/members/{{@contest.username}}">{{@contest.username}}</a>
 </h4>
 
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="main/paginate.html" /></F3:check>
@@ -25,7 +25,7 @@
 						</check>
 					</false>
 				</check>
-				{{@LN__by}} <repeat group="{{@entry.cache_authors}}" value="{{@author}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check><a href="{{@BASE}}/authors/{{@author.0}}">{{@author.1}}</a></repeat>
+				{{@LN__by}} <repeat group="{{@entry.cache_authors}}" value="{{@author}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check><a href="{{@BASE}}/members/{{@author.1}}">{{@author.1}}</a></repeat>
 			</div>
 			<check if="{{!empty(@entry.cache_categories)}}">
 				<div>{ICON:folder} <repeat group="{{@entry.cache_categories}}" value="{{@category}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check>{{@category.1}}</repeat></div>

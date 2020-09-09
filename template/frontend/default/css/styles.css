@@ -1,6 +1,7 @@
 /* import basic settings, IE-fixes and grids */
 @import url(bulma.min.css);
 @import url(bulma.tooltip.css);
+@import url(bulma-badge.min.css);
 /* @import url(forms.css); */
 @import url(typography.css);
 @import url(tokeninput.css);
@@ -183,7 +184,7 @@ legend {
 	padding: 0 6px;
 }
 
-/* --------------- sidewide --------------- */
+/* --------------- sitewide --------------- */
 
 .buttons-alignment {
 	text-align: center;

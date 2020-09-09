@@ -302,14 +302,6 @@ class AdminCP extends Base
 		return $this->render('archive/rating.list.html');
 	}
 	
-	public function collectionAdd (string $module, string $returnpath="") : string
-	{
-		$this->f3->set('module', 	$module);
-		$this->f3->set('returnpath', $returnpath);
-
-		return $this->render('stories/collection.add.html');
-	}
-
 	public function collectionsList(array $data, array $sort, string $module) : string
 	{
 		//while ( list($key, $value) = each($data) )

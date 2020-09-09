@@ -500,7 +500,7 @@ class Story extends Base
 		$replacements =
 		[
 			"WHERE" => "AND S.sid = :sid",
-			"EXTRA"	=> ", C.chapid",
+			"EXTRA"	=> ", C.chapid, C.notes as chapter_notes, C.endnotes as chapter_endnotes",
 			"JOIN"	=> "LEFT JOIN `tbl_chapters`C ON ( S.sid = C.sid and C.inorder = :chapter )"
 		];
 
@@ -514,6 +514,7 @@ class Story extends Base
 
 		if ( sizeof($data)==1 )
 			return $data[0];
+
 		else return FALSE;
 	}
 		
@@ -900,7 +901,7 @@ class Story extends Base
 						);
 	}
 
-	public function getMiniTOC($story)
+	public function getChapterList($story)
 	{
 		return $this->exec( "SELECT Ch.title, Ch.inorder as chapter, Ch.chapid
 								FROM `tbl_chapters`Ch 

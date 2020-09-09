@@ -3,21 +3,24 @@ namespace View;
 
 class Auth extends Base
 {
-	public static function loginError($f3)
+	public function loginForm($f3)
 	{
 		\Base::instance()->set('loginform', TRUE );
 		if( sizeof($f3->get('POST'))>0 )
 		{
-			if(""==$f3->get('POST.login') || ""==$f3->get('POST.password')) 
+			if(""==$f3->get('POST.login') && ""==$f3->get('POST.password')) 
+			{}
+			
+			elseif(""==$f3->get('POST.login') || ""==$f3->get('POST.password')) 
 				\Base::instance()->set('error', 'Login_NoData' );
 
 			else
 				\Base::instance()->set('error', 'Login_NoMatch' );
 
 			}
-		\Base::instance()->set('returnpath', (""==$f3->get('POST.returnpath')) ? $f3->get('PATH') : $f3->get('POST.returnpath') );
+		$f3->set('returnpath', (""==$f3->get('POST.returnpath')) ? $f3->get('PATH') : $f3->get('POST.returnpath') );
 
-		return \Template::instance()->render('main/login.html','text/html');
+		return $this->render('main/login.html','text/html');
 	}
 
 	public static function loginMulti(\Base $f3, $switch)
@@ -51,38 +54,37 @@ class Auth extends Base
 		return \Template::instance()->render('email/lostpw.html','text/html');
 	}
 
-	public static function register($data = [], $error = [])
+	public function register($data = [], $error = [])
 	{
 		if( isset($_SESSION['lastAction']) )
 		{
-			\Base::instance()->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
+			$this->f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
 			unset($_SESSION['lastAction']);
 		}
 
-		\Base::instance()->set('data', $data);
-		\Base::instance()->set('error', $error);
+		$this->f3->set('data', $data);
+		$this->f3->set('error', $error);
 
-		return \Template::instance()->render('main/register.html');
+		return $this->render('main/register.html');
 	}
 	
-	public static function registerMail($user, $token)
+	public function registerMail($user, $token)
 	{
-		\Base::instance()->set('username', $user['login']);
-		\Base::instance()->set('token', $token);
+		$this->f3->set('username', $user['login']);
+		$this->f3->set('token', $token);
 		
-		return \Template::instance()->render('email/activation.html','text/html');
+		return $this->render('email/activation.html','text/html');
 	}
 
 	public static function captchaF3()
 	{
 		ob_start();
-		$img = new \Image();
-		$img->captcha('template/captchaFonts/Browning.ttf',16,5,'SESSION.captcha');
-		$_SESSION['captcha'] = password_hash($_SESSION['captcha'], PASSWORD_DEFAULT);
+			$img = new \Image();
+			$img->captcha('template/captchaFonts/Browning.ttf',16,5,'SESSION.captcha');
+			$_SESSION['captcha'] = password_hash($_SESSION['captcha'], PASSWORD_DEFAULT);
 
-		
-		$img->render();
-		$image_data = ob_get_contents();
+			$img->render();
+			$image_data = ob_get_contents();
 		ob_end_clean();
 
 		echo base64_encode($image_data);

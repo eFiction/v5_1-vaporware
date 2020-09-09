@@ -1,7 +1,9 @@
 <include href="header.list.html" />
 
-<h2>{{@LN__ACP_Contest}}</h2>
 <form action="{{@BASE}}/adminCP/archive/contests/id={{ @data.id }}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
+
+	<fieldset class="notification">
+		<legend class="label has-text-centered"></legend>
 <div class="field is-horizontal">
   <div class="field-label is-normal">
     <label class="label">{{@LN__Title}}</label>
@@ -155,14 +157,26 @@
 		</div></div>
 	</div>
 </div>
+</fieldset>
 
 <div class="field is-horizontal">
-	<div class="field-label is-normal"></div>
 	<div class="field-body">
 		<div class="field">
 			<div class="control">
-				<input class="button is-success" type="submit">
-				<input class="button" type="reset">
+				<div class="field is-grouped">
+					<p class="control">
+						<button class="button is-success" type="submit">
+							<span class="icon">{ICON:save}</span>
+							<span>{{@LN__Submit}}</span>
+						</button>
+					</p>
+					<p class="control">
+						<button class="button is-light" type="reset">
+							<span class="icon">{ICON:undo}</span>
+							<span>{{@LN__Reset}}</span>
+						</button>
+					</p>
+				</div>
 			</div>
 		</div>
 	</div>

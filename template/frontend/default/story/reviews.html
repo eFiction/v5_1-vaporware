@@ -1,95 +1,74 @@
-<!-- https://bulma.io/documentation/layout/media-object/ -->
-
 	<h4>
 		<a href="{{@BASE}}/story/read/{{@story.sid}}">{{@story.title}}</a><br />
 		{{@LN__by}} <repeat group="{{@story.cache_authors}}" value="{{@author}}" counter="{{ @i }}">
 			<check if="{{ @i>1 }}">, </check>
 			<check if="{{ @_SESSION.userID == @author[0] }}"><set no_review="1" /></check>
-		<a href="{{@BASE}}/authors/{{@author[0]}}">{{@author[1]}}</a>
+		<a href="{{@BASE}}/members/{{@author[1]}}">{{@author[1]}}</a>
 		</repeat>
 	</h4>
 
-<div id="story-container">
-<div id="review-container">
-{* Begin: Loop configuration *}
-	<set last_level="0">
-	<set odd_even="1">
-{* End: Loop configuration *}
-{*	<ul class="review"> *}
-{* Begin: Loop build, opening and closing tags *}
-	<repeat group="{{ @data.reviews }}" value="{{ @item }}">
-		<check if="{{@last_level==@item.level}}">
-			</li>
-		</check>
-		<check if="{{@last_level<@item.level}}">
-			<ul class="review">
-		</check>
-		<check if="{{@last_level>@item.level}}">
-			<loop from="{{ @k=@last_level }}" to="{{ @k > @item.level }}" step="{{ @k-- }}"></li></ul></loop>
-		</check>
-{* End: Loop build, opening and closing tags *}
-		{* make sure odd and even iterate from top to bottom, not by the DOM structure *}
-		<check if="{{(@odd_even++) % 2 == 0}}">
-			<true><li class="review even"></true>
-			<false><li class="review odd"></false>
-		</check>
-		<a id="r{{@item.id}}"></a>
-{* Begin: DIV headline *}
-		<div class="review-headline">
-			{* This is quite an abuse of the "check" function, but there is no other way for a dynamic assignment of variables *}
-			<check if="{{@item.uid>0}}">
-				<true><check if="{{@namelink='<a href=\''.@BASE.'/member/'.@item.name.'\'>'.@item.name.'</a>' }}"></check></true>
-				<false><check if="{{@namelink='\''.@item.name.'\''}}"></check></false>
-			</check>
-			{* End of abuse, but this saves quite some work right below and keeps the link generation from the controller  *}
-			<check if="{{@item.level==1}}">
-				<true>
-					{{@LN__ReviewHeadline, @namelink, @item.date, @item.time, @item.chapternr | format }}
-					<set edit='ST'>
-				</true>
-				<false>
-					<set edit='C'>
-					{* Is there a timestamp? eFiction 3 didn't save comment timestamp *}
-					<check if="{{@item.timestamp>0}}">
-						<true>
-						{{@LN__ReplyHeadline, @namelink, @item.date, @item.time | format }}
-						</true>
-						<false>
-						{{@LN__ReplyHeadline_noDate, @namelink | format }}
-						</false>
-					</check>
-				</false>
-			</check>
-		{* Debug [ Level {{@item.level}} ID {{@item.id}} ] /Debug *}
-			<check if="{{isset(@item.elements) AND @item.elements>0}}">{ICON:comment} <a href="{{@BASE}}/story/reviews/{{@item.story}},{{@item.chapternr}},{{@item.id}}#r{{@item.id}}">{{@LN__ReviewCommentsLink, @item.elements | format }}</a></check>
-		</div><br />
-{* End: DIV headline *}
-{* Begin: DIV text *}
-		<div class="review-content">
-			{* review or comment text *}
-			{{nl2br(@item.text) |raw}}
-		</div>
-{* End: DIV text *}
-{* Begin: DIV button *}
-			<check if="{{ @_SESSION.userID OR TRUE==@CONFIG.allow_guest_reviews }}">
-				<check if="{{ @_SESSION.userID > 0 AND @_SESSION.userID == @item.uid }}">
-					<true>
-						<a href="{{@BASE}}/userCP/feedback/reviews/written/edit/id={{@edit}},{{@item.id}};returnpath={{@returnpath}}">{ICON:edit}</a> {{@LN__Edit}}
-					</true>
-					<false>
-						<check if="{{isset(@item.id) AND empty(@item.nocomment)}}"><span id="{{@item.id}}" data-captcha="{{ (@_SESSION.userID==0) }}" data-level="{{@item.level}}" data-story="{{@item.story}}" data-chapter="{{@item.chapter}}" class="openform"><a class="opener" href="#">{{@LN__Reply}}</a></span></check>
-					</false>
-				</check>
-			</check>
-			{* form placeholder *}
-			<div class="ajaxform"></div>
-{* End: DIV button *}
-		<set last_level="{{@item.level}}">
-	</repeat>
-	</ul>
-	<check if="{{empty(@nocomment)}}">
-		<span id="new" data-level=0 data-story="{{@story.sid}}" data-chapter="{{@data.chapter}}" class="openform"><a class="opener" href="#">{{@LN__Comment}}</a></span>
-	</check>
-	<div class="ajaxform"></div>
-</div>
-</div>
+<script type="text/javascript">
+			$(function() {
+				$('#comments-container').comments({
+					profilePictureURL: '',
+					currentUserId: 1,
+					roundProfilePictures: true,
+					textareaRows: 1,
+					enableAttachments: false,
+					enableHashtags: false,
+					enablePinging: false,
+					enableNavigation: false,
+					enableUpvoting: false,
+					scrollContainer: $(window),
+					searchUsers: function(term, success, error) {
+						success([]);
+					},
+					getComments: function(success, error) {
+						setTimeout(function() {
+						$.ajax({
+							type: 'POST',
+							url: '{{@BASE}}/story/ajax/getreviews',
+							data: { sid: {{@story.sid}}<check if="isset(@story.chapid)">, chapid: {{@story.chapid}}</check> },
+							datatype: 'JSON',
+							success: function(commentsArray2) {
+								comments = JSON.parse(commentsArray2);
+								parser = new DOMParser();
+								comments.forEach(function(item,index,arr) {
+									arr[index]['content'] = parser.parseFromString(arr[index]['content'],'text/html').documentElement.textContent;
+								});
+								success(comments);
+							},
+							error: error
+						});
+						}, 500);
+					},
+					postComment: function(data, success, error) {
+						setTimeout(function() {
+							success(saveComment(data));
+						}, 500);
+					},
+					putComment: function(data, success, error) {
+						setTimeout(function() {
+							success(saveComment(data));
+						}, 500);
+					},
+					deleteComment: function(data, success, error) {
+						setTimeout(function() {
+							success();
+						}, 500);
+					},
+					upvoteComment: function(data, success, error) {
+						setTimeout(function() {
+							success(data);
+						}, 500);
+					},
+					validateAttachments: function(attachments, callback) {
+						setTimeout(function() {
+							callback(attachments);
+						}, 500);
+					},
+				});
+			});
+		</script>
+
+<div id="comments-container"></div>

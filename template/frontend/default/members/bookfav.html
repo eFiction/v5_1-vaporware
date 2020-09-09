@@ -20,7 +20,7 @@
 	<repeat group="{{ @extradata }}" value="{{ @data }}">
 	<tr>
 		<td><a href="{{@BASE}}/
-			<check if="{{ @data.type == 'AU' }}">member/{{ @data.name }}"></check>
+			<check if="{{ @data.type == 'AU' }}">members/{{ @data.name }}"></check>
 			<check if="{{ @data.type == 'RC' }}">story/read/{{ @data.id }}"></check>
 			<check if="{{ @data.type == 'CO' }}">story/collections/id={{ @data.id }}"></check>
 			<check if="{{ @data.type == 'SE' }}">story/series/id={{ @data.id }}"></check>

@@ -32,18 +32,7 @@ class Story extends Base
 		$this->f3->set('tocData', $tocData);
 		$this->f3->set('storyID', $storyData['sid']);
 
-		return $this->buildInfoblock($storyData) . $this->render('story/toc.html');
-	}
-
-	public function buildInfoblock($storyData)
-	{
-		$storyData['cache_categories'] = json_decode($storyData['cache_categories'],TRUE);
-		$storyData['cache_tags'] = 		 json_decode($storyData['cache_tags'],TRUE);
-		$storyData['cache_characters'] = json_decode($storyData['cache_characters'],TRUE);
-
-		$this->f3->set('storyData', $storyData);
-
-		return $this->render('story/information.html');
+		return $this->render('story/toc.html');
 	}
 
 	public function commentForm(array $in_structure)
@@ -76,17 +65,13 @@ class Story extends Base
 		// defined in \View\Base
 		return $this->commentFormBase($out_structure,$data);
 	}
-
-	public function buildStory($storyData,$content,$dropdown,$view=1)
+	
+	public function readBody($storyData,$content,$dropdown,$view=1)
 	{
-		$this->javascript('body', TRUE, 'jquery.comments.min.js' );
 		$this->javascript('body', TRUE, 'chapter.js?' );
 		$this->javascript('body', FALSE, "var url='".\Base::instance()->get('BASE')."/story/read/{$storyData['sid']},'" );
 
-		$storyData['cache_authors'] = json_decode($storyData['cache_authors'],TRUE);
-		$storyData['published'] = date( $this->config['date_format'], $storyData['published']);
-		$storyData['modified']  = date( $this->config['date_format'], $storyData['modified']);
-		
+		$this->dataProcess($storyData);
 		// fix for <b> not showing with bulma, might have to find a better one for this
 		$content = str_replace(["<b>","</b>"], ["<strong>","</strong>"], $content);
 
@@ -94,27 +79,26 @@ class Story extends Base
 											"story" 	=> $storyData,
 											"content" 	=> $content,
 											"dropdown" 	=> $dropdown,
-											"feedback_form_label" => "__Review",
 											"view"		=> $view,
-											"postName"	=> '',
-											"postText"	=> '',
 										]);
 		$this->f3->set('returnpath', \Base::instance()->get('PATH') );
 		
-		return $this->render('story/single.html');
+		return $this->render('story/read.body.html');		
 	}
 	
-	public function buildReviews($storyData, $reviewData, $chapter, $selected)
+	//public function buildReviews($storyData, $reviewData, $chapter, $selected)
+	public function buildReviews($storyData)
 	{
+		$this->javascript('body', TRUE, 'jquery.comments.min.js' );
 		$this->javascript('body', TRUE, 'chapter.js?' );
 
 		$this->dataProcess($storyData);
 		$this->f3->set('story', $storyData);
-		$this->f3->set('data', [
+/* 		$this->f3->set('data', [
 								"reviews" 	=> $reviewData,
 								"selected"	=> $selected,
 								"chapter"	=> $chapter,
-							]);
+							]); */
 		$this->f3->set('returnpath', $this->f3->get('PATH') );
 		
 		return $this->render('story/reviews.html');

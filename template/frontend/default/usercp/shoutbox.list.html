@@ -1,26 +1,28 @@
 <check if="{{isset(@deleted)}}">
 	<switch expr="{{ @deleted }}">
 		<case value="success" break="TRUE">
-			<div class="alert-box-half success">{{@LN__MSG_deletedSuccess}}</div>
+			<div class="notification is-success is-light">{{@LN__MSG_deletedSuccess}}</div>
 		</case>
 		<case value="notfound" break="TRUE">
-			<div class="alert-box-half warning">{{@LN__MSG_deleteNotFound}}</div>
+			<div class="notification is-warning is-light">{{@LN__MSG_deleteNotFound}}</div>
 		</case>
 		<case value="noaccess" break="TRUE">
-			<div class="alert-box-half error">{{@LN__MSG_deleteNoAccess}}</div>
+			<div class="notification is-danger is-light">{{@LN__MSG_deleteNoAccess}}</div>
 		</case>
 		<case value="unknown" break="TRUE">
-			<div class="alert-box-half error">{{@LN__UnknowError}}</div>
+			<div class="notification is-danger is-light">{{@LN__UnknowError}}</div>
 		</case>
 	</switch>
 </check>
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="main/paginate.html" /></F3:check>
-<table class="tbody">
+<div class="table-container">
+  <table class="table is-striped">
+	<thead>
 	<tr>
-		<th>&nbsp;</th>
-		<th>&nbsp;</th>
+		<th>_Edit</th>
+		<th>_Delete</th>
 		<th>{{@LN__Date}}</th>
-		<th>&nbsp;</th>
+		<th>_Shout</th>
 	</tr>
 	<repeat group="{{ @shouts }}" value="{{ @row }}">
 	<tr>
@@ -30,7 +32,9 @@
 		<td>{{ @row.username | raw }}: {{ @row.message | raw }}</td>
 	</tr>
 	</repeat>
-</table>
+	</thead>
+  </table>
+</div>
 <F3:check if="{{isset(@paginate.firstPage) AND sizeof(@shouts)>10}}"><include href="main/paginate.html" /></F3:check>
 <script type="text/javascript">
 $(document).ready (function () {

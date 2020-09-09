@@ -91,6 +91,7 @@ return array(
 
 // [4] Registrierung
 'Registration'			=> 'Registrierung',
+'Register'				=> 'Registrieren',
 'RegisterNow'			=> 'Jetzt registrieren',
 'Reg_AcceptTOS'			=> 'Ich akzeptiere die Nutzungsbedingungen!',
 'Reg_AcceptTOS_Error'	=> 'Du musst den Nutzungsbedingungen zustimmen.',
@@ -103,6 +104,7 @@ return array(
 'Reg_PasswordTwice'		=> 'Passwort bitte zwei mal eingeben',
 'Reg_PasswordMismatch'	=> 'Die eingegebenen Passwörter stimmen nicht miteinander überein.',
 'Reg_PasswordCriteria'	=> 'Dein gewünschtes Passwort erfüllt nicht die Voraussetzungen.',
+'Reg_CaptchaMismatch'	=> 'Der Sicherheitscode wurde nicht oder falsch eingegeben.',
 'Reg_Failed'			=> 'Registrierung fehlgeschlagen!',
 'Reg_FailedSorry'		=> 'Leider kann die Registrierung zu diesem Zeitpunkt nicht abgeschlossen werden',
 	'Reg_Moderation'		=> 'Die Registrierung war erfolgreich, muss aber noch moderiert werden',
@@ -216,10 +218,12 @@ return array(
 'StoryTitle'		=>	'Titel der Geschichte',
 'ChapterTitle'		=>	'Titel des Kapitels',
 'ChapterText'		=>	'Text des Kapitels',
-//'ChapterNotes'	=>	'Notes',
-//'ChapterEndnotes'	=>	'Endnotes',
+//'ChapterNotes'	=>	'Notes',					// db
+//'ChapterEndnotes'	=>	'Endnotes',					// db
 'AddChapter'	=> 'Kapitel hinzufügen',
 'EditHeader'	=> 'Kopfdaten bearbeiten',
+'EditItems'		=> 'Einträge bearbeiten',			// db
+'DeleteItems'	=> 'Einträge löschen',				// db
 'DragdropSort'	=> 'Ziehen, um zu sortieren',
 'SwitchPlainHTML'	=> 'Zum einfachen Modus wechseln',
 'SwitchVisual'		=> 'Zum Editor wechseln',
@@ -227,6 +231,11 @@ return array(
 // [14] Authors
 'NoAuthorsListed'	=> 'Momentan gibt es keine Autoren, die angezeigt werden könnten',
 'Overview'			=> 'Übersicht',
+
+// Library
+'ChangeType'			=> 'Umwandeln',
+'ChangeTypeSeries'		=> '... in eine Serie',
+'ChangeTypeCollection'	=> '... in eine Sammlung',
 
 ///DB
 // User panel - PM
@@ -435,6 +444,7 @@ return array(
 'AdminMenu_News' => 'News',
 'AdminMenu_Modules' => 'Module',
 'AdminMenu_Logs' => 'Logs',
+	'AdminMenu_Logs_X'	=> 'Andere',
 	'AdminMenu_Logs_AM' => 'Wartung durch Admin',
 	'AdminMenu_Logs_DL' => 'Löschungen',
 	'AdminMenu_Logs_EB' => 'Mitglieder bearbeitet',
@@ -484,6 +494,7 @@ return array(
 'AdminMenu_Archive' => 'Archive',
 	'AdminMenu_Intro' => 'Intro',
 	'AdminMenu_Authors' => 'Autorenseite',
+	'AdminMenu_Ebook'	=> 'eBooks',
 'AdminMenu_Submission' => 'Einsendungen',
 	'AdminMenu_Stories' => 'Geschichten',
 	'AdminMenu_Images' => 'Cover Grafik',
@@ -606,7 +617,10 @@ return array(
 	'CFG_stories_per_page'		=> 'Angezeigte Geschichten pro Seite im Archiv.',
 	'CFG_stories_recent'		=> 'Tage für zuletzt erschienene Geschichten.',
 	'CFG_stories_default_order'	=> 'Standardsortierung für Geschichten.',
+	'CFG_stories_default_order_date'	=> 'nach Datum',
+	'CFG_stories_default_order_title'	=> 'nach Titel',
 	'CFG_story_toc_default'		=> 'Zeige immer das Inhaltsverzeichnis bei Geschichten mit mehreren Kapiteln.',
+	// 'CFG_epub_version'			=> 'ePub version@SMALL@v2 is older, but should work on all devices.',
 	// 'CFG_epub_domain'			=> 'ePub Domain@SMALL@Used to calculate your epub UUID v5. Leave blank for default (Archive URL)',
 // archive_images
 	// 'CFG_images_allowed' 		=> 'Erlaube Veröffentlichung von Cover-Grafiken.',
@@ -615,6 +629,8 @@ return array(
 // archive_intro
 	'CFG_story_intro_items' => 'Anzahl der Stories auf der Startseite des Archivs.',
 	'CFG_story_intro_order' => 'Sortierung der Stories auf der Startseite des Archivs.',
+	'CFG_story_intro_order_modified' 	=> 'zuletzt bearbeitet',
+	'CFG_story_intro_order_published' 	=> 'zuerst veröffentlicht',
 // archive_authors
 //	'CFG_author_overview_columns' 	=> 'Columns to show on the overview.',
 //	'CFG_author_letter_columns' 	=> 'Columns to show when selecting a letter.',
@@ -754,7 +770,7 @@ return array(
 
 'NoElements'	=> 'Für diese Ansicht gibt es keine Elemente',
 
-'CheckToDelete'	=> 'Markieren, um zu löschen',
+'CheckBoxToDelete'	=> 'Markiere das Kontrollkästchen, um das Löschen zu bestätigen',
 
 'TOC'	=> 'Inhaltsverzeichnis',
 'NoTags' => 'Keine Tags gesetzt',

@@ -24,14 +24,15 @@ if ( FALSE == $config->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
 	  [ 'GET /story', 'GET /story/@action', 'GET /story/@action/*', ],
 		'Controller\Story->index' );
 
+	// memberlist
 	$f3->route(
-	  [ 'GET|POST /members', 'GET /members/*' ], 'Controller\Members->index' );
+	  [ 'GET|POST /members', 'GET|POST /memberlist', 'GET /memberlist/*' ], 'Controller\Members->index' );
 
+	// member profiles
 	$f3->route(
-	  [ 'GET /member/@user', 
+	  [ 'GET /members/@user', 
 		'GET /member/@user/@selection', 'GET /member/@user/@selection/*' ],
 		'Controller\Members->profile' );
-	$f3->route([ 'GET|POST /member' ] , function($f3) { $f3->reroute('/members', false); } );
 
 	$f3->route(
 	  [ 'POST /story/@action' , 'POST /story/@action/*' ],
@@ -66,9 +67,9 @@ $f3->route( [ 'GET /privacy', 'GET /privacy/*' ], 'Controller\Privacy->index' );
 if ($_SESSION['groups'] & 1)
 {
 	// Logout is always possible
-	$f3->route(
-	[ 'GET /logout', 'GET /logout/*' ],
-	'Controller\Auth->logout' );
+	$f3->route([ 'GET /logout', 'GET /logout/*' ], 'Controller\Auth->logout' );
+	// Always re-route login/register when logged in
+	$f3->route([ 'GET|POST /login', 'GET|POST /register'] , function($f3) { $f3->reroute('/', false); } );
 
 	if ( FALSE == $config->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
 	{
@@ -77,14 +78,11 @@ if ($_SESSION['groups'] & 1)
 			only if not in
 			maintenance
 		-------------------- */
-		$f3->route([ 'GET|POST /login', 'GET|POST /register'] , function($f3) { $f3->reroute('/', false); } );
-
 		$f3->route(
 			[ 'GET|POST /userCP', 'GET|POST /userCP/*' ],
 			'Controller\UserCP->index' );
 
 		// Ajax routes
-//		$f3->route( ['POST /userCP/ajax/@module [ajax]', 'POST /userCP/ajax/@module/@sub [ajax]'], 'Controller\UserCP->ajax' );
 		$f3->route( ['POST /userCP/ajax/@module [ajax]', 'POST /userCP/ajax/@module/* [ajax]'], 'Controller\UserCP->ajax' );
 
 		if ( $_SESSION['groups'] & 32 )

@@ -1,18 +1,44 @@
 <div class="sbox sbarbox">
 	<h4>{{@LN__Shoutbox}}</h4>
 	<div id="sboxContent" data-offset=0>
-		<div class="buttons are-small">
-			<span class="shoutButton button" data-direction="top"><a href="#">{ICON:angle-double-up}</a></span>
-			<span class="shoutButton button" data-direction="up"><a href="#">{ICON:angle-up}</a></span>
-			<span class="shoutButton button" data-direction="down"><a href="#">{ICON:angle-down}</a></span>
-			<check if="{{@_SESSION['userID']>0 OR TRUE==\Config::getPublic('shoutbox_guest')}}"><span class="shoutButton button" data-action="shout"><a href="#">{ICON:comment}</a></span></check>
-		</div>
+
+	<div class="field has-addons">
+	<p class="control">
+		<button class="button">
+		<span class="shoutButton icon is-small" data-direction="top"">
+			{ICON:angle-double-up}
+		</span>
+		</button>
+	</p>
+	<p class="control">
+		<button class="button">
+		<span class="shoutButton icon is-small" data-direction="up"">
+			{ICON:angle-up}
+		</span>
+		</button>
+	</p>
+	<p class="control">
+		<button class="button">
+		<span class="shoutButton icon is-small" data-direction="down"">
+			{ICON:angle-down}
+		</span>
+		</button>
+	</p>
+	<p class="control">
+		<button class="button">
+		<check if="{{@_SESSION['userID']>0 OR TRUE==\Config::getPublic('shoutbox_guest')}}"><span class="shoutButton icon is-small" data-action="shout">
+			{ICON:comment}
+		</span></check>
+		</button>
+	</p>
+	</div>
+
 		<span id="sboxError" style="display: none"></span>
 		<form id="sboxInput" style="display: none">
 			<span id="sboxForm"></span>
 			<div class="buttons are-small">
-				<span class="shoutButton button is-success" data-action="submit"><a href="#">{{@LN__Submit}}</a></span>
-				<span class="shoutButton button is-danger" data-action="reset"><a href="#">{{@LN__Cancel}}</a></span>
+				<input class="shoutButton button is-success" data-action="submit" type="submit" value="{{@LN__Submit}}">
+				<input class="shoutButton button is-light" data-action="reset" type="reset" value="{{@LN__Reset}}">
 			</div>
 		</form>
 		<div id="sboxLines"></div>

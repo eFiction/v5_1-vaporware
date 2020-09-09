@@ -683,6 +683,11 @@ class UserCP extends Controlpanel
 				$ajax_sql = "SELECT U.username as name, U.uid as id from `tbl_users`U WHERE U.username LIKE :username AND (U.groups&5) ORDER BY U.username ASC LIMIT 10";
 				$bind = [ ":username" =>  "%{$data['author']}%" ];
 			}
+			elseif(isset($data['storyID']))
+			{
+				$ajax_sql = "SELECT S.title as name,S.sid as id from `tbl_stories`S WHERE S.title LIKE :story OR S.sid = :sid ORDER BY S.title ASC LIMIT 5";
+				$bind = [ ":story" =>  "%{$data['storyID']}%", ":sid" =>  $data['storyID'] ];
+			}
 			elseif(isset($data['category']))
 			{
 				$ajax_sql = "SELECT category as name, cid as id from `tbl_categories`C WHERE C.category LIKE :category AND C.locked = 0 ORDER BY C.category ASC LIMIT 5";

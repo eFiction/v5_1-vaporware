@@ -2,7 +2,7 @@
 	<div class="column">
 <repeat group="{{ @data }}" value="{{ @entry }}" counter="{{ @ctr }}">
 	<div class="story-box">
-		<div class="story-list-head"><a href="{{@BASE}}/story/{{@type}}/id={{@entry.collid}}">{{@entry.title}}</a> {{@LN__by}} <repeat group="{{@entry.cache_authors}}" value="{{@author}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check><a href="{{@BASE}}/authors/{{@author.0}}">{{@author.1}}</a></repeat></div>
+		<div class="story-list-head"><a href="{{@BASE}}/story/{{@type}}/id={{@entry.collid}}">{{@entry.title}}</a> {{@LN__by}} <repeat group="{{@entry.cache_authors}}" value="{{@author}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check><a href="{{@BASE}}/members/{{@author.1}}">{{@author.1}}</a></repeat></div>
 		<div class="story-list-actions">
 			&nbsp;
 			<check if="{{ @SESSION['userID']>0 }}">

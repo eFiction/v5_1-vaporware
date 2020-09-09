@@ -6,7 +6,7 @@
 	<repeat group="{{@contests.open}}"  value="{{ @contest }}" counter="{{ @ctr }}">
 		<check if="{{@extra=='large'}}">
 			<true>
-				<div class="updated-title"><a href="{{@BASE}}/story/contests/id={{@contest.conid}}">{{@contest.title}}</a> {{@LN__by}} <a href="{{@BASE}}/member/{{@contest.username}}">{{@contest.username}}</a></div>
+				<div class="updated-title"><a href="{{@BASE}}/story/contests/id={{@contest.conid}}">{{@contest.title}}</a> {{@LN__by}} <a href="{{@BASE}}/members/{{@contest.username}}">{{@contest.username}}</a></div>
 				<div class="updated-summary">{{@contest.description | raw}}</div>
 			</true>
 			<false>
@@ -18,7 +18,7 @@
 							<span class="toggle_less" style="display:none" >{ICON:square-up}</span>
 						</span>
 						</check>
-						<a href="{{@BASE}}/story/contests/id={{@contest.conid}}">{{@contest.title}}</a> {{@LN__by}} <a href="{{@BASE}}/member/{{@contest.username}}">{{@contest.username}}</a><br />
+						<a href="{{@BASE}}/story/contests/id={{@contest.conid}}">{{@contest.title}}</a> {{@LN__by}} <a href="{{@BASE}}/members/{{@contest.username}}">{{@contest.username}}</a><br />
 						<check if="{{ @contest.date_open>0 }}">
 							{{@LN__ContestIsActiveSince, date(@CONFIG.date_format ,@contest.date_open) | format }}<br />
 						</check>
@@ -47,7 +47,7 @@
 	<repeat group="{{@contests.votable}}"  value="{{ @contest }}" counter="{{ @ctr }}">
 		<check if="{{@extra=='large'}}">
 			<true>
-				<div class="updated-title"><a href="{{@BASE}}/story/contests/id={{@contest.conid}}">{{@contest.title}}</a> {{@LN__by}} <a href="{{@BASE}}/member/{{@contest.username}}">{{@contest.username}}</a></div>
+				<div class="updated-title"><a href="{{@BASE}}/story/contests/id={{@contest.conid}}">{{@contest.title}}</a> {{@LN__by}} <a href="{{@BASE}}/members/{{@contest.username}}">{{@contest.username}}</a></div>
 				<div class="updated-summary">{{@contest.description | raw}}</div>
 			</true>
 			<false>
@@ -59,7 +59,7 @@
 							<span class="toggle_less" style="display:none" >{ICON:square-up}</span>
 						</span>
 						</check>
-						<a href="{{@BASE}}/story/contests/id={{@contest.conid}}">{{@contest.title}}</a> {{@LN__by}} <a href="{{@BASE}}/member/{{@contest.username}}">{{@contest.username}}</a><br />
+						<a href="{{@BASE}}/story/contests/id={{@contest.conid}}">{{@contest.title}}</a> {{@LN__by}} <a href="{{@BASE}}/members/{{@contest.username}}">{{@contest.username}}</a><br />
 						<check if="{{ @contest.date_close>0 }}">
 							{{@LN__ContestWillCloseOn, date(@CONFIG.date_format ,@contest.date_close) | format }}<br />
 						</check>

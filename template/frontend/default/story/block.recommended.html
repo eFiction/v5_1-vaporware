@@ -3,7 +3,7 @@
 <true>
 	<repeat group="{{@renderData}}"  value="{{ @story }}">
 		<a href="{{@story.url}}" target="_blank">{{@story.title}}</a> {ICON:external-link} {{@LN__by}} {{@story.author}}<br />
-		{{@LN__RecommBy}} <a href="{{@BASE}}/member/{{@story.username}}">{{@story.username}}</a><br />
+		{{@LN__RecommBy}} <a href="{{@BASE}}/members/{{@story.username}}">{{@story.username}}</a><br />
 		<check if="{{isset(@story.cache_categories.0.1)}}">
 			<repeat group='@story.cache_categories' value='@category' counter='{{ @ctr }}'><check if="{{@ctr>1}}">, </check>{ICON:folder} <a href="{{@BASE}}/story/browse/catIn={{@category.0}}">{{@category.1}}</a></repeat><br />
 		</check>

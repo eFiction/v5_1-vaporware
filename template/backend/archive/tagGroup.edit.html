@@ -16,27 +16,55 @@
 </check>
 <!-- END: success notification -->
 
-{*<h1>{{@LN__ACP_TagGroups}}:</h1>*}
+<!-- <h1>{{@LN__ACP_TagGroups}}</h1> -->
+
+<div class="columns">
+<div class="column is-half">
 
 <form action="{{@BASE}}/adminCP/archive/tags/groups/id={{ @data['id'] }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
-<div class="field">
-  <div class="control">
-	<div class="columns">
-		<div class="column is-2">{{@LN__ACP_TagGroupLabel}}</div>
-		<div class="column is-5"><input class="input" type="text" name="form_data[label]" value="{{ @data.label }}" /></div>
-	</div>
-	<div class="columns">
-		<div class="column is-2">{{@LN__ACP_TagGroup}}</div>
-		<div class="column is-5"><input class="input" type="text" name="form_data[description]" value="{{ @data.description }}" /></div>
-	</div>
-	<div class="columns">
-		<div class="column is-half">
-			<div class="buttons">
-				<input class="button is-success" type="submit">
-				<input class="button" type="reset">
-			</div>
-		</div>
-		</div>
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__ACP_TagGroupLabel}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<input class="input" type="text" name="form_data[label]" value="{{ @data.label }}" />
+		</div></div>
 	</div>
 </div>
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__ACP_TagGroup}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<input class="input" type="text" name="form_data[description]" value="{{ @data.description }}" />
+		</div></div>
+	</div>
+</div>
+	
+<div class="field is-horizontal">
+	<div class="field-label"><!-- Left empty for spacing --></div>
+	<div class="field-body">
+		<div class="field">
+			<div class="control">
+				<div class="field is-grouped">
+					<p class="control">
+						<button class="button is-success" type="submit">
+							<span class="icon">{ICON:save}</span>
+							<span>{{@LN__Submit}}</span>
+						</button>
+					</p>
+					<p class="control">
+						<button class="button is-light" type="reset">
+							<span class="icon">{ICON:undo}</span>
+							<span>{{@LN__Reset}}</span>
+						</button>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>	
+	
+	
 </form>
+</div></div>

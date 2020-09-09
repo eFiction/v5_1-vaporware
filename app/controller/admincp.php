@@ -126,6 +126,7 @@ class AdminCP extends Base
 		$data['General'] = $this->model->settingsFields('archive_general');
 		$data['Intro'] = $this->model->settingsFields('archive_intro');
 		$data['Authors'] = $this->model->settingsFields('archive_authors');
+		$data['Ebook'] = $this->model->settingsFields('archive_ebook');
 		$this->buffer( $this->template->settingsFields($data, "archive/home", $feedback) );
 	}
 	
@@ -1825,13 +1826,8 @@ class AdminCP extends Base
 
 		if( isset ($params['id']) )
 		{
-			if ( $params['id']=="new" )
-			{
-				$this->buffer( $this->template->collectionAdd($module) );
-				return;
-			}
 			// edit the elements of the collection/series
-			elseif ( isset ($params['items']) AND NULL !== $data = $this->model->collectionLoadItems($params['id']) )
+			if ( isset ($params['items']) AND NULL !== $data = $this->model->collectionLoadItems($params['id']) )
 			{
 				$data['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
 				$this->buffer( $this->template->collectionItems($data, $module, @$params['returnpath']) );

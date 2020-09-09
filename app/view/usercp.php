@@ -178,17 +178,15 @@ class UserCP extends Base
 		return $this->render('usercp/library/bookFavEdit.html');
 	}
 	
-	public function libraryCollectionAdd (string $module, string $returnpath="") : string
-	{
-		$this->f3->set('module', 	$module);
-		$this->f3->set('returnpath', $returnpath);
-
-		return $this->render('usercp/library/collection.add.html');
-	}
-
 	public function libraryCollectionsList(array $data, array $sort, string $module) : string
 	{
-		//while ( list($key, $value) = each($data) )
+		if( isset($_SESSION['lastAction']) )
+		{
+			foreach( $_SESSION['lastAction'] as $key => $value )
+				$this->f3->set($key,$value);
+			unset($_SESSION['lastAction']);
+		}
+
 		foreach ( $data as $key => $value )
 			$this->dataProcess($data[$key], $key);
 
@@ -201,6 +199,13 @@ class UserCP extends Base
 
 	public function collectionEdit(array $data, array $prePop, string $module, string $returnpath="" ) : string
 	{
+		if( isset($_SESSION['lastAction']) )
+		{
+			foreach( $_SESSION['lastAction'] as $key => $value )
+				$this->f3->set($key,$value);
+			unset($_SESSION['lastAction']);
+		}
+
 		if($data['editor']=="visual" AND $this->config['advanced_editor']==TRUE )
 		{
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );

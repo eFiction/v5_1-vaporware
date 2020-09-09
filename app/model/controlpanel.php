@@ -728,10 +728,13 @@ class Controlpanel extends Base {
 		$newCollection->title	= $data['title'];
 		$newCollection->uid		= $_SESSION['userID'];
 		$newCollection->open	= 0;
+		$newCollection->ordered	= $data['ordered'];
 		$newCollection->status	= "H";
 		$newCollection->save();
 		
 		$newID = $newCollection->_id;
+		\Cache::instance()->reset("menuUCPCountLib.{$_SESSION['userID']}");
+
 		return $newID;
 	}
 	
@@ -824,24 +827,33 @@ class Controlpanel extends Base {
 		$where = ($userID) ? "AND Coll.uid = {$userID}" : "";
 
 		$sql = "SELECT Coll.collid, Coll.title, Coll.ordered,
-					GROUP_CONCAT(DISTINCT S.sid,',',S.title ORDER BY (rCS.inorder),S.title ASC SEPARATOR '||') as storyblock
+					S.sid,S.title,
+					GROUP_CONCAT(DISTINCT A.uid,',',A.username ORDER BY A.username ASC SEPARATOR '||') as authorblock
 					FROM `tbl_collections`Coll
 						LEFT JOIN `tbl_collection_stories`rCS ON ( Coll.collid = rCS.collid )
 							LEFT JOIN `tbl_stories`S ON ( rCS.sid = S.sid )
+							LEFT JOIN `tbl_stories_authors`rSA ON ( rCS.sid = rSA.sid )
+								LEFT JOIN `tbl_users`A ON ( rSA.aid = A.uid )
 					WHERE Coll.collid = :collid @WHERE@
-					GROUP BY Coll.collid";
+					GROUP BY rCS.sid
+					ORDER BY
+						CASE ordered WHEN 1 THEN rCS.inorder END ASC, 
+						CASE ordered WHEN 0 THEN S.updated END DESC";
 
-		$tmp = $this->exec(str_replace("@WHERE@", $where, $sql), [":collid" => $collid ])[0] ?? [];
+		$items = $this->exec(str_replace("@WHERE@", $where, $sql), [":collid" => $collid ]);
 
-		if (sizeof($tmp)==0)
+		if (sizeof($items)==0)
 			return NULL;
+
+		foreach ( $items as &$item )
+			$item["authorblock"] = parent::cleanResult($item['authorblock']);
 
 		$data =
 		[
-			"collid"			=> $tmp['collid'],
-			"title"				=> $tmp['title'],
-			"ordered"			=> $tmp['ordered'],
-			"storyblock"		=> parent::cleanResult($tmp['storyblock']),
+			"collid"		=> $items[0]['collid'],
+			"title"			=> $items[0]['title'],
+			"ordered"		=> $items[0]['ordered'],
+			"items"			=> ($items[0]['sid'])?$items:NULL,
 		];
 
 		return $data;
@@ -970,8 +982,12 @@ class Controlpanel extends Base {
 
 	public function collectionSave(int $collid, array $data, int $userID=0)
 	{
+		$uid = ($userID==0)?$data['maintainer']:$_SESSION['userID'];
 		$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collections');
-		$collection->load(array('collid=?',$collid));
+		if($userID)
+			$collection->load(array('collid=? AND uid=?', $collid, $userID));
+		else
+			$collection->load(array('collid=?', $collid));
 
 		$collection->copyfrom( 
 			[
@@ -996,11 +1012,35 @@ class Controlpanel extends Base {
 		$this->rebuildCollectionCache($collection->collid);
 		
 		// drop menu cache if type changed:
-		if(isset($data['changetype'])) \Cache::instance()->reset("menuUCPCountLib.{$_SESSION['userID']}");
+		if(isset($data['changetype'])) \Cache::instance()->reset("menuUCPCountLib.{$uid}");
 
 		return $i;
 	}
 	
+	public function collectionDelete(int $collid, array $data, int $userID=0)
+	{
+		$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collections');
+		
+		// attempt to delete based upon ACP or UCP access
+		if($userID)
+			$i = $collection->erase(array('collid=? AND uid=?', $collid, $userID));
+		else
+			$i = $collection->erase(array('collid=?', $collid));
+		
+		// if one item was deleted, clean up the relation tables
+		if ( $i )
+		{
+			(new \DB\SQL\Mapper($this->db, $this->prefix.'collection_properties'))->erase(array('collid=?', $collid));
+			(new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories'))->erase(array('collid=?', $collid));
+
+			// decide whose menu cache to delete
+			$uid = ($userID==0)?$data['maintainer']:$_SESSION['userID'];
+			\Cache::instance()->reset("menuUCPCountLib.{$uid}");
+		}
+		// report the result
+		return $i;
+	}
+
 	private function collectionProperties( $collid, $data, $type )
 	{
 		// Check tags:
@@ -1063,6 +1103,16 @@ class Controlpanel extends Base {
 			// Access violation *todo*
 			
 		}
+	}
+	
+	public function libraryCollectionItemDelete(int $collid, int $itemid, int $userID=0)
+	{
+		// make sure the user actuall owns this collection
+		if ( ($userID==0) OR  (1 == (new \DB\SQL\Mapper($this->db, $this->prefix."collections"))->count(['collid=? AND uid=?', $collid, $userID])) )
+		{
+			return (new \DB\SQL\Mapper($this->db, $this->prefix."collection_stories"))->erase(['collid=? AND sid=?', $collid, $itemid]);
+		}
+		return 0;
 	}
 	
 	public function collectionAjaxItemsort(array $data, int $userID = 0)

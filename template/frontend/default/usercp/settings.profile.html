@@ -1,4 +1,74 @@
-<fieldset>
+<div class="notification">
+<form method="post" action="{{@BASE}}/userCP/settings/profile">
+<div class="field">
+  <label class="label">Username</label>
+  <div class="control">
+    <input class="input" type="text" placeholder="{{ @SESSION['username'] }}">
+  </div>
+  <p class="help">At the moment only admins can change the username.</p>
+</div>
+
+<div class="field">
+  <label class="label">Realname</label>
+  <div class="control">
+    <input class="input" type="text" placeholder="Text input">
+  </div>
+  <p class="help">What is your name?</p>
+</div>
+
+<div class="field">
+  <label class="label">Location</label>
+  <div class="control">
+    <input class="input" type="text" placeholder="Text input">
+  </div>
+  <p class="help">Where do you come from?</p>
+</div>
+
+<div class="field">
+  <label class="label">E-Mail</label>
+  <div class="control">
+    <input class="input" type="text" placeholder="Text input">
+  </div>
+  <p class="help">Your E-Mail will be hidden for visitors, but we need it for several functions.</p>
+</div>
+
+<div class="field">
+  <label class="label">Website</label>
+  <div class="control">
+    <input class="input" type="text" placeholder="Text input">
+  </div>
+  <p class="help">Share a link to your website.</p>
+</div>
+
+<div class="field">
+  <label class="label">Birthdate</label>
+  <div class="control">
+    <input class="input" type="text" placeholder="Text input">
+  </div>
+  <p class="help">Your birthday will apear at your profile and at the websites calendar.</p>
+</div>
+
+<div class="field">
+  <label class="label">Biography</label>
+  <div class="control">
+    <textarea class="textarea" placeholder="Textarea"></textarea>
+  </div>
+  <p class="help">Tell us a little bit about yourself.</p>
+</div>
+</div>
+<div class="field is-grouped">
+  <div class="control">
+    <button class="button is-link">Submit</button>
+  </div>
+  <div class="control">
+    <button class="button is-link is-light">Cancel</button>
+  </div>
+</div>
+</form>
+</div>
+
+
+<!-- <fieldset>
 <legend>LEGEND</legend>
 <form method="post" action="{{@BASE}}/userCP/settings/profile">
 	<table>
@@ -47,4 +117,4 @@
 	</table>
 	<input class="button" type="submit"><input class="button" type="reset">
 </form>
-</fieldset>
+</fieldset> -->

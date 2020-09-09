@@ -98,12 +98,7 @@ class Members extends Base
 	
 	public function memberStories(array $author, array $options): array
 	{
-		//if ( empty($options['page']) OR $options['page']==1 )
-		//{
-			$data['cat'] = $this->profileCategories($author['uid']);
-			$data['tag'] = $this->profileTags($author['uid']);
-			$data['char'] = $this->profileCharacters($author['uid']);
-		//}
+		$data = $this->profileGetCount($author['uid']);
 			
 		$limit = $this->config['stories_per_page'];
 		
@@ -154,57 +149,68 @@ class Members extends Base
 		return $data;
 	}
 
-	protected function profileCategories(int $uid, bool $full=FALSE) : array
+	protected function profileGetCount(int $uid, bool $full=FALSE) : array
 	{
-		$sql = "SELECT SQL_CALC_FOUND_ROWS 
-				C.category as name, C.cid, count(C.cid) as counted
-					FROM `tbl_stories_authors`rSA
-						INNER JOIN `tbl_stories_categories`rSC ON (rSC.sid = rSA.sid AND rSA.type='M' AND rSA.aid = :uid)
-					LEFT JOIN `tbl_categories`C ON ( rSC.cid = C.cid )
-				GROUP BY C.cid
-				ORDER BY counted DESC";
-		if (!$full) $sql .= " LIMIT 0,5";
+		// all available jobs to get a member profile count of categories, tags characters
+		$jobs =
+		[
+			"cat"	=>
+			[
+				"name" => "Categories",
+				"sql"	=> "SELECT SQL_CALC_FOUND_ROWS 
+							C.category as name, C.cid, count(C.cid) as counted
+								FROM `tbl_stories_authors`rSA
+									INNER JOIN `tbl_stories_categories`rSC ON (rSC.sid = rSA.sid AND (rSA.type='M' OR rSA.type='S') AND rSA.aid = :uid)
+								LEFT JOIN `tbl_categories`C ON ( rSC.cid = C.cid )
+							GROUP BY C.cid
+							ORDER BY counted DESC"
+			],
+			"tag"	=>
+			[
+				"name" => "Categories",
+				"sql"	=> "SELECT SQL_CALC_FOUND_ROWS 
+							T.label, T.tid, count(T.tid) as counted
+								FROM `tbl_stories_authors`rSA
+									INNER JOIN `tbl_stories_tags`rST ON (rSA.sid = rST.sid AND rST.character=0 AND (rSA.type='M' OR rSA.type='S') AND rSA.aid = :uid)
+										INNER JOIN `tbl_tags`T ON ( rST.tid = T.tid AND T.tgid = 1 )
+							GROUP BY T.tid
+							ORDER BY counted DESC, T.label ASC"
+			],
+			"char"	=>
+			[
+				"name" => "Categories",
+				"sql"	=> "SELECT SQL_CALC_FOUND_ROWS 
+							Ch.charname, Ch.charid, count(Ch.charid) as counted
+								FROM `tbl_stories_authors`rSA
+									INNER JOIN `tbl_stories_tags`rSC ON (rSA.sid = rSC.sid AND rSC.character=1 AND (rSA.type='M' OR rSA.type='S') AND rSA.aid = :uid)
+										INNER JOIN `tbl_characters`Ch ON ( rSC.tid = Ch.charid )
+							GROUP BY Ch.charid
+							ORDER BY counted DESC, Ch.charname ASC"
+			],
+		];
 		
-		$data = $this->exec( $sql, [ ":uid" => $uid ] );
-		
-		// return 'n' elements and the amount of total elements
-		return [ $data, $this->exec("SELECT FOUND_ROWS() as found")[0]['found'] ];
+		// run through the jobs defined above
+		foreach ( $jobs as $key => $fields )
+		{
+			// create the proper name for the cache field
+			$cachename = 'memberProfile'.$fields['sql'].($full?'Full':'').'Cache_'.$uid;
+			unset($cache);
+			// if the cache field is empty, use sql statement from above to get data
+			if ( "" == $cache = \Cache::instance()->get($cachename) )
+			{
+				if (!$full) $fields['sql'] .= " LIMIT 0,5";
+
+				$tmp = $this->exec( $fields['sql'], [ ":uid" => $uid ] );
+
+				// remember 'n' elements and the amount of total elements
+				$cache = [ $tmp, $this->exec("SELECT FOUND_ROWS() as found")[0]['found'] ];
+				\Cache::instance()->set($cachename, $cache, 300);
+			}
+			$data[$key] = $cache;
+		}
+		return $data;
 	}
 
-	protected function profileTags(int $uid, bool $full=FALSE) : array
-	{
-		$sql = "SELECT SQL_CALC_FOUND_ROWS 
-				T.label, T.tid, count(T.tid) as counted
-					FROM `tbl_stories_authors`rSA
-						INNER JOIN `tbl_stories_tags`rST ON (rSA.sid = rST.sid AND rST.character=0 AND rSA.type='M' AND rSA.aid = :uid)
-							INNER JOIN `tbl_tags`T ON ( rST.tid = T.tid AND T.tgid = 1 )
-				GROUP BY T.tid
-				ORDER BY counted DESC, T.label ASC";
-		if (!$full) $sql .= " LIMIT 0,5";
-		
-		$data = $this->exec( $sql, [ ":uid" => $uid ] );
-		
-		// return 'n' elements and the amount of total elements
-		return [ $data, $this->exec("SELECT FOUND_ROWS() as found")[0]['found'] ];
-	}
-	
-	protected function profileCharacters(int $uid, bool $full=FALSE) : array
-	{
-		$sql = "SELECT SQL_CALC_FOUND_ROWS 
-				Ch.charname, Ch.charid, count(Ch.charid) as counted
-					FROM `tbl_stories_authors`rSA
-						INNER JOIN `tbl_stories_tags`rSC ON (rSA.sid = rSC.sid AND rSC.character=1 AND rSA.type='M' AND rSA.aid = :uid)
-							INNER JOIN `tbl_characters`Ch ON ( rSC.tid = Ch.charid )
-				GROUP BY Ch.charid
-				ORDER BY counted DESC, Ch.charname ASC";
-		if (!$full) $sql .= " LIMIT 0,5";
-		
-		$data = $this->exec( $sql, [ ":uid" => $uid ] );
-		
-		// return 'n' elements and the amount of total elements
-		return [ $data, $this->exec("SELECT FOUND_ROWS() as found")[0]['found'] ];
-	}
-	
 	public function loadBookmarks(array $author, array $options, int $page ): array
 	{
 		$data = $this->loadFavourites($author, $options, $page, TRUE);
@@ -279,53 +285,4 @@ class Members extends Base
 		return $data;
 	}
 	
-/*
-//	public function profileData(int $uid)
-	public function profileData(int $uid)
-	{
-		$user = $this->profileUser($uid);
-
-		// is there any user data?
-		if ( isset($user[0]['username']) )
-		{
-			$user[0]['fields'] = parent::cleanResult($user[0]['fields']);
-			
-			return
-			[
-				"cat"	=> $this->profileCategories($uid),
-				"tag"	=> $this->profileTags($uid),
-				"char"	=> $this->profileCharacters($uid),
-				"user"	=> $user[0],
-			];
-		}
-		
-		// return FALSE if not
-		return FALSE;
-	}
-	
-//	public function profileUser(int $uid) : array
-	public function profileUser($uid)
-	{
-		$sql = "SELECT
-					U.username, U.realname, UNIX_TIMESTAMP(U.registered) as registered, U.groups, U.about, U.uid, 
-					GROUP_CONCAT(F.field_title, ',', F.field_type, ',', I.info, ',', F.field_options ORDER BY F.field_order ASC SEPARATOR '||' ) as fields
-					FROM `tbl_users`U
-						LEFT JOIN `tbl_user_info`I ON ( U.uid = I.uid )
-						INNER JOIN `tbl_user_fields`F ON ( I.field = F.field_id )
-					WHERE U.uid = :uid AND U.groups > 0";
-		return $this->exec( $sql, [ ":uid" => $uid ] );
-	}
-
-	
-//	public function uidByName(string $name): int 
-	public function uidByName($name)
-	{
-		$sql = "SELECT U.uid FROM `tbl_users`U WHERE U.username = :name;";
-		$data = $this->exec( $sql, [ ":name" => $name ] );
-		
-		if( isset($data[0]['uid']) )
-			return $data[0]['uid'];
-		else return 0;
-	}
-*/	
 }

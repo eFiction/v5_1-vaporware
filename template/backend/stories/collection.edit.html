@@ -4,7 +4,7 @@
 		<check if="{{!empty(@returnpath)}}">{ICON:arrow-left} <a href="{{@BASE}}{{@returnpath}}">{{@LN__Return}}</a></check>&nbsp;
 	</div>
 	<div class="column">
-		<a href="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @data['collid'] }}/items/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">{@LN*__EditStories}</a> {ICON:arrow-right}
+		<a href="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @data['collid'] }}/items/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">{{@LN__EditItems}}</a> {ICON:arrow-right}
 	</div>
 </div>
 
@@ -25,7 +25,7 @@
 </check>
 <!-- END: success notification -->
 
-<h2><check if="{{@data.ordered==1}}"><true>{{@LN__Series}}</true><false>{@LN_Collection}</false></check></h2>
+{* <h2><check if="{{@data.ordered==1}}"><true>{{@LN__Series}}</true><false>{{@LN__Collections}}</false></check></h2> *}
 <form action="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @data['collid'] }}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
 <div class="field is-horizontal">
   <div class="field-label is-normal">
@@ -166,18 +166,22 @@
 </div>
 
 <div class="field is-horizontal">
-	<div class="field-label is-normal"><label class="label">{@LN__Convert}</label></div>
+	<div class="field-label">
+		<label class="label">{{@LN__ChangeType}}</label>
+	</div>
 	<div class="field-body">
 		<div class="field"><div class="control">
-			<input type="checkbox" name="form_data[changetype]" />
-			<check if="{{ @data.ordered==1 }}">
-				<true>
-					{@*LN__makeCollection}
-				</true>
-				<false>
-					{@*LN__makeSeries}
-				</false>
-			</check>
+			<label class="checkbox">
+				<input type="checkbox" name="form_data[changetype]" />
+				<check if="{{ @data.ordered==1 }}">
+					<true>
+						{{@LN__ChangeTypeCollection}}
+					</true>
+					<false>
+						{{@LN__ChangeTypeSeries}}
+					</false>
+				</check>
+			</label>
 		</div></div>
 	</div>
 </div>
@@ -186,12 +190,6 @@
 	<div class="field-label">&nbsp;</div>
 	<div class="field-body">
 		<div class="field is-grouped">
-			<p class="control">
-				<a class="button is-danger" href="{{@BASE}}/adminCP/stories/series/id={{@data.collid}}">
-					<span class="icon">{ICON:remove}</span>
-					<span>{{@LN__Delete}}</span>
-				</a>
-			</p>				
 			<p class="control">
 				<button class="button is-primary" type="submit">
 					<span class="icon">{ICON:save}</span>
@@ -202,6 +200,12 @@
 				<button class="button is-light" type="reset">
 					<span class="icon"><i class="fas fa-undo-alt"></i></span>
 					<span>{{@LN__Reset}}</span>
+				</button>
+			</p>
+			<p class="control">
+				<button class="button is-danger" href="{{@BASE}}/adminCP/stories/series/id={{@data.collid}}">
+					<span class="icon">{ICON:remove}</span>
+					<span>{{@LN__Delete}}</span>
 				</button>
 			</p>
 		</div>

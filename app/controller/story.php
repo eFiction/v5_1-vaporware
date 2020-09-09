@@ -640,12 +640,13 @@ class Story extends Base
 
 			if ( $view == "toc" )
 			{
-				$tocData = $this->model->getTOC($story);
+				$tocData  = $this->model->getTOC($story);
+				$storyData['infoblock']  = TRUE;
 				$content = $this->template->buildTOC($tocData,$storyData);
 			}
 			else
 			{
-				$tocData = $this->model->getMiniTOC($story);
+				$tocData = $this->model->getChapterList($story);
 
 				if( empty($view) OR !is_numeric($view) ) $view = 1;
 				$chapter = $view = max ( 1, min ( $view, $storyData['chapters']) );
@@ -658,10 +659,11 @@ class Story extends Base
 				//	$content = "Error (Load chaptertext)";
 
 				$storyData['chapternr'] = $chapter;
+				$storyData['chapterTitle'] = $tocData[($chapter-1)]['title'];
 			}
 
 			$dropdown = $this->template->dropdown($tocData,$view);
-			return $this->template->buildStory($storyData,$content,$dropdown,$view);
+			return $this->template->readBody($storyData,$content,$dropdown,$view);
 		}
 		else return "__Error, not found";
 	}
@@ -673,9 +675,10 @@ class Story extends Base
 		if($storyData = $this->model->getStory($story,(int)$chapter))
 		{
 			$chapter = max ( 0, min ( $chapter, $storyData['chapters']) );
-			$reviewData = $this->model->loadReviews($story,$selected,$storyData['chapid']);
+			//$reviewData = $this->model->loadReviews($story,$selected,$storyData['chapid']);
 
-			return $this->template->buildReviews($storyData, $reviewData, $chapter, $selected);
+			//return $this->template->buildReviews($storyData, $reviewData, $chapter, $selected);
+			return $this->template->buildReviews($storyData);
 		}
 		else return "__Error, not found";
 	}

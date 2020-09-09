@@ -8,7 +8,7 @@
 		<ul class="author-grid">
 			<repeat group="{{ @authors }}" value="{{ @author }}">
 			<!-- BLOCK:NAMES -->
-				<li><a href="{{@BASE}}/member/{{ @author.name }}">{{ @author.name }}</a> ({{ @author.stories }})</li>
+				<li><a href="{{@BASE}}/members/{{ @author.name }}">{{ @author.name }}</a> ({{ @author.stories }})</li>
 			<!-- END:NAMES -->
 			</repeat>
 		</ul>
@@ -23,7 +23,7 @@
 		<ul class="alphabetical">
 		<repeat group="{{ @listing }}" value="{{ @author }}">
 			<li>
-				<a href="{{@BASE}}/member/{{ @author.name }}">{ICON:member}</a>
+				<a href="{{@BASE}}/members/{{ @author.name }}">{ICON:member}</a>
 				{{ @author.name }} ({{ @author.stories }})
 			</li>
 		</repeat>

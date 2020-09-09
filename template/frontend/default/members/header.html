@@ -11,19 +11,19 @@
 	<div id="memberMenu" class="navbar-menu">
 		<div class="navbar-start">
 		<check if="{{ @userdata.extras.stories>0 }}">
-			<a class="navbar-item button navmenu" href="{{@BASE}}/member/{{ @userdata.username }}/stories">
+			<a class="navbar-item button navmenu" href="{{@BASE}}/members/{{ @userdata.username }}/stories">
 				<span class="icon">{ICON:reader}</span>
 				<span>{{ @userdata.extras.stories }} {{@LN__Stories}}</span>
 			</a> 
 		</check>
 		<check if="{{ @userdata.extras.series>0 }}">
-			<a class="navbar-item button navmenu" href="{{@BASE}}/member/{{ @userdata.username }}/series">
+			<a class="navbar-item button navmenu" href="{{@BASE}}/members/{{ @userdata.username }}/series">
 				<span class="icon">{ICON:numlist}</span>
 				<span>{{ @userdata.extras.series }} {{@LN__Series}}</span>
 			</a> 
 		</check>
 		<check if="{{ @userdata.extras.collections>0 }}">
-			<a class="navbar-item button navmenu" href="{{@BASE}}/member/{{ @userdata.username }}/collections">
+			<a class="navbar-item button navmenu" href="{{@BASE}}/members/{{ @userdata.username }}/collections">
 				<span class="icon">{ICON:list}</span>
 				<span>{{ @userdata.extras.collections }} {{@LN__Collections}}</span>
 			</a> 
@@ -36,7 +36,7 @@
 				</a> 
 				<div class="navbar-dropdown">
 				<repeat group="{{ @userdata.extras.favourites }}" value="{{ @favs }}">
-					<a class="navbar-item" href="{{@BASE}}/member/{{ @userdata.username }}/favourites/{{ @favs.1 }}">
+					<a class="navbar-item" href="{{@BASE}}/members/{{ @userdata.username }}/favourites/{{ @favs.1 }}">
 						<span>{{ ${"LN__FavType_".@favs[1]}, @favs.0 | format }}</span>
 					</a> 
 				</repeat>
@@ -51,7 +51,7 @@
 				</a> 
 				<div class="navbar-dropdown">
 				<repeat group="{{ @userdata.extras.bookmarks }}" value="{{ @books }}">
-					<a class="navbar-item" href="{{@BASE}}/member/{{ @userdata.username }}/bookmarks/{{ @books.1 }}">
+					<a class="navbar-item" href="{{@BASE}}/members/{{ @userdata.username }}/bookmarks/{{ @books.1 }}">
 						<span>{{ ${"LN__FavType_".@books[1]}, @books.0 | format }}</span>
 					</a> 
 				</repeat>
@@ -84,34 +84,6 @@
 		</check>
 
 	</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', () => {
-
-  // Get all "navbar-burger" elements
-  const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
-
-  // Check if there are any navbar burgers
-  if ($navbarBurgers.length > 0) {
-
-    // Add a click event on each of them
-    $navbarBurgers.forEach( el => {
-      el.addEventListener('click', () => {
-
-        // Get the target from the "data-target" attribute
-        const target = el.dataset.target;
-        const $target = document.getElementById(target);
-
-        // Toggle the "is-active" class on both the "navbar-burger" and the "navbar-menu"
-        el.classList.toggle('is-active');
-        $target.classList.toggle('is-active');
-
-      });
-    });
-  }
-
-});
-</script>
 
 	<check if="{{ isset(@removed) }}">
 		<check if="{{ @removed=='success' }}">

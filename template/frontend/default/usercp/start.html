@@ -1,11 +1,57 @@
-<article class="message">
-  <div class="message-body">
-    {{ @LN__Welcome }} {{ @SESSION['username'] }} 
-  </div>
-</article>
+<div class="columns">
+	<div class="column">
+	{{ @LN__Welcome }} {{ @SESSION['username'] }}
+	</div>
+</div>
 
 <article class="message is-info">
   <div class="message-body">
     You have <a href="{{ @BASE }}/userCP/messaging/inbox">{{ @SESSION['mail'][1] }} {{@LN__PM_unread}}</a> messages in your inbox.
   </div>
 </article>
+
+<div class="columns">
+	<div class="column">
+    Your favorites have been updated.
+	</div>
+</div>
+
+<div class="columns">
+	<div class="column">
+    Add chapter to unfinished works.
+ 	</div>
+</div>
+
+<div class="columns">
+	<div class="column is-full"><h4>Your Stats</h4></div>
+</div>
+<div class="columns">
+	<div class="column">
+		<nav class="level">
+		<div class="level-item has-text-centered">
+			<div>
+			<p class="heading">Favourite Author of</p>
+			<p class="title">10</p>
+			</div>
+		</div>
+		<div class="level-item has-text-centered">
+			<div>
+			<p class="heading">Faved Stories</p>
+			<p class="title">499</p>
+			</div>
+		</div>
+		<div class="level-item has-text-centered">
+			<div>
+			<p class="heading">Reviews received</p>
+			<p class="title">960</p>
+			</div>
+		</div>
+		<div class="level-item has-text-centered">
+			<div>
+			<p class="heading">Intern recommendations</p>
+			<p class="title">3</p>
+			</div>
+		</div>
+		</nav>
+	</div>
+</div>

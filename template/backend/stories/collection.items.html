@@ -4,17 +4,26 @@
 		<check if="{{!empty(@returnpath)}}">{ICON:arrow-left} <a href="{{@BASE}}{{@returnpath}}">{{@LN__Return}}</a></check>&nbsp;
 	</div>
 	<div class="column">
-		<a href="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @data['collid'] }}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">{@LN*__EditHeader}</a> {ICON:arrow-right}
+		{ICON:arrow-left} <a href="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @data['collid'] }}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">{{@LN__EditHeader}}</a>
 	</div>
 </div>
 
-<ul id="story-sort" class="box">
-		<repeat group="{{ @data.storyblock }}" value="{{ @row }}" counter="{{ @ctr }}">
-			<li id="{{ @row.0 }}">
-				{ICON:arrow-vert} {{ @ctr }}: {{ @row.1 }} 
-			</li>
-		</repeat>
-</ul>
+<div class="columns is-multiline" id="story-sort" >
+	<repeat group="{{ @data.items }}" value="{{ @item }}" counter="{{ @ctr }}">
+	<div class="column is-full box" id="{{ @item.sid }}">
+		<div class="columns">
+			<div class="column">{ICON:arrow-vert} {{ @ctr }}: {{ @item.title }} </div>
+			<div class="column"><repeat group="{{ @item.authorblock }}" value="{{ @author }}"><a class="button is-small">{{@author.1}}</a></repeat></div>
+			<div class="column is-1">
+				<a class="button is-danger is-small" href="{{@BASE}}/userCP/library/{{@module}}/id={{@data.collid}}/delete={{ @item.sid }}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">
+					<span class="icon">{ICON:remove}</span>
+					<span>{{@LN__Delete}}</span>
+				</a>
+			</div>
+		</div>
+	</div>
+	</repeat>
+</div>
 
 <div class="columns">
 	<div class="column is-half">
@@ -41,16 +50,23 @@ $(document).ready(function() {
 
 	$("#story-sort").sortable({
 		cursor: "move",
-		placeholder: "ui-state-highlight",
+		sort: function(event, ui) {
+			var $target = $(event.target);
+			if (!/html|body/i.test($target.offsetParent()[0].tagName)) {
+				var top = event.pageY - $target.offsetParent().offset().top - (ui.helper.outerHeight(true) / 2);
+				ui.helper.css({'top' : top + 'px'});
+			}
+		},
 		update: function () {
 			var neworder = $('#story-sort').sortable('toArray');
 			$.ajax({
 				type: "post",
-				url: "{{@BASE}}/adminCP/ajax/stories/sort",
+				url: "{{@BASE}}/userCP/ajax/library",
 				data: { collectionsort: {{@data.collid}}, neworder: neworder },
 				dataType: "html"
 			});
 		}
 	});
+	$( "#story-sort" ).disableSelection();
 });
 </script>

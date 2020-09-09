@@ -3,7 +3,7 @@
 	<div class="column is-one-half">
 		<div class="is-pulled-right"><a class="button" <check if="{{ @data.entries>0 }}">href="{{@BASE}}/story/contests/id={{@data.id}}/entries"</check>>{{@LN__Entries, @data.entries | format }}</a></div>
 	</div>
-	<div class="column is-full"><h4>{{@data.title}}<br />{{@LN__by}} <a href="{{@BASE}}/member/{{@data.username}}">{{@data.username}}</a></h4></div>
+	<div class="column is-full"><h4>{{@data.title}}<br />{{@LN__by}} <a href="{{@BASE}}/members/{{@data.username}}">{{@data.username}}</a></h4></div>
 	<div class="column is-one-third">
 		<switch expr="{{ @data.active }}">
 			<case value="preparing" break="TRUE">

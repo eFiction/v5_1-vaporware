@@ -25,6 +25,8 @@
 		<check if="{{ isset(@changes) }}"><div class="gb-90 alert-box success">{{ @LN__Status_Changes, @changes | format }}</div></check>
 *}
 
+<div class="columns">
+<div class="column is-half">
 <form action="{{@BASE}}/adminCP/archive/ratings/id={{ @data['rid'] }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
 
 <div class="field is-horizontal">
@@ -49,7 +51,7 @@
 	<div class="field-label is-normal"><label class="label">{{@LN__ACP_RatingWarning}}</label></div>
 	<div class="field-body">
 		<div class="field"><div class="control">
-			<a class="button is-light"><input type="checkbox" name="form_data[ratingwarning]" value="ratingwarning"<check if="{{ @data['ratingwarning'] }}"> checked="checked"</check> /></a>
+			<input type="checkbox" name="form_data[ratingwarning]" value="ratingwarning"<check if="{{ @data['ratingwarning'] }}"> checked="checked"</check> />
 		</div></div>
 	</div>
 </div>
@@ -70,7 +72,7 @@
 			<div class="control">
 				<div class="field is-grouped">
 					<p class="control">
-						<button class="button is-primary" type="submit">
+						<button class="button is-success" type="submit">
 							<span class="icon">{ICON:save}</span>
 							<span>{{@LN__Submit}}</span>
 						</button>
@@ -87,3 +89,5 @@
 	</div>
 </div>
 </form>
+
+</div></div>
