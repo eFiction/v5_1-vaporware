@@ -1,5 +1,8 @@
-/* import default template css  */
-@import url(../../default/css/styles.css);
+/* load bulma main css */
+@import url(darkstyles.css);
+/* load helper css */
+@import url(../../default/css/helper.css);
+/* load font definitions */
+@import url(../../default/css/typography.css);
 
 /*-----------------  overwrite color settings  -----------------*/
-

@@ -1,108 +1,85 @@
-<h2><a href="{{@BASE}}/members/{{ @userdata.username }}/profile">{{@userdata.username}}</a></h2>
+<h2>{{@userdata.username}}</h2>
 
-	<div class="navbar-brand">
-		<div id="navbarBurger" class="navbar-burger burger" data-target="memberMenu">
-			<span></span>
-			<span></span>
-			<span></span>
-		</div>
+<div class="columns is-mobile is-multiline is-centered">
+	<div class="column is-narrow">
+		<a href="{{@BASE}}/members/{{ @userdata.username }}/profile">
+			<span class="icon">{ICON:member}</span>
+			<span>{{@LN__Profile}}</span>
+		</a> 
 	</div>
 
-	<div id="memberMenu" class="navbar-menu">
-		<div class="navbar-start">
-		<check if="{{ @userdata.extras.stories>0 }}">
-			<a class="navbar-item button navmenu" href="{{@BASE}}/members/{{ @userdata.username }}/stories">
-				<span class="icon">{ICON:reader}</span>
-				<span>{{ @userdata.extras.stories }} {{@LN__Stories}}</span>
-			</a> 
-		</check>
-		<check if="{{ @userdata.extras.series>0 }}">
-			<a class="navbar-item button navmenu" href="{{@BASE}}/members/{{ @userdata.username }}/series">
-				<span class="icon">{ICON:numlist}</span>
-				<span>{{ @userdata.extras.series }} {{@LN__Series}}</span>
-			</a> 
-		</check>
-		<check if="{{ @userdata.extras.collections>0 }}">
-			<a class="navbar-item button navmenu" href="{{@BASE}}/members/{{ @userdata.username }}/collections">
-				<span class="icon">{ICON:list}</span>
-				<span>{{ @userdata.extras.collections }} {{@LN__Collections}}</span>
-			</a> 
-		</check>
-		<check if="{{ @userdata.extras.favourites_count>0 }}">
-			<div class="navbar-item has-dropdown is-hoverable">
-				<a class="navbar-link button navmenu">
+	<check if="{{ @userdata.extras.stories>0 }}">
+	<div class="column is-narrow">
+		<a href="{{@BASE}}/members/{{ @userdata.username }}/stories">
+			<span class="icon">{ICON:book}</span>
+			<span>{{ @userdata.extras.stories }} {{@LN__Stories}}</span>
+		</a> 
+	</div>
+	</check>
+	
+	<check if="{{ @userdata.extras.series>0 }}">
+	<div class="column is-narrow">
+		<a href="{{@BASE}}/members/{{ @userdata.username }}/series">
+			<span class="icon">{ICON:numlist}</span>
+			<span>{{@LN__SeriesCounted, @userdata.extras.series | format }}</span>
+		</a> 
+	</div>
+	</check>
+	
+	<check if="{{ @userdata.extras.collections>0 }}">
+	<div class="column is-narrow">
+		<a href="{{@BASE}}/members/{{ @userdata.username }}/collections">
+			<span class="icon">{ICON:list}</span>
+			<span>{{@LN__CollectionsCounted, @userdata.extras.collections | format }}</span>
+		</a> 
+	</div>
+	</check>
+	
+	<check if="{{ @userdata.extras.favourites_count>0 }}">
+	<div class="column is-narrow">
+		<div class="dropdown is-hoverable">
+			<div class="dropdown-trigger">
+				<span aria-haspopup="true" aria-controls="dropdown-menu1">
 					<span class="icon">{ICON:favourite}</span>
 					<span>{{ @LN__FavType_FAV, @userdata.extras.favourites_count | format }}</span>
-				</a> 
-				<div class="navbar-dropdown">
-				<repeat group="{{ @userdata.extras.favourites }}" value="{{ @favs }}">
-					<a class="navbar-item" href="{{@BASE}}/members/{{ @userdata.username }}/favourites/{{ @favs.1 }}">
-						<span>{{ ${"LN__FavType_".@favs[1]}, @favs.0 | format }}</span>
-					</a> 
-				</repeat>
+					<i class="fas fa-angle-down" aria-hidden="true"></i>
+				</span>
+			</div>
+			<div class="dropdown-menu" id="dropdown-menu1" role="menu">
+				<div class="dropdown-content">
+					<repeat group="{{ @userdata.extras.favourites }}" value="{{ @favs }}">
+						<a class="dropdown-item" href="{{@BASE}}/members/{{ @userdata.username }}/favourites/{{ @favs.1 }}">
+							<span>{{ ${"LN__FavType_".@favs[1]}, @favs.0 | format }}</span>
+						</a>
+					</repeat>
 				</div>
 			</div>
-		</check>
-		<check if="{{ @userdata.extras.bookmarks_count>0 }}">
-			<div class="navbar-item has-dropdown is-hoverable">
-				<a class="navbar-link button navmenu">
+		</div>
+	</div>
+	</check>
+	
+	<check if="{{ @userdata.extras.bookmarks_count>0 }}">
+	<div class="column is-narrow">
+		<div class="dropdown is-hoverable">
+			<div class="dropdown-trigger">
+				<span aria-haspopup="true" aria-controls="dropdown-menu2">
 					<span class="icon">{ICON:bookmark}</span>
 					<span>{{ @LN__FavType_BM, @userdata.extras.bookmarks_count | format }}</span>
-				</a> 
-				<div class="navbar-dropdown">
-				<repeat group="{{ @userdata.extras.bookmarks }}" value="{{ @books }}">
-					<a class="navbar-item" href="{{@BASE}}/members/{{ @userdata.username }}/bookmarks/{{ @books.1 }}">
-						<span>{{ ${"LN__FavType_".@books[1]}, @books.0 | format }}</span>
-					</a> 
-				</repeat>
+					<i class="fas fa-angle-down" aria-hidden="true"></i>
+				</span>
+			</div>
+			<div class="dropdown-menu" id="dropdown-menu2" role="menu">
+				<div class="dropdown-content">
+					<repeat group="{{ @userdata.extras.bookmarks }}" value="{{ @books }}">
+						<a class="dropdown-item" href="{{@BASE}}/members/{{ @userdata.username }}/bookmarks/{{ @books.1 }}">
+							<span>{{ ${"LN__FavType_".@books[1]}, @books.0 | format }}</span>
+						</a>
+					</repeat>
 				</div>
 			</div>
-		</check>
 		</div>
-	
-		<check if="{{ @_SESSION['userID']>0 AND @userdata.uid != @_SESSION['userID'] }}">
-		<div class="navbar-end">
-				<check if="{{ @userdata.friend==FALSE }}">
-				<true>
-				<a class="navbar-item button navmenu" href="{{@BASE}}/userCP/friends/update/add={{@userdata.username}};returnpath={{@current_path}}">
-					<span class="icon">{ICON:user-friend}</span>
-					<span>{{@LN__Friend}}</span>
-				</a>
-				</true>
-				<false>
-				<a class="navbar-item button navmenu" href="{{@BASE}}/userCP/friends/update/remove={{@userdata.username}};returnpath={{@current_path}}">
-					<span class="icon">{ICON:user-friend-remove}</span>
-					<span>{{@LN__Friend}}</span>
-				</a>
-				</false>
-				</check>
-			<a class="navbar-item button navmenu">
-				<span class="icon">{ICON:mail}</span>
-				<span>{{@LN__Contact}}</span>
-			</a>
-		</div>
-		</check>
-
 	</div>
-
-	<check if="{{ isset(@removed) }}">
-		<check if="{{ @removed=='success' }}">
-			<true>
-			<div class="notification is-success"><button class="delete"></button>**__removed</div>
-			</true>
-			<false>
-			<div class="notification is-warning"><button class="delete"></button>**__notRemoved</div>
-			</false>
-		</check>
 	</check>
 
-	<check if="{{ isset(@added) }}">
-		<check if="{{ @added=='success' }}">
-			<true>
-			<div class="notification is-success"><button class="delete"></button>**__added</div>
-			</true>
-			<false>
-			<div class="notification is-warning"><button class="delete"></button>**__notAdded</div>
-			</false>
-		</check>
-	</check>
+</div>
+<hr>

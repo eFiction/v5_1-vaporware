@@ -1,14 +1,9 @@
-/* import basic settings, IE-fixes and grids */
-@import url(bulma.min.css);
-@import url(bulma.tooltip.css);
-@import url(bulma-badge.min.css);
-/* @import url(forms.css); */
+/* load bulma main css */
+@import url(default.css);
+/* load helper css */
+@import url(helper.css);
+/* load font definitions */
 @import url(typography.css);
-@import url(tokeninput.css);
-@import url(barfiller.css);
-@import url(jquery.comments.css);
-@import url(jquery.datetimepicker.css);
-@import url(cookieconsent.css);
 
 /* --------------- listing --------------- */
 

@@ -9,7 +9,7 @@
 		<section class="hero is-warning is-small"><div class="hero-body"><div class="container"><h2 class="subtitle">{{@LN__MaintenanceMode}}!</h2></div></div></section>
 	</check>
 
-	<div class="container"><!-- start container -->
+	<div class="container is-fullhd"><!-- start container -->
 	<div class="columns">
 		<div class="column"><a href="{{@BASE}}"><h1>{{@CONFIG.page_title}}</h1></a> {{@CONFIG.page_slogan}}</div>
 	</div>
@@ -28,10 +28,11 @@
 		
 	<!-- regular pages -->
 		<false>
-		<div class="column is-2">
-			{BLOCK:story.tagcloud.20}{BLOCK:shoutbox}
+		<div class="column is-2 is-hidden-touch">
+				{BLOCK:story.tagcloud.20}
+			{BLOCK:shoutbox}
 			{{@LEFT}}
-		</div>
+			</div>
 			<!-- select width for main section -->
 			<check if="{{ isset(@bigscreen) }}">
 				<true>

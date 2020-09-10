@@ -2,12 +2,28 @@
 
 <include href="members/header.html" />
 
-<div class="columns is-multiline is-mobile">
+<div class="columns">
+	<div class="column is-full">
+		{ICON:calendar} {{ date(@CONFIG.date_format, @userdata.registered) }}<br />
+		{ICON:members} {{@LN__UserGroup}}: {{ floor(log(@userdata.groups, 2)) }}<br />
+		<check if="{{!empty(@userdata.realname)}}">{ICON:realname} {{@LN__Realname}}: {{ @userdata.realname }}</check><br />
+		{ICON:birthday-cake} birthday<br />
+		{ICON:globe-europe} location<br />
+		{ICON:home} url
+	</div>
+</div>
+<div class="columns">
+	<div class="column is-full">{{ nl2br (@userdata.about) | raw }}</div>
+</div>
+
+<hr>
+
+<!-- <div class="columns is-multiline is-mobile">
 	<div class="column is-one-quarter">{{@LN__Username}}:</div> <div class="column is-one-quarter">{{ @userdata.username }}</div>
 	<check if="{{!empty(@userdata.realname)}}"><div class="column is-one-quarter">{{@LN__Realname}}:</div> <div class="column is-one-quarter">{{ @userdata.realname }}</div></check>
 	<div class="column is-one-quarter">{{@LN__Registered}}:</div> <div class="column is-one-quarter">{{ date(@CONFIG.date_format, @userdata.registered) }}</div>
 	<div class="column is-one-quarter">{{@LN__UserGroup}}:</div> <div class="column is-one-quarter">{{ floor(log(@userdata.groups, 2)) }}</div>
 	<div class="column is-full">{{ nl2br (@userdata.about) | raw }}</div>
-</div>
+</div> -->
 
 

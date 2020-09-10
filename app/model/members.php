@@ -69,7 +69,7 @@ class Members extends Base
 
 			// parse and count favourites
 			$library['favourites_count'] = 0;
-			if ( isset($library['favourites']) AND is_array($library['favourites']) AND sizeof($library['favourites']) )
+			if ( isset($library['favourites']) )
 			{
 				$library['favourites'] = $this->cleanResult( $library['favourites'] );
 				foreach ( $library['favourites'] as $fav )
@@ -78,7 +78,7 @@ class Members extends Base
 
 			// parse and count bookmarks
 			$library['bookmarks_count'] = 0;
-			if ( isset($library['bookmarks']) AND is_array($library['bookmarks']) AND sizeof($library['bookmarks']) )
+			if ( isset($library['bookmarks']) )
 			{
 				$library['bookmarks'] = $this->cleanResult( $library['bookmarks'] );
 				foreach ( $library['bookmarks'] as $book )

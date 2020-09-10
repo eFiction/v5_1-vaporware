@@ -288,10 +288,19 @@ return array(
 'Recomms'	=> 'Recommendations',
 'RecommBy'	=> 'Recommended by',
 'Collections'	=> 'Collections',
+'CollectionsCounted'		=> '{0, plural,'.	// db
+	'zero	{No collections},'.
+	'one	{One collection},'.
+	'other	{# collections} }',
 'Series'	=> 'Series',
+'SeriesCounted'		=> '{0, plural,'.	// db
+	'zero	{No series},'.
+	'one	{One series},'.
+	'other	{# series} }',
 'Story'		=> 'Story',
 'Stories'	=> 'Stories',
 'Episodes'	=> 'Episodes',
+'Profile'	=> 'Profile',		//db
 
 // UserCP elements
 'ChangeTo'	=> 'Change to',

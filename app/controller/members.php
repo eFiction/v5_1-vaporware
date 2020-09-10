@@ -83,7 +83,7 @@ class Members extends Base {
 		if ( sizeof($data) == 0 )
 		{
 			// return to member page on empty data
-			$this->f3->reroute("/member/".$user_data['username'], false);
+			$this->f3->reroute("/members/".$user_data['username'], false);
 			exit;
 		}
 

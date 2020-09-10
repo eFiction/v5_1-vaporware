@@ -374,7 +374,7 @@ class UserCP extends Controlpanel
 		}
 	}
 	
-	public function authorStoryList( string $select, int $author, string $sort, int $page )
+	public function authorStoryList( string $select, int $author, array $sort, int $page )
 	{
 		$limit = 20;
 		$pos = $page - 1;
