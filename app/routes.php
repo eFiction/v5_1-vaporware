@@ -31,7 +31,7 @@ if ( FALSE == $config->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
 	// member profiles
 	$f3->route(
 	  [ 'GET /members/@user', 
-		'GET /member/@user/@selection', 'GET /member/@user/@selection/*' ],
+		'GET /members/@user/@selection', 'GET /members/@user/@selection/*' ],
 		'Controller\Members->profile' );
 
 	$f3->route(

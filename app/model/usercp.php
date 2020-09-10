@@ -152,7 +152,7 @@ class UserCP extends Controlpanel
 		if ( $module == "LIB" )
 		{
 			// look for cached data
-			if ( FALSE === \Cache::instance()->exists("menuUCPCountLib.{$_SESSION['userID']}", $counter) )
+			if ( FALSE === \Cache::instance()->exists("menuUCPCountLib_.{$_SESSION['userID']}", $counter) )
 			{
 				// prepare query
 				$sql[]= "SET @bms  := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_user_favourites`F WHERE F.uid={$_SESSION['userID']} AND F.bookmark=1 GROUP BY F.type) AS F1);";
@@ -183,7 +183,7 @@ class UserCP extends Controlpanel
 					else $count['details'] = "";
 				}
 				// cache the result for max 10 minutes or changes occur
-				\Cache::instance()->set("menuUCPCountLib.{$_SESSION['userID']}", $counter, 600);
+				\Cache::instance()->set("menuUCPCountLib_.{$_SESSION['userID']}", $counter, 600);
 			}
 
 			$this->menuCount['data']['library'] = $counter;
@@ -232,7 +232,7 @@ class UserCP extends Controlpanel
 		}
 		elseif ( $module == "PL" )
 		{
-			if ( "" == $data = \Cache::instance()->get('openPolls') )
+			if ( FALSE === \Cache::instance()->exists('openPolls', $data) )
 			{
 				$sql = "SELECT UNIX_TIMESTAMP(`end_date`) as end FROM `tbl_poll` WHERE `start_date`IS NOT NULL AND (`end_date` IS NULL OR `end_date` > NOW()) ORDER BY `end_date` DESC;";
 				$probe = $this->exec($sql);
@@ -251,6 +251,25 @@ class UserCP extends Controlpanel
 		return @$this->menuCount['data'][$module];
 	}
 	
+	public function startGetStats() : array
+	{
+		if ( FALSE === \Cache::instance()->exists("userStats_.{$_SESSION['userID']}", $stats) )
+		{
+			$stats = 
+			[
+				// count times this user was set as favourite author
+				"fav_a" => (new \DB\SQL\Mapper($this->db, $this->prefix."user_favourites"))->count(['item=? AND type=?',$_SESSION['userID'],'AU']),
+				// count times this user's stories were set as favourite
+				"fav_s" => (new \DB\SQL\Mapper($this->db, "v_statsUserStoryFavBM"))->count(['aid=? AND type=? and bookmark=0',$_SESSION['userID'],'M']),
+				// count reviews this user has received for stories
+				"revre" => (new \DB\SQL\Mapper($this->db, "v_statsUserStoryReviews"))->count(['aid=? AND type=?',$_SESSION['userID'],'M']),
+			
+			];
+			\Cache::instance()->set("userStats_.{$_SESSION['userID']}", $stats, 10);
+		}
+		return $stats;
+	}
+
 	public function authorStoryAdd($data)
 	{
 		$newStory = new \DB\SQL\Mapper($this->db, $this->prefix."stories");
@@ -327,8 +346,7 @@ class UserCP extends Controlpanel
 		return ( empty($data) ) ? NULL : $data[0];
 	}
 	
-//	public function authorStoryDelete(int $sid,int $uid)
-	public function authorStoryDelete( $storyID, $authorID )
+	public function authorStoryDelete(int $storyID, int $authorID)
 	{
 		$sql = "SELECT S.completed, A2.aid
 					FROM `tbl_stories`S
@@ -356,7 +374,7 @@ class UserCP extends Controlpanel
 		}
 	}
 	
-	public function authorStoryList($select,$author,$sort,$page)
+	public function authorStoryList( string $select, int $author, string $sort, int $page )
 	{
 		$limit = 20;
 		$pos = $page - 1;
@@ -401,7 +419,7 @@ class UserCP extends Controlpanel
 		return $data;
 	}
 	
-	public function authorStoryHeaderSave( $storyID, array $post )
+	public function authorStoryHeaderSave( int $storyID, array $post )
 	{
 		$story=new \DB\SQL\Mapper($this->db, $this->prefix.'stories');
 		$story->load(array('sid=?',$storyID));
@@ -452,7 +470,7 @@ class UserCP extends Controlpanel
 		$this->rebuildStoryCache($story->sid);
 	}
 
-	public function authorStoryChapterAdd($sid, $uid)
+	public function authorStoryChapterAdd( int $sid, int $uid)
 	{
 		return parent::storyChapterAdd($sid, $uid);
 	}
@@ -518,7 +536,7 @@ class UserCP extends Controlpanel
 		return TRUE;
 	}
 	
-	public function authorCuratorGet()
+	public function authorCuratorGet() : array
 	{
 		$data = $this->exec("SELECT C.username, C.uid
 								FROM `tbl_users`U 
@@ -534,7 +552,7 @@ class UserCP extends Controlpanel
 		return $return;
 	}
 	
-	public function authorCuratorSet($uid)
+	public function authorCuratorSet( int $uid ) : bool
 	{
 		$data = $this->exec("SELECT U.uid FROM `tbl_users`U WHERE U.uid = :uid AND U.groups > 0;",[":uid" => $uid]);
 		if(empty($data)) return FALSE;
@@ -542,7 +560,7 @@ class UserCP extends Controlpanel
 		return TRUE;
 	}
 	
-	public function feedbackHomeStats(array $data)
+	public function feedbackHomeStats( array $data ) : array
 	{
 		$chapters = $this->exec("SELECT COUNT(1) as count FROM `tbl_chapters`C INNER JOIN `tbl_stories_authors`SA ON ( C.sid = SA.sid ) WHERE SA.aid = {$_SESSION['userID']};")[0]['count'];
 
@@ -565,7 +583,7 @@ class UserCP extends Controlpanel
 		return $stats;
 	}
 	
-	public function saveFeedback(array $post, array $params)
+	public function saveFeedback( array $post, array $params ) : array
 	{
 		$sql = "UPDATE `tbl_feedback`
 				SET `text` = :text
@@ -580,8 +598,13 @@ class UserCP extends Controlpanel
 		// no recount required, editing a feedback does not change stats
 	}
 	
-	public function deleteFeedback(array $post, array $params)
+	public function deleteFeedback( array $post, array $params ) : array
 	{
+		// drop user feedback stat cache
+		\Model\Routines::dropUserCache("feedback");
+		// purge stats cache, forcing re-cache
+		\Cache::instance()->clear('stats');
+
 		$sql = "DELETE FROM `tbl_feedback`
 				WHERE `fid` = :fid AND `type` = :type;";
 		return $this->exec( $sql,
@@ -590,13 +613,9 @@ class UserCP extends Controlpanel
 						":type"	=> $params['id'][0],
 					]
 		);
-		// drop user feedback stat cache
-		\Model\Routines::dropUserCache("feedback");
-		// purge stats cache, forcing re-cache
-		\Cache::instance()->clear('stats');
 	}
 	
-	public function friendsAdd($username)
+	public function friendsAdd( string $username )
 	{
 		$sql = "INSERT INTO `tbl_user_friends` (`user_id`, `friend_id`)
 					SELECT '{$_SESSION['userID']}', U.uid 
@@ -612,7 +631,7 @@ class UserCP extends Controlpanel
 		$_SESSION['lastAction']['added'] = "failed";
 	}
 
-	public function friendsRemove($username, $permanent = TRUE)
+	public function friendsRemove( string $username, $permanent = TRUE )
 	{
 		if ( $permanent )
 		{
@@ -638,7 +657,7 @@ class UserCP extends Controlpanel
 		return (bool)$children;
 	}
 	
-	public function reviewDelete($fid)
+	public function reviewDelete( int $fid ) : bool
 	{
 		$bind = [ ":fid" => $fid ];
 		if ( $storyID = $this->exec("SELECT F.reference FROM `tbl_feedback`F WHERE F.fid = :fid AND type='ST';", $bind ) )
@@ -646,7 +665,7 @@ class UserCP extends Controlpanel
 		else
 		{
 			// Set a session note to show after reroute
-			$_SESSION['lastAction'] = [ "error" => "badID" ];
+			$_SESSION['lastAction']['error'] = "badID";
 			return FALSE;
 		}
 		
@@ -660,7 +679,7 @@ class UserCP extends Controlpanel
 		}
 
 		// Set a session note to show after reroute
-		$_SESSION['lastAction'] = [ "error" => "unknown" ];
+		$_SESSION['lastAction']['error'] = "unknown";
 		return FALSE;
 	}
 	

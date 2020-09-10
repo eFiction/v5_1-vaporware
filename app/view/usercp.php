@@ -31,8 +31,9 @@ class UserCP extends Base
 		return $this->render('usercp/menu.upper.html');
 	}
 	
-	public function start ()
+	public function start (array $stats)
 	{
+		$this->f3->set('stats', $stats);
 		return $this->render('usercp/start.html');
 	}
 	

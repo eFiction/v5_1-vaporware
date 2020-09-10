@@ -155,7 +155,7 @@ return array(
 'Token_InputHint'	=> 'Suchwort eingeben',
 'Token_NoMatches'	=> 'Keine Treffer',
 //'Token_StartTyping' => '',
-'SearchContest'		=> 'Contest suchen',
+'SearchContest'		=> 'Wettbewerb suchen',
 'SearchCharacter'	=> 'Charakter suchen',
 'SearchStory'		=> 'Geschichte suchen',
 'SearchTag'			=> 'Tag suchen',
@@ -491,7 +491,7 @@ return array(
 'ACP_NewProfileField' => 'Neues Profil-Feld anlegen', //DB
 
 // AdminCP Archive elements
-'AdminMenu_Archive' => 'Archive',
+'AdminMenu_Archive' => 'Archiv',
 	'AdminMenu_Intro' => 'Intro',
 	'AdminMenu_Authors' => 'Autorenseite',
 	'AdminMenu_Ebook'	=> 'eBooks',
@@ -588,7 +588,7 @@ return array(
 //'AddFeature'			=> 'Add as feature',
 
 // Admin - Archive - Contest
-//'AdminMenu_Contests'	=> 'Wettbewerb',
+'AdminMenu_Contests'	=> 'Wettbewerbe',
 'ContestSummary'		=> 'Kurzbeschreibung',
 //'ContestDescription'	=> 'Beschreibung des Wettbewerbs',
 

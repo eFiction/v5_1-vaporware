@@ -114,7 +114,7 @@ class Members extends Base
 		
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
-			"/member/{$author['username']}/stories",
+			"/members/{$author['username']}/stories",
 			$limit
 		);
 		
@@ -130,7 +130,7 @@ class Members extends Base
 				
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
-			$ordered ? "/member/{$userData['username']}/series" : "/member/{$userData['username']}/collections",
+			$ordered ? "/members/{$userData['username']}/series" : "/members/{$userData['username']}/collections",
 			$limit
 		);
 		
@@ -278,7 +278,7 @@ class Members extends Base
 		
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
-			"/member/{$author['username']}/".(($bookmarks)?"bookmarks":"favourites")."/{$options[0]}",
+			"/members/{$author['username']}/".(($bookmarks)?"bookmarks":"favourites")."/{$options[0]}",
 			$limit
 		);
 

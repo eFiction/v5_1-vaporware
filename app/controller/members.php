@@ -46,6 +46,7 @@ class Members extends Base {
 		// still in the game, let's check for extra options
 		$options = ( isset($params['*']) ) ? $this->parametric($params['*']) : [];
 		// check what to do
+
 		switch ( @$params['selection'] )
 		{
 			case "profile":

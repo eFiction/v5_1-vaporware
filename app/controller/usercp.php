@@ -68,7 +68,10 @@ class UserCP extends Base
 		// no additional work required here
 		$this->showMenu();
 		
-		return $this->template->start();
+		// get some user stats
+		$stats = $this->model->startGetStats();
+		
+		return $this->template->start($stats);
 	}
 	
 	public function author(\Base $f3, array $params)//: void

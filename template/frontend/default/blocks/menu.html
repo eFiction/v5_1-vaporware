@@ -1,4 +1,4 @@
-<!-- https://bulma.io/documentation/components/navbar/ -->
+{*<!-- https://bulma.io/documentation/components/navbar/ -->*}
 
 <nav class="navbar" role="navigation" aria-label="main navigation">
  	<div class="navbar-brand">
@@ -8,32 +8,27 @@
 			<span></span>
 		</div>
 	</div>
-  
-  <div id="mainMenu" class="navbar-menu">
-    <div class="navbar-start">
-      <repeat group="{{ @menuMain }}" value="{{ @item }}">
-	  <a class="navbar-item navmenu" href='{{@BASE}}/{{@item.link}}'>{{@item.label}}</a>
-		</repeat>
-	</div>
- </div>
- 
-</nav>
-  
-<!-- <div id="mainMenu" class="navbar-menu">
-	 <repeat group="{{ @menuMain }}" value="{{ @item }}">
-		<a class="navbar-item" href='{{@BASE}}/{{@item.link}}'>{{@item.label}}</a>
-	</repeat>
- 
- 	<check if="{{ ( @menuSub )}}">
-    <div class="navbar-item has-dropdown">
-		<repeat group="{{ @menuMain }}" value="{{ @item }}">
-			<a class="navbar-link" href='{{@BASE}}/{{@item.link}}'>{{@item.label}}</a>
-		</repeat>
-	</div>
-		<div class="navbar-dropdown">
-			<repeat group="{{ @menuSub }}" value="{{ @item }}">
-				<a class="navbar-item" href='{{@BASE}}/{{@item.link}}'>{{@item.label}}</a>
+
+	<div id="mainMenu" class="navbar-menu">
+		<div class="navbar-start">
+			<repeat group="{{ @menuMain }}" value="{{ @item }}">
+				<a class="navbar-item navmenu" href='{{@BASE}}/{{@item.link}}'>{{@item.label}}</a>
 			</repeat>
+			{*<!--
+			Currently unused sub-menu dropdown
+			<check if="{{ ( @menuSub )}}">
+			<div class="navbar-item has-dropdown is-hoverable">
+				<repeat group="{{ @menuMain }}" value="{{ @item }}">
+					<a class="navbar-link" href='{{@BASE}}/{{@item.link}}'>{{@item.label}}</a>
+				</repeat>
+				<div class="navbar-dropdown">
+					<repeat group="{{ @menuSub }}" value="{{ @item }}">
+						<a class="navbar-item" href='{{@BASE}}/{{@item.link}}'>{{@item.label}}</a>
+					</repeat>
+				</div>
+			</div>
+			</check>
+			-->*}
 		</div>
-	</check>
-</div> -->
+	</div>
+</nav>
