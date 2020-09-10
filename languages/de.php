@@ -823,6 +823,8 @@ return array(
 'Poll_End'			=> 'Ende',
 'Poll_EndExplain'	=> 'Markieren, um die Umfrage dauerhaft offen zu lassen. Kann jederzeit nachträglich geändert werden.',
 'Poll_Options'		=> 'Antwortmöglichkeiten',
+'Poll_NoVotes'		=> 'Es wurden keine Stimmen für diese Umfrage abgegeben',
+'Poll_NoActivePolls'	=> 'Momentan gibt es keine aktiven Umfragen',
 
 // Archiv News'
 'News_Headline'	=> 'Schlagzeile',

@@ -1,50 +1,49 @@
-<include href="main/header.html" />
+<!-- Hero head: will stick at the top -->
+<div class="hero-head">
+	<include href="main/header.html" />
+</div>
 
-{*
-<!-- Hero content: will be in the middle -->
+<!-- open hero body -->
 <div class="hero-body">
-<div class="container"><!-- end hero container -->
-*}
- 	<check if="{{TRUE==\Config::getPublic('maintenance')}}">
-		<section class="hero is-warning is-small"><div class="hero-body"><div class="container"><h2 class="subtitle">{{@LN__MaintenanceMode}}!</h2></div></div></section>
-	</check>
+<check if="{{TRUE==\Config::getPublic('maintenance')}}">
+	<section class="hero is-warning is-small"><div class="hero-body"><div class="container"><h2 class="subtitle">{{@LN__MaintenanceMode}}!</h2></div></div></section>
+</check>
 
-	<div class="container is-fullhd"><!-- start container -->
-	<div class="columns">
-		<div class="column"><a href="{{@BASE}}"><h1>{{@CONFIG.page_title}}</h1></a> {{@CONFIG.page_slogan}}</div>
-	</div>
-	<div class="columns">
-		<div class="column">{BLOCK:menu.main}</div>
-	</div>
+<!-- open main container -->
+<div class="container is-fullhd">
 	
-	<div class="columns"><!-- start columns -->
+		<a href="{{@BASE}}"><h1>{{@CONFIG.page_title}}</h1></a> {{@CONFIG.page_slogan}}
+		{BLOCK:menu.main}
+	
+	
+	<!-- start columns -->
+	<div class="columns">
 	<check if="{{ @@systempage }}">
+		<!-- layout for system pages (admin panel, error pages, ...) -->
 		<true>
-	<!-- layout for system pages (admin panel, error pages, ...) -->
-		<true>
-		<div class="column is-3">{{@LEFT|raw}}</div>
-		<div class="column is-9"><!-- start content -->
+			<div class="column is-3">{{@LEFT|raw}}</div>
+			<div class="column is-9"><!-- start content -->
 		</true>
-		
-	<!-- regular pages -->
+		<!-- regular pages -->
 		<false>
-		<div class="column is-2 is-hidden-touch">
-				{BLOCK:story.tagcloud.20}
-			{BLOCK:shoutbox}
-			{{@LEFT}}
+			<div class="column is-2 is-hidden-touch">
+					{BLOCK:story.tagcloud.20}
+				{BLOCK:shoutbox}
+				{{@LEFT}}
 			</div>
 			<!-- select width for main section -->
 			<check if="{{ isset(@bigscreen) }}">
 				<true>
-		<div class="column is-10"><!-- start content -->
+					<div class="column is-10"><!-- start content -->
 				</true>
 				<false>
-		<div class="column is-8"><!-- start content -->
+					<div class="column is-8"><!-- start content -->
 				</false>
 			</check>
 		</false>
 	</check>
 
+	<!-- show page title and subtitle if available -->
 	<check if="{{ isset(@title_h1) }}">
 			<h1>{{ @title_h1 }}</h1>
 	</check>
@@ -54,21 +53,24 @@
 	</check>
 
 		{{@BODY | raw }}
-		</div><!-- end content -->
+		<!-- end left/center column -->
+		</div>
 
 	<!-- drop right bar for system  -->
 	<check if="{{ empty(@bigscreen) and empty(@systempage) }}">
 		<div class="column is-2">
-		{BLOCK:story.stats}{BLOCK:categories}{BLOCK:calendar}
+			{BLOCK:story.stats}{BLOCK:categories}{BLOCK:calendar}
 			{{@RIGHT|raw}}
 		</div>
 	</check>
 	</div><!-- end columns -->
 	
-	</div><!-- end container -->
-{*	
-</div><!-- end hero container -->
-</div><!-- END Hero content: will be in the middle -->
-*}
+<!-- end main container -->
+</div>
 
-<include href="main/footer.html" />
+<!-- end hero body -->
+</div>
+
+<div class="hero-foot">
+	<include href="main/footer.html" />
+</div>

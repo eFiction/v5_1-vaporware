@@ -823,6 +823,8 @@ return array(
 'Poll_End'			=> 'End',
 'Poll_EndExplain'	=> 'Check to keep open indefinitely. Can be closed anytime.',
 'Poll_Options'		=> 'Reply options',
+'Poll_NoVotes'		=> 'No votes were cast for this poll',
+'Poll_NoActivePolls'	=> 'Currently, there are no active polls',
 
 // Archive News
 'News_Headline'	=> 'Headline',

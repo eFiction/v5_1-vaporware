@@ -6,3 +6,6 @@
 @import url(../../default/css/typography.css);
 
 /*-----------------  overwrite color settings  -----------------*/
+
+.hero.is-fullheight .hero-body
+{ align-items: baseline; }

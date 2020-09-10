@@ -13,5 +13,6 @@
 		</check>
 		<br />
 	</repeat>
+	<check if="{{ empty(@pollItems) }}">{{@LN__Poll_NoActivePolls}}<br /></check>
 	<a class="button is-light" href='{{@BASE}}/home/polls'>{{@LN__AllPolls}}</a>
 </div>
