@@ -22,7 +22,8 @@ return array(
 'DateTime'	=>	'Datum und Uhrzeit',
 'Message'	=>	'Nachricht',
 'UnknowError'		=> 'Ein unbekannter Fehler ist aufgetreten',
-'MaintenanceMode'	=> 'Archiv befindet sich in der Wartung',
+'MaintenanceMode'	=> 'Archiv befindet sich im Wartungsmodus',
+'MaintenanceSwitch'	=> 'Dies kann hier umgestellt werden',			//db
 'monthly'		=> 'monthly',
 'weekly'		=> 'weekly',
 'daily'			=> 'daily',

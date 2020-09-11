@@ -1,36 +1,44 @@
-<include href="main/header.html" />
+<!-- Hero head: will stick at the top -->
+<div class="hero-head">
+	<include href="main/header.html" />
+</div>
 
 <div class="hero-body">
-<!-- begin container -->
-	<div class="grid-wrapper header"><h1>efiction 5.0</h1>
-		<div class="gb-full screen-micro">
-			<a href="{{@BASE}}"><div class="header_img"></div></a>
+	<!-- open main container -->
+	<div class="container is-fullhd">
+		<article class="message is-warning">
+			<div class="message-body">
+				<h2 class="subtitle">{{@LN__MaintenanceMode}}!</h2>
+			</div>
+		</article>
+
+		<a href="{{@BASE}}"><h1>{{@CONFIG.page_title}}</h1></a> {{@CONFIG.page_slogan}}
+
+		<div class="columns">
+			<div class="column is-2">
+				&nbsp;
+			</div>
+
+			<div class="column is-8">
+				<check if="{{ isset(@title_h1) }}">
+					<h1>{{ @title_h1 }}</h1>
+				</check>
+					
+				<check if="{{ isset(@title_h3) }}">
+					<h3>{{ @title_h3 }}</h3>
+				</check>
+
+				{{@BODY | raw }}
+			</div>
+
+			<div class="column is-2">
+				&nbsp;
+			</div>
 		</div>
-	</div><!-- end header -->
-
-<div class="columns">
-	<div class="column is-2">
-		&nbsp;
 	</div>
-	<div class="column is-8">
-		<p class="is-warning">{{@LN__MaintenanceMode}}!</p>
-
-		<check if="{{ isset(@title_h1) }}">
-			<h1>{{ @title_h1 }}</h1>
-		</check>
-			
-		<check if="{{ isset(@title_h3) }}">
-			<h3>{{ @title_h3 }}</h3>
-		</check>
-
-		{{@BODY | raw }}
-	</div><!-- end content -->
-
-	<div class="column is-2">
-		&nbsp;
-	</div>
-</div>
 <!-- end container -->
 </div>
 
-<include href="main/footer.html" />
+<div class="hero-foot">
+	<include href="main/footer.html" />
+</div>

@@ -104,6 +104,7 @@ class Home extends Base
 					LEFT JOIN `tbl_users`U ON ( P.uid = U.uid )
 					LEFT JOIN `tbl_poll_votes`V ON ( V.uid = {$_SESSION['userID']} AND P.poll_id = V.poll_id )
 				WHERE P.start_date IS NOT NULL AND P.end_date<NOW()
+				ORDER BY P.start_date DESC
 				LIMIT ".(max(0,$pos*$limit)).",".$limit;
 
 		$polls = $this->exec($sql);

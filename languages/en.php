@@ -23,6 +23,7 @@ return array(
 'Message'	=>	'Message',
 'UnknowError'		=> 'There was an unknown error',
 'MaintenanceMode'	=> 'Archive is in maintenance mode',
+'MaintenanceSwitch'	=> 'This can be switched off here',			//db
 'monthly'		=> 'monthly',
 'weekly'		=> 'weekly',
 'daily'			=> 'daily',

@@ -2,24 +2,47 @@
 
 <repeat group="{{@polls}}" value="{{@poll}}" counter="{{ @ctr }}">
 	<div class="notification is-transparent has-border">
-		<p>{{@poll.question}}</p>
-		<check if="{{ @poll.votes>0 }}">
-		<true>
-			<span class="polltoggle">
-				<span class="polltoggle_more"><i class="fas fa-caret-square-down fa-fw"></i> {{@LN__ShowDetails}}</span>
-				<span class="polltoggle_less" style="display:none"><i class="fas fa-caret-square-up fa-fw"></i> {{@LN__HideDetails}}</span>
-			</span>
-			<span class="polltoggle_container" style="display:none">
-			<repeat group="{{@poll.cache}}" key="{{ @option }}" value="{{@res}}" counter="{{ @ctr }}">
-				<p>{{ @option }} ({{ @res }})</p>
-				<progress class="progress is-success" value="{{ (int)((@res*100*@poll.factor)/@poll.votes) }}" max="100">{{@res}}</progress>
-			</repeat>
-			</span>
-		</true>
-		<false>
-			{{@LN__Poll_NoVotes}}
-		</false>
-		</check>
+		<div class="columns is-gapless is-multiline">
+			<div class="column is-half">{{ @LN__PollOpenSince, date(@CONFIG.datetime_format, @poll.start_date) | format }}</div>
+			<div class="column is-half has-text-right">
+				<check if="{{ @poll.end_date==NULL }}"">
+					<true>
+						{{@LN__PollOUFN}}
+					</true>
+					<false>
+						<check if="{{ @poll.end_date < time() }}"">
+							<true>
+								{{@LN__PollClosedOn, date(@CONFIG.datetime_format, @poll.end_date) | format }}
+							</true>
+							<false>
+								{{@LN__PollCloseOn, date(@CONFIG.datetime_format, @poll.end_date) | format }}
+							</false>
+						</check>
+					</false>
+				</check>
+			</div>
+		
+			<div class="column is-full has-text-centered"><p>{{@poll.question}}</p></div>
+			<div class="column is-full">
+				<check if="{{ @poll.votes>0 }}">
+				<true>
+					<span class="polltoggle">
+						<span class="polltoggle_more"><i class="fas fa-caret-square-down fa-fw"></i> {{@LN__ShowDetails}}</span>
+						<span class="polltoggle_less" style="display:none"><i class="fas fa-caret-square-up fa-fw"></i> {{@LN__HideDetails}}</span>
+					</span>
+					<span class="polltoggle_container" style="display:none">
+					<repeat group="{{@poll.cache}}" key="{{ @option }}" value="{{@res}}" counter="{{ @ctr }}">
+						<p>{{ @option }} ({{ @res }})</p>
+						<progress class="progress is-success" value="{{ (int)((@res*100*@poll.factor)/@poll.votes) }}" max="100">{{@res}}</progress>
+					</repeat>
+					</span>
+				</true>
+				<false>
+					{{@LN__Poll_NoVotes}}
+				</false>
+				</check>
+			</div>
+		</div>
 	</div>
 </repeat>
 
