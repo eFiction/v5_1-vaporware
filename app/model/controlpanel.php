@@ -3,7 +3,103 @@ namespace Model;
 
 class Controlpanel extends Base {
 
-	public function deleteStory($storyID)
+	// rewrite 2020-09
+	public function storyAdd( array $data ) : int
+	{
+		$newStory = new \DB\SQL\Mapper($this->db, $this->prefix."stories");
+		$newStory->title		= $data['new_title'];
+		// completed 1 means it's a draft
+		$newStory->completed	= 1;
+		$newStory->date			= date('Y-m-d H:i:s');
+		$newStory->updated		= $newStory->date;
+
+		// get the highest level according to the groups bit-mask and assign a validation level accordingly
+		switch ( floor(log($_SESSION['groups'], 2)) )
+		{
+			// admin
+			case 7:
+				$newStory->validated = 33;
+				break;			
+			// mods and supermods
+			case 6:
+			case 5:
+				$newStory->validated = 32;
+				break;
+			// lector and trusted author
+			case 4:
+			case 3:
+				$newStory->validated = 31;
+				break;
+			// regular author
+			default:
+				$newStory->validated = 11;
+				break;
+		}
+
+		// save data
+		$newStory->save();
+		
+		// get the new story's ID
+		$newID = $newStory->_id;
+		
+		// new authors - either from form data or the UCP selection
+		$new_authors = ( empty($data['uid']) ) ? explode(",",$data['new_author']) : [ $data['uid'] ];
+		foreach ( $new_authors as $new_author )
+		{
+			// add the story-author relation
+			$newRelation = new \DB\SQL\Mapper($this->db, $this->prefix."stories_authors");
+			$newRelation->sid	= $newID;
+			$newRelation->aid	= $new_author;
+			$newRelation->type	= 'M';
+			$newRelation->save();
+			
+			// already counting as author? mainly for stats, but would allow a user to post stories when authoring is restricted.
+			$editUser = new \DB\SQL\Mapper($this->db, $this->prefix."users");
+			$editUser->load(array("uid=?",$new_author));
+			if ( !($editUser->groups & 4) )
+				$editUser->groups += 4;
+			$editUser->save();
+		}
+		
+		// This story is created as draft without a chapter text and tags, so there is no need to do any recount or cache reset
+		return $newID;
+	}
+
+	// rewrite 2020-09
+	public function storyLoadInfo( int $sid, int $uid=0 ) : array
+	{
+		// common SQL builder
+		$sql = 	"SELECT S.*, COUNT(DISTINCT Ch.chapid) as chapters, COUNT(DISTINCT Ch2.chapid) as validchapters
+					FROM `tbl_stories`S
+						@INNER@
+						LEFT JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid)
+						LEFT JOIN `tbl_chapters`Ch2 ON ( S.sid = Ch2.sid AND Ch2.validated >= 30)
+					WHERE S.sid = :sid";
+					
+		if ( $uid )
+		{
+			// inside UCP
+			$sql = str_replace("@INNER@", "INNER JOIN `tbl_stories_authors`A ON ( S.sid = A.sid AND A.type='M' AND A.aid = :aid )", $sql);
+			$bind = [":sid" => $sid, ":aid" => $uid ];
+		}
+		else
+		{
+			// inside ACP
+			$sql = str_replace("@INNER@", "", $sql);
+			$bind = [":sid" => $sid ];
+		}
+
+		$data = $this->exec ( $sql, $bind );
+
+		if (sizeof($data)==1 AND $data[0]['sid']!="")
+		{
+			$data[0]['ratings'] = $this->exec("SELECT rid, rating, ratingwarning FROM `tbl_ratings`");
+			return $data[0];
+		}
+		return [];
+	}
+
+	public function storyDelete( int $storyID, int $userID = 0 ) : int
 	{
 		// get a review mapper
 		$mapper = new \DB\SQL\Mapper($this->db, $this->prefix.'feedback');
@@ -190,9 +286,7 @@ class Controlpanel extends Base {
 			// Get current chapter count and raise
 			$chapterCount++;
 
-			// coming from adminCP, we set the chapter to active assuming them people know what they are doing
-			if ( $_SESSION['groups']&32 )	$validated = 32;	// added by mod
-			if ( $_SESSION['groups']&128 )	$validated = 33;	// added by admin
+			$validated = "1".($_SESSION['groups']&128)?"3":"2";
 
 			// date is NULL when adding additional chapters, in this context we also update the story entry
 			if ( !$date )
@@ -228,7 +322,7 @@ class Controlpanel extends Base {
 		}
 
 		// rebuild the story cache
-		$this->rebuildStoryCache($storyID);
+		//$this->rebuildStoryCache($storyID);
 
 		return $chapterID;
 	}
@@ -261,7 +355,7 @@ class Controlpanel extends Base {
 		return $data[0];
 	}
 
-	public function chapterSave( int $chapterID, string $chapterText, \DB\SQL\Mapper $mapper )
+	public function chapterSave( int $chapterID, string $chapterText, \DB\SQL\Mapper $mapper ) : int 
 	{
 		if ( $this->config['chapter_data_location'] == "local" )
 		{
@@ -271,11 +365,34 @@ class Controlpanel extends Base {
 		else
 		{
 			$mapper->chaptertext = $chapterText;
-			$chapterSave = (int)$mapper->changed();
+			$chapterSave = $mapper->changed();
 			$mapper->save();
 		}
 
 		return $chapterSave;
+	}
+
+	public function chapterDelete( int $storyID, int $chapterID, int $userID = 0 ) : int
+	{
+		if ( $userID == 0 OR 1==(new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors'))->count( ["sid = ? AND aid = ? and type='M'", $storyID, $userID] ) )
+		{	
+			$chapter=new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
+			
+			if ( $this->config['chapter_data_location'] == "local" )
+			{
+				$chapter->load(['sid=? AND chapid=?', $storyID, $chapterID]);
+
+				$localdb = new \DB\SQL\Mapper(\storage::instance()->localChapterDB(), 'chapters');
+				$i = $localdb->erase(['sid=? AND inorder=?', $storyID, $chapter->inorder]);
+			}
+			else $i=1;
+			
+			$this->recountStory($storyID);
+			
+			// this should equate to 1*1 if there was no error
+			return ( $i * $chapter->erase() );
+		}
+		return 0;
 	}
 
 	public function rebuildStoryCache($sid)
@@ -528,6 +645,7 @@ class Controlpanel extends Base {
 	{
 		$data = array_filter(explode(",",$data));
 		$categories = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_categories');
+		$i = 0;
 
 		foreach ( $categories->find(array('`sid` = ?',$sid)) as $X )
 		{
@@ -538,6 +656,7 @@ class Controlpanel extends Base {
 				$categories->erase(['lid=?',$X['lid']]);
 				// recache this category
 				$this->cacheCategories($X['cid']);
+				$i++;
 			}
 			else unset($data[$temp]);
 		}
@@ -554,15 +673,18 @@ class Controlpanel extends Base {
 				$categories->save();
 				// recache this category
 				$this->cacheCategories($temp);
+				$i++;
 			}
 		}
 		unset($categories);
+		
+		return $i;
 	}
 
 	// wrapper for storyRelationTag
 	public function storyRelationCharacter( $sid, $data )
 	{
-		$this->storyRelationTag( $sid, $data, 1 );
+		return $this->storyRelationTag( $sid, $data, 1 );
 	}
 
 	public function storyRelationTag( $sid, $data, $character = 0 )
@@ -570,6 +692,7 @@ class Controlpanel extends Base {
 		// Check tags:
 		$data = array_filter(explode(",",$data));
 		$relations = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_tags');
+		$i = 0;
 
 		foreach ( $relations->find(array('`sid` = ? AND `character` = ?',$sid,$character)) as $X )
 		{
@@ -579,6 +702,7 @@ class Controlpanel extends Base {
 				$recounts[] = $X['tid'];
 				// Excess relation, drop from table
 				$relations->erase(['lid=?',$X['lid']]);
+				$i++;
 			}
 			else unset($data[$temp]);
 		}
@@ -595,6 +719,7 @@ class Controlpanel extends Base {
 				$relations->character = $character;
 				$relations->save();
 				$recounts[] = $temp;
+				$i++;
 			}
 		}
 		unset($relations);
@@ -602,6 +727,7 @@ class Controlpanel extends Base {
 		// call recount function
 		if ( isset( $recounts ) )
 			$this->storyRecountTags( $recounts, $character );
+		return $i;
 	}
 
 	public function storyRecountTags( $tags, $character = 0 )
@@ -652,6 +778,7 @@ class Controlpanel extends Base {
 		$supDB = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors');
 		// Check Authors:
 		$mainDB = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors');
+		$i = 0;
 
 
 		// refuse to leave an empty author list behind (unless stated otherwise)
@@ -670,6 +797,7 @@ class Controlpanel extends Base {
 				{
 					// Excess relation, drop from table
 					$supDB->erase(['lid=?',$X['lid']]);
+					$i++;
 				}
 				else unset($supauthor[$isSup]);
 			}
@@ -682,6 +810,7 @@ class Controlpanel extends Base {
 				{
 					// Excess relation, drop from table
 					$mainDB->erase(['lid=?',$X['lid']]);
+					$i++;
 				}
 				else unset($mainauthor[$isMain]);
 			}
@@ -697,6 +826,7 @@ class Controlpanel extends Base {
 					$supDB->aid = $temp;
 					$supDB->type = 'S';
 					$supDB->save();
+					$i++;
 				}
 			}
 			unset($supDB);
@@ -712,6 +842,7 @@ class Controlpanel extends Base {
 					$mainDB->aid = $temp;
 					$mainDB->type = 'M';
 					$mainDB->save();
+					$i++;
 				}
 			}
 			unset($mainDB);
@@ -720,6 +851,7 @@ class Controlpanel extends Base {
 		{
 			$_SESSION['lastAction'] = [ "deleteWarning" => \Base::instance()->get('LN__MainAuthorNotEmpty') ];
 		}
+		return $i;
 	}
 
 	public function collectionAdd(array $data) : int

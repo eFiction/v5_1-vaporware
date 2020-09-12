@@ -53,10 +53,11 @@ class storage extends Prefab {
 		}
 		else return FALSE;
 	}
-
+/*
 	public function update($type,$conf) {
 		$cfg = Config::instance();
 		$cfg->set('DB_'.strtoupper($type), $conf);
 		$cfg->save();
 	}
+	*/
 }

@@ -15,6 +15,17 @@
 	padding: 0;
 }
 
+.columns .is-smallgap .column
+{
+	padding: 0.4rem;
+}
+
+
+
+
+
+
+
 .sidebar {
 	position: sticky;
 	top: 0;

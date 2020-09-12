@@ -6,10 +6,11 @@ class AdminCP extends Base
 	public function __construct()
 	{
 		parent::__construct();
-		
+
 		if( isset($_SESSION['lastAction']) )
 		{
-			$this->f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
+			foreach( $_SESSION['lastAction'] as $key => $value )
+				$this->f3->set($key,$value);
 			unset($_SESSION['lastAction']);
 		}
 	}

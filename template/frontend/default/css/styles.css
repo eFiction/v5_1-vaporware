@@ -6,14 +6,17 @@
 @import url(typography.css);
 
 
-/* ------ rewrite bulma directives ------- */
-.hero.is-fullheight .hero-body
+/* ------ rewrite/add bulma directives ------- */
+.hero.is-fullheight .hero-body.is-baseline
 {
 	align-items: baseline; 
 	padding: 1.5rem 1.5rem;
 }
 
-
+.columns .is-smallgap .column
+{
+	padding: 0.4rem;
+}
 
 /* --------------- listing --------------- */
 
@@ -45,11 +48,6 @@
 	margin: 8px 0;
 }
 
-.calendar {
-	font-size: medium;
-	text-align: center;
-}
-
 .sbox {
 	font-size: small;
 }
@@ -79,25 +77,6 @@
 
 .stats-table td {
 	padding: 0 6px;
-}
-
-/* --------------- archive news --------------- */
-
-.news-box {
-	border: 1px solid #efefef;
-	margin: 6px 0;
-	padding: 8px;
-	text-align: justify;
-}
-.news-date-author {
-	text-align: center;
-	padding: 6px;
-}
-.news-comments {
-	border: 1px solid #efefef;
-	margin: 6px 0;
-	padding: 8px;
-	text-align: justify;
 }
 
 /* --------------- authors index --------------- */
@@ -199,9 +178,4 @@ legend {
 	vertical-align: sub;
 	height: 2.25em;
 	line-height: 1.5;
-}
-
-/* required for drag&drop */
-ul#chapter-sort {
-	margin: 5px;
 }

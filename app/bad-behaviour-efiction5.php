@@ -61,7 +61,7 @@ function bb2_db_query($query) {
 	global $bb_db;
 	
 	if ( is_array( $query) )
-		return $bb_db->exec($query[0], $query[1]);
+		return $bb_db->exec($query[0], $query[1], @$query[2]);
 	else
 		return $bb_db->exec($query);
 	//return FALSE;
@@ -176,7 +176,7 @@ function bb2_insert_stats($force = false) {
 	global $bb_settings, $f3;
 
 	if ($force || $bb_settings['display_stats']) {
-		$blocked = bb2_db_query("SELECT COUNT(*) FROM " . $bb_settings['log_table'] . " WHERE `key` NOT LIKE '00000000'");
+		$blocked = bb2_db_query(["SELECT COUNT(*) FROM " . $bb_settings['log_table'] . " WHERE `key` NOT LIKE '00000000'",[],120]);
 		if ($blocked !== FALSE) {
 			$f3->set('bb2_stats', $blocked[0]["COUNT(*)"]);
 		}

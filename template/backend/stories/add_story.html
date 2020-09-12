@@ -1,26 +1,23 @@
 <div class="columns">
 	<div class="column is-half">
 
-<div class="notification">
-	<check if="{{ isset(@storyLink) }}"><div class="gb-90 alert-box warning">{{@storyLink | raw }}?</div></check>
-	<div class="gb-3qrt">
-		<form method="post" action="{{@BASE}}/adminCP/stories/add">
-			<div class="ym-grid">
-				<div class="gb-1qrt"><h6>{{@LN__Title}}</h6></div>
-				<div class="gb-3qrt"><input class="input" placeholder="Your story title goes here" type="text" name="form[new_title]" value="{{@storyTitle}}"></div>
-{*		<!-- The next field will be filled by the javascript below, do not change the id! --> *}
-				<div class="gb-1qrt"><h6>{{@LN__MainAuthor}} <a class="tooltip is-tooltip-multiline" data-tooltip="Info: {{@UCP_ExplainMainAuthor}}."><i class="fas fa-info-circle"></i></a></h6></div>
-				<div class="gb-3qrt"><input type="text" id="mainauthor-select" name="form[new_author]" /></div>
+		<div class="notification">
+		<check if="{{ isset(@storyLink) }}"><div class="notification is-warning">{{@storyLink | raw }}?</div></check>
+			<form method="post" action="{{@BASE}}/adminCP/stories/add">
+				<h6>{{@LN__Title}}</h6>
+				<input class="input" placeholder="Your story title goes here" type="text" name="form[new_title]" value="{{@storyTitle}}" />
+				<h6>{{@LN__MainAuthor}} <a class="has-tooltip-multiline" data-tooltip="Info: {{@LN__UCP_ExplainMainAuthor}}.">{ICON:info}</a></h6>
+				{*		<!-- The next field will be filled by the javascript below, do not change the id! --> *}
+				<input type="text" id="mainauthor-select" name="form[new_author]" />
 				<check if="{{ isset(@storyLink) }}">
-				<div class="full"><div class="gb-90 alert-box warning"><input type="checkbox" name="form[confirmInsert]"/>{{@LN__StoryConfirmSimilar}}</div></div>
+					<div class="notification is-warning"><input type="checkbox" name="form[confirmInsert]" />{{@LN__StoryConfirmSimilar}}</div>
 				</check>
-				<div class="gb-full"><input class="button is-success" type="submit"> <input class="button is-danger" type="reset"></div>
-			</div>
-		</form>
-	</div>
-</div>
+				<br />
+				<input class="button is-success" type="submit" /> <input class="button is-danger" type="reset" />
+			</form>
+		</div>
 
-</div>
+	</div>
 </div>
 <script type="text/javascript">
 $(document).ready(function() {

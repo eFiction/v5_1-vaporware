@@ -1670,47 +1670,6 @@ class AdminCP extends Controlpanel {
 		else
 			return "[]";
 	}
-	
-	public function storyAdd(array $data)
-	{
-		$newStory = new \DB\SQL\Mapper($this->db, $this->prefix."stories");
-		$newStory->title		= $data['new_title'];
-		$newStory->completed	= 1;
-		$newStory->validated	= ($_SESSION['groups']&128) ? 33 : 32;
-		$newStory->date			= date('Y-m-d H:i:s');
-		$newStory->updated		= $newStory->date;
-		$newStory->save();
-		
-		$newID = $newStory->_id;
-		
-		// add initial chapter to the story
-		if ( FALSE === $this->storyChapterAdd($newID, NULL, $newStory->date) )
-		{
-			
-		}
-		
-		$new_authors = explode(",",$data['new_author']);
-		foreach ( $new_authors as $new_author )
-		{
-			// add the story-author relation
-			$newRelation = new \DB\SQL\Mapper($this->db, $this->prefix."stories_authors");
-			$newRelation->sid	= $newID;
-			$newRelation->aid	= $new_author;
-			$newRelation->type	= 'M';
-			$newRelation->save();
-			
-			// already counting as author? mainly for stats ...
-			$editUser = new \DB\SQL\Mapper($this->db, $this->prefix."users");
-			$editUser->load(array("uid=?",$new_author));
-			if ( $editUser->groups < 4 )
-				$editUser->groups += 4;
-			$editUser->save();
-		}
-		
-		$this->rebuildStoryCache($newID);
-
-		return $newID;
-	}
 
 	public function storyAddCheck(array $formData)
 	{
@@ -1728,24 +1687,6 @@ class AdminCP extends Controlpanel {
 		$authors = $this->exec($sqlAuthors,  [ ':uid' => $formData['new_author'] ] );
 		
 		return [ "storyInfo" => $similarExists[0], "preAuthor" => json_encode($authors) ];
-	}
-
-	public function storyLoadInfo(int $sid)
-	{
-		$data = $this->exec
-		(
-			"SELECT S.*, COUNT(DISTINCT Ch.chapid) as chapters
-				FROM `tbl_stories`S
-					LEFT JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid)
-				WHERE S.sid = :sid",
-			[":sid" => $sid ]
-		);
-		if (sizeof($data)==1)
-		{
-			$data[0]['ratings'] = $this->exec("SELECT rid, rating, ratingwarning FROM `tbl_ratings`");
-			return $data[0];
-		}
-		return FALSE;
 	}
 
 	public function storySaveChanges(\DB\SQL\Mapper $current, array $post)
@@ -1768,28 +1709,35 @@ class AdminCP extends Controlpanel {
 			\Logging::addEntry('VS', $current->sid);
 		}
 		
+		$i = $current->changed();
+
 		$current->save();
 
 		// Step two: check for changes in relation tables
-		
 
 		// Check tags:
-		$this->storyRelationTag( $current->sid, $post['tags'] );
+		$i += $this->storyRelationTag( $current->sid, $post['tags'] );
 		// Check Characters:
-		$this->storyRelationCharacter( $current->sid, $post['characters'] );
+		$i += $this->storyRelationCharacter( $current->sid, $post['characters'] );
 		// Check Categories:
-		$this->storyRelationCategories( $current->sid, $post['category'] );
+		$i += $this->storyRelationCategories( $current->sid, $post['category'] );
 		// Check Authors:
-		$this->storyRelationAuthor( $current->sid, $post['mainauthor'], $post['supauthor'] );
+		$i += $this->storyRelationAuthor( $current->sid, $post['mainauthor'], $post['supauthor'] );
+
+		$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories');
+		$inSeries = $collection->find(array('sid=?',$current->sid));
+		foreach ( $inSeries as $in )
+		{
+			// Rebuild collection/series cache based on new data
+			$this->rebuildSeriesCache($in->seriesid);
+		}
 
 		// Rebuild story cache based on new data
-		$this->rebuildStoryCache($current->sid);
-		
-		return TRUE;
+		if ( $i ) $this->rebuildStoryCache($current->sid);
+		return $i;
 	}
 
-	//public function storyListPending(int $page, array $sort)
-	public function storyListPending($page, array $sort)
+	public function storyListPending( int $page, array $sort ) : array
 	{
 		$limit = 20;
 		$pos = $page - 1;
@@ -1970,8 +1918,9 @@ class AdminCP extends Controlpanel {
 	
 	public function chapterAdd ( int $storyID )
 	{
-		$location = $this->config['chapter_data_location'];
-		
+		return parent::storyChapterAdd($storyID);
+
+		/*
 		// Get current chapter count and raise
 		if ( FALSE === $chapterCount = @$this->exec("SELECT COUNT(chapid) as chapters FROM `tbl_chapters` WHERE `sid` = :sid ", [ ":sid" => $storyID ])[0]['chapters'] )
 			return FALSE;
@@ -1988,7 +1937,7 @@ class AdminCP extends Controlpanel {
 
 		$chapterID = $this->insertArray($this->prefix.'chapters', $kv );
 
-		if ( $location == "local" )
+		if ( $this->config['chapter_data_location'] == "local" )
 		{
 			$db = \storage::instance()->localChapterDB();
 			$chapterAdd= @$db->exec('INSERT INTO "chapters" ("chapid","sid","inorder","chaptertext") VALUES ( :chapid, :sid, :inorder, :chaptertext )', 
@@ -2001,12 +1950,13 @@ class AdminCP extends Controlpanel {
 			);
 		}
 		
-		$this->rebuildStoryCache($storyID);
+		//$this->rebuildStoryCache($storyID);
 		
 		return $chapterID;
+		*/
 	}
 
-	public function chapterSaveChanges( int $chapterID, array $post )
+	public function chapterSaveChanges( int $chapterID, array $post ) : int
 	{
 		// plain and visual return different newline representations, this will bring things to standard.
 		$chaptertext = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $post['chapter_text']);
@@ -2035,22 +1985,40 @@ class AdminCP extends Controlpanel {
 			\Logging::addEntry(['VS','c'], [ $chapter->sid, $chapter->inorder] );
 		}
 		
-		if ( $chapter->changed("validated") OR $chapter->changed("wordcount") )
-			// mark recount chapters and words for entire story
+		if ( 
+			// validation status changed
+			$chapter->changed("validated") 
+			// chapter text changed
+			OR $this->chapterSave($chapterID, $chaptertext, $chapter)
+			)
+		{
 			$recount = 1;
+		}
 
+		$i = $chapter->changed();
 		// save chapter information
 		$chapter->save();
-		// save the chapter text
-		$this->chapterSave($chapterID, $chaptertext, $chapter);
 
 		if ( isset($recount) )
 		// perform recount, this has to take place after save();
+		{
+			// recount this story
 			$this->recountStory($chapter->sid);
-	}
+			
+			// recount all collections that feature this story
+			$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories');
+			$inSeries = $collection->find(array('sid=?',$current->sid));
+			foreach ( $inSeries as $in )
+			{
+				// Rebuild collection/series cache based on new data
+				$this->rebuildSeriesCache($in->seriesid);
+			}
+		}
 
-//	public function tagAdd(string $name) : int
-	public function tagAdd($name)
+		return $i;
+	}
+	
+	public function tagAdd(string $name) : int
 	{
 		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'tags');
 		$tag->label = $name;

@@ -83,8 +83,8 @@ class UserCP extends Base
 	{
 		if($chapterData['editor']=="visual")
 		{
-			$this->javascript( 'head', TRUE, "//cdn.tinymce.com/5/tinymce.min.js" );
-			$this->javascript( 'head', TRUE, "editor.js" );
+			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
+			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
 		}
 
 		$this->f3->set('data', $chapterData);

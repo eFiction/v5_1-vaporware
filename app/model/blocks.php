@@ -144,7 +144,7 @@ class Blocks extends Base
 												FROM `tbl_menu` M
 												WHERE M.child_of IS NULL AND M.active = '1'
 												ORDER BY M.order";
-		$temp = $this->exec($menuSQL);
+		$temp = $this->exec($menuSQL,[],60);
 		foreach ( $temp as $tmp )
 		{
 			$menu['main'][] = [ "label" => $tmp['label'], "link" => $tmp['link'], "selected" => FALSE ];

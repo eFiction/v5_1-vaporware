@@ -1,30 +1,32 @@
-<h4>
-	<check if="{{@data.TITLELINK}}">
-		<true><a href="{{@BASE}}/story/updates/date={{ @data.TITLELINK }}">{{ @LN__Month_Calendar, @data.TITLE | format }}</a></true>
-		<false>{{ @LN__Month_Calendar, @data.TITLE | format }}</false>
-	</check>
-</h4>
-
-<div class="calendar">
-	<check if="{{@data.BACK}}"><true><a href="javascript:getCalendar('{{ @data.BACK }}');">{ICON:angle-left:}</a></true><false>{ICON:angle-left}</false></check>
-	<check if="{{@data.TODAY}}"><true><a href="javascript:getCalendar('{{ @data.TODAY }}');">{ICON:calendar:current}</a></true><false>{ICON:calendar}</false></check>
-	<check if="{{@data.FORWARD}}"><true><a href="javascript:getCalendar('{{ @data.FORWARD }}');">{ICON:angle-right:forward}</a></true><false>{ICON:angle-right}</false></check>
-</div>
-<table class="table is-bordered is-striped is-narrow is-hoverable">
-<tbody>
-	<tr>
-	<repeat group="{{ @data.CELLS }}" value="{{ @cell }}" counter="{{ @ctr }}">
-		<check if="{{isset(@cell.LINK)}}">
-			<true><td>
-				<check if="{{@cell.LINK}}">
-					<true><a href='{{@BASE}}/story/updates/date={{@cell.LINK}}'>{{@cell.I}}</a></true>
-					<false>{{@cell.I}}</false>
-				</check></td>
-			</true>
-			<false><td>&nbsp;</td></false>
+<div class="container has-text-centered">
+	<h4>
+		<check if="{{@data.TITLELINK}}">
+			<true><a href="{{@BASE}}/story/updates/date={{ @data.TITLELINK }}">{{ @LN__Month_Calendar, @data.TITLE | format }}</a></true>
+			<false>{{ @LN__Month_Calendar, @data.TITLE | format }}</false>
 		</check>
-		<check if="{{ @ctr%7==0 }}"></tr><tr></check>
-	</repeat>
-	</tr>
-</tbody>
-</table>
+	</h4>
+
+	<div class="calendar">
+		<check if="{{@data.BACK}}"><true><a href="javascript:getCalendar('{{ @data.BACK }}');">{ICON:angle-left:}</a></true><false>{ICON:angle-left}</false></check>
+		<check if="{{@data.TODAY}}"><true><a href="javascript:getCalendar('{{ @data.TODAY }}');">{ICON:calendar:current}</a></true><false>{ICON:calendar}</false></check>
+		<check if="{{@data.FORWARD}}"><true><a href="javascript:getCalendar('{{ @data.FORWARD }}');">{ICON:angle-right:forward}</a></true><false>{ICON:angle-right}</false></check>
+	</div>
+	<table class="table is-bordered is-striped is-narrow is-hoverable">
+		<tbody>
+			<tr>
+			<repeat group="{{ @data.CELLS }}" value="{{ @cell }}" counter="{{ @ctr }}">
+				<check if="{{isset(@cell.LINK)}}">
+					<true><td>
+						<check if="{{@cell.LINK}}">
+							<true><a href='{{@BASE}}/story/updates/date={{@cell.LINK}}'>{{@cell.I}}</a></true>
+							<false>{{@cell.I}}</false>
+						</check></td>
+					</true>
+					<false><td>&nbsp;</td></false>
+				</check>
+				<check if="{{ @ctr%7==0 }}"></tr><tr></check>
+			</repeat>
+			</tr>
+		</tbody>
+	</table>
+</div>

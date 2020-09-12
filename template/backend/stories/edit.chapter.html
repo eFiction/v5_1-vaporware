@@ -1,3 +1,20 @@
+<!-- error notification v4 -->
+<check if="{{ isset(@delete_error) }}">
+	<div class="notification is-danger">
+		<button class="delete"></button>
+		{{ @LN__FailedDelete }}
+	</div>
+</check>
+<!-- END: error notification -->
+<!-- success notification v4 -->
+<check if="{{ isset(@save_success) }}">
+	<div class="notification is-success">
+		<button class="delete"></button>
+		{{ @LN__Status_Changes, @save_success | format }}
+	</div>
+</check>
+<!-- END: success notification -->
+
 <div class="columns">
 	<div class="column is-three-quarters">
 		<check if="{{@data.chapid=='new'}}">New chapter!</check>
@@ -48,14 +65,64 @@
 				<div class="column is-half"><h6>{{@LN__ChapterNotes}}</h6><textarea class="textarea" placeholder="Notes and dedications go here" name="form[chapter_notes]">{{@data.notes}}</textarea></div>
 				<div class="column is-half"><h6>{{@LN__ChapterEndnotes}}</h6><textarea class="textarea" placeholder="Commenting on this chapter" name="form[chapter_endnotes]">{{@data.endnotes}}</textarea></div>
 
-				<div class="column is-full" align="right">
+				<div class="column is-full">
+
+					<!-- error notification v4 -->
+					<check if="{{ isset(@delete_confirm) }}">
+						<div class="notification is-warning">
+							<button class="delete"></button>
+							{{ @LN__CheckBoxToDelete }}
+						</div>
+					</check>
+					<!-- END: error notification -->
+
+					<!-- Form submit buttons v3 -->
 					<div class="field is-grouped">
-{*						<p class="control">
+						<div class="columns">
+							<div class="column">
+								<div class="field is-grouped">
+									<p class="control">
+										<button class="button is-primary" type="submit">
+											<span class="icon">{ICON:save}</span>
+											<span>{{@LN__Submit}}</span>
+										</button>
+									</p>
+									<p class="control">
+										<button class="button is-light" type="reset">
+											<span class="icon"><i class="fas fa-undo-alt"></i></span>
+											<span>{{@LN__Reset}}</span>
+										</button>
+									</p>
+								</div>
+							</div>
+							<div class="column is-3"></div>
+							<div class="column">
+								<div class="field is-grouped">
+									<p class="control">
+										<button class="button is-danger" type="submit" formaction="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}}/chapter={{@data.chapid}}/delete/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">
+											<span class="icon">{ICON:remove}</span>
+											<span>{{@LN__Delete}}</span>
+										</button>
+									</p>
+									<p class="control">
+										<a class="button is-danger">
+											<input type="checkbox" name="confirm_delete" />
+										</a>
+									</p>
+								</div>
+							</div>
+						</div>
+					</div>
+					<!-- END: Form submit buttons v3 -->
+
+{*
+					<div class="field is-grouped">
+						<p class="control">
 							<a class="button is-danger" href="{{@BASE}}/adminCP/stories/edit/story={{@data.sid}}">
 								<span class="icon">{ICON:remove}</span>
 								<span>__Delete</span>
 							</a>
-						</p>				*}
+						</p>				
 						<p class="control">
 							<button class="button is-primary" type="submit">
 								<span class="icon"><i class="fas fa-save"></i></span>
@@ -69,6 +136,7 @@
 							</button>
 						</p>
 					</div>
+*}
 				</div>
 			</div>
 		</form>

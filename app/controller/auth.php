@@ -23,14 +23,14 @@ class Auth extends Base {
 		/*
 		Session mask (bit-wise)
 
-		- admin			   128
-		- super mod			64
-		- story mod 		32
-		- lector			16
-		- author (trusted)	 8
-		- author (regular)	 4
-		- user (trusted)	 2
-		- user (active)		 1
+		- admin			   128    7
+		- super mod			64    6
+		- story mod 		32    5
+		- lector			16    4
+		- author (trusted)	 8    3
+		- author (regular)	 4    2
+		- user (trusted)	 2    1
+		- user (active)		 1    0
 		- guest/banned		 0
 		*/
 

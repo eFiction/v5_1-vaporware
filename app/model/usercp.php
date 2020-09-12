@@ -104,7 +104,7 @@ class UserCP extends Controlpanel
 		$sql = "SELECT M.label, M.link, M.icon, M.evaluate FROM `tbl_menu_userpanel`M WHERE M.child_of @WHERE@ ORDER BY M.order ASC";
 		$menu = [];
 
-		$menuItems = $this->exec(str_replace("@WHERE@", ($selected?"= :selected;":"IS NULL;"), $sql) , [":selected"=> $selected]);
+		$menuItems = $this->exec(str_replace("@WHERE@", ($selected?"= :selected;":"IS NULL;"), $sql) , [":selected"=> $selected], 120);
 		
 		foreach ( $menuItems as $item )
 		{
@@ -270,64 +270,6 @@ class UserCP extends Controlpanel
 		return $stats;
 	}
 
-	public function authorStoryAdd($data)
-	{
-		$newStory = new \DB\SQL\Mapper($this->db, $this->prefix."stories");
-		$newStory->title		= $data['new_title'];
-		$newStory->completed	= 1;
-		$newStory->validated	= ($_SESSION['groups']&8) ? 31 : 11;
-		$newStory->date			= date('Y-m-d H:i:s');
-		$newStory->updated		= $newStory->date;
-		$newStory->save();
-		
-		$newID = $newStory->_id;
-		
-		// add the story-author relation
-		$newRelation = new \DB\SQL\Mapper($this->db, $this->prefix."stories_authors");
-		$newRelation->sid	= $newID;
-		$newRelation->aid	= $data['uid'];
-		$newRelation->type	= 'M';
-		$newRelation->save();
-		
-		// already counting as author? mainly for stats ...
-		$editUser = new \DB\SQL\Mapper($this->db, $this->prefix."users");
-		$editUser->load(array("uid=?",$data['uid']));
-		if ( $editUser->groups < 4 )
-			$editUser->groups += 4;
-		$editUser->save();
-		
-		// add initial chapter to the story
-		// must occur after the story-author relation to satisfy the check
-		if ( FALSE === $this->storyChapterAdd($newID, $data['uid'], $newStory->date) )
-		{
-
-		}
-		
-		$this->rebuildStoryCache($newID);
-
-		return $newID;
-	}
-	
-	public function authorStoryLoadInfo($sid, $uid)
-	{
-		
-		$data = $this->exec
-		(
-			"SELECT S.*, COUNT(DISTINCT Ch.chapid) as chapters, COUNT(DISTINCT Ch2.chapid) as validchapters
-				FROM `tbl_stories`S
-					INNER JOIN `tbl_stories_authors`A ON ( S.sid = A.sid AND A.type='M' AND A.aid = :aid )
-					LEFT JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid)
-					LEFT JOIN `tbl_chapters`Ch2 ON ( S.sid = Ch2.sid AND Ch2.validated >= 30)
-				WHERE S.sid = :sid",
-			[":sid" => $sid, ":aid" => $uid ]
-		);
-		if (sizeof($data)==1 AND $data[0]['sid']!="")
-		{
-			$data[0]['ratings'] = $this->exec("SELECT rid, rating, ratingwarning FROM `tbl_ratings`");
-			return $data[0];
-		}
-		return FALSE;
-	}
 	
 /*	
 	public function chapterLoadList($sid)
@@ -370,7 +312,7 @@ class UserCP extends Controlpanel
 		}
 		else
 		{
-			return $this->deleteStory($storyID);
+			return $this->storyDelete($storyID);
 		}
 	}
 	
@@ -444,19 +386,21 @@ class UserCP extends Controlpanel
 			// Log validation
 			\Logging::addEntry('VS', $storyID);
 		}
+		
+		$i = $story->changed();
 
 		$story->save();
 		
 		// Step two: check for changes in relation tables
 
 		// Check tags:
-		$this->storyRelationTag( $story->sid, $post['tags'] );
+		$i += $this->storyRelationTag( $story->sid, $post['tags'] );
 		// Check Characters:
-		$this->storyRelationCharacter( $story->sid, $post['characters'] );
+		$i += $this->storyRelationCharacter( $story->sid, $post['characters'] );
 		// Check Categories:
-		$this->storyRelationCategories( $story->sid, $post['category'] );
+		$i += $this->storyRelationCategories( $story->sid, $post['category'] );
 		// Check Authors:
-		$this->storyRelationAuthor( $story->sid, $post['mainauthor'], $post['supauthor'] );
+		$i += $this->storyRelationAuthor( $story->sid, $post['mainauthor'], $post['supauthor'] );
 		
 		$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories');
 		$inSeries = $collection->find(array('sid=?',$storyID));
@@ -467,7 +411,8 @@ class UserCP extends Controlpanel
 		}
 
 		// Rebuild story cache based on new data
-		$this->rebuildStoryCache($story->sid);
+		if ( $i ) $this->rebuildStoryCache($story->sid);
+		return $i;
 	}
 
 	public function authorStoryChapterAdd( int $sid, int $uid)
@@ -516,18 +461,37 @@ class UserCP extends Controlpanel
 			\Logging::addEntry(['VS','c'], [$chapter->sid,$chapterID]);
 		}
 
-		if ( $chapter->changed("validated") OR $chapter->changed("wordcount") )
-			// mark recount chapters and words for entire story
+		if ( 
+			// validation status changed
+			$chapter->changed("validated") 
+			// chapter text changed
+			OR $this->chapterSave($chapterID, $chaptertext, $chapter)
+			)
+		{
 			$recount = 1;
+		}
 
+		$i = $chapter->changed();
 		// save chapter information
 		$chapter->save();
-		// save the chapter text
-		$this->chapterSave($chapterID, $chaptertext, $chapter);
 
 		if ( isset($recount) )
 		// perform recount, this has to take place after save();
+		{
+			// recount this story
 			$this->recountStory($chapter->sid);
+			
+			// recount all collections that feature this story
+			$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories');
+			$inSeries = $collection->find(array('sid=?',$current->sid));
+			foreach ( $inSeries as $in )
+			{
+				// Rebuild collection/series cache based on new data
+				$this->rebuildSeriesCache($in->seriesid);
+			}
+	}
+
+		return $i;
 	}
 
 	public function authorCuratorRemove($uid=NULL)
@@ -1124,7 +1088,7 @@ class UserCP extends Controlpanel
 		if ( in_array($params[2],["RC","SE","ST"]) )
 		{
 			$sql = $this->sqlMaker("feedback".$params[1], $params[2]) . 
-					( $params[1]=="written" ? "GROUP BY F.reference_sub " : "") .
+					 ( $params[1]=="written" ? "GROUP BY F.fid " : "") .
 					"ORDER BY {$sort['order']} {$sort['direction']}
 					LIMIT ".(max(0,$pos*$limit)).",".$limit;
 		}
@@ -1250,7 +1214,7 @@ class UserCP extends Controlpanel
 				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Rec.recid as id, Rec.author as name, F.text, Rec.title, Rec.url, UNIX_TIMESTAMP(F.datetime) as date 
 						FROM `tbl_feedback`F
 							INNER JOIN `tbl_recommendations`Rec ON ( F.reference = Rec.recid )
-						WHERE F.writer_uid = {$_SESSION['userID']} AND F.type='ST' ",
+						WHERE F.writer_uid = {$_SESSION['userID']} AND F.type='RC' ",
 		];
 
 		$sql['feedbackreceived'] =

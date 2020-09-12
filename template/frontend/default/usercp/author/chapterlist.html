@@ -1,33 +1,53 @@
-		<check if="{{isset(@data.chapid)}}"><a class="button" href="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}};returnpath={{@data.form.returnpath}}">{{@LN__EditHeader}}</a> <br /><br /></check>
-		<h6>{{@LN__Chapters}}</h6>
-		<check if="{{ sizeof(@chapterList) }}">
-		<small>{{@LN__DragdropSort}}</small>
-		<br /><br />
-		<ul id="chapter-sort">
+<check if="{{isset(@data.chapid)}}">
+	<a class="button" href="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}};returnpath={{@data.form.returnpath}}">{{@LN__EditHeader}}</a>
+	<br /><br />
+</check>
+
+<h6>{{@LN__Chapters}}</h6>
+
+<check if="{{ sizeof(@chapterList) }}">
+
+	<small>{{@LN__DragdropSort}}</small>
+	<br /><br />
+	<div class="columns is-multiline is-smallgap" id="chapter-sort" >
 		<repeat group="{{ @chapterList }}" value="{{ @row }}" counter="{{ @ctr }}">
-			<li id="{{ @row.chapid }}">{ICON:arrow-vert} {{ @ctr }}: <a href="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}}/chapter={{ @row.chapid }}/editor={{ @data.editor=='visual' ? "visual" : "plain" }};returnpath={{@data.form.returnpath}}">{ICON:edit}</a> {{ @row.title }} 
-			<check if="{{@_SESSION.groups&8}}">
-				<true>
-					<check if="{{10 < @row.validated AND @row.validated < 30}}">{ICON:alert:{{@LN__UCP_NotFinishedC}}}</check>
-				</true>
-				<false>
-					<check if="{{10 < @row.validated AND @row.validated < 20}}">{ICON:alert:{{@LN__UCP_NotValidatedC}}}</check><check if="{{20 < @row.validated AND @row.validated < 30}}">{ICON:waiting:{{@LN__UCP_BeingValidatedC}}}</check>
-				</false>
-			</check>
-			</li>
+			<div class="column is-full" id="{{ @row.chapid }}">
+				<div class="columns">
+					<div class="column is-narrow">{ICON:arrow-vert} {{ @ctr }}:</div>
+					<div class="column is-narrow"><a href="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}}/chapter={{ @row.chapid }}/editor={{ @data.editor=='visual' ? 'visual' : 'plain' }};returnpath={{@data.form.returnpath}}">{ICON:edit}</a></div>
+					<div class="column">{{ @row.title }}</div>
+					<div class="column is-narrow">
+						<check if="{{@_SESSION.groups&8}}">
+							<true>
+								<check if="{{10 < @row.validated AND @row.validated < 30}}">{ICON:alert:{{@LN__UCP_NotFinishedC}}}</check>
+							</true>
+							<false>
+								<check if="{{10 < @row.validated AND @row.validated < 20}}">{ICON:alert:{{@LN__UCP_NotValidatedC}}}</check><check if="{{20 < @row.validated AND @row.validated < 30}}">{ICON:waiting:{{@LN__UCP_BeingValidatedC}}}</check>
+							</false>
+						</check>
+					</div>
+				</div>
+			</div>
 		</repeat>
-		</ul>
-		</check>
+	</div>
+
+</check>
 		
-		<br /><br />
+<br />
 		
-		<a class="button" href="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}}/chapter=new;returnpath={{@data.form.returnpath}}">{{@LN__AddChapter}}</a>
+<a class="button is-primary" href="{{@BASE}}/userCP/author/uid={{@data.form.uid}}/edit/sid={{@data.sid}}/chapter=new;returnpath={{@data.form.returnpath}}">{{@LN__AddChapter}}</a>
 
 <script type="text/javascript">
 $(function () {
 	$("#chapter-sort").sortable({
 		cursor: "move",
-		placeholder: "ui-state-highlight",
+		sort: function(event, ui) {
+			var $target = $(event.target);
+			if (!/html|body/i.test($target.offsetParent()[0].tagName)) {
+				var top = event.pageY - $target.offsetParent().offset().top - (ui.helper.outerHeight(true) / 2);
+				ui.helper.css({'top' : top + 'px'});
+			}
+		},
 		update: function () {
 			var neworder = $('#chapter-sort').sortable('toArray');
 			$.ajax({

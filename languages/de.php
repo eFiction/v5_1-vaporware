@@ -607,6 +607,12 @@ return array(
 'AdminMenu_Add' => 'Hinzufügen',
 'AdminMenu_Series' => 'Serien',
 'AdminMenu_Collections' => 'Sammlungen',
+	'CollectionCreateAs'	=> 'Anlegen als',
+	'CreateTypeSeries'		=> 'eine Serie',
+	'TypeSeriesExplain'		=> 'Serien sind sortiert und sollten einen Handlungsverlauf darstellen',
+	'CreateTypeCollection'	=> 'eine Sammlung',
+	'TypeCollectionExplain'	=> 'Sammlungen sind unsortiert und bündeln thematisch oder andersartig verbundene Geschichten',
+	
 
 'CannotDeleteUsedElement'	=> 'Kann ein Element, dass zurzeit verwendet wird, nicht löschen.',
 'ElementDeleted'	=> 'Element gelöscht',

@@ -607,6 +607,11 @@ return array(
 'AdminMenu_Add' => 'Add',
 'AdminMenu_Series' => 'Series',
 'AdminMenu_Collections' => 'Collections',
+	'CollectionCreateAs'	=> 'Create as',
+	'CreateTypeSeries'		=> 'a series',
+	'TypeSeriesExplain'		=> 'Series are sorted and follow a course of action over several stories',
+	'CreateTypeCollection'	=> 'a collection',
+	'TypeCollectionExplain'	=> 'Collections are unsorted and loosely bundle related stories',
 
 'CannotDeleteUsedElement'	=> 'Cannot delete an element that is currently being used.',
 'ElementDeleted'	=> 'Element deleted',

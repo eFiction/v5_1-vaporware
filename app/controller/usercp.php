@@ -156,7 +156,7 @@ class UserCP extends Base
 		{
 			if( "" != $data['new_title'] = $f3->get('POST.new_title') )
 			{
-				if ( $newID = $this->model->authorStoryAdd($data) )
+				if ( $newID = $this->model->storyAdd($data) )
 				{
 					$f3->reroute("/userCP/author/uid={$uid}/edit/sid={$newID};returnpath=/userCP/author/uid={$uid}/drafts", false);
 					exit;
@@ -197,7 +197,7 @@ class UserCP extends Base
 	{
 		if(empty($params['sid'])) return "__Error";
 		//$uid = isset($params['uid']) ? $params['uid'] : $_SESSION['userID'];
-		if ( FALSE !== $storyData = $this->model->authorStoryLoadInfo($params['sid'], $params['uid']) )
+		if ( [] !== $storyData = $this->model->storyLoadInfo($params['sid'], $params['uid']) )
 		{
 			if (isset($_POST) and sizeof($_POST)>0 )
 			{
@@ -723,7 +723,7 @@ class UserCP extends Base
 
 			// save data and report success to the user
 			if ( 0 < $i = $this->model->collectionSave($params['id'], $f3->get('POST.form_data'), $_SESSION['userID'] ) )
-				$_SESSION['lastAction']['save_success'] = $i;
+				$f3->set('save_success', $i);
 
 			if ( isset($_POST['form_data']['changetype']) )
 			{

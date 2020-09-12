@@ -8,19 +8,19 @@
 	</div>
 </div>
 
-<!-- error notification -->
-<check if="{{ isset(@form_error) }}">
-	<div class="notification is-warning">
+<!-- error notification v4 -->
+<check if="{{ isset(@delete_error) }}">
+	<div class="notification is-danger">
 		<button class="delete"></button>
-		{{ @form_error }}
+		{{ @LN__FailedDelete }}
 	</div>
 </check>
 <!-- END: error notification -->
-<!-- success notification -->
-<check if="{{ isset(@form_changes) }}">
+<!-- success notification v4 -->
+<check if="{{ isset(@save_success) }}">
 	<div class="notification is-success">
 		<button class="delete"></button>
-		{{ @LN__Changes_saved }}
+		{{ @LN__Status_Changes, @save_success | format }}
 	</div>
 </check>
 <!-- END: success notification -->

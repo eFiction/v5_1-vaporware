@@ -1,4 +1,4 @@
-<div class="news-box">
+
 	<h5><a href='{{@BASE}}/home/polls'>{{@LN__PollBox}}</a></h5>
 	<repeat group="{{ @pollItems }}" value="{{ @poll }}" counter="{{ @ctr }}">
 		<a href='{{@BASE}}/home/polls/id={{ @poll.id }}'>{{ @poll.question }}</a><br />
@@ -15,4 +15,3 @@
 	</repeat>
 	<check if="{{ empty(@pollItems) }}">{{@LN__Poll_NoActivePolls}}<br /></check>
 	<a class="button is-light" href='{{@BASE}}/home/polls'>{{@LN__AllPolls}}</a>
-</div>

@@ -73,12 +73,12 @@
 				</div>
 				<div class="column is-one-third">
 					<h6>{{@LN__UCP_statusCompleted}}: <strong>{{ ${"LN__UCP_statusCompleted_".@data.completed} }}</strong></h6>
-					{{@LN__ChangeTo}}:<select id="completed" name="form[completed]">
+					{{@LN__ChangeTo}}:<br /><div class="select"><select id="completed" name="form[completed]">
 						<loop from="{{ @i=0 }}" to="{{ @i <= 6 }}" step="{{ @i++ }}">
 							<option value="{{ @i }}"<check if="{{@i==@data.completed}}"> selected="selected"</check>>{{ ${"LN__UCP_statusCompleted_".@i} }}</option>
 						</loop>
 						<option value="9"<check if="{{9==@data.completed}}"> selected="selected"</check>>{{ @LN__UCP_statusCompleted_9 }}</option>
-					</select>
+					</select></div>
 				</div>
 {*		<!-- end: story status fields -->	*}
 				<div class="column is-full" align="right">

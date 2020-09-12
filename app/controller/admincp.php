@@ -1639,25 +1639,75 @@ class AdminCP extends Base
 			$this->buffer( $this->template->storySearch() );
 			return;
 		}
-		elseif ( FALSE !== $storyInfo = $this->model->storyLoadInfo((int)$params['story']) )
+		elseif ( [] !== $storyInfo = $this->model->storyLoadInfo((int)$params['story']) )
 		{
 			// save data
 			if (isset($_POST) and sizeof($_POST)>0 )
 			{
-				$post = $f3->get('POST');
-				$current = $this->model->loadStoryMapper($params['story']);
-				
-				if ( isset($params['chapter']) )
+				// so we want to delete something
+				if( isset($params['delete']) )
 				{
-					$this->model->chapterSaveChanges($params['chapter'], $post['form']);
-					$f3->reroute("/adminCP/stories/edit/story={$storyInfo['sid']};chapter={$params['chapter']}", false);
+					// let's assume this will work
+					$reroute['base']  = "/adminCP/stories/edit";
+					$reroute['story'] = "/story={$params['story']}";
+					if ( isset($params['chapter']) ) $reroute['chapter'] = "/chapter=".$params['chapter'];
+					$reroute['editor'] = "/editor=".$params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
+					if ( isset($params['returnpath']) ) $reroute['returnpath'] = ";returnpath=".$params['returnpath'];
+
+					if ( ""!=$f3->get('POST.confirm_delete') )
+					{
+						// delete a chapter
+						if ( isset($params['chapter']) )
+						{
+							// when deleting a chapter, always return to chapter overview
+							if ( 0 == $i = $this->model->chapterDelete( $params['story'], $params['chapter'] ) )
+								$_SESSION['lastAction']['delete_error'] = TRUE;
+							else
+							{
+								$_SESSION['lastAction']['delete_success'] = TRUE;
+								unset($reroute['chapter']);
+							}
+						}
+						// delete the whole story
+						else
+						{
+							if ( 0 == $i = $this->model->storyDelete( $params['story'] ) )
+								$_SESSION['lastAction']['delete_error'] = TRUE;
+							// since the story is now gone, we must fall back to the story listing
+							else
+							{
+								$_SESSION['lastAction']['delete_success'] = TRUE;
+								if (isset($params['returnpath']))
+									$reroute = [$params['returnpath']];
+								else
+									$reroute = $reroute['base'];
+							}
+						}
+					}
+					// but it seems we are not really sure ...
+					else
+					{
+						$_SESSION['lastAction']['delete_confirm'] = TRUE;
+					}
+					$f3->reroute(implode("",$reroute),FALSE);
 					exit;
 				}
 				else
 				{
-					$this->model->storySaveChanges($current, $post['form']);
-					$f3->reroute('/adminCP/stories/edit/story='.$storyInfo['sid'], false);
-					exit;
+					$current = $this->model->loadStoryMapper($params['story']);
+					
+					if ( isset($params['chapter']) )
+					{
+						if ( 0 < $i = $this->model->chapterSaveChanges($params['chapter'], $f3->get('POST.form')) )
+							$f3->set('save_success', $i);
+					}
+					else
+					{
+						if ( 0 < $i = $this->model->storySaveChanges($current, $f3->get('POST.form')) )
+							$_SESSION['lastAction']['save_success'] = $i;
+						$f3->reroute('/adminCP/stories/edit/story='.$storyInfo['sid'], false);
+						exit;
+					}
 				}
 			}
 
@@ -1673,14 +1723,21 @@ class AdminCP extends Base
 					$f3->reroute($reroute, false);
 					exit;
 				}
-				
-				$chapterInfo = $this->model->chapterLoad($storyInfo['sid'],(int)$params['chapter']);
-				// abusing $chapterData to carry a few more details
-				$chapterInfo['storytitle'] = $storyInfo['title'];
-				// figure out if we want a visual editor
-				$chapterInfo['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
+				// make sure this chapter actually exists for this story
+				elseif ( FALSE !== $chapterInfo = $this->model->chapterLoad($storyInfo['sid'],(int)$params['chapter']) )
+				{
+					// abusing $chapterData to carry a few more details
+					$chapterInfo['storytitle'] = $storyInfo['title'];
+					// figure out if we want a visual editor
+					$chapterInfo['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
 
-				$this->buffer( $this->template->storyChapterEdit($chapterInfo,$chapterList) );
+					$this->buffer( $this->template->storyChapterEdit($chapterInfo,$chapterList) );
+				}
+				else
+				{
+					$f3->reroute('/adminCP/stories/edit/story='.$storyInfo['sid'], false);
+					exit;
+				}
 			}
 			else
 			{
@@ -1801,7 +1858,9 @@ class AdminCP extends Base
 		
 		if (isset($_POST['form_data']))
 		{
-			$this->model->collectionSave($params['id'], $f3->get('POST.form_data') );
+			if ( 0 < $i = $this->model->collectionSave($params['id'], $f3->get('POST.form_data') ) )
+				$f3->set('save_success', $i);
+
 			if ( isset($_POST['form_data']['changetype']) )
 			{
 				$reroute = "/adminCP/stories";
