@@ -119,6 +119,7 @@ return array(
 'CookieAccept'	=> 'Akzeptiert!',
 'Month_Calendar' => '{0,date,custom,%B %Y}',	// using php strftime
 'Weekday' => '{0,date,custom,%A}',
+'FailedLoadItem'	=> 'Failed to load {0}',
 
 // [6] Global -- Forms
 'CaptchaMismatch'	=> 'Captcha stimmt nicht überein',
@@ -603,6 +604,7 @@ return array(
 //'ContestDescription'	=> 'Beschreibung des Wettbewerbs',
 
 'AdminMenu_Stories_Pending' => 'Ausstehend',
+	'NoPendingStories'		=> 'Keine ausstehenden Geschichten',
 'AdminMenu_Edit' => 'Editieren',
 'AdminMenu_Add' => 'Hinzufügen',
 'AdminMenu_Series' => 'Serien',

@@ -69,6 +69,9 @@
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
 	</true>
 	<false>
-		__noPendingStories
+		<div class="notification is-success">
+			<button class="delete"></button>
+			{{ @LN__NoPendingStories }}
+		</div>
 	</false>
 </check>

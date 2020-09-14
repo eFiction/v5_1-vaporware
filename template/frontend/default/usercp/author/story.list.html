@@ -1,7 +1,17 @@
+<!-- error notification v4 -->
+<check if="{{ isset(@load_error) }}">
+	<div class="notification is-warning">
+		<button class="delete"></button>
+		{{ @LN__FailedLoadItem, @LN__Story | format }}
+	</div>
+</check>
+<!-- END: error notification -->
+
+{*
 <check if="{{isset(@deleted)}}">
 	<switch expr="{{ @deleted }}">
 		<case value="success" break="TRUE">
-			<div class="alert-box half success">{{@LN__MSG_deletedSuccess}}{* {{print_r(@results,TRUE)}} *}</div>
+			<div class="alert-box half success">{{@LN__MSG_deletedSuccess}}</div>
 		</case>
 		<case value="moved" break="TRUE">
 			<div class="alert-box half info">Story moved</div>
@@ -11,19 +21,12 @@
 		</case>
 	</switch>
 </check>
+*}
 <F3:check if="{{ empty(@storyEntries) }}">
 <true>
 {{@LN__NoRecordsInList}}
 </true>
 <false>
-{*
-<div class="grid-wrapper">
-	<div class="gb-1qrt">__all</div>
-	<div class="gb-1qrt">__closed</div>
-	<div class="gb-1qrt">__inModeration</div>
-	<div class="gb-1qrt">__validated</div>
-</div>
-*}
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="main/paginate.html" /></F3:check>
 <br/>
 <table class="table table is-striped is-hoverable is-fullwidth">

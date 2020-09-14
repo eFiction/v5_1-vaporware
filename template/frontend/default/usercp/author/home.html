@@ -1,3 +1,13 @@
+<!-- error notification v4 -->
+<check if="{{ isset(@load_error) }}">
+	<div class="notification is-warning">
+		<button class="delete"></button>
+		{{ @LN__FailedLoadItem, @LN__Story | format }}
+	</div>
+</check>
+<!-- END: error notification -->
+		
+
 <check if="{{ @_SESSION['groups']&5 }}">
 	<true>
 	<article class="message is-info">

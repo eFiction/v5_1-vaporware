@@ -415,85 +415,6 @@ class UserCP extends Controlpanel
 		return $i;
 	}
 
-	public function authorStoryChapterAdd( int $sid, int $uid)
-	{
-		return parent::storyChapterAdd($sid, $uid);
-	}
-
-	public function authorStoryChapterSave( int $chapterID, array $post )
-	{
-		// plain and visual return different newline representations, this will bring things to standard.
-		$chaptertext = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $post['chapter_text']);
-
-		$chapter=new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
-		$chapter->load(array('chapid=?',$chapterID));
-		
-		$chapter->title 	= $post['chapter_title'];
-		$chapter->notes 	= $post['chapter_notes'];
-		$chapter->endnotes 	= $post['chapter_endnotes'];
-		$chapter->wordcount	= max(count(preg_split("/\p{L}[\p{L}\p{Mn}\p{Pd}'\x{2019}]{0,}/u",$chaptertext))-1, 0);
-		
-		// Toggle validation request, keeping the reason part untouched
-		if ( isset($post['request_validation']) AND $chapter->validated < 20 )
-		{
-			$chapter->validated 	= 	$chapter->validated + 10;
-			// Insert time of creation (internal data)
-			$chapter->created		=	date('Y-m-d H:i:s');
-		}
-		elseif ( empty($post['request_validation']) AND $chapter->validated >= 20 AND $chapter->validated < 30 )
-			$chapter->validated 	= 	$chapter->validated - 10;
-			
-		// Allow trusted authors to set validation
-		if ( isset($post['mark_validated']) AND $_SESSION['groups']&8 AND $chapter->validated < 20 AND $chapter->wordcount > 0 )
-		{
-			$chapter->validated 	= 	$chapter->validated + 20;
-			$chapter->created		=	date('Y-m-d H:i:s');
-			
-			// Update the story entry, set updated field to now
-			$this->exec("UPDATE `tbl_stories`S 
-							INNER JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid AND Ch.chapid = :chapid ) 
-						SET S.updated = :updated;",
-						[
-							":chapid" => $chapterID,
-							":updated" => $chapter->created
-						]);
-			// Log validation
-			\Logging::addEntry(['VS','c'], [$chapter->sid,$chapterID]);
-		}
-
-		if ( 
-			// validation status changed
-			$chapter->changed("validated") 
-			// chapter text changed
-			OR $this->chapterSave($chapterID, $chaptertext, $chapter)
-			)
-		{
-			$recount = 1;
-		}
-
-		$i = $chapter->changed();
-		// save chapter information
-		$chapter->save();
-
-		if ( isset($recount) )
-		// perform recount, this has to take place after save();
-		{
-			// recount this story
-			$this->recountStory($chapter->sid);
-			
-			// recount all collections that feature this story
-			$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories');
-			$inSeries = $collection->find(array('sid=?',$current->sid));
-			foreach ( $inSeries as $in )
-			{
-				// Rebuild collection/series cache based on new data
-				$this->rebuildSeriesCache($in->seriesid);
-			}
-	}
-
-		return $i;
-	}
-
 	public function authorCuratorRemove($uid=NULL)
 	{
 		$this->exec("UPDATE `tbl_users`U set U.curator = NULL WHERE U.uid = :uid;", [ ":uid" => ($uid ?: $_SESSION['userID']) ]);
@@ -726,27 +647,7 @@ class UserCP extends Controlpanel
 				if(sizeof($_SESSION['allowed_authors']))
 				{
 					$authors = $this->exec("SELECT rel.aid FROM `tbl_stories_authors`rel WHERE rel.sid = :sid AND rel.type='M' AND rel.aid IN (".implode(",",$_SESSION['allowed_authors']).")", [ ":sid" => $data['chaptersort']] );
-					if(empty($authors)) return NULL;
-
-					$chapters = new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
-					if ( $this->config['chapter_data_location'] == "local" )
-						$chaptersLocal = new \DB\SQL\Mapper(\storage::instance()->localChapterDB(), "chapters");
-
-					foreach ( $data["neworder"] as $order => $id )
-					{
-						if ( is_numeric($order) && is_numeric($id) && is_numeric($data["chaptersort"]) )
-						{
-							$chapters->load(array('chapid = ? AND sid = ?',$id, $data['chaptersort']));
-							$chapters->inorder = $order+1;
-							$chapters->save();
-							if ( $this->config['chapter_data_location'] == "local" )
-							{
-								$chaptersLocal->load(array('chapid = ? AND sid = ?',$id, $data['chaptersort']));
-								$chaptersLocal->inorder = $order+1;
-								$chaptersLocal->save();
-							}
-						}
-					}
+						if(!empty($authors)) $this->ajaxStoryChaptersort($data);
 				}
 			}
 		}

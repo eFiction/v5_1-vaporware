@@ -3,7 +3,315 @@ namespace Model;
 
 class Controlpanel extends Base {
 
-	// rewrite 2020-09
+	/**
+	* List chapters for a given story ID
+	* rewrite 2020-09
+	*
+	* @param	int		$storyID	Story ID
+	* @param	int		$userID		Optional, only used in UCP
+	*
+	* @return	int					New chapter's ID (0 in case of error)
+	*/
+	public function chapterAdd( int $storyID, int $userID=0 ) : int
+	{
+		// get the current chapter count, and with it, check if the story exists
+		// if required, the user's permission to add a chapter to the story will also be checked, although the controller should have taken care of this
+		if ( $userID )
+		{
+			$countSQL = "SELECT COUNT(chapid) as chapters, U.uid, MAX(Ch.inorder) as lastorder
+							FROM `tbl_stories`S
+								LEFT JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid )
+								INNER JOIN `tbl_stories_authors`rSA ON ( rSA.sid = S.sid AND rSA.type='M' )
+									INNER JOIN `tbl_users`U ON ( (rSA.aid = U.uid) AND (U.uid=:uidU OR U.curator=:uidC) )
+						WHERE S.sid = :sid ";
+			$countBind = [ ":sid" => $storyID, ":uidU" => $userID, ":uidC" => $userID ];
+
+			$chapterCount = $this->exec($countSQL, $countBind)[0];
+
+			if ( empty($chapterCount) OR $chapterCount['uid']==NULL )
+				return 0;
+
+			// set the initial validation status
+			// even with a trusted author, we don't want the chapter to be marked as finished right away
+			$validated = 11;
+		}
+		else
+		{
+			// coming from adminCP, no need to check user permission
+			$chapterCount = $this->exec("SELECT COUNT(Ch.chapid) as chapters, MAX(Ch.inorder) as lastorder
+											FROM `tbl_chapters`Ch
+										WHERE `sid` = :sid ", [ ":sid" => $storyID ])[0];
+
+			if ( empty($chapterCount) )
+				return 0;
+
+			// set the initial validation status
+			$validated = "1".($_SESSION['groups']&128)?"3":"2";
+		}
+
+		// use this to check if the inorder has been properly set, i.e. no missing orders
+		if ( $chapterCount['chapters'] != $chapterCount['lastorder'] )
+			$this->rebuildStoryChapterOrder ( $storyID );
+
+		// Get current chapter count and raise
+		$chapterCount = $chapterCount['chapters'] + 1;
+
+		$newChapter = new \DB\SQL\Mapper($this->db, $this->prefix."chapters");
+		$newChapter->sid		= $storyID;
+		$newChapter->title		= \Base::instance()->get('LN__Chapter')." #{$chapterCount}";
+		$newChapter->inorder	= $chapterCount;
+		$newChapter->validated	= $validated;
+		$newChapter->created	= 'CURRENT_TIMESTAMP';
+		$newChapter->save();
+
+		$chapterID = $newChapter->_id;
+
+		// if using local storage, create a chapter entry in SQLite
+		if ( "local" == $this->config['chapter_data_location'] )
+		{
+			$db = \storage::instance()->localChapterDB();
+			$chapterAdd= @$db->exec('INSERT INTO "chapters" ("chapid","sid") VALUES ( :chapid, :sid )',
+								[
+									':chapid' 		=> $chapterID,
+									':sid' 			=> $storyID,
+								]
+			);
+		}
+
+		return $chapterID;
+	}
+
+	/**
+	* List chapters for a given story ID
+	* rewrite 2020-09
+	*
+	* @param	int		$storyID	Story ID
+	*
+	* @return	array			Result or empty
+	*/
+	public function chapterLoadList( int $storyID ) : array
+	{
+		return $this->exec
+		(
+			"SELECT Ch.sid,Ch.chapid,Ch.title,Ch.validated,Ch.inorder
+				FROM `tbl_chapters`Ch
+			WHERE Ch.sid = :sid ORDER BY Ch.inorder ASC",
+			[":sid" => $storyID ]
+		);
+	}
+
+	/**
+	* Load chapter
+	* rewrite 2020-09
+	*
+	* @param	int		$storyID	Story ID
+	* @param	int		$chapterID	Chapter ID
+	*
+	* @return	array			Result or empty
+	*/
+	public function chapterLoad( int $storyID, int $chapterID ) : array
+	{
+		$data = $this->exec
+		(
+			"SELECT Ch.sid,Ch.chapid,Ch.inorder,Ch.title,Ch.notes,Ch.endnotes,Ch.validated,Ch.rating,Ch.chaptertext
+				FROM `tbl_chapters`Ch
+			WHERE Ch.sid = :sid AND Ch.chapid = :chapter",
+			[":sid" => $storyID, ":chapter" => $chapterID ]
+		);
+		// an empty result means there is no such chapter
+		if (empty($data)) return [];
+
+		// if the chapter text is stored locally, we must go end get it
+		if ( $this->config['chapter_data_location'] == "local" )
+			$data[0]['chaptertext'] = $this->getChapterText( $storyID, $chapterID, FALSE );
+
+		return $data[0];
+	}
+
+	/**
+	* Save chapter info/description
+	* rewrite 2020-09
+	*
+	* @param	int		$chapterID	Chapter ID ID
+	* @param	array	$post		Data sent from the form
+	* @param	string	$power		Are we an 'A'dmin or a 'U'ser
+	*
+	* @return	int					Counted changes
+	*/
+	public function chapterSave( int $chapterID, array $post, string $power = 'U' ) : int
+	{
+		// plain and visual return different newline representations, this will bring things to standard.
+		$chaptertext = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $post['chapter_text']);
+
+		$chapter=new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
+		$chapter->load(array('chapid=?',$chapterID));
+		
+		$chapter->title 	= $post['chapter_title'];
+		$chapter->notes 	= $post['chapter_notes'];
+		$chapter->endnotes 	= $post['chapter_endnotes'];
+		$chapter->wordcount	= max(count(preg_split("/\p{L}[\p{L}\p{Mn}\p{Pd}'\x{2019}]{0,}/u",$chaptertext))-1, 0);
+
+		// Treat validation input based on module
+		// 'A'dmin has more power
+		if ( $power == 'A' )
+		{
+			// remember old validation status
+			$oldValidated 		= $chapter->validated;
+			$chapter->validated = $post['validated'].$post['valreason'];
+
+			if ( $chapter->changed("validated") )
+			{
+				if ( $post['validated'] == 3 AND substr($oldValidated,0,1)!=3 )
+				// story got validated
+				\Logging::addEntry(['VS','c'], [ $chapter->sid, $chapter->inorder] );
+
+				elseif ( $post['validated'] < 3 AND substr($oldValidated,0,1)==3 )
+				// story got invalidated
+				// need better logging here
+				\Logging::addEntry(['VS','c'], [ $chapter->sid, $chapter->inorder] );
+			}
+		}
+		// 'U'ser may onle be able to request validation
+		else
+		{
+			// Toggle validation request, keeping the reason part untouched
+			if ( isset($post['request_validation']) AND $chapter->validated < 20 )
+			{
+				$chapter->validated 	= 	$chapter->validated + 10;
+				// Insert time of creation (internal data)
+				$chapter->created		=	date('Y-m-d H:i:s');
+			}
+			elseif ( empty($post['request_validation']) AND $chapter->validated >= 20 AND $chapter->validated < 30 )
+				$chapter->validated 	= 	$chapter->validated - 10;
+				
+			// Allow trusted authors to set validation
+			if ( isset($post['mark_validated']) AND $_SESSION['groups']&8 AND $chapter->validated < 20 AND $chapter->wordcount > 0 )
+			{
+				$chapter->validated 	= 	$chapter->validated + 20;
+				$chapter->created		=	date('Y-m-d H:i:s');
+				
+				// Update the story entry, set updated field to now
+				$this->exec("UPDATE `tbl_stories`S 
+								INNER JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid AND Ch.chapid = :chapid ) 
+							SET S.updated = :updated;",
+							[
+								":chapid" => $chapterID,
+								":updated" => $chapter->created
+							]);
+				// Log validation
+				\Logging::addEntry(['VS','c'], [$chapter->sid,$chapterID]);
+			}
+		}
+
+		// Decide if we need to run a recount
+		if ( 
+			// validation status changed
+			$chapter->changed("validated") 
+			// chapter text changed
+			OR $this->chapterContentSave($chapterID, $chaptertext, $chapter)
+			)
+		{
+			$recount = TRUE;
+		}
+
+		$i = $chapter->changed();
+		// save chapter information
+		$chapter->save();
+
+		if ( isset($recount) )
+		// perform recount, this has to take place after save();
+		{
+			// recount this story
+			$this->recountStory($chapter->sid);
+			
+			// recount all collections that feature this story
+			$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories');
+			$inSeries = $collection->find(array('sid=?',$chapter->sid));
+			foreach ( $inSeries as $in )
+			{
+				// Rebuild collection/series cache based on new data
+				$this->rebuildSeriesCache($in->seriesid);
+			}
+			$i++;
+		}
+
+		return $i;
+	}
+
+	/**
+	* Save chapter text in the assigned database
+	* rewrite 2020-09
+	*
+	* @param	int				$chapterID
+	* @param	string			$chapterText
+	* @param	\DB\SQL\Mapper	$mapper			mapper to the SQL table
+	*
+	* @return	int								Was anything changed?
+	*/
+	public function chapterContentSave( int $chapterID, string $chapterText, \DB\SQL\Mapper $mapper ) : int 
+	{
+		if ( $this->config['chapter_data_location'] == "local" )
+		{
+			$db = \storage::instance()->localChapterDB();
+			$chapterSave= $db->exec('UPDATE "chapters" SET "chaptertext" = :chaptertext WHERE "chapid" = :chapid', array(':chapid' => $chapterID, ':chaptertext' => $chapterText ));
+		}
+		else
+		{
+			$mapper->chaptertext = $chapterText;
+			$chapterSave = $mapper->changed();
+			$mapper->save();
+		}
+
+		return $chapterSave;
+	}
+
+	/**
+	* Delete the given chapter
+	* rewrite 2020-09
+	*
+	* @param	int				$storyID
+	* @param	int				$chapterID
+	* @param	int				$userID			Optional, only used in UCP
+	*
+	* @return	int								Success count
+	*/
+	public function chapterDelete( int $storyID, int $chapterID, int $userID = 0 ) : int
+	{
+		if ( $userID == 0 OR 1==(new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors'))->count( ["sid = ? AND aid = ? and type='M'", $storyID, $userID] ) )
+		{	
+			$chapter=new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
+			$bind = ['sid=? AND chapid=?', $storyID, $chapterID];
+			
+			if ( $this->config['chapter_data_location'] == "local" )
+			{
+				$localdb = new \DB\SQL\Mapper(\storage::instance()->localChapterDB(), 'chapters');
+				$i = $localdb->erase($bind);
+			}
+			else $i=1;
+			
+			// delete the chapter
+			$j = $chapter->erase($bind);
+			
+			// recount story stats based on new data
+			$this->recountStory($storyID);
+			
+			// rebuild the inorder fields
+			$this->rebuildStoryChapterOrder($storyID);
+			
+			// this should equate to 1*1 if there was no error
+			return ( $i * $j );
+		}
+		return 0;
+	}
+
+	/**
+	* Add a new story
+	* rewrite 2020-09
+	*
+	* @param	array	$data	Story title, and in case of ACP also a list of authors
+	*
+	* @return	int				SQL ID of the newly created story
+	*/
 	public function storyAdd( array $data ) : int
 	{
 		$newStory = new \DB\SQL\Mapper($this->db, $this->prefix."stories");
@@ -65,7 +373,15 @@ class Controlpanel extends Base {
 		return $newID;
 	}
 
-	// rewrite 2020-09
+	/**
+	* Load story info
+	* rewrite 2020-09
+	*
+	* @param	int		$sid	Story ID
+	* @param	int		$uid	User ID, optional, only sent from the UCP
+	*
+	* @return	array			Result or empty
+	*/
 	public function storyLoadInfo( int $sid, int $uid=0 ) : array
 	{
 		// common SQL builder
@@ -99,6 +415,11 @@ class Controlpanel extends Base {
 		return [];
 	}
 
+
+
+
+
+
 	public function storyDelete( int $storyID, int $userID = 0 ) : int
 	{
 		// get a review mapper
@@ -120,6 +441,8 @@ class Controlpanel extends Base {
 		}
 
 		// Load all series that housed this story
+		// rewrite: entries get deleted by foreign key
+		/*
 		$mapper = new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories');
 		$deleted['series'] = 0;
 		while( $mapper->load(array('sid=?',$storyID)) )
@@ -130,16 +453,22 @@ class Controlpanel extends Base {
 			$mapper->erase();
 			$deleted['series']++;
 		}
+		*/
 
 		// Faster with a direct SQL call, delete all user-story relations for this story
+		// rewrite: entries get deleted by foreign key
+		/*
 		$this->exec
 		(
 			"DELETE FROM `tbl_stories_authors` WHERE `sid` = :sid;",
 			[ ":sid" => $storyID ]
 		);
 		$deleted['authors'] = $this->db->count();
+		*/
 
 		// get a tag relation mapper
+		// rewrite: entries get deleted by foreign key
+		/*
 		$mapper = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_tags');
 		$deleted['tags'] = 0;
 		$deleted['characters'] = 0;
@@ -172,14 +501,18 @@ class Controlpanel extends Base {
 			$this->cacheCategories($category);
 			$deleted['categories']++;
 		}
+		*/
 
 		// Delete all tracker entries for the story
+		// rewrite: entries get deleted by foreign key
+		/*
 		$this->exec
 		(
 			"DELETE FROM `tbl_tracker` WHERE `sid` = :sid;",
 			[ ":sid" => $storyID ]
 		);
 		$deleted['tracker'] = $this->db->count();
+		*/
 
 		// Delete chapters form local storag if required
 		if ( $this->config['chapter_data_location'] == "local" )
@@ -247,153 +580,33 @@ class Controlpanel extends Base {
 		return $pre;
 	}
 
-	public function storyChapterAdd($storyID, $userID=FALSE, $date=NULL)
+
+	/**
+	* Rebuild the inorder data for chapters within a story
+	* This will be called whenever a chapter is being deleted and if there is a mismatch detected when adding a chapter.
+	* rewrite 2020-09
+	*
+	* @param	int		$sid	Story ID
+	* @param	int		$uid	User ID, optional, only sent from the UCP
+	*
+	* @return	array			Result or empty
+	*/
+	public function rebuildStoryChapterOrder( int $storyID )
 	{
-		// get the current chapter count, and with it, check if the story exists
-		// if required, the user's permission to add a chapter to the story will also be checked, although the controller should have taken care of this
-		if ( $userID )
+		$chapterList = new \DB\SQL\Mapper($this->db, $this->prefix."chapters");
+		$chapterList->load(['sid = ?', $storyID], ['order' => 'inorder ASC, chapid ASC']);
+		
+		$i = 1;
+		while ( !$chapterList->dry() )
 		{
-			$countSQL = "SELECT COUNT(chapid) as chapters, U.uid
-							FROM `tbl_stories`S
-								LEFT JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid )
-								INNER JOIN `tbl_stories_authors`rSA ON ( rSA.sid = S.sid AND rSA.type='M' )
-									INNER JOIN `tbl_users`U ON ( (rSA.aid = U.uid) AND (U.uid=:uidU OR U.curator=:uidC) )
-						WHERE S.sid = :sid ";
-			$countBind = [ ":sid" => $storyID, ":uidU" => $userID, ":uidC" => $userID ];
-
-			$chapterCount = $this->exec($countSQL, $countBind);
-
-			if ( empty($chapterCount) OR  $chapterCount[0]['uid']==NULL )
-				return FALSE;
-
-			// Get current chapter count and raise
-			$chapterCount = $chapterCount[0]['chapters'] + 1;
-
-			// set the initial validation status
-			// even with a trusted author, we don't want the chapter to be marked as finished right away
-			$validated = 11;
+			$chapterList->inorder = $i++;
+			$chapterList->save();
+			$chapterList->next();
 		}
-		else
-		{
-			// coming from adminCP, no need to check user permission
-			$chapterCount = $this->exec("SELECT COUNT(Ch.chapid) as chapters
-											FROM `tbl_chapters`Ch
-										WHERE `sid` = :sid ", [ ":sid" => $storyID ])[0]['chapters'];
-
-			if ( empty($chapterCount) )
-				return FALSE;
-
-			// Get current chapter count and raise
-			$chapterCount++;
-
-			$validated = "1".($_SESSION['groups']&128)?"3":"2";
-
-			// date is NULL when adding additional chapters, in this context we also update the story entry
-			if ( !$date )
-			{
-				$this->exec(
-					"UPDATE `tbl_stories` SET `updated` = CURRENT_TIME() WHERE `sid` = :sid;",
-					[ ":sid" =>  $storyID ]
-				);
-			}
-		}
-
-		$newChapter = new \DB\SQL\Mapper($this->db, $this->prefix."chapters");
-		$newChapter->sid		= $storyID;
-		$newChapter->title		= \Base::instance()->get('LN__Chapter')." #{$chapterCount}";
-		$newChapter->inorder	= $chapterCount;
-		$newChapter->validated	= $validated;
-		$newChapter->created	= 'CURRENT_TIMESTAMP';
-		$newChapter->save();
-
-		$chapterID = $newChapter->_id;
-
-		// if using local storage, create a chapter entry in SQLite
-		if ( "local" == $this->config['chapter_data_location'] )
-		{
-			$db = \storage::instance()->localChapterDB();
-			$chapterAdd= @$db->exec('INSERT INTO "chapters" ("chapid","sid","inorder") VALUES ( :chapid, :sid, :inorder )',
-								[
-									':chapid' 		=> $chapterID,
-									':sid' 			=> $storyID,
-									':inorder' 		=> $chapterCount
-								]
-			);
-		}
-
-		// rebuild the story cache
-		//$this->rebuildStoryCache($storyID);
-
-		return $chapterID;
 	}
 
-	public function chapterLoadList($sid): array
-	{
-		$data = $this->exec
-		(
-			"SELECT Ch.sid,Ch.chapid,Ch.title,Ch.validated,Ch.inorder
-				FROM `tbl_chapters`Ch
-			WHERE Ch.sid = :sid ORDER BY Ch.inorder ASC",
-			[":sid" => $sid ]
-		);
-		if (sizeof($data)>0) return $data;
-		return [];
-	}
 
-	public function chapterLoad( $story, $chapter )
-	{
-		$data = $this->exec
-		(
-			"SELECT Ch.sid,Ch.chapid,Ch.inorder,Ch.title,Ch.notes,Ch.endnotes,Ch.validated,Ch.rating
-				FROM `tbl_chapters`Ch
-			WHERE Ch.sid = :sid AND Ch.chapid = :chapter",
-			[":sid" => $story, ":chapter" => $chapter ]
-		);
-		if (empty($data)) return FALSE;
-		$data[0]['chaptertext'] = parent::getChapterText( $story, $data[0]['inorder'], FALSE );
 
-		return $data[0];
-	}
-
-	public function chapterSave( int $chapterID, string $chapterText, \DB\SQL\Mapper $mapper ) : int 
-	{
-		if ( $this->config['chapter_data_location'] == "local" )
-		{
-			$db = \storage::instance()->localChapterDB();
-			$chapterSave= $db->exec('UPDATE "chapters" SET "chaptertext" = :chaptertext WHERE "chapid" = :chapid', array(':chapid' => $chapterID, ':chaptertext' => $chapterText ));
-		}
-		else
-		{
-			$mapper->chaptertext = $chapterText;
-			$chapterSave = $mapper->changed();
-			$mapper->save();
-		}
-
-		return $chapterSave;
-	}
-
-	public function chapterDelete( int $storyID, int $chapterID, int $userID = 0 ) : int
-	{
-		if ( $userID == 0 OR 1==(new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors'))->count( ["sid = ? AND aid = ? and type='M'", $storyID, $userID] ) )
-		{	
-			$chapter=new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
-			
-			if ( $this->config['chapter_data_location'] == "local" )
-			{
-				$chapter->load(['sid=? AND chapid=?', $storyID, $chapterID]);
-
-				$localdb = new \DB\SQL\Mapper(\storage::instance()->localChapterDB(), 'chapters');
-				$i = $localdb->erase(['sid=? AND inorder=?', $storyID, $chapter->inorder]);
-			}
-			else $i=1;
-			
-			$this->recountStory($storyID);
-			
-			// this should equate to 1*1 if there was no error
-			return ( $i * $chapter->erase() );
-		}
-		return 0;
-	}
 
 	public function rebuildStoryCache($sid)
 	{
@@ -459,26 +672,6 @@ class Controlpanel extends Base {
 			],
 			['sid=?',$sid]
 		);
-	}
-
-	public function recountStory(int $sid)
-	{
-		$this->exec("UPDATE `tbl_stories`S
-						INNER JOIN
-						(
-							SELECT
-								sid,
-								COUNT(DISTINCT chapid)'chapters',
-								SUM(wordcount)'wordcount'
-							FROM `tbl_chapters`
-							WHERE sid = :sid AND validated >= 30
-							GROUP BY sid
-						) Ch ON ( S.sid = Ch.sid  )
-					SET S.wordcount = Ch.wordcount, S.chapters = Ch.chapters;",
-					[ ":sid" => $sid ]
-					);
-		// drop stats cache to make changes visible
-		\Cache::instance()->clear('stats');
 	}
 
 	public function rebuildSeriesCache($collID)
@@ -681,12 +874,31 @@ class Controlpanel extends Base {
 		return $i;
 	}
 
-	// wrapper for storyRelationTag
+	/**
+	* Update the 'story - character' relation table
+	* Wrapper for the storyRelationTag function
+	* rewrite 2020-09
+	*
+	* @param	int		$sid		Story ID
+	* @param	array	$data		New character list
+	*
+	* @return	int					Report changes made
+	*/	
 	public function storyRelationCharacter( $sid, $data )
 	{
 		return $this->storyRelationTag( $sid, $data, 1 );
 	}
 
+	/**
+	* Update the 'story - tag' relation table
+	* rewrite 2020-09
+	*
+	* @param	int		$sid		Story ID
+	* @param	array	$data		New tag list
+	* @param	int		$character	Is it a character(person) (default=no)
+	*
+	* @return	int					Report changes made
+	*/
 	public function storyRelationTag( $sid, $data, $character = 0 )
 	{
 		// Check tags:
@@ -726,11 +938,46 @@ class Controlpanel extends Base {
 
 		// call recount function
 		if ( isset( $recounts ) )
-			$this->storyRecountTags( $recounts, $character );
+			$this->recountTags( $recounts, $character );
 		return $i;
 	}
 
-	public function storyRecountTags( $tags, $character = 0 )
+	/**
+	* Recount story chapters and words
+	* rewrite 2020-09
+	*
+	* @param	mixed	$storyID	Story ID
+	*/
+	public function recountStory( int $storyID ) : void
+	{
+		$this->exec("UPDATE `tbl_stories`S
+						INNER JOIN
+						(
+							SELECT
+								sid,
+								COUNT(DISTINCT chapid)'chapters',
+								SUM(wordcount)'wordcount'
+							FROM `tbl_chapters`
+							WHERE sid = :sid AND validated >= 30
+							GROUP BY sid
+						) Ch ON ( S.sid = Ch.sid  )
+					SET S.wordcount = Ch.wordcount, S.chapters = Ch.chapters;",
+					[ ":sid" => $storyID ]
+					);
+		// drop stats cache to make changes visible
+		\Cache::instance()->clear('stats');
+	}
+
+	/**
+	* Recount tag usage
+	* rewrite 2020-09
+	*
+	* @param	mixed	$tags		Tag ID or list of Tag IDs
+	* @param	int		$character	Is it a character(person) (default=no)
+	*
+	* @return	int					Report recounted tags
+	*/
+	public function recountTags( $tags, $character = 0 ) : int
 	{
 		// tags is either an array
 		if ( is_array($tags) ) $tags = implode(",",$tags);
@@ -1247,7 +1494,13 @@ class Controlpanel extends Base {
 		return 0;
 	}
 	
-	public function collectionAjaxItemsort(array $data, int $userID = 0)
+	/**
+	* AJAX sort collection items
+	* rewrite 2020-09
+	*
+	* @param	array		$date	Lists the new item order
+	*/	
+	public function ajaxCollectionItemsort( array $data, int $userID = 0 ) : void
 	{
 		// quietly drop out on user mismatch
 		if ( ($userID==0) OR  (1 == (new \DB\SQL\Mapper($this->db, $this->prefix."collections"))->count(['collid=? AND uid=?', $data['collectionsort'], $userID])) )
@@ -1264,6 +1517,26 @@ class Controlpanel extends Base {
 			}
 		}
 		exit;
+	}
+	
+	/**
+	* AJAX sort chapters
+	* rewrite 2020-09
+	*
+	* @param	array		$date	Lists the new chapter order
+	*/	
+	public function ajaxStoryChaptersort( array $data ) : void
+	{
+		$chapters = new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
+		foreach ( $data["neworder"] as $order => $id )
+		{
+			if ( is_numeric($order) && is_numeric($id) && is_numeric($data["chaptersort"]) )
+			{
+				$chapters->load(array('chapid = ? AND sid = ?',$id, $data['chaptersort']));
+				$chapters->inorder = $order+1;
+				$chapters->save();
+			}
+		}
 	}
 
 }

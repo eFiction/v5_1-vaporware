@@ -10,7 +10,7 @@
 <check if="{{ isset(@save_success) }}">
 	<div class="notification is-success">
 		<button class="delete"></button>
-		{{ @LN__Status_Changes, @save_success | format }}
+		{{ @LN__Changes_saved }}
 	</div>
 </check>
 <!-- END: success notification -->
@@ -145,20 +145,3 @@
 		<include href="stories/chapterlist.html" />
 	</div>
 </div>
-<script type="text/javascript">
-$(function () {
-	$("#chapter-sort").sortable({
-		cursor: "move",
-		containment: "parent",
-		update: function () {
-			var neworder = $('#chapter-sort').sortable('toArray');
-			$.ajax({
-				type: "post",
-				url: "{{@BASE}}/adminCP/ajax/stories/chaptersort",
-				data: { story: {{@data.sid}}, neworder: neworder },
-				dataType: "html"
-			});
-		}
-	});
-});
-</script>

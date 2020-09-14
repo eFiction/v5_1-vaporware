@@ -126,21 +126,11 @@ class AdminCP extends Controlpanel {
 		{
 			// unified
 			if(isset($data['collectionsort']))
-				$this->collectionAjaxItemsort($data);
+				$this->ajaxCollectionItemsort($data);
 			
 			elseif(isset($data['chaptersort']))
-			{
-				$chapters = new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
-				foreach ( $data["neworder"] as $order => $id )
-				{
-					if ( is_numeric($order) && is_numeric($id) && is_numeric($data["chaptersort"]) )
-					{
-						$chapters->load(array('chapid = ? AND sid = ?',$id, $data['chaptersort']));
-						$chapters->inorder = $order+1;
-						$chapters->save();
-					}
-				}
-			}
+				$this->ajaxStoryChaptersort($data);
+
 		}
 
 		if ( isset($ajax_sql) ) return $this->exec($ajax_sql, $bind);
@@ -1904,118 +1894,11 @@ class AdminCP extends Controlpanel {
 		return $result;
 	}
 
-/*	
-	public function chapterLoadList($sid)
-	moved to parent
-*/
-	
 	public function loadStoryMapper($sid)
 	{
 		$story=new \DB\SQL\Mapper($this->db, $this->prefix.'stories');
 		$story->load(array('sid=?',$sid));
 		return $story;
-	}
-	
-	public function chapterAdd ( int $storyID )
-	{
-		return parent::storyChapterAdd($storyID);
-
-		/*
-		// Get current chapter count and raise
-		if ( FALSE === $chapterCount = @$this->exec("SELECT COUNT(chapid) as chapters FROM `tbl_chapters` WHERE `sid` = :sid ", [ ":sid" => $storyID ])[0]['chapters'] )
-			return FALSE;
-		$chapterCount++;
-		
-		$kv = [
-			'title'			=> \Base::instance()->get('LN__Chapter')." #{$chapterCount}",
-			'inorder'		=> $chapterCount,
-			'validated'		=> "1".($_SESSION['groups']&128)?"3":"2",
-			'wordcount'		=> 0,
-			'rating'		=> "0", // allow rating later
-			'sid'			=> $storyID,
-		];
-
-		$chapterID = $this->insertArray($this->prefix.'chapters', $kv );
-
-		if ( $this->config['chapter_data_location'] == "local" )
-		{
-			$db = \storage::instance()->localChapterDB();
-			$chapterAdd= @$db->exec('INSERT INTO "chapters" ("chapid","sid","inorder","chaptertext") VALUES ( :chapid, :sid, :inorder, :chaptertext )', 
-								[
-									':chapid' 		=> $chapterID,
-									':sid' 			=> $storyID,
-									':inorder' 		=> $chapterCount,
-									':chaptertext'	=> '',
-								]
-			);
-		}
-		
-		//$this->rebuildStoryCache($storyID);
-		
-		return $chapterID;
-		*/
-	}
-
-	public function chapterSaveChanges( int $chapterID, array $post ) : int
-	{
-		// plain and visual return different newline representations, this will bring things to standard.
-		$chaptertext = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $post['chapter_text']);
-
-		$chapter=new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
-		$chapter->load(array('chapid=?',$chapterID));
-		
-		$chapter->title 	= $post['chapter_title'];
-		$chapter->notes 	= $post['chapter_notes'];
-		$chapter->endnotes 	= $post['chapter_endnotes'];
-		$chapter->wordcount	= max(count(preg_split("/\p{L}[\p{L}\p{Mn}\p{Pd}'\x{2019}]{0,}/u",$chaptertext))-1, 0);
-
-		// remember old validation status
-		$oldValidated 		= $chapter->validated;
-		$chapter->validated = $post['validated'].$post['valreason'];
-
-		if ( $chapter->changed("validated") )
-		{
-			if ( $post['validated'] == 3 AND substr($oldValidated,0,1)!=3 )
-			// story got validated
-			\Logging::addEntry(['VS','c'], [ $chapter->sid, $chapter->inorder] );
-
-			elseif ( $post['validated'] < 3 AND substr($oldValidated,0,1)==3 )
-			// story got invalidated
-			// need better logging here
-			\Logging::addEntry(['VS','c'], [ $chapter->sid, $chapter->inorder] );
-		}
-		
-		if ( 
-			// validation status changed
-			$chapter->changed("validated") 
-			// chapter text changed
-			OR $this->chapterSave($chapterID, $chaptertext, $chapter)
-			)
-		{
-			$recount = 1;
-		}
-
-		$i = $chapter->changed();
-		// save chapter information
-		$chapter->save();
-
-		if ( isset($recount) )
-		// perform recount, this has to take place after save();
-		{
-			// recount this story
-			$this->recountStory($chapter->sid);
-			
-			// recount all collections that feature this story
-			$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories');
-			$inSeries = $collection->find(array('sid=?',$current->sid));
-			foreach ( $inSeries as $in )
-			{
-				// Rebuild collection/series cache based on new data
-				$this->rebuildSeriesCache($in->seriesid);
-			}
-		}
-
-		return $i;
 	}
 	
 	public function tagAdd(string $name) : int

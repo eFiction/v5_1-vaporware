@@ -1698,7 +1698,7 @@ class AdminCP extends Base
 					
 					if ( isset($params['chapter']) )
 					{
-						if ( 0 < $i = $this->model->chapterSaveChanges($params['chapter'], $f3->get('POST.form')) )
+						if ( 0 < $i = $this->model->chapterSave($params['chapter'], $f3->get('POST.form'), 'A') )
 							$f3->set('save_success', $i);
 					}
 					else
@@ -1724,7 +1724,7 @@ class AdminCP extends Base
 					exit;
 				}
 				// make sure this chapter actually exists for this story
-				elseif ( FALSE !== $chapterInfo = $this->model->chapterLoad($storyInfo['sid'],(int)$params['chapter']) )
+				elseif ( [] !== $chapterInfo = $this->model->chapterLoad($storyInfo['sid'],(int)$params['chapter']) )
 				{
 					// abusing $chapterData to carry a few more details
 					$chapterInfo['storytitle'] = $storyInfo['title'];
@@ -1752,7 +1752,8 @@ class AdminCP extends Base
 		}
 		else
 		{
-			$this->buffer ( "__Error" );
+			$_SESSION['lastAction']['load_error'] = TRUE;
+			$f3->reroute("adminCP/stories/edit", false);
 		}
 	}
 	

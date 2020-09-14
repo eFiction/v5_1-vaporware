@@ -649,11 +649,11 @@ class Story extends Base
 				$tocData = $this->model->getChapterList($story);
 
 				if( empty($view) OR !is_numeric($view) ) $view = 1;
-				$chapter = $view = max ( 1, min ( $view, $storyData['chapters']) );
+				$chapter = $view = max ( 1, min ( $view, sizeof($tocData)) );
 				\Base::instance()->set('bigscreen',TRUE);
-				
+
 				// Will return error on empty chapter text
-				$content = ($content = $this->model->getChapterText( $story, $chapter )) ? : "Error (Load chaptertext)";
+				$content = ($content = $this->model->getChapterText( $story, $tocData[$chapter-1]['chapid'] )) ? : "Error (Load chaptertext)";
 				// Will allow empty chapter
 				//if ( FALSE === $content = $this->model->getChapterText( $story, $chapter ))
 				//	$content = "Error (Load chaptertext)";

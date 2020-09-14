@@ -26,8 +26,7 @@ class Base extends \Prefab {
 		return $this->db->log(TRUE);
 	}
 	
-	/*
-	foreign keys, currently not used
+	//foreign keys, currently not used
 	public function getFKeys()
 	{
 		$sql = "SELECT CONSTRAINT_NAME as fk, TABLE_NAME as tbl
@@ -38,7 +37,6 @@ class Base extends \Prefab {
 					AND information_schema.TABLE_CONSTRAINTS.TABLE_NAME LIKE '{$this->prefix}%';";
 		return $this->exec($sql);
 	}
-	*/
 
 	public function newPasswordQuality($password1, $password2)
 	{
@@ -430,28 +428,39 @@ class Base extends \Prefab {
 	}
 	*/
 	
-	public function getChapterText( $story, $chapter, $counting = TRUE )
+	/**
+	* Load the actual chapter text
+	* rewrite 2020-09
+	*
+	* @param	int		$storyID	Story ID
+	* @param	int		$chapterID	Chapter ID (changed from inorder)
+	* @param	bool	$counting	Are we counting this as a read or do we need the contents for an editing mask
+	*
+	* @return	string				Result or empty
+	*/
+	public function getChapterText( int $storyID, int $chapterID, bool $counting = TRUE ) : string
 	{
 		if ( $this->config['chapter_data_location'] == "local" )
 		{
 			$db = \storage::instance()->localChapterDB();
-			@$chapterLoad= $db->exec('SELECT "chaptertext" FROM "chapters" WHERE "sid" = :sid AND "inorder" = :inorder', array(':sid' => $story, ':inorder' => $chapter ))[0];
+			@$chapterLoad= $db->exec('SELECT "chaptertext" FROM "chapters" WHERE "sid" = :storyID AND "chapid" = :chapterID', array(':storyID' => $storyID, ':chapterID' => $chapterID ))[0];
 		}
 		else
 		{
-			$chapterLoad = $this->exec("SELECT C.chaptertext FROM `tbl_chapters`C WHERE C.sid=:sid AND C.inorder=:inorder", array(':sid' => $story, ':inorder' => $chapter ))[0];
+			$chapterLoad = $this->exec("SELECT C.chaptertext FROM `tbl_chapters`C WHERE C.sid=:storyID AND C.chapid=:chapterID", array(':storyID' => $storyID, ':chapterID' => $chapterID ))[0];
 		}
-		if ( isset($chapterLoad['chaptertext']) ) $chapterText = $chapterLoad['chaptertext'];
-		else return FALSE;
+
+		if ( empty($chapterLoad['chaptertext']) )
+			return "";
 
 		if ( $counting AND \Base::instance()->get('SESSION')['userID'] > 0 )
 		{
-			$sql_tracker = "INSERT INTO `tbl_tracker` (sid,uid,last_chapter) VALUES (".(int)$story.", ".\Base::instance()->get('SESSION')['userID'].",".(int)$chapter.") 
+			$sql_tracker = "INSERT INTO `tbl_tracker` (sid,uid,last_chapter) VALUES (".(int)$storyID.", ".\Base::instance()->get('SESSION')['userID'].",".(int)$chapterID.") 
 											ON DUPLICATE KEY
-											UPDATE last_read=NOW(),last_chapter=".(int)$chapter.";";
+											UPDATE last_read=NOW(),last_chapter=".(int)$chapterID.";";
 			$this->exec($sql_tracker);
 		}
-		return nl2br($chapterText);
+		return nl2br($chapterLoad['chaptertext']);
 	}
 
 	protected static function cleanResult($messy)

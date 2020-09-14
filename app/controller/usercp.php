@@ -195,15 +195,13 @@ class UserCP extends Base
 
 	protected function authorStoryEdit(\Base $f3, array $params): string
 	{
-		if(empty($params['sid'])) return "__Error";
-		//$uid = isset($params['uid']) ? $params['uid'] : $_SESSION['userID'];
-		if ( [] !== $storyData = $this->model->storyLoadInfo($params['sid'], $params['uid']) )
+		if ( isset($params['sid']) AND  ( [] !== $storyData = $this->model->storyLoadInfo($params['sid'], $params['uid']) ) )
 		{
 			if (isset($_POST) and sizeof($_POST)>0 )
 			{
 				if ( isset($params['chapter']) )
 				{
-					$this->model->authorStoryChapterSave($params['chapter'], $f3->get('POST.form'));
+					$this->model->chapterSave($params['chapter'], $f3->get('POST.form'), 'U');
 					$reroute = "/userCP/author/uid={$params['uid']}/edit/sid={$params['sid']}/chapter={$params['chapter']};returnpath=".$params['returnpath'];
 					$f3->reroute($reroute, false);
 					exit;
@@ -250,10 +248,16 @@ class UserCP extends Base
 			{
 				if ( $params['chapter']=="new" )
 				{
-					$newChapterID = $this->model->authorStoryChapterAdd($params['sid'], $params['uid'] );
-					$reroute = "/userCP/author/uid={$params['uid']}/edit/sid={$params['sid']}/chapter={$newChapterID};returnpath=".$params['returnpath'];
-					$f3->reroute($reroute, false);
-					exit;
+					if ( 0 == $newChapterID = $this->model->chapterAdd($params['sid'], $params['uid'] ) )
+					{
+						// could not create chapter, return with the bad news *todo*
+					}
+					else
+					{
+						$reroute = "/userCP/author/uid={$params['uid']}/edit/sid={$params['sid']}/chapter={$newChapterID};returnpath=".$params['returnpath'];
+						$f3->reroute($reroute, false);
+						exit;
+					}
 				}
 				$chapterData = $this->model->chapterLoad($storyData['sid'],(int)$params['chapter']);
 				// abusing $chapterData to carry a few more details
@@ -272,7 +276,10 @@ class UserCP extends Base
 				return $this->template->authorStoryHeaderEdit($storyData,$chapterList,$prePopulate);
 			}
 		}
-		else return "__ErrorFileEdit";
+		elseif ( isset($params['sid']) )
+			$_SESSION['lastAction']['load_error'] = TRUE;
+		$return = isset($params['returnpath']) ? $params['returnpath'] : "userCP/author/uid={$params['uid']}";
+		$f3->reroute($return, false);
 	}
 	
 	public function feedback(\Base $f3, array $params)//: void
