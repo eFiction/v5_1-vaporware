@@ -394,20 +394,20 @@ class UserCP extends Controlpanel
 		// Step two: check for changes in relation tables
 
 		// Check tags:
-		$i += $this->storyRelationTag( $story->sid, $post['tags'] );
+		$i += $this->relationStoryTag( $story->sid, $post['tags'] );
 		// Check Characters:
-		$i += $this->storyRelationCharacter( $story->sid, $post['characters'] );
+		$i += $this->relationStoryCharacter( $story->sid, $post['characters'] );
 		// Check Categories:
-		$i += $this->storyRelationCategories( $story->sid, $post['category'] );
+		$i += $this->relationStoryCategories( $story->sid, $post['category'] );
 		// Check Authors:
-		$i += $this->storyRelationAuthor( $story->sid, $post['mainauthor'], $post['supauthor'] );
+		$i += $this->relationStoryAuthor( $story->sid, $post['mainauthor'], $post['supauthor'] );
 		
 		$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories');
 		$inSeries = $collection->find(array('sid=?',$storyID));
 		foreach ( $inSeries as $in )
 		{
 			// Rebuild collection/series cache based on new data
-			$this->rebuildSeriesCache($in->seriesid);
+			$this->cacheCollections($in->seriesid);
 		}
 
 		// Rebuild story cache based on new data

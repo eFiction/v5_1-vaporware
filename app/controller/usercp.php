@@ -764,7 +764,7 @@ class UserCP extends Base
 			// delete an element from the collection/series
 			if ( isset ($params['delete']) )
 			{
-				$delete = $this->model->libraryCollectionItemDelete($params['id'], $params['delete'], $_SESSION['userID']);
+				$delete = $this->model->collectionItemDelete($params['id'], $params['delete'], $_SESSION['userID']);
 				// session to report deleted item *todo*
 				$params['items'] = 1;
 			}

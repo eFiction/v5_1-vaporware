@@ -291,8 +291,16 @@ class AdminCP extends Controlpanel {
 		return array_filter($menu);
 	}
 
-//	public function categoryAdd( int $parent_cid, array $data=[] )
-	public function categoryAdd($parent_cid, array $data=[] )
+	/**
+	* Add a new category
+	* rewrite 2020-09
+	*
+	* @param	int		$parent_cid		
+	* @param	array	$data			
+	*
+	* @return	int						New category's ID
+	*/
+	public function categoryAdd( int $parent_cid, array $data ) : int
 	{
 		// "clean" target category level
 		$this->categoryMove(0, NULL, $parent_cid);
@@ -316,10 +324,12 @@ class AdminCP extends Controlpanel {
 		$categories->parent_cid		= $parent_cid;
 		
 		$categories->save();
-		$newCategory = $categories->get('_id'); 
+
+		// recount parent category, if applicable
+		if ( $parent_cid>0 )
+			$this->cacheCategories($parent_cid);
 		
-		// recount parent category
-		if ( $parent_cid>0 )	$this->cacheCategories($parent_cid);
+		// create the rather boring cache for the new category
 		$this->cacheCategories($categories->_id);
 
 		$this->categoryMove(0, NULL, $parent_cid);
@@ -1706,20 +1716,20 @@ class AdminCP extends Controlpanel {
 		// Step two: check for changes in relation tables
 
 		// Check tags:
-		$i += $this->storyRelationTag( $current->sid, $post['tags'] );
+		$i += $this->relationStoryTag( $current->sid, $post['tags'] );
 		// Check Characters:
-		$i += $this->storyRelationCharacter( $current->sid, $post['characters'] );
+		$i += $this->relationStoryCharacter( $current->sid, $post['characters'] );
 		// Check Categories:
-		$i += $this->storyRelationCategories( $current->sid, $post['category'] );
+		$i += $this->relationStoryCategories( $current->sid, $post['category'] );
 		// Check Authors:
-		$i += $this->storyRelationAuthor( $current->sid, $post['mainauthor'], $post['supauthor'] );
+		$i += $this->relationStoryAuthor( $current->sid, $post['mainauthor'], $post['supauthor'] );
 
 		$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories');
 		$inSeries = $collection->find(array('sid=?',$current->sid));
 		foreach ( $inSeries as $in )
 		{
 			// Rebuild collection/series cache based on new data
-			$this->rebuildSeriesCache($in->seriesid);
+			$this->cacheCollections($in->seriesid);
 		}
 
 		// Rebuild story cache based on new data

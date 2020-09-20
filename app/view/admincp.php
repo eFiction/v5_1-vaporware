@@ -330,7 +330,6 @@ class AdminCP extends Base
 		$this->f3->set('returnpath', $returnpath);
 
 		return $this->render('stories/collection.edit.html');
-		return "Edit";
 	}
 	
 	public function collectionItems(array $data, string $module, string $returnpath="" ) : string
@@ -361,6 +360,29 @@ class AdminCP extends Base
 		$this->f3->set('returnpath', $returnpath);
 
 		return $this->render('home/poll.edit.html');
+	}
+
+	public function recommendationList( array $data, array $sort ) : string
+	{
+		$this->f3->set('data', 		 $data);
+		$this->f3->set('sort', $sort);
+		
+		return $this->render('stories/recommendation.list.html');
+	}
+
+	public function recommendationEdit( array $data, array $prePop, string $returnpath="" ) : string
+	{
+		if($data['editor']=="visual" AND $this->config['advanced_editor']==TRUE )
+		{
+			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
+			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
+		}
+		$this->dataProcess($data);
+		$this->f3->set('prePop', 	$prePop);
+		$this->f3->set('data', 		$data);
+		$this->f3->set('returnpath', $returnpath);
+		
+		return $this->render('stories/recommendation.edit.html');
 	}
 
 	public function shoutEdit(array $data, array $sort, $page)

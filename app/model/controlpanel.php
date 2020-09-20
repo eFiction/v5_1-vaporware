@@ -230,7 +230,7 @@ class Controlpanel extends Base {
 			foreach ( $inSeries as $in )
 			{
 				// Rebuild collection/series cache based on new data
-				$this->rebuildSeriesCache($in->seriesid);
+				$this->cacheCollections($in->seriesid);
 			}
 			$i++;
 		}
@@ -415,13 +415,22 @@ class Controlpanel extends Base {
 		return [];
 	}
 
-
-
-
-
-
-	public function storyDelete( int $storyID, int $userID = 0 ) : int
+	/**
+	* Delete the entire story
+	* This will also delete all associated reviews, tracker entries, and relations
+	* rewrite 2020-09
+	*
+	* @param	int		$sid	Story ID
+	* @param	int		$uid	User ID, optional, only sent from the UCP
+	*
+	* @return	array			Result or empty
+	*/	
+	public function storyDelete( int $storyID, int $userID = 1 ) : int
 	{
+		// drop out with an error if the story exists, but the user has no access
+		if ( $userID > 0 AND 0 == ( new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors') )->count(["sid = ? AND aid = ? AND type = 'M'",$storyID,$userID]) )
+			return -1;
+
 		// get a review mapper
 		$mapper = new \DB\SQL\Mapper($this->db, $this->prefix.'feedback');
 		$deleted['reviews'] = 0;
@@ -440,94 +449,41 @@ class Controlpanel extends Base {
 			$deleted['reviews']++;
 		}
 
-		// Load all series that housed this story
-		// rewrite: entries get deleted by foreign key
-		/*
+		/**
+		*  rewrite: entries get deleted by foreign key, so in this step
+		*  we take note of all items that need to be recounted or recached
+		*/
+		// Collections
 		$mapper = new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories');
-		$deleted['series'] = 0;
-		while( $mapper->load(array('sid=?',$storyID)) )
+		$mapper->load(["sid = ?",$storyID]);
+		while ( !$mapper->dry() )
 		{
-			// rebuild cache of affected series
-			$this->rebuildSeriesCache($mapper->seriesid);
-			// delete link to the series
-			$mapper->erase();
-			$deleted['series']++;
+			$recacheCollections[] = $mapper->collid;
+			$mapper->next();
 		}
-		*/
 
-		// Faster with a direct SQL call, delete all user-story relations for this story
-		// rewrite: entries get deleted by foreign key
-		/*
-		$this->exec
-		(
-			"DELETE FROM `tbl_stories_authors` WHERE `sid` = :sid;",
-			[ ":sid" => $storyID ]
-		);
-		$deleted['authors'] = $this->db->count();
-		*/
-
-		// get a tag relation mapper
-		// rewrite: entries get deleted by foreign key
-		/*
+		// Tags
 		$mapper = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_tags');
-		$deleted['tags'] = 0;
-		$deleted['characters'] = 0;
-		while( $mapper->load(array('sid=?',$storyID)) )
+		$mapper->load(["sid = ?",$storyID]);
+		while ( !$mapper->dry() )
 		{
-			// take note of character to recount
-			if ( $mapper->character == 1 )	$recountC[]= $mapper->tid;
-			// take note of tag to recount
-			else							$recountT[]= $mapper->tid;
+			if ( $mapper->character == 0 )
+				$recountTags[] = $mapper->tid;
 
-			// remove the relation
-			$mapper->erase();
+			else
+				$recountCharacters[] = $mapper->tid;
+
+			$mapper->next();
 		}
-		// Tag recount
-		if ( !empty($recountT) )
-			$deleted['tags'] = $this->storyRecountTags($recountT);
-
-		// Character recount
-		if ( !empty($recountC) )
-			$deleted['characters'] = $this->storyRecountTags($recountC,1);
-
-		// get a categories relation mapper
+		
+		// Categories
 		$mapper = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_categories');
-		$deleted['categories'] = 0;
-		while( $mapper->load(array('sid=?',$storyID)) )
+		$mapper->load(['sid = ?',$storyID]);
+		while ( !$mapper->dry() )
 		{
-			$category = $mapper->cid;
-			// remove the relation
-			$mapper->erase();
-			$this->cacheCategories($category);
-			$deleted['categories']++;
+			$recacheCategories[] = $mapper->cid;
+			$mapper->next();
 		}
-		*/
-
-		// Delete all tracker entries for the story
-		// rewrite: entries get deleted by foreign key
-		/*
-		$this->exec
-		(
-			"DELETE FROM `tbl_tracker` WHERE `sid` = :sid;",
-			[ ":sid" => $storyID ]
-		);
-		$deleted['tracker'] = $this->db->count();
-		*/
-
-		// Delete chapters form local storag if required
-		if ( $this->config['chapter_data_location'] == "local" )
-		{
-			$db = \storage::instance()->localChapterDB();
-			$db->exec('DELETE FROM "chapters" WHERE "sid" = :sid', array(':sid' => $storyID ));
-			$deleted['chapterlocal'] = $db->count();
-		}
-		// Delete all chapters
-		$this->exec
-		(
-			"DELETE FROM `tbl_chapters` WHERE `sid` = :sid;",
-			[ ":sid" => $storyID ]
-		);
-		$deleted['chapterdb'] = $this->db->count();
 
 		// Remove the story from the db
 		$this->exec
@@ -535,9 +491,40 @@ class Controlpanel extends Base {
 			"DELETE FROM `tbl_stories` WHERE `sid` = :sid;",
 			[ ":sid" => $storyID ]
 		);
-		$deleted['story'] = $this->db->count();
+		// Let the user know that the story couldn't be deleted
+		if ( 0 == $deleted['story'] = $this->db->count() )
+			return 0;
 
-		return $deleted;
+		/**
+		*  If we are here, it means we have deleted a story.
+		*  Now it's time to clean up
+		*/
+
+		// Delete chapters from local storage if required
+		if ( $this->config['chapter_data_location'] == "local" )
+		{
+			$db = \storage::instance()->localChapterDB();
+			$db->exec('DELETE FROM "chapters" WHERE "sid" = :sid', array(':sid' => $storyID ));
+			$deleted['chapterlocal'] = $db->count();
+		}
+		
+		// Tag recount
+		if ( !empty($recountTags) )
+			$deleted['tags'] = $this->recountTags($recountTags);
+
+		// Character recount
+		if ( !empty($recountCharacters) )
+			$deleted['characters'] = $this->recountTags($recountCharacters,1);
+
+		// re-create Collections cache
+		if ( !empty($recacheCollections) )
+			$this->cacheCollections($mapper->seriesid);
+
+		// re-create Categories cache
+		if ( !empty($recacheCategories) )
+			$this->cacheCategories($category);
+
+		return 1;
 	}
 
 	public function storyEditPrePop(array $storyData)
@@ -605,10 +592,7 @@ class Controlpanel extends Base {
 		}
 	}
 
-
-
-
-	public function rebuildStoryCache($sid)
+	public function rebuildStoryCache( int $sid ) : bool
 	{
 		$sql = "SELECT SELECT_OUTER.sid,
 					GROUP_CONCAT(DISTINCT tid,',',tag,',',description,',',tgid ORDER BY `order`,tgid,tag ASC SEPARATOR '||') AS tagblock,
@@ -672,9 +656,19 @@ class Controlpanel extends Base {
 			],
 			['sid=?',$sid]
 		);
+		return TRUE;
 	}
 
-	public function rebuildSeriesCache($collID)
+	/**
+	* rebuild the stats cache for all collections that were added to or removed from a story
+	* ot that hat a story added to or removed from
+	* rewrite 2020-09
+	*
+	* @param	array		$collList	ID or array of collection(s) to be re-cached
+	*
+	* @return	bool
+	*/
+	public function cacheCollections( int $collID ) : bool
 	{
 		$sql = "SELECT
 					SERIES.collid,
@@ -730,9 +724,10 @@ class Controlpanel extends Base {
 			],
 			['collid=?',$collID]
 		);
+		return TRUE;
 	}
 
-	public function rebuildContestCache($conid)
+	public function rebuildContestCache( int $conid ) : bool
 	{
 		$sql = "SELECT SELECT_OUTER.conid,
 					GROUP_CONCAT(DISTINCT tid,',',tag,',',description,',',tgid ORDER BY `order`,tgid,tag ASC SEPARATOR '||') AS tagblock,
@@ -778,20 +773,34 @@ class Controlpanel extends Base {
 			],
 			['conid=?',$conid]
 		);
+		return TRUE;
 	}
 
-	public function rebuildCollectionCache($collid)
-	{
 
-	}
-
-	public function cacheCategories(int $catID)
+	/**
+	* rebuild the stats cache for all categories that were added to or removed from a story
+	* rewrite 2020-09
+	*
+	* @param	array		$catList	ID or array of category/categories to be re-cached
+	*
+	* @return	bool
+	*/
+	public function cacheCategories( $catList ) : bool
 	{
+		// mapper for categories
 		$categories = new \DB\SQL\Mapper($this->db, $this->prefix.'categories' );
-		$categories->load(array('cid=?',$catID));
 
-		// recover from bad category ID
-		if( empty($categories->cid) ) return FALSE;
+		/**
+			if we received a single ID, convert to array
+			no need to sanitize the array, this will be done
+			when building the job list
+		*/
+		if ( is_numeric($catList) )
+			$catList[] = (int)$catList;
+		
+		if ( [] == $jobs = $this->cacheCategoriesGetParent( $categories, $catList ) )
+			return FALSE;
+		// $jobs is an array containing all categories that need to be redone, starting with lowest level
 
 		$sql = "SELECT C.cid, C.category, COUNT(DISTINCT S.sid) as counted, C.parent_cid as parent,
 					GROUP_CONCAT(DISTINCT C1.category SEPARATOR '||' ) as sub_categories,
@@ -802,218 +811,88 @@ class Controlpanel extends Base {
 				LEFT JOIN `tbl_categories`C1 ON ( C.cid = C1.parent_cid )
 			WHERE C.cid = :cid
 			GROUP BY C.cid";
-		$item = $this->exec($sql, [":cid" => $catID])[0];
 
-		if ( $item['sub_categories']==NULL ) $sub = NULL;
-		else
+		foreach ( $jobs as $catID )
 		{
-			$sub_categories = explode("||", $item['sub_categories']);
-			$sub_stats = explode("||", $item['sub_stats']);
-			$sub_stats = array_map("json_decode", $sub_stats);
+			// set the cursor to the current category
+			$categories->load(['cid = ?', $catID]);
+			
+			$item = $this->exec($sql, [":cid" => $catID])[0];
 
-			foreach( $sub_categories as $key => $value )
+			if ( $item['sub_categories']==NULL ) $sub = NULL;
+			else
 			{
-				if ($sub_stats[$key]!=NULL)
+				$sub_categories = explode("||", $item['sub_categories']);
+				$sub_stats = explode("||", $item['sub_stats']);
+				$sub_stats = array_map("json_decode", $sub_stats);
+
+				foreach( $sub_categories as $key => $value )
 				{
-					$item['counted'] += $sub_stats[$key]->count;
-					$sub[] =
-					[
-						'id' 	=> $sub_stats[$key]->cid,
-						'count' => $sub_stats[$key]->count,
-						'name'	=> $value,
-					];
+					if ($sub_stats[$key]!=NULL)
+					{
+						$item['counted'] += $sub_stats[$key]->count;
+						$sub[] =
+						[
+							'id' 	=> $sub_stats[$key]->cid,
+							'count' => $sub_stats[$key]->count,
+							'name'	=> $value,
+						];
+					}
 				}
 			}
+			$categories->counter = (int)$item['counted'];
+			$categories->stats = json_encode([ "count" => (int)$item['counted'], "cid" => $item['cid'], "sub" => $sub ]);
+			$categories->save();
 		}
-		$categories->stats = json_encode([ "count" => (int)$item['counted'], "cid" => $item['cid'], "sub" => $sub ]);
-		$categories->save();
-
-		if ( $categories->parent_cid > 0 )
-			$this->cacheCategories( $categories->parent_cid );
-
 		return TRUE;
 	}
 
-	public function storyRelationCategories( $sid, $data )
+	/**
+	* Get a list of all categories to be recached,
+	* recursively done from bottom to top
+	* rewrite 2020-09
+	*
+	* @param	\DB\SQL\Mapper	$categories	DB mapper
+	* @param	array			$collList	List of all collections that need to be checked for their parent
+	* @param	array			$jobList	List of already known category IDs
+	*
+	* @return	array			Updated job list
+	*/
+	public function cacheCategoriesGetParent( \DB\SQL\Mapper $categories, array $collList, array $jobList = [] ) : array
 	{
-		$data = array_filter(explode(",",$data));
-		$categories = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_categories');
-		$i = 0;
-
-		foreach ( $categories->find(array('`sid` = ?',$sid)) as $X )
+		$parents = [];
+		foreach ( $collList as $coll )
 		{
-			$temp=array_search($X['cid'], $data);
-			if ( $temp===FALSE )
+			if ( !in_array( $coll, $jobList ) )
 			{
-				// Excess relation, drop from table
-				$categories->erase(['lid=?',$X['lid']]);
-				// recache this category
-				$this->cacheCategories($X['cid']);
-				$i++;
-			}
-			else unset($data[$temp]);
-		}
-
-		// Insert any category IDs not already present
-		if ( sizeof($data)>0 )
-		{
-			foreach ( $data as $temp)
-			{
-				// Add relation to table
-				$categories->reset();
-				$categories->sid = $sid;
-				$categories->cid = $temp;
-				$categories->save();
-				// recache this category
-				$this->cacheCategories($temp);
-				$i++;
+				$categories->load(['cid = ?', $coll]);
+				if ( $categories->cid == $coll )
+					$jobList[] = $categories->cid;
+				if ( $categories->parent_cid > 0 )
+					$parents[] = $categories->parent_cid;
 			}
 		}
-		unset($categories);
+		if ( !empty($parents) )
+			$jobList = $this->cacheCategoriesGetParent( $categories, array_unique($parents), $jobList );
 		
-		return $i;
+		return $jobList;
 	}
 
 	/**
-	* Update the 'story - character' relation table
-	* Wrapper for the storyRelationTag function
+	* Given the list of new authors and a current status,
+	* either insert, drop or skip entries in the story-authors table.
+	* Make sure that nobody is main and supporting author and, if required, 
+	* make sure the main author isn't empty
 	* rewrite 2020-09
 	*
-	* @param	int		$sid		Story ID
-	* @param	array	$data		New character list
+	* @param	int			$storyID
+	* @param	string		$mainauthor			List of main authors to be
+	* @param	string		$supauthor			List of supporting authors to be
+	* @param	bool		$allowEmptyAuthor	Check if the author list can be empty (ACP only)
 	*
-	* @return	int					Report changes made
-	*/	
-	public function storyRelationCharacter( $sid, $data )
-	{
-		return $this->storyRelationTag( $sid, $data, 1 );
-	}
-
-	/**
-	* Update the 'story - tag' relation table
-	* rewrite 2020-09
-	*
-	* @param	int		$sid		Story ID
-	* @param	array	$data		New tag list
-	* @param	int		$character	Is it a character(person) (default=no)
-	*
-	* @return	int					Report changes made
+	* @return	int								Changes made
 	*/
-	public function storyRelationTag( $sid, $data, $character = 0 )
-	{
-		// Check tags:
-		$data = array_filter(explode(",",$data));
-		$relations = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_tags');
-		$i = 0;
-
-		foreach ( $relations->find(array('`sid` = ? AND `character` = ?',$sid,$character)) as $X )
-		{
-			$temp=array_search($X['tid'], $data);
-			if ( $temp===FALSE )
-			{
-				$recounts[] = $X['tid'];
-				// Excess relation, drop from table
-				$relations->erase(['lid=?',$X['lid']]);
-				$i++;
-			}
-			else unset($data[$temp]);
-		}
-
-		// Insert any tag/character IDs not already present
-		if ( sizeof($data)>0 )
-		{
-			foreach ( $data as $temp)
-			{
-				// Add relation to table
-				$relations->reset();
-				$relations->sid = $sid;
-				$relations->tid = $temp;
-				$relations->character = $character;
-				$relations->save();
-				$recounts[] = $temp;
-				$i++;
-			}
-		}
-		unset($relations);
-
-		// call recount function
-		if ( isset( $recounts ) )
-			$this->recountTags( $recounts, $character );
-		return $i;
-	}
-
-	/**
-	* Recount story chapters and words
-	* rewrite 2020-09
-	*
-	* @param	mixed	$storyID	Story ID
-	*/
-	public function recountStory( int $storyID ) : void
-	{
-		$this->exec("UPDATE `tbl_stories`S
-						INNER JOIN
-						(
-							SELECT
-								sid,
-								COUNT(DISTINCT chapid)'chapters',
-								SUM(wordcount)'wordcount'
-							FROM `tbl_chapters`
-							WHERE sid = :sid AND validated >= 30
-							GROUP BY sid
-						) Ch ON ( S.sid = Ch.sid  )
-					SET S.wordcount = Ch.wordcount, S.chapters = Ch.chapters;",
-					[ ":sid" => $storyID ]
-					);
-		// drop stats cache to make changes visible
-		\Cache::instance()->clear('stats');
-	}
-
-	/**
-	* Recount tag usage
-	* rewrite 2020-09
-	*
-	* @param	mixed	$tags		Tag ID or list of Tag IDs
-	* @param	int		$character	Is it a character(person) (default=no)
-	*
-	* @return	int					Report recounted tags
-	*/
-	public function recountTags( $tags, $character = 0 ) : int
-	{
-		// tags is either an array
-		if ( is_array($tags) ) $tags = implode(",",$tags);
-		// or a plain numeric
-		elseif ( !is_numeric($tags) ) return FALSE;
-
-		if ( $character == 1 )
-		{
-			$this->exec("UPDATE `tbl_characters`C
-							LEFT JOIN
-							(
-								SELECT C.charid, COUNT( DISTINCT RT.sid ) AS counter
-								FROM `tbl_characters`C
-								LEFT JOIN `tbl_stories_tags`RT ON (RT.tid = C.charid AND RT.character = 1)
-									WHERE C.charid IN ({$tags})
-									GROUP BY C.charid
-							) AS C2 ON C.charid = C2.charid
-							SET C.count = C2.counter WHERE C.charid = C2.charid;");
-		}
-		else
-		{
-			$this->exec("UPDATE `tbl_tags`T1
-							LEFT JOIN
-							(
-								SELECT T.tid, COUNT( DISTINCT RT.sid ) AS counter
-								FROM `tbl_tags`T
-								LEFT JOIN `tbl_stories_tags`RT ON (RT.tid = T.tid AND RT.character = 0)
-									WHERE T.tid IN ({$tags})
-									GROUP BY T.tid
-							) AS T2 ON T1.tid = T2.tid
-							SET T1.count = T2.counter WHERE T1.tid = T2.tid;");
-		}
-		return $this->db->count();
-	}
-
-	public function storyRelationAuthor ( $storyID, $mainauthor, $supauthor, $allowEmptyAuthor = FALSE )
+	public function relationStoryAuthor ( int $storyID, string $mainauthor, string $supauthor, bool $allowEmptyAuthor = FALSE ) : int
 	{
 		// Author and co-Author preparation:
 		$mainauthor = array_filter(explode(",",$mainauthor));
@@ -1099,6 +978,201 @@ class Controlpanel extends Base {
 			$_SESSION['lastAction'] = [ "deleteWarning" => \Base::instance()->get('LN__MainAuthorNotEmpty') ];
 		}
 		return $i;
+	}
+
+	/**
+	* Given the list of new relations and a current status,
+	* either insert, drop or skip entries in the story-categories table.
+	* Call for a recache when changes did occur
+	* rewrite 2020-09
+	*
+	* @param	int			$storyID
+	* @param	string		$data		List of relations to be
+	*
+	* @return	int						Changes made
+	*/
+	public function relationStoryCategories( int $storyID, string $data ) : int
+	{
+		$data = array_filter(explode(",",$data));
+		$categories = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_categories');
+		$i = 0;
+
+		foreach ( $categories->find(array('`sid` = ?',$storyID)) as $X )
+		{
+			$temp=array_search($X['cid'], $data);
+			if ( $temp===FALSE )
+			{
+				// Excess relation, drop from table
+				$categories->erase(['lid=?',$X['lid']]);
+				// recache this category
+				$recache[] = $X['cid'];
+				$i++;
+			}
+			else unset($data[$temp]);
+		}
+
+		// Insert any category IDs not already present
+		if ( sizeof($data)>0 )
+		{
+			foreach ( $data as $temp)
+			{
+				// Add relation to table
+				$categories->reset();
+				$categories->sid = $storyID;
+				$categories->cid = $temp;
+				$categories->save();
+				// recache this category
+				$recache[] = $temp;
+				$i++;
+			}
+		}
+		unset($categories);
+		
+		if ( !empty($recache) )
+			$this->cacheCategories( $recache );
+		
+		return $i;
+	}
+
+	/**
+	* Update the 'story - character' relation table
+	* Wrapper for the relationStoryTag function
+	* rewrite 2020-09
+	*
+	* @param	int		$storyID	Story ID
+	* @param	string	$data		New character list
+	*
+	* @return	int					Report changes made
+	*/	
+	public function relationStoryCharacter( int $storyID, string $data )
+	{
+		return $this->relationStoryTag( $storyID, $data, 1 );
+	}
+
+	/**
+	* Given the list of new relations and a current status,
+	* either insert, drop or skip entries in the story-tag table.
+	* Call for a recache when changes did occur
+	* rewrite 2020-09
+	*
+	* @param	int		$storyID	Story ID
+	* @param	string	$data		New tag list
+	* @param	int		$character	Is it a character(person) (default=no)
+	*
+	* @return	int					Report changes made
+	*/
+	public function relationStoryTag( int $storyID, string $data, $character = 0 )
+	{
+		// Check tags:
+		$data = array_filter(explode(",",$data));
+		$relations = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_tags');
+		$i = 0;
+
+		foreach ( $relations->find(array('`sid` = ? AND `character` = ?',$storyID,$character)) as $X )
+		{
+			$temp=array_search($X['tid'], $data);
+			if ( $temp===FALSE )
+			{
+				$recounts[] = $X['tid'];
+				// Excess relation, drop from table
+				$relations->erase(['lid=?',$X['lid']]);
+				$i++;
+			}
+			else unset($data[$temp]);
+		}
+
+		// Insert any tag/character IDs not already present
+		if ( sizeof($data)>0 )
+		{
+			foreach ( $data as $temp)
+			{
+				// Add relation to table
+				$relations->reset();
+				$relations->sid = $storyID;
+				$relations->tid = $temp;
+				$relations->character = $character;
+				$relations->save();
+				$recounts[] = $temp;
+				$i++;
+			}
+		}
+		unset($relations);
+
+		// call recount function
+		if ( isset( $recounts ) )
+			$this->recountTags( $recounts, $character );
+		return $i;
+	}
+
+	/**
+	* Recount story chapters and words
+	* rewrite 2020-09
+	*
+	* @param	mixed	$storyID	Story ID
+	*/
+	public function recountStory( int $storyID ) : void
+	{
+		$this->exec("UPDATE `tbl_stories`S
+						INNER JOIN
+						(
+							SELECT
+								sid,
+								COUNT(DISTINCT chapid)'chapters',
+								SUM(wordcount)'wordcount'
+							FROM `tbl_chapters`
+							WHERE sid = :sid AND validated >= 30
+							GROUP BY sid
+						) Ch ON ( S.sid = Ch.sid  )
+					SET S.wordcount = Ch.wordcount, S.chapters = Ch.chapters;",
+					[ ":sid" => $storyID ]
+					);
+		// drop stats cache to make changes visible
+		\Cache::instance()->clear('stats');
+	}
+
+	/**
+	* Recount tag usage
+	* rewrite 2020-09
+	*
+	* @param	mixed	$tags		Tag ID or list of Tag IDs
+	* @param	int		$character	Is it a character(person) (default=no)
+	*
+	* @return	int					Report recounted tags
+	*/
+	public function recountTags( $tags, $character = 0 ) : int
+	{
+		// tags is either an array
+		if ( is_array($tags) ) $tags = implode(",",$tags);
+		// or a plain numeric
+		elseif ( !is_numeric($tags) ) return FALSE;
+
+		if ( $character == 1 )
+		{
+			$this->exec("UPDATE `tbl_characters`C
+							LEFT JOIN
+							(
+								SELECT C.charid, COUNT( DISTINCT RT.sid ) AS counter
+								FROM `tbl_characters`C
+								LEFT JOIN `tbl_stories_tags`RT ON (RT.tid = C.charid AND RT.character = 1)
+									WHERE C.charid IN ({$tags})
+									GROUP BY C.charid
+							) AS C2 ON C.charid = C2.charid
+							SET C.count = C2.counter WHERE C.charid = C2.charid;");
+		}
+		else
+		{
+			$this->exec("UPDATE `tbl_tags`T1
+							LEFT JOIN
+							(
+								SELECT T.tid, COUNT( DISTINCT RT.sid ) AS counter
+								FROM `tbl_tags`T
+								LEFT JOIN `tbl_stories_tags`RT ON (RT.tid = T.tid AND RT.character = 0)
+									WHERE T.tid IN ({$tags})
+									GROUP BY T.tid
+							) AS T2 ON T1.tid = T2.tid
+							SET T1.count = T2.counter WHERE T1.tid = T2.tid;");
+		}
+		return $this->db->count();
 	}
 
 	public function collectionAdd(array $data) : int
@@ -1388,7 +1462,7 @@ class Controlpanel extends Base {
 		$this->collectionProperties( $collid, $data['character'], "CH" );
 		$this->collectionProperties( $collid, $data['category'], "CA" );
 
-		$this->rebuildCollectionCache($collection->collid);
+		$this->cacheCollections($collection->collid);
 		
 		// drop menu cache if type changed:
 		if(isset($data['changetype'])) \Cache::instance()->reset("menuUCPCountLib.{$uid}");
@@ -1484,7 +1558,7 @@ class Controlpanel extends Base {
 		}
 	}
 	
-	public function libraryCollectionItemDelete(int $collid, int $itemid, int $userID=0)
+	public function collectionItemDelete(int $collid, int $itemid, int $userID=0)
 	{
 		// make sure the user actuall owns this collection
 		if ( ($userID==0) OR  (1 == (new \DB\SQL\Mapper($this->db, $this->prefix."collections"))->count(['collid=? AND uid=?', $collid, $userID])) )
@@ -1494,6 +1568,72 @@ class Controlpanel extends Base {
 		return 0;
 	}
 	
+	public function recommendationList( int $page, array $sort, int $userID = 0 ) : array
+	{
+		$limit = 20;
+		$pos = $page - 1;
+		
+		$sql = 	"SELECT SQL_CALC_FOUND_ROWS
+					Rec.recid, Rec.title, Rec.url, Rec.uid, 
+					IF(Rec.guestname IS NULL,U.username,Rec.guestname) as maintainer, 
+					R.rating
+				FROM `tbl_recommendations`Rec
+					LEFT JOIN `tbl_users`U ON ( Rec.uid = U.uid )
+					LEFT JOIN `tbl_ratings`R ON ( Rec.ratingid = R.rid )
+				".(($userID>0)?" WHERE Rec.uid = {$userID}":"")."
+				GROUP BY Rec.recid
+				ORDER BY {$sort['order']} {$sort['direction']}
+				LIMIT ".(max(0,$pos*$limit)).",".$limit;
+		
+		$data = $this->exec( $sql );
+
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/adminCP/stories/recommendations/order={$sort['link']},{$sort['direction']}",
+			$limit
+		);
+		
+		return $data;
+	}
+	
+	public function recommendationLoad( int $recID, int $userID = 0 ) : array
+	{
+		$sql = "SELECT Rec.recid, Rec.uid, Rec.url, Rec.title, Rec.author, Rec.summary, Rec.comment, Rec.ratingid,
+					IF(Rec.guestname IS NULL,U.username,Rec.guestname) as maintainer,
+					GROUP_CONCAT(DISTINCT U.uid,',',U.username ORDER BY U.username ASC SEPARATOR '||' ) as maintainerblock,
+					GROUP_CONCAT(DISTINCT Cat.cid,',',Cat.category ORDER BY Cat.category ASC SEPARATOR '||') as categoryblock
+				FROM `tbl_recommendations`Rec
+					LEFT JOIN `tbl_users`U ON ( Rec.uid = U.uid )
+					LEFT JOIN `tbl_recommendation_relations`pRec ON ( pRec.recid = Rec.recid )
+--						LEFT JOIN `tbl_characters`Ch ON ( Ch.charid = pColl.relid AND pColl.type = 'CH' )
+--						LEFT JOIN `tbl_tags`T ON ( T.tid = pColl.relid AND pColl.type = 'T' )
+--							LEFT JOIN `tbl_tag_groups`TG ON ( TG.tgid = T.tgid )
+						LEFT JOIN `tbl_categories`Cat ON ( Cat.cid = pRec.relid AND pRec.type = 'CA' )
+				".(($userID>0)?" WHERE Rec.uid = {$userID}":"")."
+				WHERE Rec.recid = :recid
+				GROUP BY Rec.recid";
+
+		if ( ( FALSE !== $data = current ( $this->exec( $sql, [ ":recid" => $recID ] ) ) ) AND $data['recid']!="" )
+		{
+			/**
+				Use cURL to get an idea of how good or bad the URL might be.
+				In the end, a closer look may be required, but it might give a hint
+			*/
+			$handle = curl_init();
+			curl_setopt($handle, CURLOPT_URL, $data['url']);
+			curl_setopt($handle, CURLOPT_RETURNTRANSFER, TRUE);
+			curl_setopt($handle, CURLOPT_FAILONERROR, TRUE);
+			curl_setopt($handle, CURLOPT_TIMEOUT, 1);
+			curl_exec($handle);
+			// embed the status into the data array
+			$data['lookup'] = curl_getinfo ($handle);
+			$data['ratings'] = $this->exec("SELECT rid, rating, ratingwarning FROM `tbl_ratings`");
+			return $data;
+		}
+		return [];
+	}
+		
+
 	/**
 	* AJAX sort collection items
 	* rewrite 2020-09

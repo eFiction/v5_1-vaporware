@@ -1,77 +1,74 @@
-<!-- success notification -->
-<check if="{{ isset(@saveResult) }}">
+{* provide a return link if a path exists *}
+<div class="columns">
+	<div class="column">
+		<check if="{{!empty(@returnpath)}}">{ICON:arrow-left} <a href="{{@BASE}}{{@returnpath}}">{{@LN__Return}}</a></check>&nbsp;
+	</div>
+</div>
+
+<!-- success notification v4 -->
+<check if="{{ isset(@save_success) }}">
 	<div class="notification is-success">
 		<button class="delete"></button>
-		{{ @LN__Changes_saved }}
+		{{ @LN__Status_Changes, @save_success | format }}
 	</div>
 </check>
 <!-- END: success notification -->
 
-<check if="{{ @returnpath!='' }}"><a href="{{@BASE}}{{@returnpath}}">{{@LN__Return}}</a></check>
+<form action="{{@BASE}}/adminCP/stories/recommendations/id={{ @data['recid'] }}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
 
-<h2>{{@LN__RecommendedStory,1 | format }}:</h2>
-<form action="{{@BASE}}/adminCP/stories/recommendations/recid={{ @data['recid'] }}<check if="{{ @returnpath!='' }}">;returnpath={{@returnpath}}</check>" method="post">
-<div class="columns is-multiline">
-	<div class="column is-one-fifth"><span class="is-pulled-right">{{@LN__Title}}:</a></div>
-	<div class="column is-four-fifths"><input class="input" type="text" name="form_data[title]" value="{{ @data.title }}" /></div>
+<div class="field is-horizontal">
+  <div class="field-label is-normal">
+    <label class="label">{{@LN__Title}}</label>
+  </div>
+  <div class="field-body">
+    <div class="field">
+      <div class="control">
+        <input class="input" type="text" name="form_data[title]" value="{{ @data['title'] }}" />
+      </div>
+    </div>
+  </div>
+</div>
 
-	<div class="column is-one-fifth"><span class="is-pulled-right">{{@LN__Author}}:</a></div>
-	<div class="column is-four-fifths"><input class="input" type="text" name="form_data[author]" value="{{ @data.author }}" /></div>
-
-	<div class="column is-one-fifth"><span class="is-pulled-right">{{@LN__Author}}:</a></div>
-	<div class="column is-four-fifths"><input class="input" type="text" name="form_data[url]" value="{{ @data.url }}" /></div>
-
-	<div class="column is-one-fifth"><span class="is-pulled-right">{{@LN__Status}}:</span></div>
-	<div class="column is-four-fifths">
-		<select class="input" name="form_data[status]" onchange="this.form.submit()">
-			<option value="1"<check if="{{@data.status==1}}"> selected="selected"</check>>{{@LN__Feat_Current}}</option>
-			<option value="2"<check if="{{@data.status==2}}"> selected="selected"</check>>{{@LN__Feat_Past}}</option>
-			<option value="3"<check if="{{@data.status==3}}"> selected="selected"</check>>{{@LN__Feat_Upcoming}}</option>
-			<option value="-1"<check if="{{@data.status==NULL}}"> selected="selected"</check>>{{@LN__Feat_Auto}}</option>
-		</select>
-	</div>
-
-	<div class="column is-one-fifth"><span class="is-pulled-right">Start:</span></div>
-	<div class="column is-four-fifths"><input class="input" type="text" name="form_data[start]" value="{{ @data.start }}" id="datestart"<check if="{{@data.status!=NULL}}"> disabled</check> /></div>
-
-	<div class="column is-one-fifth"><span class="is-pulled-right">End:</span></div>
-	<div class="column is-four-fifths"><input class="input" type="text" name="form_data[end]" value="{{ @data.end }}" id="dateend"<check if="{{@data.status!=NULL}}"> disabled</check> /></div>
-
-	<div class="column is-one-fifth">&nbsp;</div>
-	<div class="column is-four-fifths">
-		<div class="control">
-			<div class="field is-grouped">
-				<p class="control">
-					<button class="button is-primary" type="submit">
-						<span class="icon">{ICON:save}</span>
-						<span>{{@LN__Submit}}</span>
-					</button>
-				</p>
-				<p class="control">
-					<button class="button is-light" type="reset">
-						<span class="icon">{ICON:undo}</span>
-						<span>{{@LN__Reset}}</span>
-					</button>
-				</p>
-			</div>
-		</div>
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__RecommBy}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<input class="input" type="text" id="maintainer-select" name="form_data[maintainer]" />
+		</div></div>
 	</div>
 </div>
-{* when the date fields become disabled, we need to preserve the values *}
-<check if="{{@data.status!=NULL}}">
-	<input type="hidden" name="form_data[start]" value="{{ @data.start }}">
-	<input type="hidden" name="form_data[end]" value="{{ @data.end }}">
-</check>
-</form>
 
-<script>
-jQuery.datetimepicker.setLocale('{{ $_SESSION['preferences']['language'] }}');
-$('#datestart').datetimepicker({
-	dayOfWeekStart : <check if="{{ \Config::getPublic('monday_first_day')==1 }}"><true>1</true><false>7</false></check>,
-	format:'{{ @format }}',
+
+
+
+
+
+
+
+
+
+
+
+
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#category-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "category",
+    	preventDuplicates: true,
+    	prePopulate: {{@data.categoryblock | raw}}
+    });
 });
-$('#dateend').datetimepicker({
-	dayOfWeekStart : <check if="{{ \Config::getPublic('monday_first_day')==1 }}"><true>1</true><false>7</false></check>,
-	format:'{{ @format }}',
+
+$(document).ready(function() {
+    $("#maintainer-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "user",
+    	preventDuplicates: true,
+		tokenLimit: 1,
+    	prePopulate: {{@data.maintainerblock | raw}}
+    });
 });
+
 </script>

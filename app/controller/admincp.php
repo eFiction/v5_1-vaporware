@@ -1391,13 +1391,13 @@ class AdminCP extends Base
 		return $this->template->settingsDateTime();
 	}
 
- 	protected function settingsLanguage(\Base $f3, array $params): string
+ 	protected function settingsLanguage(\Base $f3, array $params) : string
 	{
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Language') );
 
 		$languageConfig = $this->model->getLanguageConfig();
 
-		$files = glob("./languages/*.xml");
+		$files = glob("./languages/*.xml"); // */
 		foreach ( $files as $file)
 		{
 			$data = (array)simplexml_load_file($file);
@@ -1937,11 +1937,11 @@ class AdminCP extends Base
 
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 
-		if ( isset( $_POST['recid'] ) )
-			$params['recid'] = (int)$_POST['recid'];
+		if ( isset( $_POST['id'] ) )
+			$params['id'] = (int)$_POST['id'];
 		
 		if (isset($_POST['form_data']))
-			$this->model->recommendationSave($params['recid'], $f3->get('POST.form_data') );
+			$this->model->recommendationSave($params['id'], $f3->get('POST.form_data') );
 
 		// delete through the dialog box
 		if( isset($params['delete']) AND ( $_POST['confirmed'] ?? FALSE ) )
@@ -1952,10 +1952,74 @@ class AdminCP extends Base
 		}
 		
 		
-		if( isset ($params['recid']) )
+		if( isset ($params['id']) )
 		{
-			
+			if ( [] !== $data = $this->model->recommendationLoad($params['id']) )
+			{
+				// despite 0 not being an official code, AO3 will reply this way when a story is no longer found.
+				if ( $data['lookup']['http_code']==0 )
+				{
+					$f3->set('lookup_error', 0);
+				}
+				
+				// server has found something
+				elseif ( $data['lookup']['http_code']==200 )
+					$f3->set('lookup_success', 1);
+				// server has found something but it's not the plain 'OK' code
+				elseif ( $data['lookup']['http_code']>200 AND $data['lookup']['http_code']<300 )
+					$f3->set('lookup_success', 0);
+	
+				// Server replies with a permanent moved status
+				elseif ( $data['lookup']['http_code']==301 OR $data['lookup']['http_code']==308 )
+				{
+					// if the only difference is a change from http to https, silently alter the value and inform the user.
+					if ( str_replace("http:", "https:", $data['url']) == $data['lookup']['redirect_url'] )
+					{
+						$f3->set('lookup_moved', 1);
+					}
+					else
+					{
+						$f3->set('lookup_moved', 0);
+					}
+				}
+
+				$data['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
+				$this->buffer ( $this->template->recommendationEdit($data, $this->model->storyEditPrePop($data), @$params['returnpath']) );
+				return;
+			}
+			else
+			{
+				$reroute = isset($params['returnpath']) ? $params['returnpath'] : "/adminCP/stories/recommendations";
+				$f3->reroute($reroute,FALSE);
+				exit;
+			}
 		}
+		
+		// page will always be an integer > 0
+		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
+
+		// search/browse
+		$allow_order = array (
+				"id"		=>	"Rec.recid",
+				"title"		=>	"title",
+				"author"	=>	"maintainer",
+				"date"		=>	"date",
+				"rating"	=>	"R.inorder",
+		);
+
+		// sort order
+		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "id";
+		$sort["order"]		= $allow_order[$sort["link"]];
+		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
+		
+		$this->buffer
+		(
+			$this->template->recommendationList
+			(
+				$this->model->recommendationList($page, $sort),
+				$sort
+			)
+		);
 	}
 
 }
