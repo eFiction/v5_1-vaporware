@@ -1598,23 +1598,17 @@ class Controlpanel extends Base {
 	
 	public function recommendationLoad( int $recID, int $userID = 0 ) : array
 	{
-		$sql = "SELECT Rec.recid, Rec.uid, Rec.url, Rec.title, Rec.author, Rec.summary, Rec.comment, Rec.ratingid,
-					IF(Rec.guestname IS NULL,U.username,Rec.guestname) as maintainer,
-					GROUP_CONCAT(DISTINCT U.uid,',',U.username ORDER BY U.username ASC SEPARATOR '||' ) as maintainerblock,
-					GROUP_CONCAT(DISTINCT Cat.cid,',',Cat.category ORDER BY Cat.category ASC SEPARATOR '||') as categoryblock
+		$sql = "SELECT Rec.recid, Rec.uid, Rec.url, Rec.title, Rec.author, Rec.summary, Rec.comment, Rec.ratingid, Rec.cache_tags, Rec.cache_characters, Rec.cache_categories,
+					U.uid, U.username, Rec.guestname
 				FROM `tbl_recommendations`Rec
 					LEFT JOIN `tbl_users`U ON ( Rec.uid = U.uid )
-					LEFT JOIN `tbl_recommendation_relations`pRec ON ( pRec.recid = Rec.recid )
---						LEFT JOIN `tbl_characters`Ch ON ( Ch.charid = pColl.relid AND pColl.type = 'CH' )
---						LEFT JOIN `tbl_tags`T ON ( T.tid = pColl.relid AND pColl.type = 'T' )
---							LEFT JOIN `tbl_tag_groups`TG ON ( TG.tgid = T.tgid )
-						LEFT JOIN `tbl_categories`Cat ON ( Cat.cid = pRec.relid AND pRec.type = 'CA' )
 				".(($userID>0)?" WHERE Rec.uid = {$userID}":"")."
 				WHERE Rec.recid = :recid
 				GROUP BY Rec.recid";
 
 		if ( ( FALSE !== $data = current ( $this->exec( $sql, [ ":recid" => $recID ] ) ) ) AND $data['recid']!="" )
 		{
+			$data['maintainerblock'] = json_encode( [[ "id" => $data['uid'], "name" => $data['username'] ]] );
 			/**
 				Use cURL to get an idea of how good or bad the URL might be.
 				In the end, a closer look may be required, but it might give a hint
@@ -1628,6 +1622,7 @@ class Controlpanel extends Base {
 			// embed the status into the data array
 			$data['lookup'] = curl_getinfo ($handle);
 			$data['ratings'] = $this->exec("SELECT rid, rating, ratingwarning FROM `tbl_ratings`");
+
 			return $data;
 		}
 		return [];

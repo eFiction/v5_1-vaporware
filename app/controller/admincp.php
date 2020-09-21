@@ -1973,14 +1973,21 @@ class AdminCP extends Base
 				elseif ( $data['lookup']['http_code']==301 OR $data['lookup']['http_code']==308 )
 				{
 					// if the only difference is a change from http to https, silently alter the value and inform the user.
-					if ( str_replace("http:", "https:", $data['url']) == $data['lookup']['redirect_url'] )
+					if ( str_replace("http:", "https:", $data['url']) == $data['lookup']['redirect_url'] OR 
+							"https://".$data['url'] == $data['lookup']['redirect_url'] )
 					{
+						$data['url'] = $data['lookup']['redirect_url'];
 						$f3->set('lookup_moved', 1);
 					}
 					else
 					{
 						$f3->set('lookup_moved', 0);
 					}
+				}
+				
+				elseif ( $data['lookup']['http_code']>=400 )
+				{
+					$f3->set('lookup_error', 0);
 				}
 
 				$data['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");

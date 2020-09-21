@@ -46,6 +46,7 @@ return array(
 'ShowDetails'	=> 'Details zeigen',
 'HideDetails'	=> 'Details verbergen',
 'Entries' 		=> '{0, plural, zero {Keine Einträge}, one	{Ein Eintrag}, other	{# Einträge} }',
+'URL'			=> 'URL', //db
 
 // [2] Global -- Login related
 'Login'			=> 'Anmelden',
