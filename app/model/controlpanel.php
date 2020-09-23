@@ -1598,8 +1598,9 @@ class Controlpanel extends Base {
 	
 	public function recommendationLoad( int $recID, int $userID = 0 ) : array
 	{
-		$sql = "SELECT Rec.recid, Rec.uid, Rec.url, Rec.title, Rec.author, Rec.summary, Rec.comment, Rec.ratingid, Rec.cache_tags, Rec.cache_characters, Rec.cache_categories,
-					U.uid, U.username, Rec.guestname
+		$sql = "SELECT Rec.recid, Rec.uid, Rec.url, Rec.title, Rec.author, Rec.summary, Rec.comment, Rec.ratingid, Rec.public, Rec.completed,
+					Rec.cache_tags, Rec.cache_characters, Rec.cache_categories,
+					U.uid, U.username
 				FROM `tbl_recommendations`Rec
 					LEFT JOIN `tbl_users`U ON ( Rec.uid = U.uid )
 				".(($userID>0)?" WHERE Rec.uid = {$userID}":"")."

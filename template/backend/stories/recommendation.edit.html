@@ -188,6 +188,47 @@
 	</div>
 </div>
 
+<!-- Form submit buttons v3 -->
+<div class="field is-horizontal">
+	<div class="field-label">&nbsp;</div>
+	<div class="field-body">
+		<div class="columns">
+			<div class="column">
+				<div class="field is-grouped">
+					<p class="control">
+						<button class="button is-primary" type="submit">
+							<span class="icon">{ICON:save}</span>
+							<span>{{@LN__Submit}}</span>
+						</button>
+					</p>
+					<p class="control">
+						<button class="button is-light" type="reset">
+							<span class="icon"><i class="fas fa-undo-alt"></i></span>
+							<span>{{@LN__Reset}}</span>
+						</button>
+					</p>
+				</div>
+			</div>
+			<div class="column is-3"></div>
+			<div class="column">
+				<div class="field is-grouped">
+					<p class="control">
+						<button class="button is-danger has-tooltip-multiline has-tooltip-danger" data-tooltip="{{@LN__CheckBoxToDelete}}" type="submit" formaction="{{@BASE}}/adminCP/stories/recommendations/id={{ @data['recid'] }}/delete/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">
+							<span class="icon">{ICON:remove}</span>
+							<span>{{@LN__Delete}}</span>
+						</button>
+					</p>
+					<p class="control">
+						<a class="button is-danger">
+							<input type="checkbox" name="confirm_delete" />
+						</a>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- END: Form submit buttons v3 -->
 
 <script type="text/javascript">
 $(document).ready(function() {

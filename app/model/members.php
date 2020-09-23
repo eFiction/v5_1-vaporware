@@ -193,7 +193,7 @@ class Members extends Base
 		foreach ( $jobs as $key => $fields )
 		{
 			// create the proper name for the cache field
-			$cachename = 'memberProfile'.$fields['sql'].($full?'Full':'').'Cache_'.$uid;
+			$cachename = 'memberProfile'.$key.($full?'Full':'').'Cache_'.$uid;
 			unset($cache);
 			// if the cache field is empty, use sql statement from above to get data
 			if ( "" == $cache = \Cache::instance()->get($cachename) )
