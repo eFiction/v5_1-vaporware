@@ -9,7 +9,8 @@ class Config extends \Prefab
 	{
 		include('data/config.php');
 		self::$protected = $config;
-		//self::$public['prefix'] = $config['prefix'];
+		// Fix a Catch-22 that requires the config to load the config.
+		\Base::instance()->set('CONFIG.prefix', $config['prefix']);
 	}
 	
 	public function load()
