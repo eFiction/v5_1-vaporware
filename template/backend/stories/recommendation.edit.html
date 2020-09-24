@@ -65,7 +65,7 @@
 			<check if="{{ isset(@lookup_error) }}">
 				<article class="message is-danger">
 				  <div class="message-body">
-					**LN__URLNotFound (http code returned was {{@data.lookup.http_code}})
+					**LN__URLNotFound (http code returned was {{@@data.lookup.http_code}})
 				  </div>
 				</article>
 			</check>
@@ -123,7 +123,7 @@
   <div class="field-body">
     <div class="field">
       <div class="control">
-        <input class="input" type="text" name="form_data[title]" value="{{ @data.title }}" />
+        <input class="input" type="text" name="form_data[author]" value="{{ @data.author }}" />
       </div>
     </div>
   </div>

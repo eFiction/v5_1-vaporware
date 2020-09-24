@@ -421,7 +421,7 @@ class AdminCP extends Base
 			$this->f3->set('storyTitle', '');
 			$this->f3->set('preAuthor', '[]');
 		}
-		return $this->render('stories/add_story.html');
+		return $this->render('stories/story.add.html');
 	}
 	
 	public function storyMetaEdit(array $storyData, array $chapterList, array $prePop)

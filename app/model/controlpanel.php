@@ -664,7 +664,7 @@ class Controlpanel extends Base {
 	* ot that hat a story added to or removed from
 	* rewrite 2020-09
 	*
-	* @param	array		$collList	ID or array of collection(s) to be re-cached
+	* @param	array		$collID		ID of collection to be re-cached
 	*
 	* @return	bool
 	*/
@@ -723,6 +723,63 @@ class Controlpanel extends Base {
 				'max_rating'		=> json_encode(explode(",",$item['max_rating'])),
 			],
 			['collid=?',$collID]
+		);
+		return TRUE;
+	}
+
+	/**
+	* rebuild the stats cache for all collections that were added to or removed from a story
+	* ot that hat a story added to or removed from
+	* rewrite 2020-09
+	*
+	* @param	array		$recID	ID of recommendation to be re-cached
+	*
+	* @return	bool
+	*/
+	public function cacheRecommendations( int $recID ) : bool
+	{
+		$sql = "SELECT SELECT_OUTER.recid,
+					GROUP_CONCAT(DISTINCT tid,',',tag,',',description,',',tgid ORDER BY `order`,tgid,tag ASC SEPARATOR '||') AS tagblock,
+					GROUP_CONCAT(DISTINCT charid,',',charname ORDER BY charname ASC SEPARATOR '||') AS characterblock,
+					GROUP_CONCAT(DISTINCT cid,',',category ORDER BY category ASC SEPARATOR '||' ) as categoryblock,
+					GROUP_CONCAT(DISTINCT ratingid,',',rating_name,',',rating_image SEPARATOR '||' ) as rating
+					FROM
+					(
+						SELECT R.recid,
+							R.ratingid, Ra.rating as rating_name, IF(Ra.rating_image,Ra.rating_image,'') as rating_image,
+							Cat.cid, Cat.category,
+							TG.description,TG.order,TG.tgid,T.label as tag,T.tid,
+							Ch.charid, Ch.charname
+						FROM `tbl_recommendations` R
+							LEFT JOIN `tbl_ratings` Ra ON ( Ra.rid = R.ratingid )
+							LEFT JOIN `tbl_recommendation_relations`rRT ON ( rRT.recid = R.recid )
+								LEFT JOIN `tbl_tags` T ON ( T.tid = rRT.relid AND rRT.type='T' )
+									LEFT JOIN `tbl_tag_groups` TG ON ( TG.tgid = T.tgid )
+								LEFT JOIN `tbl_characters` Ch ON ( Ch.charid = rRT.relid AND rRT.type = 'CH' )
+								LEFT JOIN `tbl_categories` Cat ON ( Cat.cid = rRT.relid AND rRT.type = 'CA' )
+						WHERE R.recid = :recid
+					)AS SELECT_OUTER
+					GROUP BY recid ORDER BY recid ASC;;";
+		$item = $this->exec($sql, [':recid' => $recID] );
+
+		if ( empty($item) ) return FALSE;
+
+		$item = $item[0];
+
+		$tagblock['simple'] = $this->cleanResult($item['tagblock']);
+		if($tagblock['simple']!==NULL) foreach($tagblock['simple'] as $t)
+			$tagblock['structured'][$t[2]][] = [ $t[0], $t[1], $t[2], $t[3] ];
+
+		$this->update
+		(
+			'tbl_recommendations',
+			[
+				'cache_tags'		=> json_encode($tagblock),
+				'cache_characters'	=> json_encode($this->cleanResult($item['characterblock'])),
+				'cache_categories'	=> json_encode($this->cleanResult($item['categoryblock'])),
+				'cache_rating'		=> json_encode(explode(",",$item['rating']))
+			],
+			['recid=?',$recID]
 		);
 		return TRUE;
 	}
@@ -1494,7 +1551,7 @@ class Controlpanel extends Base {
 		return $i;
 	}
 
-	private function collectionProperties( $collid, $data, $type )
+	private function collectionProperties( int $collid, array $data, string $type )
 	{
 		// Check tags:
 		$data = explode(",",$data);
@@ -1614,6 +1671,7 @@ class Controlpanel extends Base {
 				Use cURL to get an idea of how good or bad the URL might be.
 				In the end, a closer look may be required, but it might give a hint
 			*/
+			/*
 			$handle = curl_init();
 			curl_setopt($handle, CURLOPT_URL, $data['url']);
 			curl_setopt($handle, CURLOPT_RETURNTRANSFER, TRUE);
@@ -1622,13 +1680,112 @@ class Controlpanel extends Base {
 			curl_exec($handle);
 			// embed the status into the data array
 			$data['lookup'] = curl_getinfo ($handle);
+			*/
 			$data['ratings'] = $this->exec("SELECT rid, rating, ratingwarning FROM `tbl_ratings`");
 
 			return $data;
 		}
 		return [];
 	}
+
+	public function recommendationSave( int $recid, array $data, int $userID=0 ) : int
+	{
+		$recommendation=new \DB\SQL\Mapper($this->db, $this->prefix.'recommendations');
 		
+		if($userID)
+			$recommendation->load(array('recid=? AND uid=?', $recid, $userID));
+		else
+			$recommendation->load(array('recid=?', $recid));
+
+		// copy form data, also used to create a new feature
+		$recommendation->copyfrom( 
+			[ 
+				"title"		=> $data['title'],
+				"url"		=> $data['url'],
+				"uid"		=> $data['maintainer'],
+				"author"	=> $data['author'],
+				"summary"	=> $data['summary'],
+				"comment"	=> $data['comment'],
+			]
+		);
+
+		$i  = $recommendation->changed("title");
+		$i += $recommendation->changed("url");
+		$i += $recommendation->changed("author");
+		$i += $recommendation->changed("summary");
+		$i += $recommendation->changed("comment");
+
+		// save date
+		$recommendation->save();
+
+		// update relation table
+		$i += $this->recommendationProperties( $recid, $data['maintainer'], "A" );
+		$i += $this->recommendationProperties( $recid, $data['tag'], "T" );
+		//$this->recommendationProperties( $recid, $data['character'], "CH" );
+		$i += $this->recommendationProperties( $recid, $data['category'], "CA" );
+
+		$this->cacheRecommendations($recommendation->recid);
+
+		return $i;
+	}
+
+	/**
+	* Re-set the recommendation properties based on a data field
+	* rewrite 2020-09
+	*
+	* @param	int			$recid	
+	* @param	string 		$data		Comma-separated list of new relations
+	* @param	string 		$type		Type of relations
+	*
+	* @return	int						Amount of changes made
+	*/
+	private function recommendationProperties( int $recid, string $data, string $type ) : int
+	{
+		// load given relations:
+		$data = explode(",",$data);
+		$relations = new \DB\SQL\Mapper($this->db, $this->prefix.'recommendation_relations');
+		
+		$i = 0;
+
+		foreach ( $relations->find(array('`recid` = ? AND `type` = ?',$recid,$type)) as $X )
+		{
+			if ( FALSE === $temp = array_search($X['relid'], $data) )
+			{
+				// Excess relation, drop from table
+				$relations->erase(['lid=?',$X['lid']]);
+				$i++;
+			}
+			else unset($data[$temp]);
+		}
+		
+		// Insert any relation IDs not already present
+		if ( sizeof($data)>0 )
+		{
+			foreach ( $data as $temp )
+			{
+				if ( !empty($temp) )		// Fix adding empty entries
+				{
+					// Add relation to table
+					$relations->reset();
+					$relations->recid = $recid;
+					$relations->relid = $temp;
+					$relations->type = $type;
+					$relations->save();
+					$i++;
+				}
+			}
+		}
+		unset($relations);
+		return $i;
+	}
+
+	public function featuredDelete(int $sid)
+	{
+		$feature=new \DB\SQL\Mapper($this->db, $this->prefix.'featured');
+		$feature->load(array('id=? AND type="ST"',$sid));
+		
+		$_SESSION['lastAction'] = [ "deleteResult" => $feature->erase() ];
+	}
 
 	/**
 	* AJAX sort collection items

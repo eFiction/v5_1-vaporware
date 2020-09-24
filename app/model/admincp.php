@@ -1128,55 +1128,6 @@ class AdminCP extends Controlpanel {
 		$feature->save();
 	}
 	
-	public function featuredDelete(int $sid)
-	{
-		$feature=new \DB\SQL\Mapper($this->db, $this->prefix.'featured');
-		$feature->load(array('id=? AND type="ST"',$sid));
-		
-		$_SESSION['lastAction'] = [ "deleteResult" => $feature->erase() ];
-	}
-
-	public function recommendationSave( int $recid, array $data )
-	{
-		$recommendation=new \DB\SQL\Mapper($this->db, $this->prefix.'recommendations');
-		
-		// load the recommendation if an ID is provided
-		if ( $recid > 0 ) $recommendation->load(array('recid=?',$recid));
-
-		// copy form data, also used to create a new feature
-		$recommendation->copyfrom( 
-			[ 
-				"status"	=> ($data['status']>0) ? $data['status'] : NULL, 
-				"id"		=> $recid,
-				"uid"		=> $_SESSION['userID']
-			]
-		);
-
-		if ( NULL === $recommendation->status OR ""!=($data['start']??"") OR ""!=($data['end']??"") )
-		{
-			// we either have or require a start date, so let's make sure this is proper
-			$start = ( ""==($data['start']??"") OR ( FALSE === $obj = \DateTime::createFromFormat($this->config['date_preset']." ".$this->config['time_preset'], $data['start']) ) )
-				? date('Y-m-d H:i')
-				: $obj->format('Y-m-d H:i');
-			$recommendation->start = $start.":00";
-
-			// same goes for the end date
-			$end = ( ""==($data['end']??"") OR ( FALSE === $obj = \DateTime::createFromFormat($this->config['date_preset']." ".$this->config['time_preset'], $data['end']) ) )
-				? date('Y-m-d H:i')
-				: $obj->format('Y-m-d H:i');
-			$recommendation->end = $end.":00";
-
-			// if start is past end, make them the same
-			if ( \DateTime::createFromFormat('Y-m-d H:i', $start)->format("U") > \DateTime::createFromFormat('Y-m-d H:i', $end)->format("U") )
-				$recommendation->end = $recommendation->start;
-		}
-		// make note of data change, must occur before save()
-		$_SESSION['lastAction'] = [ "saveResult" => (int)$recommendation->changed() ];
-
-		// save date
-		$recommendation->save();
-	}
-
 	public function recommendationDelete(int $recid)
 	{
 		// map the recommendation

@@ -1941,7 +1941,8 @@ class AdminCP extends Base
 			$params['id'] = (int)$_POST['id'];
 		
 		if (isset($_POST['form_data']))
-			$this->model->recommendationSave($params['id'], $f3->get('POST.form_data') );
+			if ( 0 < $i = $this->model->recommendationSave($params['id'], $f3->get('POST.form_data') ) )
+				$f3->set('save_success', $i);
 
 		// delete through the dialog box
 		if( isset($params['delete']) AND ( $_POST['confirmed'] ?? FALSE ) )
@@ -1957,23 +1958,23 @@ class AdminCP extends Base
 			if ( [] !== $data = $this->model->recommendationLoad($params['id']) )
 			{
 				// despite 0 not being an official code, AO3 will reply this way when a story is no longer found.
-				if ( $data['lookup']['http_code']==0 )
+				if ( @$data['lookup']['http_code']===0 )
 				{
 					$f3->set('lookup_error', 0);
 				}
 				
 				// server has found something
-				elseif ( $data['lookup']['http_code']==200 )
+				elseif ( @$data['lookup']['http_code']==200 )
 					$f3->set('lookup_success', 1);
 				// server has found something but it's not the plain 'OK' code
-				elseif ( $data['lookup']['http_code']>200 AND $data['lookup']['http_code']<300 )
+				elseif ( @$data['lookup']['http_code']>200 AND @$data['lookup']['http_code']<300 )
 					$f3->set('lookup_success', 0);
 	
 				// Server replies with a permanent moved status
-				elseif ( $data['lookup']['http_code']==301 OR $data['lookup']['http_code']==308 )
+				elseif ( @$data['lookup']['http_code']==301 OR @$data['lookup']['http_code']==308 )
 				{
 					// if the only difference is a change from http to https, silently alter the value and inform the user.
-					if ( str_replace("http:", "https:", $data['url']) == $data['lookup']['redirect_url'] OR 
+					if ( str_replace("http:", "https:", $data['url']) == @$data['lookup']['redirect_url'] OR 
 							"https://".$data['url'] == $data['lookup']['redirect_url'] )
 					{
 						$data['url'] = $data['lookup']['redirect_url'];
@@ -1985,7 +1986,7 @@ class AdminCP extends Base
 					}
 				}
 				
-				elseif ( $data['lookup']['http_code']>=400 )
+				elseif ( @$data['lookup']['http_code']>=400 )
 				{
 					$f3->set('lookup_error', 0);
 				}
