@@ -893,6 +893,14 @@ return array(
 'CollectionOpen_1'	=> 'Moderated',
 'CollectionOpen_2'	=> 'Open',
 
+// Recommendations
+'RecommCompleted'	=> 'Recommended story is completed',
+'RecommPublic'		=> 'Show recommendation site-wide',
+'URLFound'			=> 'URL was found, however this cannot confirm that the story is still there',
+'URLNotFound'		=> 'URL could not be found, error code returned was {0}',
+'URLMovedHTTPS'		=> 'Server reports URL has changed, but the only change was to a secure connection. Submit to save the change',
+'URLMoved'			=> 'Server reports URL has changed and returned a new location, but no changes were made so far. Manual check is required',
+
 // Contests
 'Contests'					=> 'Contests',
 'ContestPrepare'			=> 'Contest is being prepared',

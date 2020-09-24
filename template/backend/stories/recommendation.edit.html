@@ -17,16 +17,14 @@
 <form action="{{@BASE}}/adminCP/stories/recommendations/id={{ @data['recid'] }}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
 
 <div class="field is-horizontal">
-  <div class="field-label is-normal">
-    <label class="label">{{@LN__Title}}</label>
-  </div>
-  <div class="field-body">
-    <div class="field">
-      <div class="control">
-        <input class="input" type="text" name="form_data[title]" value="{{ @data.title }}" />
-      </div>
-    </div>
-  </div>
+	<div class="field-label is-normal">
+		<label class="label">{{@LN__Title}}</label>
+	</div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<input class="input" type="text" name="form_data[title]" value="{{ @data.title }}" />
+		</div></div>
+	</div>
 </div>
 
 <div class="field is-horizontal">
@@ -41,13 +39,27 @@
 <div class="field is-horizontal">
 	<div class="field-label"></div>
 	<div class="field-body">
+		<div class="field"><div class="control mt-2">
+			<input type="checkbox" name="form_data[completed]" <check if="{{ @data.completed }}">checked="checked"</check> />
+			{{@LN__RecommCompleted}}
+		</div></div>
+		<div class="field"><div class="control mt-2">
+			<input type="checkbox" name="form_data[public]" <check if="{{ @data.public }}">checked="checked"</check> />
+			{{@LN__RecommPublic}}
+		</div></div>
+	</div>
+</div>
+
+<div class="field is-horizontal">
+	<div class="field-label"></div>
+	<div class="field-body">
 		<div class="field"><div class="control">
 
 	{* <!--		Status 301 (moved) and the only difference is http - https		--> *}		
 			<check if="{{ isset(@lookup_moved) AND @lookup_moved==1 }}">
 				<article class="message is-success">
 				  <div class="message-body">
-					**LN__MovedHTTPS
+					{{@LN__URLMovedHTTPS}}.
 				  </div>
 				</article>
 			</check>
@@ -56,7 +68,7 @@
 			<check if="{{ isset(@lookup_success) }}">
 				<article class="message is-success">
 				  <div class="message-body">
-					**LN__URLFound
+					{{@LN__URLFound}}.
 				  </div>
 				</article>
 			</check>	
@@ -65,7 +77,7 @@
 			<check if="{{ isset(@lookup_error) }}">
 				<article class="message is-danger">
 				  <div class="message-body">
-					**LN__URLNotFound (http code returned was {{@@data.lookup.http_code}})
+					{{@LN__URLNotFound, @@data.lookup.http_code | format }}!
 				  </div>
 				</article>
 			</check>
@@ -92,7 +104,7 @@
 	{* <!--		Status 301 (moved) and reporting a different location		--> *}		
 				<article class="message is-warning">
 				  <div class="message-body">
-					**LN__MovedURL
+					{{@LN__URLMoved}}.
 				  </div>
 				</article>
 		</div></div>
@@ -121,7 +133,7 @@
     <label class="label">{{@LN__Author}}</label>
   </div>
   <div class="field-body">
-    <div class="field">
+    <div class="field is-half">
       <div class="control">
         <input class="input" type="text" name="form_data[author]" value="{{ @data.author }}" />
       </div>
@@ -181,12 +193,14 @@
 	<div class="field-label is-normal"><label class="label">{{@LN__Rating}}</label></div>
 	<div class="field-body">
 		<div class="field"><div class="control"><div class="select">
-			<select id="ratingid" name="form[ratingid]">
+			<select id="ratingid" name="form_data[ratingid]">
 				<repeat group="{{ @data.ratings }}" value="{{ @rating }}"><option value="{{ @rating.rid }}"<check if="{{@rating.rid==@data.ratingid}}"> selected="selected"</check>>{{ @rating.rating }}</option></repeat>
 			</select>
 		</div></div></div>
 	</div>
 </div>
+
+{{ @data.public }} / {{ @data.completed }}
 
 <!-- Form submit buttons v3 -->
 <div class="field is-horizontal">

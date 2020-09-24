@@ -894,6 +894,14 @@ return array(
 'CollectionOpen_1'	=> 'Moderiert',
 'CollectionOpen_2'	=> 'Offen',
 
+// Recommendations
+'RecommCompleted'	=> 'Empfohlene Geschichte ist abgeschlossen',
+'RecommPublic'		=> 'Zeige die Empfehlung öffentlich',
+'URLFound'			=> 'URL wurde gefunden, allerdings kann nicht überprüft werden, ob diese noch auf die gewünschte Geschichte verweist.',
+'URLNotFound'		=> 'URL wurde nicht gefunden, es wurde der Fehlercode {0} übermittelt',
+'URLMovedHTTPS'		=> 'Server meldet, dass sich die URL geändert hat, es wurde aber nur auf eine sichere Verbindung umgestellt. Zum Speichern Formular abschicken',
+'URLMoved'			=> 'Server meldet eine neue URL. Es wurde noch nichts gespeichert, bitte manuell überprüfen',
+
 // Contests
 'Contests'					=> 'Wettbewerbe',
 //'ContestPrepare'			=> 'Contest is being prepared',

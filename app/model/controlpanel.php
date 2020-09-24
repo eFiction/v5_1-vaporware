@@ -1632,7 +1632,7 @@ class Controlpanel extends Base {
 		
 		$sql = 	"SELECT SQL_CALC_FOUND_ROWS
 					Rec.recid, Rec.title, Rec.url, Rec.uid, 
-					IF(Rec.guestname IS NULL,U.username,Rec.guestname) as maintainer, 
+					U.username as maintainer, 
 					R.rating
 				FROM `tbl_recommendations`Rec
 					LEFT JOIN `tbl_users`U ON ( Rec.uid = U.uid )
@@ -1671,7 +1671,6 @@ class Controlpanel extends Base {
 				Use cURL to get an idea of how good or bad the URL might be.
 				In the end, a closer look may be required, but it might give a hint
 			*/
-			/*
 			$handle = curl_init();
 			curl_setopt($handle, CURLOPT_URL, $data['url']);
 			curl_setopt($handle, CURLOPT_RETURNTRANSFER, TRUE);
@@ -1680,7 +1679,7 @@ class Controlpanel extends Base {
 			curl_exec($handle);
 			// embed the status into the data array
 			$data['lookup'] = curl_getinfo ($handle);
-			*/
+			// add the available ratings
 			$data['ratings'] = $this->exec("SELECT rid, rating, ratingwarning FROM `tbl_ratings`");
 
 			return $data;
@@ -1688,6 +1687,16 @@ class Controlpanel extends Base {
 		return [];
 	}
 
+	/**
+	* Save changes to a recommendation
+	* rewrite 2020-09
+	*
+	* @param	int			$recid	
+	* @param	string 		$data		Comma-separated list of new relations
+	* @param	int 		$userID		User ID, optional, only sent from the UCP
+	*
+	* @return	int						Amount of changes made
+	*/	
 	public function recommendationSave( int $recid, array $data, int $userID=0 ) : int
 	{
 		$recommendation=new \DB\SQL\Mapper($this->db, $this->prefix.'recommendations');
@@ -1696,33 +1705,42 @@ class Controlpanel extends Base {
 			$recommendation->load(array('recid=? AND uid=?', $recid, $userID));
 		else
 			$recommendation->load(array('recid=?', $recid));
+		
+		if($recommendation->recid == 0)
+			return 0;
 
 		// copy form data, also used to create a new feature
 		$recommendation->copyfrom( 
 			[ 
 				"title"		=> $data['title'],
 				"url"		=> $data['url'],
-				"uid"		=> $data['maintainer'],
+				"uid"		=> $userID ?: $data['maintainer'],
 				"author"	=> $data['author'],
 				"summary"	=> $data['summary'],
 				"comment"	=> $data['comment'],
+				"ratingid"	=> $data['ratingid'],
+				"completed"	=> isset($data['completed']),
+				"public"	=> isset($data['public']) ? ((!$userID OR $_SESSION['groups']&4)?2:1) : 0,
 			]
 		);
 
 		$i  = $recommendation->changed("title");
 		$i += $recommendation->changed("url");
+		$i += $recommendation->changed("uid");
 		$i += $recommendation->changed("author");
 		$i += $recommendation->changed("summary");
 		$i += $recommendation->changed("comment");
+		$i += $recommendation->changed("ratingid");
+		$i += $recommendation->changed("completed");
+		$i += $recommendation->changed("public");
 
 		// save date
 		$recommendation->save();
 
 		// update relation table
-		$i += $this->recommendationProperties( $recid, $data['maintainer'], "A" );
 		$i += $this->recommendationProperties( $recid, $data['tag'], "T" );
-		//$this->recommendationProperties( $recid, $data['character'], "CH" );
 		$i += $this->recommendationProperties( $recid, $data['category'], "CA" );
+		//$i += $this->recommendationProperties( $recid, $data['character'], "CH" );
 
 		$this->cacheRecommendations($recommendation->recid);
 
