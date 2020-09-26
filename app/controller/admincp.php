@@ -1796,7 +1796,7 @@ class AdminCP extends Base
 			$this->model->featuredSave($params['sid'], $f3->get('POST.form_data') );
 
 		// delete through the dialog box
-		if( isset($params['delete']) AND ( $_POST['confirmed'] ?? FALSE ) )
+		if( isset($params['delete']) AND ( $_POST['confirm_delete'] ?? FALSE ) )
 		{
 			$this->model->featuredDelete((int)$params['delete']);
 			$f3->reroute($params['returnpath']==""?"/adminCP/stories/featured":$params['returnpath'], false);
@@ -1957,7 +1957,8 @@ class AdminCP extends Base
 			// but it seems we are not really sure ...
 			else
 			{
-				$reroute .= "/id=".$params['id'];
+				$reroute = "/adminCP/stories/recommendations/id={$params['id']}";
+				if ( isset($params['returnpath']) ) $reroute .= ";returnpath=".$params['returnpath'];
 				$_SESSION['lastAction']['delete_confirm'] = TRUE;
 			}
 			$f3->reroute($reroute,FALSE);
@@ -1971,7 +1972,7 @@ class AdminCP extends Base
 		}
 
 		// delete through the dialog box
-		if( isset($params['delete']) AND ( $_POST['confirmed'] ?? FALSE ) )
+		if( isset($params['delete']) AND ( $_POST['confirm_delete'] ?? FALSE ) )
 		{
 			$this->model->recommendationDelete((int)$params['delete']);
 			$f3->reroute($params['returnpath']==""?"/adminCP/stories/recommendations":$params['returnpath'], false);

@@ -601,7 +601,7 @@ class UserCP extends Base
 		// delete function get's accompanied by a pseudo-post, this doesn't count here. Sorry dude
 		if( NULL != $post = $f3->get('POST') )
 		{
-			if ( array_key_exists("confirmed",$post) )
+			if ( array_key_exists("confirm_delete",$post) )
 			{
 				$this->model->libraryBookFavDelete($params);
 				$f3->reroute($params['returnpath'], false);
@@ -955,7 +955,7 @@ class UserCP extends Base
 		if( NULL != $post = $f3->get('POST') )
 		{
 			// check if the delete confirmation was triggered
-			if ( array_key_exists("confirmed",$post) )
+			if ( array_key_exists("confirm_delete",$post) )
 			{
 				// delete message
 				$result = $this->model->shoutboxDelete(@$params['message']);
