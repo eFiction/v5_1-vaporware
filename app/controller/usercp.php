@@ -702,7 +702,7 @@ class UserCP extends Base
 			{
 				if ( ""!=$f3->get('POST.confirm_delete') )
 				{
-					if ( 0 == $i = $this->model->collectionDelete($params['id'], $f3->get('POST.form_data'), $_SESSION['userID'] ) )
+					if ( 0 == $i = $this->model->collectionDelete($params['id'], $_SESSION['userID'] ) )
 					{
 						// failed to delete this item
 						$reroute  = "/userCP/library/{$module}/id={$params['id']}/editor=";

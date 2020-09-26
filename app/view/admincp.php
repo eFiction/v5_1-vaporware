@@ -305,7 +305,8 @@ class AdminCP extends Base
 	
 	public function collectionsList(array $data, array $sort, string $module) : string
 	{
-		//while ( list($key, $value) = each($data) )
+		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+	
 		foreach ( $data as $key => $value )
 			$this->dataProcess($data[$key], $key);
 

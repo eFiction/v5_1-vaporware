@@ -1527,28 +1527,30 @@ class Controlpanel extends Base {
 		return $i;
 	}
 	
-	public function collectionDelete(int $collid, array $data, int $userID=0)
+	public function collectionDelete(int $collid, int $userID=0) : int
 	{
 		$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collections');
 		
 		// attempt to delete based upon ACP or UCP access
 		if($userID)
-			$i = $collection->erase(array('collid=? AND uid=?', $collid, $userID));
+			$collection->load(array('collid=? AND uid=?', $collid, $userID));
 		else
-			$i = $collection->erase(array('collid=?', $collid));
+			$collection->load(array('collid=?', $collid));
+		
+		if ( $collection->dry() )
+			return 0;
 		
 		// if one item was deleted, clean up the relation tables
-		if ( $i )
-		{
-			(new \DB\SQL\Mapper($this->db, $this->prefix.'collection_properties'))->erase(array('collid=?', $collid));
-			(new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories'))->erase(array('collid=?', $collid));
+		(new \DB\SQL\Mapper($this->db, $this->prefix.'collection_properties'))->erase(array('collid=?', $collid));
+		(new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories'))->erase(array('collid=?', $collid));
 
-			// decide whose menu cache to delete
-			$uid = ($userID==0)?$data['maintainer']:$_SESSION['userID'];
-			\Cache::instance()->reset("menuUCPCountLib.{$uid}");
-		}
+		// decide whose menu cache to delete
+		$uid = $collection->uid;
+		$i = $collection->erase();
+		\Cache::instance()->reset("menuUCPCountLib.{$uid}");
+
 		// report the result
-		return $i;
+		return (int)$i;
 	}
 
 	private function collectionProperties( int $collid, array $data, string $type )
@@ -1799,6 +1801,15 @@ class Controlpanel extends Base {
 		return $i;
 	}
 	
+	/**
+	* Delete a recommendation and all attached fields
+	* 2020-09
+	*
+	* @param	int			$recid	
+	* @param	int			$userID	
+	*
+	* @return	int			Amount of changes made
+	*/
 	public function recommendationDelete( int $recID, int $userID = 0 ) : int
 	{
 		// map the recommendation
@@ -1809,7 +1820,7 @@ class Controlpanel extends Base {
 		else
 			$recommendations->load(array('recid=?', $recID));
 		
-		if($recommendations->recid == 0)
+		if($recommendations->dry())
 			return 0;
 
 		// map all relations

@@ -1857,6 +1857,34 @@ class AdminCP extends Base
 
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 		
+		// so we want to delete from inside the edit form
+		if( isset($params['delete']) )
+		{
+			// default return point
+			$reroute = empty($params['returnpath']) ? "/adminCP/stories/{$module}" : $params['returnpath'];
+
+			if ( ""!=$f3->get('POST.confirm_delete') )
+			{
+				if ( 0 == $i = $this->model->collectionDelete( $params['id'] ) )
+				{
+					$_SESSION['lastAction']['delete_error'] = TRUE;
+				}
+				else
+				{
+					$_SESSION['lastAction']['delete_success'] = $i;
+				}
+			}
+			// but it seems we are not really sure ...
+			else
+			{
+				$reroute  = "/adminCP/stories/{$module}/id={$params['id']}";
+				if ( isset($params['returnpath']) ) $reroute .= ";returnpath=".$params['returnpath'];
+				$_SESSION['lastAction']['delete_confirm'] = TRUE;
+			}
+			$f3->reroute($reroute,FALSE);
+			exit;
+		}
+
 		if (isset($_POST['form_data']))
 		{
 			if ( 0 < $i = $this->model->collectionSave($params['id'], $f3->get('POST.form_data') ) )
@@ -1864,8 +1892,7 @@ class AdminCP extends Base
 
 			if ( isset($_POST['form_data']['changetype']) )
 			{
-				$reroute = "/adminCP/stories";
-				$reroute .= ( $module=="collections" ) ? "/series" : "/collections";
+				$reroute = "/adminCP/stories/{$module}";
 				foreach($params as $key => $param)
 				{
 					if ($key!="returnpath")

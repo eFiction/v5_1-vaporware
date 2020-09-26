@@ -994,7 +994,7 @@ class Story extends Base
 					U.uid, U.username
 						FROM `tbl_recommendations`Rec
 							LEFT JOIN `tbl_users`U ON ( Rec.uid = U.uid)
-						WHERE Rec.validated > 0
+						WHERE Rec.public = 2
 						ORDER BY {$sort} {$limit}");
 	}
 

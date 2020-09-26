@@ -59,6 +59,7 @@
 	<tr>
 		<th>&nbsp;</th>
 		<th>&nbsp;</th>
+		<th>&nbsp;</th>
 		<th><a href="{{@BASE}}/adminCP/stories/{{@module}}/order=id,
 			<check if="{{ @sort['link']!='id' }}">
 				<true>asc">{ICON:sort}</true>
@@ -89,8 +90,9 @@
 <tbody>
 	<repeat group="{{ @data }}" value="{{ @row }}">
 	<tr>
-		<td><a href="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @row['collid'] }};returnpath=/adminCP/stories/{{@module}}/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
-		<td><a href="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @row['collid'] }}/items;returnpath=/adminCP/stories/{{@module}}/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:list}</a></td>
+		<td><a href="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @row.collid }};returnpath=/adminCP/stories/{{@module}}/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
+		<td><a href="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @row.collid }}/delete" class="deleteItem" title="#{{ @row.collid }}: {{ @row.title }}">{ICON:trash}</a></td>
+		<td><a href="{{@BASE}}/adminCP/stories/{{@module}}/id={{ @row.collid }}/items;returnpath=/adminCP/stories/{{@module}}/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:list}</a></td>
 		<td>{{ @row.collid }}</td>
 		<td>{{ @row.title }}</td>
 		<td>{{ @row.username }}</td>

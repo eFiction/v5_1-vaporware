@@ -16,14 +16,14 @@
 		<div class="field-label is-normal">&nbsp;</div>
 		<div class="field-body">
 			<div class="field"><div class="control">
-				{@*LN_collectionTypeSelect}:<br/>
+				{{@LN__CollectionCreateAs}}:<br/>
 				<label class="radio">
 					<input type="radio" <check if="{{ @module=='series' }}">checked="checked"</check> name="new_data[ordered]" value="1">
-					{@*LN_collectionTypeSeries} <a class="tooltip is-tooltip-multiline" data-tooltip="Info: {@*LN_ExplainSeries}.">{ICON:info}</a>
+					{{@LN__CreateTypeSeries}} <a class="has-tooltip-multiline" data-tooltip="Info: {{@LN__TypeSeriesExplain}}.">{ICON:info}</a>
 				</label><br/>
 				<label class="radio">
 					<input type="radio" <check if="{{ @module=='collections' }}">checked="checked"</check> name="new_data[ordered]" value="0">
-					{@*LN_collectionTypeCollection} <a class="tooltip is-tooltip-multiline" data-tooltip="Info: {@*LN_ExplainCollection}.">{ICON:info}</a>
+					{{@LN__CreateTypeCollection}} <a class="has-tooltip-multiline" data-tooltip="Info: {{@LN__TypeCollectionExplain}}.">{ICON:info}</a>
 				</label>
 			</div></div>
 		</div>
