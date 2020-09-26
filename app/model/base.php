@@ -590,6 +590,36 @@ class Base extends \Prefab {
 		return NULL;
 	}
 
+	public function userPreferencesReBuild( array &$pref ) : void
+	{
+		$pref = array_merge (
+					[
+						"ageconsent"	=> 0,
+						"useEditor"		=> 1,
+						"sortNew"		=> 1,
+						"showTOC"		=> 1,
+						"language"		=> $this->f3->get('CONFIG.language_default'),
+						"layout"		=> "default",
+						"hideTags"		=> NULL,
+					],
+					$pref ?: []
+				);
+
+		$mapper = new \DB\SQL\Mapper( $this->db, $this->prefix."users" );
+		$mapper->load(['uid = ?', $_SESSION['userID'] ]);
+		
+		$mapper->preferences = json_encode
+							([
+								"ageconsent"	=> $pref['ageconsent'],
+								"useEditor"		=> $pref['useEditor'],
+								"sortNew"		=> $pref['sortNew'],
+								"showTOC"		=> $pref['showTOC'],
+								"language"		=> $pref['language'],
+								"layout"		=> $pref['layout'],
+								"hideTags"		=> $pref['hideTags'],
+							]);
+		$mapper->save();
+	}
 	
 }
 

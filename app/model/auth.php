@@ -183,10 +183,11 @@ class Auth extends Base
 				$userInstance->save();
 			}
 
-			$user['preferences'] = json_decode($user['preferences'],TRUE);
+			$user['preferences'] = json_decode($user['preferences'],TRUE) ?: [];
+				$this->userPreferencesReBuild($user['preferences']);
 
 			// Check if language is available
-			$user['preferences']['language'] = ( FALSE===$this->f3->get('CONFIG.language_forced') AND array_key_exists($user['preferences']['language'], $this->f3->get('CONFIG.language_available' )) )
+			$user['preferences']['language'] = ( FALSE===$this->f3->get('CONFIG.language_forced') AND @array_key_exists($user['preferences']['language'], $this->f3->get('CONFIG.language_available' )) )
 									? $user['preferences']['language']
 									// Fallback to page default
 									: $this->f3->get('CONFIG.language_default');
@@ -474,6 +475,16 @@ class Auth extends Base
 		$newUser->email			= $register['email'];
 		$newUser->registered	= date("Y-m-d H:i:s",time());
 		$newUser->groups		= $register['groups'];
+		$newUser->preferences	= json_encode
+									([
+										"ageconsent"	=> 0,
+										"useEditor"		=> 1,
+										"sortNew"		=> 1,
+										"showTOC"		=> 1,
+										"language"		=> $this->f3->get('CONFIG.language_default'),
+										"layout"		=> "default",
+										"hideTags"		=> NULL,
+									]);
 		$newUser->save();
 		
 		return $newUser->_id;

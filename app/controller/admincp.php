@@ -1936,13 +1936,39 @@ class AdminCP extends Base
 		$this->menuShowUpper("stories/recommendations");
 
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
-
-		if ( isset( $_POST['id'] ) )
-			$params['id'] = (int)$_POST['id'];
 		
-		if (isset($_POST['form_data']))
+		// so we want to delete from inside the edit form
+		if( isset($params['delete']) )
+		{
+			// default return point
+			$reroute = empty($params['returnpath']) ? "/adminCP/stories/recommendations" : $params['returnpath'];
+
+			if ( ""!=$f3->get('POST.confirm_delete') )
+			{
+				if ( 0 == $i = $this->model->recommendationDelete( $params['id'] ) )
+				{
+					$_SESSION['lastAction']['delete_error'] = TRUE;
+				}
+				else
+				{
+					$_SESSION['lastAction']['delete_success'] = $i;
+				}
+			}
+			// but it seems we are not really sure ...
+			else
+			{
+				$reroute .= "/id=".$params['id'];
+				$_SESSION['lastAction']['delete_confirm'] = TRUE;
+			}
+			$f3->reroute($reroute,FALSE);
+			exit;
+		}
+
+		elseif (isset($_POST['form_data']))
+		{
 			if ( 0 < $i = $this->model->recommendationSave($params['id'], $f3->get('POST.form_data') ) )
 				$f3->set('save_success', $i);
+		}
 
 		// delete through the dialog box
 		if( isset($params['delete']) AND ( $_POST['confirmed'] ?? FALSE ) )

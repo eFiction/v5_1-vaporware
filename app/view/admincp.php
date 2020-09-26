@@ -364,6 +364,7 @@ class AdminCP extends Base
 
 	public function recommendationList( array $data, array $sort ) : string
 	{
+		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 		$this->f3->set('data', 		 $data);
 		$this->f3->set('sort', $sort);
 		

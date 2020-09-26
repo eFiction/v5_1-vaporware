@@ -1,20 +1,29 @@
+<!-- error notification v4 -->
+<check if="{{ isset(@delete_error) }}">
+	<div class="notification is-danger">
+		<button class="delete"></button>
+		{{ @LN__FailedDelete }}
+	</div>
+</check>
+<!-- END: error notification -->
 
 
-
+<!-- success notification v4 -->
+<check if="{{ isset(@delete_success) }}">
+	<div class="notification is-success">
+		<button class="delete"></button>
+		{{ @LN__ElementDeleted }}
+	</div>
+</check>
+<!-- END: success notification -->
 
 <check if="{{sizeof(@data)}}">
 	<true>
-{*
-		<check if="{{ isset(@form_error) }}">
-			<section class="hero is-warning is-small">
-			{{ @form_error }}
-			</section>
-		</check>
-*}
 		<F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
 		<table class="table is-striped is-hoverable is-fullwidth">
 		<thead>
 			<tr>
+				<th>&nbsp;</th>
 				<th>&nbsp;</th>
 				<th><a href="{{@BASE}}/adminCP/stories/recommendations/order=id,
 					<check if="{{ @sort['link']!='id' }}">
@@ -65,7 +74,8 @@
 		<tbody>
 			<repeat group="{{ @data }}" value="{{ @row }}">
 			<tr>
-				<td><a href="{{@BASE}}/adminCP/stories/recommendations/id={{ @row['recid'] }};returnpath=/adminCP/stories/recommendations/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
+				<td><a href="{{@BASE}}/adminCP/stories/recommendations/id={{ @row.recid }};returnpath=/adminCP/stories/recommendations/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
+				<td><a href="{{@BASE}}/adminCP/stories/recommendations/id={{ @row.recid }}/delete" class="deleteItem" title="#{{ @row.recid }}: {{ @row.title }}">{ICON:trash}</a></td>
 				<td>{{ @row.recid }}</td>
 				<td>{{ @row.title }}</td>
 				<td>{{ @row.maintainer }}</td>

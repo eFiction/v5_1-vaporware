@@ -1249,7 +1249,7 @@ class UserCP extends Controlpanel
 		$data['p'] = json_decode($data['preferences'],TRUE);
 		return $data;
 	}
-	
+
 	public function settingsSavePreferences($data)
 	{
 		$mapper = new \DB\SQL\Mapper( $this->db, $this->prefix."users" );

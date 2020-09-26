@@ -1128,27 +1128,6 @@ class AdminCP extends Controlpanel {
 		$feature->save();
 	}
 	
-	public function recommendationDelete(int $recid)
-	{
-		// map the recommendation
-		$recommendations=new \DB\SQL\Mapper($this->db, $this->prefix.'recommendations');
-		
-		// map all relations
-		$relations=new \DB\SQL\Mapper($this->db, $this->prefix.'recommendation_relations');
-		
-		// map a possible feature tag
-		$featured=new \DB\SQL\Mapper($this->db, $this->prefix.'featured');
-		
-		// delete all mapped entries and count the deletions
-		$_SESSION['lastAction']['deleteDetails'] = 
-		[ 
-			$recommendations->erase(array('recid=?',$recid)), 
-			$relations->erase(array('recid=?',$recid)), 
-			$featured->erase(array("id=? AND type='RC'",$recid))
-		];
-		$_SESSION['lastAction']['deleteResult']  = [ array_sum($_SESSION['lastAction']['deleteDetails']) ];
-	}
-
 	public function logGetCount()
 	{
 		$count = [];

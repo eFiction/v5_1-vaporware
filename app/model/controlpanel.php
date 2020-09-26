@@ -1671,6 +1671,7 @@ class Controlpanel extends Base {
 				Use cURL to get an idea of how good or bad the URL might be.
 				In the end, a closer look may be required, but it might give a hint
 			*/
+			/*
 			$handle = curl_init();
 			curl_setopt($handle, CURLOPT_URL, $data['url']);
 			curl_setopt($handle, CURLOPT_RETURNTRANSFER, TRUE);
@@ -1679,6 +1680,7 @@ class Controlpanel extends Base {
 			curl_exec($handle);
 			// embed the status into the data array
 			$data['lookup'] = curl_getinfo ($handle);
+			*/
 			// add the available ratings
 			$data['ratings'] = $this->exec("SELECT rid, rating, ratingwarning FROM `tbl_ratings`");
 
@@ -1795,6 +1797,35 @@ class Controlpanel extends Base {
 		}
 		unset($relations);
 		return $i;
+	}
+	
+	public function recommendationDelete( int $recID, int $userID = 0 ) : int
+	{
+		// map the recommendation
+		$recommendations=new \DB\SQL\Mapper($this->db, $this->prefix.'recommendations');
+		
+		if($userID)
+			$recommendations->load(array('recid=? AND uid=?', $recID, $userID));
+		else
+			$recommendations->load(array('recid=?', $recID));
+		
+		if($recommendations->recid == 0)
+			return 0;
+
+		// map all relations
+		$relations=new \DB\SQL\Mapper($this->db, $this->prefix.'recommendation_relations');
+		
+		// map a possible feature tag
+		$featured=new \DB\SQL\Mapper($this->db, $this->prefix.'featured');
+		
+		// delete all mapped entries and count the deletions
+		$_SESSION['lastAction']['deleteDetails'] = 
+		[ 
+			$recommendations->erase(array('recid=?',$recID)), 
+			$relations->erase(array('recid=?',$recID)), 
+			$featured->erase(array("id=? AND type='RC'",$recID))
+		];
+		return array_sum($_SESSION['lastAction']['deleteDetails']);
 	}
 
 	public function featuredDelete(int $sid)

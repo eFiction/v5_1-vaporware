@@ -200,8 +200,23 @@
 	</div>
 </div>
 
-{{ @data.public }} / {{ @data.completed }}
-
+<!-- reminder notification v4 -->
+<check if="{{ isset(@delete_confirm) }}">
+<div class="field is-horizontal">
+	<div class="field-label">&nbsp;</div>
+	<div class="field-body">
+		<div class="columns">
+			<div class="column">
+				<div class="notification is-warning">
+					<button class="delete"></button>
+					{{ @LN__CheckBoxToDelete }}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</check>
+<!-- END: reminder notification -->
 <!-- Form submit buttons v3 -->
 <div class="field is-horizontal">
 	<div class="field-label">&nbsp;</div>
