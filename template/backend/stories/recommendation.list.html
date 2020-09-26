@@ -1,3 +1,48 @@
+<div class="box">
+	<form action="{{@BASE}}/adminCP/stories/recommendations/id=new;returnpath=/adminCP/stories/recommendations/order={{@sort.link}},{{@sort.direction}}/page={{@@paginate.page}}" method="post">
+
+		<div class="field is-horizontal">
+		  <div class="field-label is-normal">
+			<label class="label">{{@LN__Title}}</label>
+		  </div>
+		  <div class="field-body">
+			<div class="field">
+			  <div class="control">
+				<input class="input" type="text" name="new_data[title]" />
+			  </div>
+			</div>
+		  </div>
+		</div>
+
+		<div class="field is-horizontal">
+		  <div class="field-label is-normal">
+			<label class="label">{{@LN__URL}}</label>
+		  </div>
+		  <div class="field-body">
+			<div class="field">
+			  <div class="control">
+				<input class="input" type="text" name="new_data[url]" />
+			  </div>
+			</div>
+		  </div>
+		</div>
+
+		<div class="field is-horizontal">
+			<div class="field-label">&nbsp;</div>
+			<div class="field-body">
+				<div class="field is-grouped">
+					<p class="control">
+						<button class="button is-primary" type="submit">
+							<span class="icon"><i class="fas fa-save"></i></span>
+							<span>{{@LN__Submit}}</span>
+						</button>
+					</p>
+				</div>
+			</div>
+		</div>
+	</form>
+</div>
+
 <!-- error notification v4 -->
 <check if="{{ isset(@delete_error) }}">
 	<div class="notification is-danger">

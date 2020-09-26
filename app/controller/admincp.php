@@ -1997,6 +1997,10 @@ class AdminCP extends Base
 			if ( 0 < $i = $this->model->recommendationSave($params['id'], $f3->get('POST.form_data') ) )
 				$f3->set('save_success', $i);
 		}
+		elseif (isset($_POST['new_data']))
+		{
+			$params['id'] = $this->model->recommendationAdd($f3->get('POST.new_data') );
+		}
 
 		// delete through the dialog box
 		if( isset($params['delete']) AND ( $_POST['confirm_delete'] ?? FALSE ) )

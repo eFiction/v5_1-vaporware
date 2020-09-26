@@ -1553,7 +1553,7 @@ class Controlpanel extends Base {
 		return (int)$i;
 	}
 
-	private function collectionProperties( int $collid, array $data, string $type )
+	private function collectionProperties( int $collid, string $data, string $type )
 	{
 		// Check tags:
 		$data = explode(",",$data);
@@ -1590,30 +1590,32 @@ class Controlpanel extends Base {
 	
 	public function collectionItemsAdd(int $collid, string $data, int $userID=0)
 	{
-		// make sure the user actuall owns this collection
-		if ( ($userID==0) OR  (1 == (new \DB\SQL\Mapper($this->db, $this->prefix."collections"))->count(['collid=? AND uid=?', $collid, $userID])) )
-		{
-			$items = explode(",",$data);
-			$newItem = new \DB\SQL\Mapper($this->db, $this->prefix."collection_stories");
-			$count = $newItem->count(array('collid=?',$collid));
-	  
-			foreach ( $items as $item )
-			{
-				if(is_numeric($item))
-				{
-					$newItem->reset();
-					$newItem->collid	= $collid;
-					$newItem->sid 		= $item;
-					$newItem->confirmed	= $item;
-					$newItem->inorder	= ++$count;
-					$newItem->save();
-				}
-			}
-		}
+		$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collections');
+		
+		// load the collection and check for existence and access
+		if($userID)
+			$collection->load(array('collid=? AND uid=?', $collid, $userID));
 		else
+			$collection->load(array('collid=?', $collid));
+		
+		if ( $collection->dry() )
+			return 0;
+
+		$items = explode(",",$data);
+		$newItem = new \DB\SQL\Mapper($this->db, $this->prefix."collection_stories");
+		$count = $newItem->count(array('collid=?',$collid));
+	  
+		foreach ( $items as $item )
 		{
-			// Access violation *todo*
-			
+			if(is_numeric($item))
+			{
+				$newItem->reset();
+				$newItem->collid	= $collid;
+				$newItem->sid 		= $item;
+				$newItem->confirmed	= $item;
+				$newItem->inorder	= ++$count;
+				$newItem->save();
+			}
 		}
 	}
 	
@@ -1625,6 +1627,19 @@ class Controlpanel extends Base {
 			return (new \DB\SQL\Mapper($this->db, $this->prefix."collection_stories"))->erase(['collid=? AND sid=?', $collid, $itemid]);
 		}
 		return 0;
+	}
+	
+	public function recommendationAdd( array $data, int $userID = 0 ) : int
+	{
+		$recommendation=new \DB\SQL\Mapper($this->db, $this->prefix.'recommendations');
+		
+		$recommendation->title	= $data['title'];
+		$recommendation->url	= $data['url'];
+		$recommendation->uid	= $_SESSION['userID'];
+		
+		$recommendation->save();
+		
+		return $recommendation->_id;
 	}
 	
 	public function recommendationList( int $page, array $sort, int $userID = 0 ) : array
