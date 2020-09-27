@@ -83,7 +83,17 @@
 			</check></a> {{@LN__Sort_Title}}
 		</th>
 		<th>{{@LN__CollectionMaintainer}}</th>
-		<th>{{@LN__Stories}}</th>
+		<th><a href="{{@BASE}}/adminCP/stories/{{@module}}/order=stories,
+			<check if="{{ @sort['link']!='stories' }}">
+				<true>asc">{ICON:sort}</true>
+				<false>
+					<check if="{{ @sort['direction']=='desc' }}">
+						<true>asc">{ICON:sort-numeric-desc}</true>
+						<false>desc">{ICON:sort-numeric-asc}</false>
+					</check>
+				</false>
+			</check></a> {{@LN__Stories}}
+		</th>
 		<th>&nbsp;</th>
 	</tr>
 </thead>

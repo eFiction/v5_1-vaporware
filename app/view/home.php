@@ -46,6 +46,7 @@ class Home extends Base
 
 		if (current($data['cache'])>0)
 			$this->f3->set('factor', $data['votes']/current($data['cache']));
+		else $this->f3->set('factor', 0);
 
 		return $this->render('home/poll.single.html');
 	}

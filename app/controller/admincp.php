@@ -1939,6 +1939,7 @@ class AdminCP extends Base
 				"date"		=>	"date",
 				"title"		=>	"title",
 				"author"	=>	"author",
+				"stories"	=>  "stories"
 		);
 
 		// sort order

@@ -1688,7 +1688,6 @@ class Controlpanel extends Base {
 				Use cURL to get an idea of how good or bad the URL might be.
 				In the end, a closer look may be required, but it might give a hint
 			*/
-			/*
 			$handle = curl_init();
 			curl_setopt($handle, CURLOPT_URL, $data['url']);
 			curl_setopt($handle, CURLOPT_RETURNTRANSFER, TRUE);
@@ -1697,7 +1696,6 @@ class Controlpanel extends Base {
 			curl_exec($handle);
 			// embed the status into the data array
 			$data['lookup'] = curl_getinfo ($handle);
-			*/
 			// add the available ratings
 			$data['ratings'] = $this->exec("SELECT rid, rating, ratingwarning FROM `tbl_ratings`");
 

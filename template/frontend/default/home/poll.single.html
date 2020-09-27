@@ -5,7 +5,7 @@
 	<true>
 	<repeat group="{{@data.cache}}" key="{{ @option }}" value="{{@res}}" counter="{{ @ctr }}">
 		<p>{{ @option }} ({{ @res }})</p>
-		<progress class="progress is-medium" value="{{ (int)((@res*100*@factor)/@data.votes) }}" max="100">{{@res}}</progress>
+		<progress class="progress is-medium" value="{{ (int)((@data.votes==0)?0:(@res*100*@factor)/@data.votes) }}" max="100">{{@res}}</progress>
 	</repeat>
 
 
@@ -23,7 +23,7 @@
 		<check if="{{ @data.open_voting }}">
 			<true>
 				<label for="option{{@ctr}}">{{ @opt }} ({{ @data['cache'][@opt] }})</label></p>
-				<progress class="progress is-medium" value="{{ (int)((@data['cache'][@opt]*100*@factor)/@data.votes) }}" max="100">{{@data['cache'][@opt]}}</progress>
+				<progress class="progress is-medium" value="{{ (int)((@data.votes==0)?0:((@data['cache'][@opt]*100*@factor)/@data.votes)) }}" max="100">{{@data['cache'][@opt]}}</progress>
 			</true>
 			<false>
 				<label for="option{{@ctr}}">{{ @opt }}</label></p><br/>
