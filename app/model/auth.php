@@ -49,8 +49,8 @@ class Auth extends Base
 		$token = md5(time());
 		$dbtoken = $token."//".sprintf('%u',ip2long($_SERVER["REMOTE_ADDR"]))."//".time();
 		// $uid and $token are safe
-		$this->exec("INSERT INTO `tbl_user_info` (uid,field,info) VALUES ({$uid},-1,CONCAT_WS( '//', :token , INET_ATON('{$_SERVER['REMOTE_ADDR']}'), :time ) )
-						ON DUPLICATE KEY UPDATE info=CONCAT_WS( '//', :token , INET_ATON('{$_SERVER['REMOTE_ADDR']}'), :time ) ",
+		$this->exec("INSERT INTO `tbl_user_info` (uid,field,info) VALUES ({$uid},-1,CONCAT_WS( '//', :token , INET6_ATON('{$_SERVER['REMOTE_ADDR']}'), :time ) )
+						ON DUPLICATE KEY UPDATE info=CONCAT_WS( '//', :token , INET6_ATON('{$_SERVER['REMOTE_ADDR']}'), :time ) ",
 						[":token" => $token, ":time" => time() ]
 					);
 
@@ -70,7 +70,7 @@ class Auth extends Base
 			"SELECT U.uid, I.info as token
 				FROM `tbl_users`U 
 					INNER JOIN `tbl_user_info`I ON (U.uid=I.uid AND I.field=-1)
-				WHERE I.info LIKE CONCAT_WS( '//', :token , INET_ATON('{$_SERVER['REMOTE_ADDR']}'), '%' );",
+				WHERE I.info LIKE CONCAT_WS( '//', :token , INET6_ATON('{$_SERVER['REMOTE_ADDR']}'), '%' );",
 			[":token" => $token]
 		);
 		// no token found
@@ -99,12 +99,23 @@ class Auth extends Base
 		$session_id = md5(time().openssl_random_pseudo_bytes(32));
 		
 		$this->f3->set('SESSION.session_id', $session_id );
-//		echo "<br>new: ".$_SESSION['session_id'];
-		$this->exec("INSERT INTO `tbl_sessions`(`session`, `user`, `lastvisited`, `ip`) VALUES
-				('{$_SESSION['session_id']}', '{NULL}', NOW(), INET_ATON('{$_SERVER['REMOTE_ADDR']}') );");
+		$this->exec(
+				"INSERT INTO `tbl_sessions`(`session`, `user`, `lastvisited`, `ip`)
+				VALUES
+				('{$_SESSION['session_id']}', '{NULL}', NOW(), INET6_ATON('{$_SERVER['REMOTE_ADDR']}') );"
+			);
 
-	  setcookie("session_id", $session_id, time()+31536000, $this->f3->get('BASE') );
-	  return $session_id;
+		setcookie
+		(
+			"session_id",
+			$session_id,
+			[
+				'expires' 	=>	time()+31536000,
+				'path'		=>	$this->f3->get('BASE'),
+				'samesite'	=>  'Strict',
+			]
+		);
+		return $session_id;
 	}
 
 	public function validateSession($session_id)
@@ -120,30 +131,30 @@ class Auth extends Base
 		$sql[] = "SET @guests  := (SELECT COUNT(DISTINCT S.session) 
 										FROM `tbl_sessions`S 
 											WHERE S.user = 0
-											AND NOT (S.session = '{$session_id}' AND S.ip = INET_ATON('{$_SERVER['REMOTE_ADDR']}') )
+											AND NOT (S.session = '{$session_id}' AND S.ip = INET6_ATON('{$_SERVER['REMOTE_ADDR']}') )
 											AND TIMESTAMPDIFF(MINUTE,S.lastvisited,NOW())<15
 									);";
 */
 		$sql[] = "SET @guests  := (SELECT COUNT(DISTINCT S.session) 
 										FROM `tbl_sessions`S 
 											WHERE S.user = 0
-											AND NOT (S.session = '{$session_id}' AND S.ip = INET_ATON('{$_SERVER['REMOTE_ADDR']}') )
+											AND NOT (S.session = '{$session_id}' AND S.ip = INET6_ATON('{$_SERVER['REMOTE_ADDR']}') )
 											AND TIMESTAMPDIFF(MINUTE,S.lastvisited,NOW())<15
 									);";
 /* 		
 		$sql[] = "SET @members := (SELECT COUNT(DISTINCT user) FROM (SELECT * FROM `tbl_sessions` GROUP BY user ORDER BY `lastvisited` DESC) as S WHERE 
 															S.user > 0 AND 
 															TIMESTAMPDIFF(MINUTE,S.lastvisited,NOW())<60 AND
-															NOT (S.session = '{$session_id}' AND S.ip = INET_ATON('{$_SERVER['REMOTE_ADDR']}') )
+															NOT (S.session = '{$session_id}' AND S.ip = INET6_ATON('{$_SERVER['REMOTE_ADDR']}') )
 											);";
  */		
 		$sql[] = "SET @members := (SELECT COUNT(DISTINCT user)
 										FROM `tbl_sessions`S
 											WHERE S.user > 0
 											AND TIMESTAMPDIFF(MINUTE,S.lastvisited,NOW())<60
-											AND NOT (S.session = '{$session_id}' AND S.ip = INET_ATON('{$_SERVER['REMOTE_ADDR']}') )
+											AND NOT (S.session = '{$session_id}' AND S.ip = INET6_ATON('{$_SERVER['REMOTE_ADDR']}') )
 											);";
-		$sql[] = "UPDATE `tbl_sessions`S SET lastvisited = CURRENT_TIMESTAMP WHERE S.session = '{$session_id}' AND S.ip = INET_ATON('{$_SERVER['REMOTE_ADDR']}');";
+		$sql[] = "UPDATE `tbl_sessions`S SET lastvisited = CURRENT_TIMESTAMP WHERE S.session = '{$session_id}' AND S.ip = INET6_ATON('{$_SERVER['REMOTE_ADDR']}');";
 
 		$sql[] = "SELECT S.session, UNIX_TIMESTAMP(S.lastvisited) as time, S.ip, IF(S.user,S.user,0) as userID, 
 						U.username, U.groups, U.preferences, U.cache_messaging, 
@@ -152,7 +163,7 @@ class Auth extends Base
 							FROM `tbl_sessions`S 
 							INNER JOIN `tbl_users` U ON ( IF(S.user,S.user = U.uid,U.uid=0) )
 								LEFT JOIN `tbl_users`U2 ON ( (U.uid = U2.uid OR U.uid = U2.curator) AND (U.groups&4) )
-						WHERE S.session = '{$session_id}' AND S.ip = INET_ATON('{$_SERVER['REMOTE_ADDR']}');";
+						WHERE S.session = '{$session_id}' AND S.ip = INET6_ATON('{$_SERVER['REMOTE_ADDR']}');";
 						
 /*
 	To do: create a cache field, move message status, curator to that field to reduce DB usage
@@ -218,7 +229,7 @@ class Auth extends Base
 							FROM `tbl_sessions`S 
 							INNER JOIN `tbl_users` U ON ( IF(S.user,S.user = U.uid,U.uid=0) )
 								LEFT JOIN `tbl_users`U2 ON ( (U.uid = U2.uid OR U.uid = U2.curator) AND U.groups&5 )
-						WHERE S.session = '{$session_id}' AND S.ip = INET_ATON('{$_SERVER['REMOTE_ADDR']}');";
+						WHERE S.session = '{$session_id}' AND S.ip = INET6_ATON('{$_SERVER['REMOTE_ADDR']}');";
 
 		$user = $this->exec($sql)[0];
 	

@@ -75,7 +75,7 @@
 	<check if="{{!empty(@data.summary)}}">
 		<div class="column is-full"><b>{{@LN__Summary}}:</b> {{@data.summary | raw}}</div>
 	</check>
-	<div class="column is-full"><b>{{@LN__Description}}:</b> {{nl2br(@data.description) | raw}}</div>
+	<div class="column is-full"><b>{{@LN__Description}}:</b> {{nl2br(@data.description),500 | cropmore,raw }}</div>
 
 	<hr />
 

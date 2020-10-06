@@ -70,6 +70,7 @@ return array(
 'oldPW'			=> 'altes Passwort',
 'newPW'			=> 'neues Passwort',
 'newPWrepeat'	=> 'neues Passwort wiederholen',
+'BadBCount'		=> '<a href="http://bad-behavior.ioerror.us/" target="_blank">Bad Behaviour</a> hat in den letzten 7 Tagen {0} Zugriffe blockiert',
 
 // [3] Global -- Sort
 'Sort_Date'			=> 'Datum',

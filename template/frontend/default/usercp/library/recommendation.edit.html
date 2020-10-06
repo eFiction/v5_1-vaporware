@@ -1,0 +1,282 @@
+{* provide a return link if a path exists *}
+<div class="columns">
+	<div class="column">
+		<check if="{{!empty(@returnpath)}}">{ICON:arrow-left} <a href="{{@BASE}}{{@returnpath}}">{{@LN__Return}}</a></check>&nbsp;
+	</div>
+</div>
+
+<!-- success notification v4 -->
+<check if="{{ isset(@save_success) }}">
+	<div class="notification is-success">
+		<button class="delete"></button>
+		{{ @LN__Status_Changes, @save_success | format }}
+	</div>
+</check>
+<!-- END: success notification -->
+
+<form action="{{@BASE}}/userCP/library/recommendations/id={{ @data['recid'] }}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal">
+		<label class="label">{{@LN__Title}}</label>
+	</div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<input class="input" type="text" name="form_data[title]" value="{{ @data.title }}" />
+		</div></div>
+	</div>
+</div>
+
+<div class="field is-horizontal">
+	<div class="field-label"></div>
+	<div class="field-body">
+		<div class="field"><div class="control mt-2">
+			<input type="checkbox" name="form_data[completed]" <check if="{{ @data.completed }}">checked="checked"</check> />
+			{{@LN__RecommCompleted}}
+		</div></div>
+		<div class="field"><div class="control mt-2">
+			<input type="checkbox" name="form_data[public]" <check if="{{ @data.public }}">checked="checked"</check> />
+			{{@LN__RecommPublic}}
+		</div></div>
+	</div>
+</div>
+
+<div class="field is-horizontal">
+	<div class="field-label"></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+
+	{* <!--		Status 301 (moved) and the only difference is http - https		--> *}		
+			<check if="{{ isset(@lookup_moved) AND @lookup_moved==1 }}">
+				<article class="message is-success">
+				  <div class="message-body">
+					{{@LN__URLMovedHTTPS}}.
+				  </div>
+				</article>
+			</check>
+
+	{* <!--		Status 200 (found) - but what did we find?		--> *}		
+			<check if="{{ isset(@lookup_success) }}">
+				<article class="message is-success">
+				  <div class="message-body">
+					{{@LN__URLFound}}.
+				  </div>
+				</article>
+			</check>	
+
+	{* <!--		Status 400/500 (found) - but what did we find?		--> *}		
+			<check if="{{ isset(@lookup_error) }}">
+				<article class="message is-danger">
+				  <div class="message-body">
+					{{@LN__URLNotFound, @@data.lookup.http_code | format }}!
+				  </div>
+				</article>
+			</check>
+
+		</div></div>
+	</div>
+</div>
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__URL}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="field is-grouped">
+			<p class="control is-expanded"><input class="input" type="text" name="form_data[url]" value="{{ @data.url }}" /></p>
+			<p class="control"><a href="{{ @data.url }}" target="_blank">{ICON:external-link}</a></p>
+		</div></div>
+	</div>
+</div>
+
+<check if="{{ isset(@lookup_moved) AND @lookup_moved==0 }}">
+<div class="field is-horizontal">
+	<div class="field-label"></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+	{* <!--		Status 301 (moved) and reporting a different location		--> *}		
+				<article class="message is-warning">
+				  <div class="message-body">
+					{{@LN__URLMoved}}.
+				  </div>
+				</article>
+		</div></div>
+	</div>
+</div>
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__URL}}</label></div>
+	<div class="field-body">
+		<div class="field">
+			<div class="field is-grouped">
+				<p class="control is-expanded"><input class="input" type="text" name="form_data[urlnew]" value="{{ @data.lookup.redirect_url }}" /></p>
+				<p class="control"><a href="{{ @data.lookup.redirect_url }}" target="_blank">{ICON:external-link}</a></p>
+			</div>
+			<div class="field">
+				<div class="control mt-3 mb-3">
+					<label class="checkbox"><input class="mr-3" type="checkbox" name="form[confirm_urlnew]" />**LN__OverwriteURL</label>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</check>
+
+<div class="field is-horizontal">
+  <div class="field-label is-normal">
+    <label class="label">{{@LN__Author}}</label>
+  </div>
+  <div class="field-body">
+    <div class="field is-half">
+      <div class="control">
+        <input class="input" type="text" name="form_data[author]" value="{{ @data.author }}" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__Categories}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<input class="input" type="text" id="category-select" name="form_data[category]" />
+		</div></div>
+	</div>
+</div>
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__Tags}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<input class="input" type="text" id="tag-select" name="form_data[tag]" />
+		</div></div>
+	</div>
+</div>
+
+<check if="\Config::getPublic('advanced_editor') == TRUE ">
+<div class="field is-horizontal">
+	<div class="field-label is-normal"></div>
+	<div class="field-body">
+		<div class="field">
+			<check if="{{@data.editor=='visual'}}">
+				<true> <a href="{{@BASE}}/userCP/library/recommendations/id={{@data.recid}}/editor=plain<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">{{@LN__SwitchPlainHTML}}</a></true>
+				<false> <a href="{{@BASE}}/userCP/library/recommendations/id={{@data.recid}}/editor=visual<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">{{@LN__SwitchVisual}}</a></false>
+			</check>
+		</div>
+	</div>
+</div>
+</check>
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__Description}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<textarea class="textarea" name="form_data[summary]" id="tinymce" rows="10" cols="80">{{ @data.summary | raw }}</textarea>
+		</div></div>
+	</div>
+</div>
+
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__Comment}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control">
+			<textarea class="textarea" name="form_data[comment]" rows="5" cols="80">{{ @data.comment | raw }}</textarea>
+		</div></div>
+	</div>
+</div>
+<div class="field is-horizontal">
+	<div class="field-label is-normal"><label class="label">{{@LN__Rating}}</label></div>
+	<div class="field-body">
+		<div class="field"><div class="control"><div class="select">
+			<select id="ratingid" name="form_data[ratingid]">
+				<repeat group="{{ @data.ratings }}" value="{{ @rating }}"><option value="{{ @rating.rid }}"<check if="{{@rating.rid==@data.ratingid}}"> selected="selected"</check>>{{ @rating.rating }}</option></repeat>
+			</select>
+		</div></div></div>
+	</div>
+</div>
+
+<!-- reminder notification v4 -->
+<check if="{{ isset(@delete_confirm) }}">
+<div class="field is-horizontal">
+	<div class="field-label">&nbsp;</div>
+	<div class="field-body">
+		<div class="columns">
+			<div class="column">
+				<div class="notification is-warning">
+					<button class="delete"></button>
+					{{ @LN__CheckBoxToDelete }}
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</check>
+<!-- END: reminder notification -->
+<!-- Form submit buttons v3 -->
+<div class="field is-horizontal">
+	<div class="field-label">&nbsp;</div>
+	<div class="field-body">
+		<div class="columns">
+			<div class="column">
+				<div class="field is-grouped">
+					<p class="control">
+						<button class="button is-primary" type="submit">
+							<span class="icon">{ICON:save}</span>
+							<span>{{@LN__Submit}}</span>
+						</button>
+					</p>
+					<p class="control">
+						<button class="button is-light" type="reset">
+							<span class="icon"><i class="fas fa-undo-alt"></i></span>
+							<span>{{@LN__Reset}}</span>
+						</button>
+					</p>
+				</div>
+			</div>
+			<div class="column is-3"></div>
+			<div class="column">
+				<div class="field is-grouped">
+					<p class="control">
+						<button class="button is-danger has-tooltip-multiline has-tooltip-danger" data-tooltip="{{@LN__CheckBoxToDelete}}" type="submit" formaction="{{@BASE}}/userCP/library/recommendations/id={{ @data['recid'] }}/delete/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">
+							<span class="icon">{ICON:remove}</span>
+							<span>{{@LN__Delete}}</span>
+						</button>
+					</p>
+					<p class="control">
+						<a class="button is-danger">
+							<input type="checkbox" name="confirm_delete" />
+						</a>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- END: Form submit buttons v3 -->
+
+<script type="text/javascript">
+$(document).ready(function() {
+    $("#category-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "category",
+    	preventDuplicates: true,
+    	prePopulate: {{@prePop.cat | raw}}
+    });
+});
+
+$(document).ready(function() {
+    $("#maintainer-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "user",
+    	preventDuplicates: true,
+		tokenLimit: 1,
+    	prePopulate: {{@data.maintainerblock | raw}}
+    });
+});
+
+$(document).ready(function() {
+    $("#tag-select").tokenInput("{{$BASE}}/adminCP/ajax/stories/editMeta",{
+    	method: "post",
+    	queryParam: "tag",
+    	preventDuplicates: true,
+    	prePopulate: {{@prePop.tag | raw}}
+    });
+});
+
+</script>

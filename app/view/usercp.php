@@ -255,6 +255,30 @@ class UserCP extends Base
 		return $this->render('usercp/feedback.edit.html');
 	}
 	
+	public function recommendationList( array $data, array $sort ) : string
+	{
+		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+		$this->f3->set('data', $data);
+		$this->f3->set('sort', $sort);
+		
+		return $this->render('usercp/library/recommendation.list.html');
+	}
+
+	public function recommendationEdit( array $data, array $prePop, string $returnpath="" ) : string
+	{
+		if($data['editor']=="visual" AND $this->config['advanced_editor']==TRUE )
+		{
+			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
+			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
+		}
+		$this->dataProcess($data);
+		$this->f3->set('prePop', 	$prePop);
+		$this->f3->set('data', 		$data);
+		$this->f3->set('returnpath', $returnpath);
+		
+		return $this->render('usercp/library/recommendation.edit.html');
+	}
+
 	public function settingsChangePW($feedback)
 	{
 		$this->f3->set('feedback', $feedback);

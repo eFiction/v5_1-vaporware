@@ -1243,12 +1243,13 @@ class Controlpanel extends Base {
 		$newCollection->save();
 		
 		$newID = $newCollection->_id;
-		\Cache::instance()->reset("menuUCPCountLib.{$_SESSION['userID']}");
+
+		\Cache::instance()->reset("menuUCPCountLib_.{$_SESSION['userID']}");
 
 		return $newID;
 	}
 	
-	public function collectionsList(int $page, array $sort, string $module, int $userid=0) : array
+	public function collectionsList(int $page, array $sort, string $module, int $userID=0) : array
 	{
 		$limit = 20;
 		$pos = $page - 1;
@@ -1259,7 +1260,7 @@ class Controlpanel extends Base {
 				FROM `tbl_collections`Coll
 					LEFT JOIN `tbl_collection_stories`rCS ON ( Coll.collid = rCS.collid )
 					LEFT JOIN `tbl_users`U ON ( Coll.uid = U.uid )
-				WHERE Coll.ordered = ".(int)($module!="collections").(($userid>0)?" AND Coll.uid = {$userid}":"")."
+				WHERE Coll.ordered = ".(int)($module!="collections").(($userID>0)?" AND Coll.uid = {$userID}":"")."
 				GROUP BY Coll.collid
 				ORDER BY {$sort['order']} {$sort['direction']}
 				LIMIT ".(max(0,$pos*$limit)).",".$limit;
@@ -1268,7 +1269,9 @@ class Controlpanel extends Base {
 
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
-			"/adminCP/stories/".(($module=="collections")?"collections":"series")."/order={$sort['link']},{$sort['direction']}",
+			( $userID )
+				? "/userCP/library/".(($module=="collections")?"collections":"series")."/order={$sort['link']},{$sort['direction']}"
+				: "/adminCP/stories/".(($module=="collections")?"collections":"series")."/order={$sort['link']},{$sort['direction']}",
 			$limit
 		);
 		
@@ -1547,7 +1550,7 @@ class Controlpanel extends Base {
 		// decide whose menu cache to delete
 		$uid = $collection->uid;
 		$i = $collection->erase();
-		\Cache::instance()->reset("menuUCPCountLib.{$uid}");
+		\Cache::instance()->reset("menuUCPCountLib_.{$uid}");
 
 		// report the result
 		return (int)$i;
@@ -1629,7 +1632,7 @@ class Controlpanel extends Base {
 		return 0;
 	}
 	
-	public function recommendationAdd( array $data, int $userID = 0 ) : int
+	public function recommendationAdd( array $data ) : int
 	{
 		$recommendation=new \DB\SQL\Mapper($this->db, $this->prefix.'recommendations');
 		
@@ -1638,7 +1641,9 @@ class Controlpanel extends Base {
 		$recommendation->uid	= $_SESSION['userID'];
 		
 		$recommendation->save();
-		
+
+		\Cache::instance()->reset("menuUCPCountLib_.{$_SESSION['userID']}");
+
 		return $recommendation->_id;
 	}
 	
@@ -1663,7 +1668,9 @@ class Controlpanel extends Base {
 
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
-			"/adminCP/stories/recommendations/order={$sort['link']},{$sort['direction']}",
+			( $userID )
+				? "/userCP/library/recommendations/order={$sort['link']},{$sort['direction']}"
+				: "/adminCP/stories/recommendations/order={$sort['link']},{$sort['direction']}",
 			$limit
 		);
 		
@@ -1677,8 +1684,8 @@ class Controlpanel extends Base {
 					U.uid, U.username
 				FROM `tbl_recommendations`Rec
 					LEFT JOIN `tbl_users`U ON ( Rec.uid = U.uid )
-				".(($userID>0)?" WHERE Rec.uid = {$userID}":"")."
 				WHERE Rec.recid = :recid
+				".(($userID>0)?" AND Rec.uid = {$userID}":"")."
 				GROUP BY Rec.recid";
 
 		if ( ( FALSE !== $data = current ( $this->exec( $sql, [ ":recid" => $recID ] ) ) ) AND $data['recid']!="" )
@@ -1849,6 +1856,9 @@ class Controlpanel extends Base {
 			$relations->erase(array('recid=?',$recID)), 
 			$featured->erase(array("id=? AND type='RC'",$recID))
 		];
+
+		\Cache::instance()->reset("menuUCPCountLib_.{$_SESSION['userID']}");
+
 		return array_sum($_SESSION['lastAction']['deleteDetails']);
 	}
 

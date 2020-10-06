@@ -2002,15 +2002,6 @@ class AdminCP extends Base
 		{
 			$params['id'] = $this->model->recommendationAdd($f3->get('POST.new_data') );
 		}
-
-		// delete through the dialog box
-		if( isset($params['delete']) AND ( $_POST['confirm_delete'] ?? FALSE ) )
-		{
-			$this->model->recommendationDelete((int)$params['delete']);
-			$f3->reroute($params['returnpath']==""?"/adminCP/stories/recommendations":$params['returnpath'], false);
-			exit;
-		}
-		
 		
 		if( isset ($params['id']) )
 		{

@@ -573,7 +573,7 @@ class UserCP extends Base
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_MyLibrary') );
 
-		$sub = [ "bookmark", "favourite", "recommendation", "series", "collections" ];
+		$sub = [ "bookmark", "favourite", "recommendations", "series", "collections" ];
 		if ( !in_array(@$params[0], $sub) ) $params[0] = "";
 		
 		$this->showMenu("library");
@@ -584,7 +584,7 @@ class UserCP extends Base
 			case "favourite":
 				$this->libraryBookFav($f3, $params);
 				break;
-			case "recommendation":
+			case "recommendations":
 				$this->libraryRecommendations($f3, $params);
 				break;
 			case "series":
@@ -812,9 +812,131 @@ class UserCP extends Base
 		);
 	}
 
-	private function libraryRecommendations(\Base $f3, $params)
+	/**
+	* Manage recommendations from the UCP
+	* 2020-09
+	*
+	* @param	\Base		$f3
+	* @param	array		$params
+	*/
+	private function libraryRecommendations(\Base $f3, array $params) : void
 	{
+		$this->response->addTitle( $f3->get('LN__AdminMenu_Recommendations') );
+		$f3->set('title_h3', $f3->get('LN__AdminMenu_Recommendations') );
+
+		if( isset($params['delete']) )
+		{
+			// default return point
+			$reroute = empty($params['returnpath']) ? "/userCP/library/recommendations" : $params['returnpath'];
+
+			if ( ""!=$f3->get('POST.confirm_delete') )
+			{
+				if ( 0 == $i = $this->model->recommendationDelete( $params['id'], $_SESSION['userID'] ) )
+				{
+					$_SESSION['lastAction']['delete_error'] = TRUE;
+				}
+				else
+				{
+					$_SESSION['lastAction']['delete_success'] = $i;
+				}
+			}
+			// but it seems we are not really sure ...
+			else
+			{
+				$reroute = "/userCP/library/recommendations/id={$params['id']}";
+				if ( isset($params['returnpath']) ) $reroute .= ";returnpath=".$params['returnpath'];
+				$_SESSION['lastAction']['delete_confirm'] = TRUE;
+			}
+			$f3->reroute($reroute,FALSE);
+			exit;
+		}
+
+		if (isset($_POST['form_data']))
+		{
+			if ( 0 < $i = $this->model->recommendationSave($params['id'], $f3->get('POST.form_data'), $_SESSION['userID'] ) )
+				$f3->set('save_success', $i);
+		}
+		elseif (isset($_POST['new_data']))
+		{
+			$params['id'] = $this->model->recommendationAdd($f3->get('POST.new_data') );
+		}
+
+		if( isset ($params['id']) )
+		{
+			if ( [] !== $data = $this->model->recommendationLoad($params['id'], $_SESSION['userID']) )
+			{
+				// despite 0 not being an official code, AO3 will reply this way when a story is no longer found.
+				if ( @$data['lookup']['http_code']===0 )
+				{
+					$f3->set('lookup_error', 0);
+				}
+				
+				// server has found something
+				elseif ( @$data['lookup']['http_code']==200 )
+					$f3->set('lookup_success', 1);
+				// server has found something but it's not the plain 'OK' code
+				elseif ( @$data['lookup']['http_code']>200 AND @$data['lookup']['http_code']<300 )
+					$f3->set('lookup_success', 0);
+	
+				// Server replies with a permanent moved status
+				elseif ( @$data['lookup']['http_code']==301 OR @$data['lookup']['http_code']==308 )
+				{
+					// if the only difference is a change from http to https, silently alter the value and inform the user.
+					if ( str_replace("http:", "https:", $data['url']) == @$data['lookup']['redirect_url'] OR 
+							"https://".$data['url'] == $data['lookup']['redirect_url'] )
+					{
+						$data['url'] = $data['lookup']['redirect_url'];
+						$f3->set('lookup_moved', 1);
+					}
+					else
+					{
+						$f3->set('lookup_moved', 0);
+					}
+				}
+				
+				elseif ( @$data['lookup']['http_code']>=400 )
+				{
+					$f3->set('lookup_error', 0);
+				}
+
+				$data['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
+				$this->buffer ( $this->template->recommendationEdit($data, $this->model->storyEditPrePop($data), @$params['returnpath']) );
+				return;
+			}
+			else
+			{
+				$reroute = isset($params['returnpath']) ? $params['returnpath'] : "/userCP/library/recommendations";
+				$f3->reroute($reroute,FALSE);
+				exit;
+			}
+		}
 		
+		// page will always be an integer > 0
+		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
+
+		// search/browse
+		$allow_order = array (
+				"id"		=>	"Rec.recid",
+				"title"		=>	"title",
+				"author"	=>	"maintainer",
+				"date"		=>	"date",
+				"rating"	=>	"R.inorder",
+		);
+
+		// sort order
+		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "id";
+		$sort["order"]		= $allow_order[$sort["link"]];
+		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
+		
+		$this->buffer
+		(
+			$this->template->recommendationList
+			(
+				$this->model->recommendationList($page, $sort, $_SESSION['userID']),
+				$sort
+			)
+		);
+
 	}
 	
 	public function messaging(\Base $f3, array $params) : void
