@@ -138,7 +138,7 @@ class Auth extends Base
 		$sql[] = "SET @guests  := (SELECT COUNT(DISTINCT S.session) 
 										FROM `tbl_sessions`S 
 											WHERE S.user = 0
-											AND NOT (S.session = '{$session_id}' AND S.ip = INET6_ATON('{$_SERVER['REMOTE_ADDR']}') )
+											AND NOT (S.session = '{$session_id}' AND INET6_NTOA(S.ip) = '{$_SERVER['REMOTE_ADDR']}')
 											AND TIMESTAMPDIFF(MINUTE,S.lastvisited,NOW())<15
 									);";
 /* 		
@@ -152,7 +152,7 @@ class Auth extends Base
 										FROM `tbl_sessions`S
 											WHERE S.user > 0
 											AND TIMESTAMPDIFF(MINUTE,S.lastvisited,NOW())<60
-											AND NOT (S.session = '{$session_id}' AND S.ip = INET6_ATON('{$_SERVER['REMOTE_ADDR']}') )
+											AND NOT (S.session = '{$session_id}' AND INET6_NTOA(S.ip) = '{$_SERVER['REMOTE_ADDR']}')
 											);";
 		$sql[] = "UPDATE `tbl_sessions`S SET lastvisited = CURRENT_TIMESTAMP WHERE S.session = '{$session_id}' AND S.ip = INET6_ATON('{$_SERVER['REMOTE_ADDR']}');";
 
@@ -163,7 +163,7 @@ class Auth extends Base
 							FROM `tbl_sessions`S 
 							INNER JOIN `tbl_users` U ON ( IF(S.user,S.user = U.uid,U.uid=0) )
 								LEFT JOIN `tbl_users`U2 ON ( (U.uid = U2.uid OR U.uid = U2.curator) AND (U.groups&4) )
-						WHERE S.session = '{$session_id}' AND S.ip = INET6_ATON('{$_SERVER['REMOTE_ADDR']}');";
+						WHERE S.session = '{$session_id}' AND INET6_NTOA(S.ip) = '{$_SERVER['REMOTE_ADDR']}';";
 						
 /*
 	To do: create a cache field, move message status, curator to that field to reduce DB usage
@@ -229,7 +229,7 @@ class Auth extends Base
 							FROM `tbl_sessions`S 
 							INNER JOIN `tbl_users` U ON ( IF(S.user,S.user = U.uid,U.uid=0) )
 								LEFT JOIN `tbl_users`U2 ON ( (U.uid = U2.uid OR U.uid = U2.curator) AND U.groups&5 )
-						WHERE S.session = '{$session_id}' AND S.ip = INET6_ATON('{$_SERVER['REMOTE_ADDR']}');";
+						WHERE S.session = '{$session_id}' AND INET6_NTOA(S.ip) = '{$_SERVER['REMOTE_ADDR']}';";
 
 		$user = $this->exec($sql)[0];
 	
