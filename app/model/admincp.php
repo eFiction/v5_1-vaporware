@@ -1152,14 +1152,16 @@ class AdminCP extends Controlpanel {
 		$limit = 50;
 		$pos = $page - 1;
 		// view: v_ACPlogData *todo*
-		$sql = "SELECT SQL_CALC_FOUND_ROWS U.uid, U.username, 
-					L.uid as uid_reg, L.id, L.action, L.ip, UNIX_TIMESTAMP(L.timestamp) as timestamp, L.type, L.subtype, L.version, L.new
-				FROM `tbl_log`L LEFT JOIN `tbl_users`U ON L.uid=U.uid ";
+		// $sql = "SELECT SQL_CALC_FOUND_ROWS U.uid, U.username, 
+					// L.uid as uid_reg, L.id, L.action, INET6_NTOA(L.ip) as ip, UNIX_TIMESTAMP(L.timestamp) as timestamp, L.type, L.subtype, L.version, L.new
+				// FROM `tbl_log`L LEFT JOIN `tbl_users`U ON L.uid=U.uid ";
+		$sql = "SELECT SQL_CALC_FOUND_ROWS *
+					FROM `view_ACPlogData`";
 
 		if ( $sub )
-			$sql .= "WHERE L.type = :sub ";
+			$sql .= " WHERE type = :sub ";
 
-		$sql .= "ORDER BY {$sort['order']} {$sort['direction']}
+		$sql .= " ORDER BY {$sort['order']} {$sort['direction']}
 				LIMIT ".(max(0,$pos*$limit)).",".$limit;
 
 		if ($sub)
@@ -1167,6 +1169,12 @@ class AdminCP extends Controlpanel {
 		else
 			$data = $this->exec($sql);
 		
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/adminCP/home/logs/".($sub?"type={$sub}/":"")."order={$sort['link']},{$sort['direction']}",
+			$limit
+		);
+
 		$geo = \Web\Geo::instance();
 
 		foreach ( $data as &$item )
@@ -1331,13 +1339,20 @@ class AdminCP extends Controlpanel {
 
 				if ( is_array($item['action']) )
 				{
-					$item['ip'] = long2ip($item['ip']);
-					$item['action']['origin'] =
-					[
-						$geo->location($item['ip'])['country_code'], 
-						$geo->location($item['ip'])['country_name'], 
-						$geo->location($item['ip'])['continent_code']
-					];
+					if ( FALSE !== $ctry = $geo->location($item['ip']) )
+					{
+						$item['action']['origin'] =
+						[
+							$ctry['country_code'],
+							$ctry['country_name'],
+							$ctry['continent_code']
+						];
+					}
+					elseif ( class_exists('Phar') )
+					{
+						$item['action']['origin'] = [];
+					}
+					else $item['action']['origin'] = [];
 					$this->logResaveData($item);
 				}
 			}
@@ -1353,12 +1368,6 @@ class AdminCP extends Controlpanel {
 			}
 		}
 				
-		$this->paginate(
-			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
-			"/adminCP/home/logs/type=".($sub?"{$sub}/":"")."order={$sort['link']},{$sort['direction']}",
-			$limit
-		);
-				
 		return $data;
 	}
 	
@@ -1370,13 +1379,6 @@ class AdminCP extends Controlpanel {
 					'action' 	=> json_encode($item['action']),
 					'version'	=> 1,
 					'subtype'	=> isset($item['subtype'])? $item['subtype'] : NULL,
-/*					'origin'	=> json_encode(
-									[
-										$geo->location($item['ip'])['country_code'], 
-										$geo->location($item['ip'])['country_name'], 
-										$geo->location($item['ip'])['continent_code']
-									]
-					)	*/
 				],
 				"id = {$item['id']}"
 		);

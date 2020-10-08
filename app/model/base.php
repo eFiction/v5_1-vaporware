@@ -17,7 +17,7 @@ class Base extends \Prefab {
 	
 	public function exec($cmds,$args=NULL,$ttl=0,$log=TRUE)
 	{
-		$result = $this->db->exec(str_replace("`tbl_", "`{$this->prefix}", $cmds), $args,$ttl,$log);
+		$result = $this->db->exec(str_replace(["`tbl_", "`view_"], ["`{$this->prefix}", "`v_{$this->prefix}"], $cmds), $args,$ttl,$log);
 		return $result;
 	}
 	
