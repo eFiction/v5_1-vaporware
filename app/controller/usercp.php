@@ -199,43 +199,64 @@ class UserCP extends Base
 		{
 			if (isset($_POST) and sizeof($_POST)>0 )
 			{
-				if ( isset($params['chapter']) )
+				// so we want to delete something
+				if( isset($params['delete']) )
 				{
-					$this->model->chapterSave($params['chapter'], $f3->get('POST.form'), 'U');
-					$reroute = "/userCP/author/uid={$params['uid']}/edit/sid={$params['sid']}/chapter={$params['chapter']};returnpath=".$params['returnpath'];
-					$f3->reroute($reroute, false);
-					exit;
-				}
-				else
-				{
-					if  ( "" != $f3->get('POST.delete') )
-					{
-						// look for the confirmation checkboxes
-						if ( $storyData['completed']>0 OR ("" != $f3->get('POST.deleteComfirm1') AND "" != $f3->get('POST.deleteComfirm2')) )
-						{
-							// attempt to delete
-							if ( FALSE !== $deleted = $this->model->authorStoryDelete($params['sid'], $params['uid']) )
-							{
-								// an array indicates the story was deleted, array contains the deleted elements
-								if ( is_array($deleted) )
-									$_SESSION['lastAction'] = [ "deleted" =>  "success", "results" =>  $deleted ];
-								else
-									$_SESSION['lastAction'] = [ "deleted" =>  "moved" ];
+					// let's assume this will work
+					$reroute['base']  = "/userCP/author/uid={$params['uid']}/edit";
+					$reroute['story'] = "/sid={$params['sid']}";
+					if ( isset($params['chapter']) ) $reroute['chapter'] = "/chapter=".$params['chapter'];
+					$reroute['editor'] = "/editor=".$params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
+					if ( isset($params['returnpath']) ) $reroute['returnpath'] = ";returnpath=".$params['returnpath'];
 
-								$f3->reroute($params['returnpath'], false);
-								exit;
+					if ( ""!=$f3->get('POST.confirm_delete') )
+					{
+						// delete a chapter
+						if ( isset($params['chapter']) )
+						{
+							// when deleting a chapter, always return to chapter overview
+							if ( 0 == $i = $this->model->chapterDelete( $params['sid'], $params['chapter'], $_SESSION['userID'] ) )
+								$_SESSION['lastAction']['delete_error'] = TRUE;
+							else
+							{
+								$_SESSION['lastAction']['delete_success'] = TRUE;
+								unset($reroute['chapter']);
 							}
-							// model failed to delete the story, let the user know
-							else $_SESSION['lastAction'] = [ "deleted" => "failed" ];
 						}
-						// delete confirmations not checked
-						else $_SESSION['lastAction'] = [ "deleted" => "confirm" ];
+						// delete the whole story
+						else
+						{
+							if ( 0 == $i = $this->model->storyDelete( $params['sid'], $_SESSION['userID'] ) )
+								$_SESSION['lastAction']['delete_error'] = TRUE;
+							// since the story is now gone, we must fall back to the story listing
+							else
+							{
+								$_SESSION['lastAction']['delete_success'] = TRUE;
+								if (isset($params['returnpath']))
+									$reroute = [$params['returnpath']];
+								else
+									$reroute = $reroute['base'];
+							}
+						}
 					}
 					else
 					{
-						$this->model->authorStoryHeaderSave($params['sid'], $f3->get('POST.form'));
-						$reroute = "/userCP/author/uid={$params['uid']}/edit/sid={$params['sid']};returnpath=".$params['returnpath'];
-						$f3->reroute($reroute, false);
+						$_SESSION['lastAction']['delete_confirm'] = TRUE;
+					}
+					$f3->reroute(implode("",$reroute),FALSE);
+				}
+				else
+				{
+					if ( isset($params['chapter']) )
+					{
+						if ( 0 < $i = $this->model->chapterSave($params['chapter'], $f3->get('POST.form'), 'U') )
+							$f3->set('save_success', $i);
+					}
+					else
+					{
+						if ( 0 < $i = $this->model->storySaveChanges($params['sid'], $f3->get('POST.form'), $_SESSION['userID']) )
+							$_SESSION['lastAction']['save_success'] = $i;
+						$f3->reroute("/userCP/author/uid={$params['uid']}/edit/sid={$params['sid']};returnpath=".$params['returnpath'], false);
 						exit;
 					}
 				}
@@ -278,7 +299,7 @@ class UserCP extends Base
 		}
 		elseif ( isset($params['sid']) )
 			$_SESSION['lastAction']['load_error'] = TRUE;
-		$return = isset($params['returnpath']) ? $params['returnpath'] : "userCP/author/uid={$params['uid']}";
+		$return = !empty($params['returnpath']) ? $params['returnpath'] : "userCP/author/uid={$params['uid']}";
 		$f3->reroute($return, false);
 	}
 	

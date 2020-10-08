@@ -1151,10 +1151,7 @@ class AdminCP extends Controlpanel {
 	{
 		$limit = 50;
 		$pos = $page - 1;
-		// view: v_ACPlogData *todo*
-		// $sql = "SELECT SQL_CALC_FOUND_ROWS U.uid, U.username, 
-					// L.uid as uid_reg, L.id, L.action, INET6_NTOA(L.ip) as ip, UNIX_TIMESTAMP(L.timestamp) as timestamp, L.type, L.subtype, L.version, L.new
-				// FROM `tbl_log`L LEFT JOIN `tbl_users`U ON L.uid=U.uid ";
+
 		$sql = "SELECT SQL_CALC_FOUND_ROWS *
 					FROM `view_ACPlogData`";
 
@@ -1619,54 +1616,6 @@ class AdminCP extends Controlpanel {
 		$authors = $this->exec($sqlAuthors,  [ ':uid' => $formData['new_author'] ] );
 		
 		return [ "storyInfo" => $similarExists[0], "preAuthor" => json_encode($authors) ];
-	}
-
-	public function storySaveChanges(\DB\SQL\Mapper $current, array $post)
-	{
-		// remember old validation status
-		$oldValidated = $current->validated;
-		
-		// Step one: save the plain data
-		$current->title			= $post['story_title'];
-		$current->summary		= str_replace("\n","<br />",$post['story_summary']);
-		$current->storynotes	= str_replace("\n","<br />",$post['story_notes']);
-		$current->ratingid		= @$post['ratingid'];	// Quick fix for when no rating is created
-		$current->completed		= $post['completed'];
-		$current->validated 	= $post['validated'].$post['valreason'];
-		
-		if ( $current->changed("validated") )
-		{
-			if ( $post['validated'] == 3 AND substr($oldValidated,0,1)!=3 )
-			// story got validated
-			\Logging::addEntry('VS', $current->sid);
-		}
-		
-		$i = $current->changed();
-
-		$current->save();
-
-		// Step two: check for changes in relation tables
-
-		// Check tags:
-		$i += $this->relationStoryTag( $current->sid, $post['tags'] );
-		// Check Characters:
-		$i += $this->relationStoryCharacter( $current->sid, $post['characters'] );
-		// Check Categories:
-		$i += $this->relationStoryCategories( $current->sid, $post['category'] );
-		// Check Authors:
-		$i += $this->relationStoryAuthor( $current->sid, $post['mainauthor'], $post['supauthor'] );
-
-		$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories');
-		$inSeries = $collection->find(array('sid=?',$current->sid));
-		foreach ( $inSeries as $in )
-		{
-			// Rebuild collection/series cache based on new data
-			$this->cacheCollections($in->seriesid);
-		}
-
-		// Rebuild story cache based on new data
-		if ( $i ) $this->rebuildStoryCache($current->sid);
-		return $i;
 	}
 
 	public function storyListPending( int $page, array $sort ) : array

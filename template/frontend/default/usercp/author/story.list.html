@@ -96,7 +96,7 @@
 		<td>{{ @row.title }}</td>
 		<td>{{ date( \Config::getPublic('datetime_format'), @row.updated ) }}</td>
 		<td>{{ ${"LN__UCP_statusValidated_".@row.story_validated.0} }}</td>
-		<td>{{ ${"LN__UCP_statusValidated_".@row.chapter_validated.0} }}</td>
+		<td><check if="{{ @@row.chapter_validated!=NULL }}">{{ ${"LN__UCP_statusValidated_".@row.chapter_validated.0} }}</check></td>
 	</tr>
 	</repeat>
 </tbody>

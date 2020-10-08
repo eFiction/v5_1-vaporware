@@ -416,6 +416,91 @@ class Controlpanel extends Base {
 	}
 
 	/**
+	* Edit the story meta data
+	* 2020-10
+	*
+	* @param	int		$sid	Story ID
+	* @param	array	$post	New story data
+	* @param	int		$uid	User ID, optional, only sent from the UCP
+	*
+	* @return	int		Changes made
+	*/	
+	public function storySaveChanges( int $storyID, array $post, int $userID = 0 ) : int
+	{
+		// drop out with an error if the story exists, but the user has no access
+		if ( $userID > 0 AND 0 == ( new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors') )->count(["sid = ? AND aid = ? AND type = 'M'",$storyID,$userID]) )
+			return -1;
+
+		$story=new \DB\SQL\Mapper($this->db, $this->prefix.'stories');
+		$story->load(array('sid=?',$storyID));
+
+		// remember old validation status
+		$oldValidated = $story->validated;
+		
+		// Step one: save the plain data
+		$story->title			= $post['story_title'];
+		$story->summary			= str_replace("\n","<br />",$post['story_summary']);
+		$story->storynotes		= str_replace("\n","<br />",$post['story_notes']);
+		$story->ratingid		= @$post['ratingid'];	// Quick fix for when no rating is created
+		$story->completed		= $post['completed'];
+
+		if ( $userID == 0 )
+		{
+			$story->validated 	= $post['validated'].$post['valreason'];
+		
+			if ( $story->changed("validated") )
+			{
+				if ( $post['validated'] == 3 AND substr($oldValidated,0,1)!=3 )
+				// story got validated
+				\Logging::addEntry('VS', $story->sid);
+			}
+		}
+		else
+		{
+			// Toggle validation request, keeping the reason part untouched
+			if ( isset($post['request_validation']) AND $story->validated < 20 )
+				$story->validated 	= 	$story->validated + 10;
+			elseif ( empty($post['request_validation']) AND $story->validated >= 20 AND $story->validated < 30 )
+				$story->validated 	= 	$story->validated - 10;
+
+			// Allow trusted authors to set validation
+			if ( isset($post['mark_validated']) AND $_SESSION['groups']&8 AND $story->validated < 20 )
+			{
+				$story->validated 	= 	$story->validated + 20;
+				// Log validation
+				\Logging::addEntry('VS', $storyID);
+			}
+		}
+		
+		$i = $story->changed();
+
+		$story->save();
+
+		// Step two: check for changes in relation tables
+
+		// Check tags:
+		$i += $this->relationStoryTag( $story->sid, $post['tags'] );
+		// Check Characters:
+		$i += $this->relationStoryCharacter( $story->sid, $post['characters'] );
+		// Check Categories:
+		$i += $this->relationStoryCategories( $story->sid, $post['category'] );
+		// Check Authors:
+		$i += $this->relationStoryAuthor( $story->sid, $post['mainauthor'], $post['supauthor'] );
+
+		$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories');
+		$inSeries = $collection->find(array('sid=?',$story->sid));
+		foreach ( $inSeries as $in )
+		{
+			// Rebuild collection/series cache based on new data
+			$this->cacheCollections($in->collid);
+		}
+
+		// Rebuild story cache based on new data
+		if ( $i ) $this->rebuildStoryCache($story->sid);
+		return $i;
+	}
+
+	/**
 	* Delete the entire story
 	* This will also delete all associated reviews, tracker entries, and relations
 	* rewrite 2020-09
@@ -425,7 +510,7 @@ class Controlpanel extends Base {
 	*
 	* @return	array			Result or empty
 	*/	
-	public function storyDelete( int $storyID, int $userID = 1 ) : int
+	public function storyDelete( int $storyID, int $userID = 0 ) : int
 	{
 		// drop out with an error if the story exists, but the user has no access
 		if ( $userID > 0 AND 0 == ( new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors') )->count(["sid = ? AND aid = ? AND type = 'M'",$storyID,$userID]) )

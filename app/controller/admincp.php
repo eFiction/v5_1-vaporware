@@ -1694,8 +1694,6 @@ class AdminCP extends Base
 				}
 				else
 				{
-					$current = $this->model->loadStoryMapper($params['story']);
-					
 					if ( isset($params['chapter']) )
 					{
 						if ( 0 < $i = $this->model->chapterSave($params['chapter'], $f3->get('POST.form'), 'A') )
@@ -1703,9 +1701,10 @@ class AdminCP extends Base
 					}
 					else
 					{
-						if ( 0 < $i = $this->model->storySaveChanges($current, $f3->get('POST.form')) )
+						
+						if ( 0 < $i = $this->model->storySaveChanges($params['story'], $f3->get('POST.form')) )
 							$_SESSION['lastAction']['save_success'] = $i;
-						$f3->reroute('/adminCP/stories/edit/story='.$storyInfo['sid'], false);
+						$f3->reroute("/adminCP/stories/edit/story={$storyInfo['sid']};returnpath=".$params['returnpath'], false);
 						exit;
 					}
 				}

@@ -13,6 +13,7 @@ class Base extends \Prefab {
 		$this->db = $this->f3->get('DB');
 		$this->config = $this->f3->get('CONFIG');
 		$this->prefix = ( $this->config == NULL ) ? \Config::getPublic('prefix') : $this->config['prefix'];
+		$this->vprefix = "v_".$this->prefix;
 	}
 	
 	public function exec($cmds,$args=NULL,$ttl=0,$log=TRUE)

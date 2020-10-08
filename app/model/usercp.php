@@ -260,9 +260,9 @@ class UserCP extends Controlpanel
 				// count times this user was set as favourite author
 				"fav_a" => (new \DB\SQL\Mapper($this->db, $this->prefix."user_favourites"))->count(['item=? AND type=?',$_SESSION['userID'],'AU']),
 				// count times this user's stories were set as favourite
-				"fav_s" => (new \DB\SQL\Mapper($this->db, "v_statsUserStoryFavBM"))->count(['aid=? AND type=? and bookmark=0',$_SESSION['userID'],'M']),
+				"fav_s" => (new \DB\SQL\Mapper($this->db, $this->vprefix."statsUserStoryFavBM"))->count(['aid=? AND type=? and bookmark=0',$_SESSION['userID'],'M']),
 				// count reviews this user has received for stories
-				"revre" => (new \DB\SQL\Mapper($this->db, "v_statsUserStoryReviews"))->count(['aid=? AND type=?',$_SESSION['userID'],'M']),
+				"revre" => (new \DB\SQL\Mapper($this->db, $this->vprefix."statsUserStoryReviews"))->count(['aid=? AND type=?',$_SESSION['userID'],'M']),
 			
 			];
 			\Cache::instance()->set("userStats_.{$_SESSION['userID']}", $stats, 10);
@@ -359,60 +359,6 @@ class UserCP extends Controlpanel
 		);
 		
 		return $data;
-	}
-	
-	public function authorStoryHeaderSave( int $storyID, array $post )
-	{
-		$story=new \DB\SQL\Mapper($this->db, $this->prefix.'stories');
-		$story->load(array('sid=?',$storyID));
-		
-		// Step one: save the plain data
-		$story->title		= $post['story_title'];
-		$story->summary		= str_replace("\n","<br />",$post['story_summary']);
-		$story->storynotes	= str_replace("\n","<br />",$post['story_notes']);
-		$story->ratingid	= @$post['ratingid'];	// Quick fix for when no rating is created
-		$story->completed	= $post['completed'];
-		
-		// Toggle validation request, keeping the reason part untouched
-		if ( isset($post['request_validation']) AND $story->validated < 20 )
-			$story->validated 	= 	$story->validated + 10;
-		elseif ( empty($post['request_validation']) AND $story->validated >= 20 AND $story->validated < 30 )
-			$story->validated 	= 	$story->validated - 10;
-
-		// Allow trusted authors to set validation
-		if ( isset($post['mark_validated']) AND $_SESSION['groups']&8 AND $story->validated < 20 )
-		{
-			$story->validated 	= 	$story->validated + 20;
-			// Log validation
-			\Logging::addEntry('VS', $storyID);
-		}
-		
-		$i = $story->changed();
-
-		$story->save();
-		
-		// Step two: check for changes in relation tables
-
-		// Check tags:
-		$i += $this->relationStoryTag( $story->sid, $post['tags'] );
-		// Check Characters:
-		$i += $this->relationStoryCharacter( $story->sid, $post['characters'] );
-		// Check Categories:
-		$i += $this->relationStoryCategories( $story->sid, $post['category'] );
-		// Check Authors:
-		$i += $this->relationStoryAuthor( $story->sid, $post['mainauthor'], $post['supauthor'] );
-		
-		$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories');
-		$inSeries = $collection->find(array('sid=?',$storyID));
-		foreach ( $inSeries as $in )
-		{
-			// Rebuild collection/series cache based on new data
-			$this->cacheCollections($in->seriesid);
-		}
-
-		// Rebuild story cache based on new data
-		if ( $i ) $this->rebuildStoryCache($story->sid);
-		return $i;
 	}
 
 	public function authorCuratorRemove($uid=NULL)
