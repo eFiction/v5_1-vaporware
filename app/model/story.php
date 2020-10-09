@@ -335,25 +335,30 @@ class Story extends Base
 			) as votable,
 		*/
 
-		$sql = "SELECT SQL_CALC_FOUND_ROWS
-					C.conid, C.title, C.summary,
-                    IF(C.active='date',IF(C.date_open<NOW(),IF(C.date_close>NOW() OR C.date_close IS NULL,'active','closed'),'preparing'),C.active) as active,
-                    IF(C.votable='date',IF(C.date_close<NOW() OR C.date_close IS NULL,IF(C.vote_close>NOW() OR C.vote_close IS NULL,'active','closed'),'preparing'),C.votable) as votable,
-					UNIX_TIMESTAMP(C.date_open) as date_open, UNIX_TIMESTAMP(C.date_close) as date_close, UNIX_TIMESTAMP(C.vote_close) as vote_close, 
-					C.cache_tags, C.cache_characters, C.cache_categories, C.cache_stories,
-					U.username, COUNT(R.lid) as count
-				FROM `tbl_contests`C
-					LEFT JOIN `tbl_users`U ON ( C.uid = U.uid )
-					LEFT JOIN `tbl_contest_relations`R ON ( C.conid = R.conid AND R.type='ST' )
-				@WHERE@
-				GROUP BY C.conid
-				ORDER BY active ASC, votable ASC, C.conid DESC
-				LIMIT ".(max(0,$pos*$limit)).",".$limit;
+		// $sql = "SELECT SQL_CALC_FOUND_ROWS
+					// C.conid, C.title, C.summary, C.description,
+                    // IF(C.active='date',IF(C.date_open<NOW(),IF(C.date_close>NOW() OR C.date_close IS NULL,'active','closed'),'preparing'),C.active) as active,
+                    // IF(C.votable='date',IF(C.date_close<NOW() OR C.date_close IS NULL,IF(C.vote_close>NOW() OR C.vote_close IS NULL,'active','closed'),'preparing'),C.votable) as votable,
+					// UNIX_TIMESTAMP(C.date_open) as date_open, UNIX_TIMESTAMP(C.date_close) as date_close, UNIX_TIMESTAMP(C.vote_close) as vote_close, 
+					// C.cache_tags, C.cache_characters, C.cache_categories, C.cache_stories,
+					// U.username, COUNT(R.lid) as count
+				// FROM `tbl_contests`C
+					// LEFT JOIN `tbl_users`U ON ( C.uid = U.uid )
+					// LEFT JOIN `tbl_contest_relations`R ON ( C.conid = R.conid AND R.type='ST' )
+				// @WHERE@
+				// GROUP BY C.conid
+				// ORDER BY active ASC, votable ASC, C.conid DESC
+				// LIMIT ".(max(0,$pos*$limit)).",".$limit;
+		$sql = "SELECT SQL_CALC_FOUND_ROWS *
+					FROM `view_contestsList`
+					@WHERE@
+					ORDER BY active ASC, votable ASC, conid DESC
+					LIMIT ".(max(0,$pos*$limit)).",".$limit;
 		if ( 1 ) $sql = str_replace("@WHERE@", 
 									(
 										($_SESSION['groups']&64)?
 										"":
-										"WHERE concealed = 0 AND ((C.active='date' AND C.date_open<=NOW()) OR C.active>2)"
+										"WHERE concealed = 0 AND ((active='date' AND date_open<=NOW()) OR active>2)"
 									),
 									$sql);
 
@@ -385,13 +390,13 @@ class Story extends Base
 						LEFT JOIN `tbl_users`U ON ( C.uid=U.uid )
 						LEFT JOIN `tbl_contest_relations`rC ON ( C.conid = rC.conid and rC.type = 'ST' )
 					WHERE @WHERE@ C.conid = :conid";
-		if ( 1 ) $sql = str_replace("@WHERE@", 
-									(
-										($_SESSION['groups']&64)?
-										"":
-										"concealed = 0 AND ((C.active='date' AND C.date_open<=NOW()) OR C.active>2) AND"
-									),
-									$sql);
+		$sql = str_replace("@WHERE@", 
+							(
+								($_SESSION['groups']&64)?
+								"":
+								"concealed = 0 AND ((C.active='date' AND C.date_open<=NOW()) OR C.active>2) AND"
+							),
+							$sql);
 
 		$data = $this->exec($sql, [":conid" => $conid ]);
 

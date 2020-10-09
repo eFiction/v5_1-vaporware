@@ -19,7 +19,8 @@
 			
 		</div>
 		<check if="{{!empty(@contest.summary)}}">
-			<div class="contest-list-summary">{{@contest.summary |raw}}</div>
+			<true><div class="contest-list-summary">{{@contest.summary |raw}}</div></true>
+			<false><div class="column is-full"><b>{{@LN__Description}}:</b> {{nl2br(@contest.description),200 | cropmore,raw }}</div></false>
 		</check>
 		<check if="{{!empty(@contest.cache_categories)}}">
 			<div class="tags">{ICON:folder}
