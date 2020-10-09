@@ -165,7 +165,7 @@ class Auth extends Base
 			
 			$this->f3->set('usercount', 
 					[
-						"member"	=>	$user['@members'],
+						"member"	=>	$user['@members']+1,
 						"guest"		=>	$user['@guests']
 					]
 			);
@@ -196,7 +196,7 @@ class Auth extends Base
 			$this->f3->set('usercount', 
 					[
 						"member"	=>	$user['@members'],
-						"guest"		=>	$user['@guests']
+						"guest"		=>	$user['@guests']+1
 					]
 			);
 			if ( $user['session'] == '' )	$this->createSession();

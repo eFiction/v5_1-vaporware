@@ -150,3 +150,109 @@ class Frontend extends Template
 		return $links[array_rand($links)];
 	}
 }
+
+// create and register custom output filters
+class TemplateFilter extends \Prefab
+{
+	/**
+	* crop a given text down to the amount of characters / paragraphs provided
+	* Example: {{nl2br(@data.description),500,3 | crop,raw }}
+	* 2020-09
+	*
+	* @param	string	$text			
+	* @param	int		$characters		
+	* @param	int		$paragraphs		Optional
+	*
+	* @return	string					Cropped text
+	*/
+	public function crop( string $text, int $characters=150, int $paragraphs=NULL, bool $readmore=FALSE) : string
+	{
+		// define the regular expression for preg_split
+		$regular = $paragraphs===NULL ? '/((?:\s*\.\s*)+)/' : '/((?:\R|<\s*br\s*\/?>\s*|&lt;\s*br\s*\/?&gt;\s*)+)/';
+		$original = $text;
+
+		// crop by letter count, but make an attempt to let the sentence be completed
+		// if paragraph = 0 is provided, also complete the paragraph
+		if ( $characters > 0 AND (int)$paragraphs<1 )
+		{
+			$count = sizeof
+			(
+				preg_split
+				(
+					// split by sentence (-ish)
+					$regular,
+					substr ( strip_tags($text), 0, $characters ),
+				)
+			);
+			$text = implode
+			(
+				// additional glue
+				"",
+				// paragraph array cut in length
+				array_slice
+				(
+					preg_split
+					(
+						// split by sentence (-ish)
+						$regular,
+						$text,
+						-1,
+						// discard empty lines and keep note of the delimiters
+						PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE
+					),
+					// start slicing with element #0
+					0, 
+					// take $characters slices and include their original delimiters
+					$count*2-(int)($paragraphs!==NULL)
+				)
+			);
+		}
+		
+		// limit the amount of paragraphs returned.
+		// will respect character limitations made above
+		if ( (int)$paragraphs>0 )
+		{
+			// crop by paragraph
+			$text = implode
+			(
+				// additional glue
+				"",
+				// paragraph array cut in length
+				array_slice
+				(
+					preg_split
+					(
+						// split by <br> tags and all newline codes
+						$regular,
+						$text,
+						-1,
+						// discard empty lines and keep note of the delimiters
+						PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE
+					),
+					// start slicing with element #0
+					0, 
+					// take $paragraphs slices and include their original delimiters
+					$paragraphs*2-1
+				)
+			);
+		}
+
+		if ( $readmore )
+		{
+			$remains = substr( $original, strlen($text) );
+			$text .= \Template::instance()->render('main/moretext.html', 'text/html', [ "remains" => $remains ] );
+		}
+
+		return $text;
+	}
+	
+	public function cropmore( string $text, int $characters=150, int $paragraphs=NULL)
+	{
+		$text = $this->crop( $text, $characters, $paragraphs, TRUE);
+		return $text;
+	}
+
+}
+
+\Template::instance()->filter('crop','\View\TemplateFilter::instance()->crop');
+\Template::instance()->filter('cropmore','\View\TemplateFilter::instance()->cropmore');

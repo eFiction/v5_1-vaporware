@@ -1,0 +1,22 @@
+{*
+<span class="toggle">
+	<span class="toggle_more" style=""><i class="fas fa-caret-square-down"></i> Show details</span>
+	<span class="toggle_less" style="display: none;"><i class="fas fa-caret-square-up"></i> Hide details</span>
+</span>
+<div class="toggle_container" style="display: none;">{{@remains}}</div>
+*}
+<span id='more' style='display: none;'>{{@remains}}</span><button onclick='myFunction()' id='myBtn'>Read more</button>
+<script>
+	function myFunction() {
+		var moreText = document.getElementById("more");
+		var btnText = document.getElementById("myBtn");
+
+		if (moreText.style.display === "inline") {
+			btnText.innerHTML = "Read more"; 
+			moreText.style.display = "none";
+		} else {
+			btnText.innerHTML = "Read less"; 
+			moreText.style.display = "inline";
+		}
+	}
+</script>
