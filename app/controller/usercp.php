@@ -307,7 +307,7 @@ class UserCP extends Base
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Reviews') );
 
-		$sub = [ "reviews", "comments", "shoutbox" ];
+		$sub = [ "reviews", "comments" ];
 		if ( !in_array(@$params[0], $sub) ) $params[0] = "";
 
 		// delete function get's accompanied by a pseudo-post, this doesn't count here. Sorry dude
@@ -323,7 +323,9 @@ class UserCP extends Base
 			{
 				if ( FALSE === $result = $this->model->saveFeedback($post, $params) )
 				{
-					$_SESSION['lastAction'] = [ "modified" => "unknown" ];
+					$_SESSION['lastAction'] = [ "modified" => $result ];
+					$f3->reroute($params['returnpath'], false);
+					exit;
 				}
 				else
 				{
@@ -373,8 +375,6 @@ class UserCP extends Base
 
 		if(array_key_exists("edit",$params))
 			return $this->feedbackReviewsEdit($f3, $params);
-		if(array_key_exists("save",$params))
-			$this->feedbackReviewsSave($f3, $params);
 		elseif(array_key_exists("delete",$params))
 		{
 			$this->feedbackReviewsDelete($f3, $params);
@@ -399,11 +399,12 @@ class UserCP extends Base
 			$sort["order"]		= $allow_order[$sort["link"]];
 			$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
 
-			$data = $this->model->listReviews($page, $sort, $params);
+			if ( [] !== $data = $this->model->listReviews($page, $sort, $params) )
+			{
+				$extra = [ "sub" => [ $params[0], $params[1] ], "type" => $params[2] ];
 
-			$extra = [ "sub" => [ $params[0], $params[1] ], "type" => $params[2] ];
-
-			return $this->template->feedbackListReviews($data, $sort, $extra);
+				return $this->template->feedbackListReviews($data, $sort, $extra);
+			}
 		}
 		// nothing yet ...
 		return "";
@@ -411,24 +412,13 @@ class UserCP extends Base
 
 	protected function feedbackReviewsEdit(\Base $f3, array $params) : string
 	{
-		if ( FALSE === $data = $this->model->loadReview($params) )
+		if ( [] === $data = $this->model->loadReview($params) )
 		{
 			// test
 			$f3->reroute("/userCP/feedback/reviews", false);
 			exit;
 		}
 		return $this->template->libraryFeedbackEdit($data, $params);
-	}
-
-	protected function feedbackReviewsSave(\Base $f3, array $params)//: void
-	{
-		if ( FALSE === $data = $this->model->loadReview($params) )
-		{
-			// test
-			$f3->reroute("/userCP/feedback/reviews", false);
-			exit;
-		}
-		$this->buffer ( $this->template->libraryFeedbackEdit($data, $params) );
 	}
 
 	protected function feedbackReviewsDelete(\Base $f3, array $params): bool
@@ -464,7 +454,7 @@ class UserCP extends Base
 		return TRUE;
 	}
 
-	protected function feedbackHome(\Base $f3, array $params)//: void
+	protected function feedbackHome(\Base $f3, array $params) : string
 	{
 		$stats = $this->model->feedbackHomeStats($this->counter);
 		return $this->template->feedbackHome($stats);
@@ -686,17 +676,18 @@ class UserCP extends Base
 			$sort["order"]		= $allow_order[$sort["link"]];
 			$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="desc") ?	"desc" : "asc";
 
-			$data = $this->model->listBookFav($page, $sort, $params);
+			if ( [] !== $data = $this->model->listBookFav($page, $sort, $params) )
+			{
+				$extra = [ "sub" => $params[0], "type" => $params[1] ];
 
-			$extra = [ "sub" => $params[0], "type" => $params[1] ];
-
-			$this->buffer ( $this->template->libraryBookFavList($data, $sort, $extra) );
+				$this->buffer ( $this->template->libraryBookFavList($data, $sort, $extra) );
+			}
 		}
 	}
 
 	private function libraryBookFavEdit(\Base $f3, array $params) : void
 	{
-		if ( FALSE !== $data = $this->model->loadBookFav($params) )
+		if ( [] !== $data = $this->model->loadBookFav($params) )
 		{
 			$this->buffer ( $this->template->libraryBookFavEdit($data, $params) );
 		}

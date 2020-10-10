@@ -865,7 +865,7 @@ class UserCP extends Controlpanel
 		return "unknown";
 	}
 
-	public function libraryBookFavDelete($params)
+	public function libraryBookFavDelete( array $params ) : bool
 	{
 		if ( empty($params['id'][0]) OR empty($params['id'][1]) ) return FALSE;
 		if ( in_array($params["id"][0],["AU","RC","CO","SE","ST"]) )
@@ -882,7 +882,7 @@ class UserCP extends Controlpanel
 		}
 	}
 
-	public function listBookFav($page, $sort, $params)
+	public function listBookFav(int $page, array $sort, array $params) : array
 	{
 		$limit = 10;
 		$pos = $page - 1;
@@ -893,7 +893,7 @@ class UserCP extends Controlpanel
 					"ORDER BY {$sort['order']} {$sort['direction']}
 					LIMIT ".(max(0,$pos*$limit)).",".$limit;
 		}
-		else return FALSE;
+		else return [];
 
 		$data = $this->exec($sql,[":bookmark" => (($params[0]=="bookmark")?1:0) ] );
 
@@ -905,7 +905,7 @@ class UserCP extends Controlpanel
 		return $data;
 	}
 
-	public function loadBookFav($params)
+	public function loadBookFav(array $params) : array
 	{
 		// ?
 		if ( empty($params['id'][0]) OR empty($params['id'][1]) ) return FALSE;
@@ -930,7 +930,7 @@ class UserCP extends Controlpanel
 			$sql = $this->sqlMaker("bookfav", "ST", FALSE) .
 				"WHERE S.sid = :id ";
 		}
-		else return FALSE;
+		else return [];
 
 		$data = $this->exec($sql,[":bookmark" => (($params[0]=="bookmark")?1:0), ":id"=>$params['id'][1]]);
 
@@ -941,10 +941,10 @@ class UserCP extends Controlpanel
 
 			return $data[0];
 		}
-		return FALSE;
+		return [];
 	}
 
-	public function listReviews($page, $sort, $params)
+	public function listReviews(int $page, array $sort, array $params) : array
 	{
 		$limit = 10;
 		$pos = $page - 1;
@@ -956,7 +956,7 @@ class UserCP extends Controlpanel
 					"ORDER BY {$sort['order']} {$sort['direction']}
 					LIMIT ".(max(0,$pos*$limit)).",".$limit;
 		}
-		else return FALSE;
+		else return [];
 
 		$data = $this->exec($sql);
 
@@ -968,7 +968,7 @@ class UserCP extends Controlpanel
 		return $data;
 	}
 
-	public function loadReview($params)
+	public function loadReview(array $params) : array
 	{
 		// ?
 		if ( empty($params['id'][0]) OR empty($params['id'][1]) ) return FALSE;
@@ -991,16 +991,16 @@ class UserCP extends Controlpanel
 					" AND F.fid = :id ";
 			}
 		}
-		else return FALSE;
+		else return [];
 
 		$data = $this->exec($sql,[ ":id"=>$params['id'][1] ]);
 
 		if ( sizeof($data)==1 AND $data[0]['type']!="" )
 			return $data[0];
-		return FALSE;
+		return [];
 	}
 
-	protected function sqlMaker($module, $type, $inner = TRUE)
+	protected function sqlMaker(string $module, string $type, bool $inner = TRUE) : string
 	{
 		$join = $inner ? "INNER" : "LEFT";
 
@@ -1117,7 +1117,7 @@ class UserCP extends Controlpanel
 		];
 		if ( isset($sql[$module][$type]) )
 			return $sql[$module][$type];
-		else return NULL;
+		return "";
 	}
 
 	public function saveBookFav($post, $params)
