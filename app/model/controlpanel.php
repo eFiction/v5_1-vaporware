@@ -132,7 +132,7 @@ class Controlpanel extends Base {
 	* Save chapter info/description
 	* rewrite 2020-09
 	*
-	* @param	int		$chapterID	Chapter ID ID
+	* @param	int		$chapterID	Chapter ID
 	* @param	array	$post		Data sent from the form
 	* @param	string	$power		Are we an 'A'dmin or a 'U'ser
 	*
@@ -145,7 +145,7 @@ class Controlpanel extends Base {
 
 		$chapter=new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
 		$chapter->load(array('chapid=?',$chapterID));
-		
+
 		$chapter->title 	= $post['chapter_title'];
 		$chapter->notes 	= $post['chapter_notes'];
 		$chapter->endnotes 	= $post['chapter_endnotes'];
@@ -183,16 +183,16 @@ class Controlpanel extends Base {
 			}
 			elseif ( empty($post['request_validation']) AND $chapter->validated >= 20 AND $chapter->validated < 30 )
 				$chapter->validated 	= 	$chapter->validated - 10;
-				
+
 			// Allow trusted authors to set validation
 			if ( isset($post['mark_validated']) AND $_SESSION['groups']&8 AND $chapter->validated < 20 AND $chapter->wordcount > 0 )
 			{
 				$chapter->validated 	= 	$chapter->validated + 20;
 				$chapter->created		=	date('Y-m-d H:i:s');
-				
+
 				// Update the story entry, set updated field to now
-				$this->exec("UPDATE `tbl_stories`S 
-								INNER JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid AND Ch.chapid = :chapid ) 
+				$this->exec("UPDATE `tbl_stories`S
+								INNER JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid AND Ch.chapid = :chapid )
 							SET S.updated = :updated;",
 							[
 								":chapid" => $chapterID,
@@ -204,9 +204,9 @@ class Controlpanel extends Base {
 		}
 
 		// Decide if we need to run a recount
-		if ( 
+		if (
 			// validation status changed
-			$chapter->changed("validated") 
+			$chapter->changed("validated")
 			// chapter text changed
 			OR $this->chapterContentSave($chapterID, $chaptertext, $chapter)
 			)
@@ -223,7 +223,7 @@ class Controlpanel extends Base {
 		{
 			// recount this story
 			$this->recountStory($chapter->sid);
-			
+
 			// recount all collections that feature this story
 			$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories');
 			$inSeries = $collection->find(array('sid=?',$chapter->sid));
@@ -248,7 +248,7 @@ class Controlpanel extends Base {
 	*
 	* @return	int								Was anything changed?
 	*/
-	public function chapterContentSave( int $chapterID, string $chapterText, \DB\SQL\Mapper $mapper ) : int 
+	public function chapterContentSave( int $chapterID, string $chapterText, \DB\SQL\Mapper $mapper ) : int
 	{
 		if ( $this->config['chapter_data_location'] == "local" )
 		{
@@ -278,26 +278,26 @@ class Controlpanel extends Base {
 	public function chapterDelete( int $storyID, int $chapterID, int $userID = 0 ) : int
 	{
 		if ( $userID == 0 OR 1==(new \DB\SQL\Mapper($this->db, $this->prefix.'stories_authors'))->count( ["sid = ? AND aid = ? and type='M'", $storyID, $userID] ) )
-		{	
+		{
 			$chapter=new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');
 			$bind = ['sid=? AND chapid=?', $storyID, $chapterID];
-			
+
 			if ( $this->config['chapter_data_location'] == "local" )
 			{
 				$localdb = new \DB\SQL\Mapper(\storage::instance()->localChapterDB(), 'chapters');
 				$i = $localdb->erase($bind);
 			}
 			else $i=1;
-			
+
 			// delete the chapter
 			$j = $chapter->erase($bind);
-			
+
 			// recount story stats based on new data
 			$this->recountStory($storyID);
-			
+
 			// rebuild the inorder fields
 			$this->rebuildStoryChapterOrder($storyID);
-			
+
 			// this should equate to 1*1 if there was no error
 			return ( $i * $j );
 		}
@@ -327,7 +327,7 @@ class Controlpanel extends Base {
 			// admin
 			case 7:
 				$newStory->validated = 33;
-				break;			
+				break;
 			// mods and supermods
 			case 6:
 			case 5:
@@ -346,10 +346,10 @@ class Controlpanel extends Base {
 
 		// save data
 		$newStory->save();
-		
+
 		// get the new story's ID
 		$newID = $newStory->_id;
-		
+
 		// new authors - either from form data or the UCP selection
 		$new_authors = ( empty($data['uid']) ) ? explode(",",$data['new_author']) : [ $data['uid'] ];
 		foreach ( $new_authors as $new_author )
@@ -360,7 +360,7 @@ class Controlpanel extends Base {
 			$newRelation->aid	= $new_author;
 			$newRelation->type	= 'M';
 			$newRelation->save();
-			
+
 			// already counting as author? mainly for stats, but would allow a user to post stories when authoring is restricted.
 			$editUser = new \DB\SQL\Mapper($this->db, $this->prefix."users");
 			$editUser->load(array("uid=?",$new_author));
@@ -368,7 +368,7 @@ class Controlpanel extends Base {
 				$editUser->groups += 4;
 			$editUser->save();
 		}
-		
+
 		// This story is created as draft without a chapter text and tags, so there is no need to do any recount or cache reset
 		return $newID;
 	}
@@ -391,7 +391,7 @@ class Controlpanel extends Base {
 						LEFT JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid)
 						LEFT JOIN `tbl_chapters`Ch2 ON ( S.sid = Ch2.sid AND Ch2.validated >= 30)
 					WHERE S.sid = :sid";
-					
+
 		if ( $uid )
 		{
 			// inside UCP
@@ -424,7 +424,7 @@ class Controlpanel extends Base {
 	* @param	int		$uid	User ID, optional, only sent from the UCP
 	*
 	* @return	int		Changes made
-	*/	
+	*/
 	public function storySaveChanges( int $storyID, array $post, int $userID = 0 ) : int
 	{
 		// drop out with an error if the story exists, but the user has no access
@@ -436,7 +436,7 @@ class Controlpanel extends Base {
 
 		// remember old validation status
 		$oldValidated = $story->validated;
-		
+
 		// Step one: save the plain data
 		$story->title			= $post['story_title'];
 		$story->summary			= str_replace("\n","<br />",$post['story_summary']);
@@ -447,7 +447,7 @@ class Controlpanel extends Base {
 		if ( $userID == 0 )
 		{
 			$story->validated 	= $post['validated'].$post['valreason'];
-		
+
 			if ( $story->changed("validated") )
 			{
 				if ( $post['validated'] == 3 AND substr($oldValidated,0,1)!=3 )
@@ -471,7 +471,7 @@ class Controlpanel extends Base {
 				\Logging::addEntry('VS', $storyID);
 			}
 		}
-		
+
 		$i = $story->changed();
 
 		$story->save();
@@ -509,7 +509,7 @@ class Controlpanel extends Base {
 	* @param	int		$uid	User ID, optional, only sent from the UCP
 	*
 	* @return	array			Result or empty
-	*/	
+	*/
 	public function storyDelete( int $storyID, int $userID = 0 ) : int
 	{
 		// drop out with an error if the story exists, but the user has no access
@@ -560,7 +560,7 @@ class Controlpanel extends Base {
 
 			$mapper->next();
 		}
-		
+
 		// Categories
 		$mapper = new \DB\SQL\Mapper($this->db, $this->prefix.'stories_categories');
 		$mapper->load(['sid = ?',$storyID]);
@@ -592,7 +592,7 @@ class Controlpanel extends Base {
 			$db->exec('DELETE FROM "chapters" WHERE "sid" = :sid', array(':sid' => $storyID ));
 			$deleted['chapterlocal'] = $db->count();
 		}
-		
+
 		// Tag recount
 		if ( !empty($recountTags) )
 			$deleted['tags'] = $this->recountTags($recountTags);
@@ -667,7 +667,7 @@ class Controlpanel extends Base {
 	{
 		$chapterList = new \DB\SQL\Mapper($this->db, $this->prefix."chapters");
 		$chapterList->load(['sid = ?', $storyID], ['order' => 'inorder ASC, chapid ASC']);
-		
+
 		$i = 1;
 		while ( !$chapterList->dry() )
 		{
@@ -939,7 +939,7 @@ class Controlpanel extends Base {
 		*/
 		if ( is_numeric($catList) )
 			$catList[] = (int)$catList;
-		
+
 		if ( [] == $jobs = $this->cacheCategoriesGetParent( $categories, $catList ) )
 			return FALSE;
 		// $jobs is an array containing all categories that need to be redone, starting with lowest level
@@ -958,7 +958,7 @@ class Controlpanel extends Base {
 		{
 			// set the cursor to the current category
 			$categories->load(['cid = ?', $catID]);
-			
+
 			$item = $this->exec($sql, [":cid" => $catID])[0];
 
 			if ( $item['sub_categories']==NULL ) $sub = NULL;
@@ -1016,14 +1016,14 @@ class Controlpanel extends Base {
 		}
 		if ( !empty($parents) )
 			$jobList = $this->cacheCategoriesGetParent( $categories, array_unique($parents), $jobList );
-		
+
 		return $jobList;
 	}
 
 	/**
 	* Given the list of new authors and a current status,
 	* either insert, drop or skip entries in the story-authors table.
-	* Make sure that nobody is main and supporting author and, if required, 
+	* Make sure that nobody is main and supporting author and, if required,
 	* make sure the main author isn't empty
 	* rewrite 2020-09
 	*
@@ -1169,10 +1169,10 @@ class Controlpanel extends Base {
 			}
 		}
 		unset($categories);
-		
+
 		if ( !empty($recache) )
 			$this->cacheCategories( $recache );
-		
+
 		return $i;
 	}
 
@@ -1185,7 +1185,7 @@ class Controlpanel extends Base {
 	* @param	string	$data		New character list
 	*
 	* @return	int					Report changes made
-	*/	
+	*/
 	public function relationStoryCharacter( int $storyID, string $data )
 	{
 		return $this->relationStoryTag( $storyID, $data, 1 );
@@ -1326,19 +1326,19 @@ class Controlpanel extends Base {
 		$newCollection->ordered	= $data['ordered'];
 		$newCollection->status	= "H";
 		$newCollection->save();
-		
+
 		$newID = $newCollection->_id;
 
 		\Cache::instance()->reset("menuUCPCountLib_.{$_SESSION['userID']}");
 
 		return $newID;
 	}
-	
+
 	public function collectionsList(int $page, array $sort, string $module, int $userID=0) : array
 	{
 		$limit = 20;
 		$pos = $page - 1;
-		
+
 		$sql = 	"SELECT SQL_CALC_FOUND_ROWS
 					Coll.collid, Coll.title, U.username,
 					COUNT(DISTINCT rCS.sid) as stories
@@ -1349,7 +1349,7 @@ class Controlpanel extends Base {
 				GROUP BY Coll.collid
 				ORDER BY {$sort['order']} {$sort['direction']}
 				LIMIT ".(max(0,$pos*$limit)).",".$limit;
-		
+
 		$data = $this->exec( $sql );
 
 		$this->paginate(
@@ -1359,7 +1359,7 @@ class Controlpanel extends Base {
 				: "/adminCP/stories/".(($module=="collections")?"collections":"series")."/order={$sort['link']},{$sort['direction']}",
 			$limit
 		);
-		
+
 		return $data;
 	}
 
@@ -1435,7 +1435,7 @@ class Controlpanel extends Base {
 					WHERE Coll.collid = :collid @WHERE@
 					GROUP BY rCS.sid
 					ORDER BY
-						CASE ordered WHEN 1 THEN rCS.inorder END ASC, 
+						CASE ordered WHEN 1 THEN rCS.inorder END ASC,
 						CASE ordered WHEN 0 THEN S.updated END DESC";
 
 		$items = $this->exec(str_replace("@WHERE@", $where, $sql), [":collid" => $collid ]);
@@ -1587,7 +1587,7 @@ class Controlpanel extends Base {
 		else
 			$collection->load(array('collid=?', $collid));
 
-		$collection->copyfrom( 
+		$collection->copyfrom(
 			[
 				"title"		=> $data['title'],
 				"ordered"	=> (isset($data['changetype'])) ? !$collection->ordered : $collection->ordered,
@@ -1598,9 +1598,9 @@ class Controlpanel extends Base {
 
 		$i  = $collection->changed("title");
 		$i += $collection->changed("summary");
-		
+
 		$collection->save();
-		
+
 		// update relation table
 		$this->collectionProperties( $collid, $data['author'], "A" );
 		$this->collectionProperties( $collid, $data['tag'], "T" );
@@ -1608,26 +1608,26 @@ class Controlpanel extends Base {
 		$this->collectionProperties( $collid, $data['category'], "CA" );
 
 		$this->cacheCollections($collection->collid);
-		
+
 		// drop menu cache if type changed:
 		if(isset($data['changetype'])) \Cache::instance()->reset("menuUCPCountLib.{$uid}");
 
 		return $i;
 	}
-	
+
 	public function collectionDelete(int $collid, int $userID=0) : int
 	{
 		$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collections');
-		
+
 		// attempt to delete based upon ACP or UCP access
 		if($userID)
 			$collection->load(array('collid=? AND uid=?', $collid, $userID));
 		else
 			$collection->load(array('collid=?', $collid));
-		
+
 		if ( $collection->dry() )
 			return 0;
-		
+
 		// if one item was deleted, clean up the relation tables
 		(new \DB\SQL\Mapper($this->db, $this->prefix.'collection_properties'))->erase(array('collid=?', $collid));
 		(new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories'))->erase(array('collid=?', $collid));
@@ -1656,7 +1656,7 @@ class Controlpanel extends Base {
 			}
 			else unset($data[$temp]);
 		}
-		
+
 		// Insert any tag IDs not already present
 		if ( sizeof($data)>0 )
 		{
@@ -1675,24 +1675,24 @@ class Controlpanel extends Base {
 		}
 		unset($relations);
 	}
-	
+
 	public function collectionItemsAdd(int $collid, string $data, int $userID=0)
 	{
 		$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collections');
-		
+
 		// load the collection and check for existence and access
 		if($userID)
 			$collection->load(array('collid=? AND uid=?', $collid, $userID));
 		else
 			$collection->load(array('collid=?', $collid));
-		
+
 		if ( $collection->dry() )
 			return 0;
 
 		$items = explode(",",$data);
 		$newItem = new \DB\SQL\Mapper($this->db, $this->prefix."collection_stories");
 		$count = $newItem->count(array('collid=?',$collid));
-	  
+
 		foreach ( $items as $item )
 		{
 			if(is_numeric($item))
@@ -1706,7 +1706,7 @@ class Controlpanel extends Base {
 			}
 		}
 	}
-	
+
 	public function collectionItemDelete(int $collid, int $itemid, int $userID=0)
 	{
 		// make sure the user actuall owns this collection
@@ -1716,30 +1716,30 @@ class Controlpanel extends Base {
 		}
 		return 0;
 	}
-	
+
 	public function recommendationAdd( array $data ) : int
 	{
 		$recommendation=new \DB\SQL\Mapper($this->db, $this->prefix.'recommendations');
-		
+
 		$recommendation->title	= $data['title'];
 		$recommendation->url	= $data['url'];
 		$recommendation->uid	= $_SESSION['userID'];
-		
+
 		$recommendation->save();
 
 		\Cache::instance()->reset("menuUCPCountLib_.{$_SESSION['userID']}");
 
 		return $recommendation->_id;
 	}
-	
+
 	public function recommendationList( int $page, array $sort, int $userID = 0 ) : array
 	{
 		$limit = 20;
 		$pos = $page - 1;
-		
+
 		$sql = 	"SELECT SQL_CALC_FOUND_ROWS
-					Rec.recid, Rec.title, Rec.url, Rec.uid, 
-					U.username as maintainer, 
+					Rec.recid, Rec.title, Rec.url, Rec.uid,
+					U.username as maintainer,
 					R.rating
 				FROM `tbl_recommendations`Rec
 					LEFT JOIN `tbl_users`U ON ( Rec.uid = U.uid )
@@ -1748,7 +1748,7 @@ class Controlpanel extends Base {
 				GROUP BY Rec.recid
 				ORDER BY {$sort['order']} {$sort['direction']}
 				LIMIT ".(max(0,$pos*$limit)).",".$limit;
-		
+
 		$data = $this->exec( $sql );
 
 		$this->paginate(
@@ -1758,10 +1758,10 @@ class Controlpanel extends Base {
 				: "/adminCP/stories/recommendations/order={$sort['link']},{$sort['direction']}",
 			$limit
 		);
-		
+
 		return $data;
 	}
-	
+
 	public function recommendationLoad( int $recID, int $userID = 0 ) : array
 	{
 		$sql = "SELECT Rec.recid, Rec.uid, Rec.url, Rec.title, Rec.author, Rec.summary, Rec.comment, Rec.ratingid, Rec.public, Rec.completed,
@@ -1800,27 +1800,27 @@ class Controlpanel extends Base {
 	* Save changes to a recommendation
 	* rewrite 2020-09
 	*
-	* @param	int			$recid	
+	* @param	int			$recid
 	* @param	string 		$data		Comma-separated list of new relations
 	* @param	int 		$userID		User ID, optional, only sent from the UCP
 	*
 	* @return	int						Amount of changes made
-	*/	
+	*/
 	public function recommendationSave( int $recid, array $data, int $userID=0 ) : int
 	{
 		$recommendation=new \DB\SQL\Mapper($this->db, $this->prefix.'recommendations');
-		
+
 		if($userID)
 			$recommendation->load(array('recid=? AND uid=?', $recid, $userID));
 		else
 			$recommendation->load(array('recid=?', $recid));
-		
+
 		if($recommendation->recid == 0)
 			return 0;
 
 		// copy form data, also used to create a new feature
-		$recommendation->copyfrom( 
-			[ 
+		$recommendation->copyfrom(
+			[
 				"title"		=> $data['title'],
 				"url"		=> $data['url'],
 				"uid"		=> $userID ?: $data['maintainer'],
@@ -1860,7 +1860,7 @@ class Controlpanel extends Base {
 	* Re-set the recommendation properties based on a data field
 	* rewrite 2020-09
 	*
-	* @param	int			$recid	
+	* @param	int			$recid
 	* @param	string 		$data		Comma-separated list of new relations
 	* @param	string 		$type		Type of relations
 	*
@@ -1871,7 +1871,7 @@ class Controlpanel extends Base {
 		// load given relations:
 		$data = explode(",",$data);
 		$relations = new \DB\SQL\Mapper($this->db, $this->prefix.'recommendation_relations');
-		
+
 		$i = 0;
 
 		foreach ( $relations->find(array('`recid` = ? AND `type` = ?',$recid,$type)) as $X )
@@ -1884,7 +1884,7 @@ class Controlpanel extends Base {
 			}
 			else unset($data[$temp]);
 		}
-		
+
 		// Insert any relation IDs not already present
 		if ( sizeof($data)>0 )
 		{
@@ -1905,13 +1905,13 @@ class Controlpanel extends Base {
 		unset($relations);
 		return $i;
 	}
-	
+
 	/**
 	* Delete a recommendation and all attached fields
 	* 2020-09
 	*
-	* @param	int			$recid	
-	* @param	int			$userID	
+	* @param	int			$recid
+	* @param	int			$userID
 	*
 	* @return	int			Amount of changes made
 	*/
@@ -1919,26 +1919,26 @@ class Controlpanel extends Base {
 	{
 		// map the recommendation
 		$recommendations=new \DB\SQL\Mapper($this->db, $this->prefix.'recommendations');
-		
+
 		if($userID)
 			$recommendations->load(array('recid=? AND uid=?', $recID, $userID));
 		else
 			$recommendations->load(array('recid=?', $recID));
-		
+
 		if($recommendations->dry())
 			return 0;
 
 		// map all relations
 		$relations=new \DB\SQL\Mapper($this->db, $this->prefix.'recommendation_relations');
-		
+
 		// map a possible feature tag
 		$featured=new \DB\SQL\Mapper($this->db, $this->prefix.'featured');
-		
+
 		// delete all mapped entries and count the deletions
-		$_SESSION['lastAction']['deleteDetails'] = 
-		[ 
-			$recommendations->erase(array('recid=?',$recID)), 
-			$relations->erase(array('recid=?',$recID)), 
+		$_SESSION['lastAction']['deleteDetails'] =
+		[
+			$recommendations->erase(array('recid=?',$recID)),
+			$relations->erase(array('recid=?',$recID)),
 			$featured->erase(array("id=? AND type='RC'",$recID))
 		];
 
@@ -1951,7 +1951,7 @@ class Controlpanel extends Base {
 	{
 		$feature=new \DB\SQL\Mapper($this->db, $this->prefix.'featured');
 		$feature->load(array('id=? AND type="ST"',$sid));
-		
+
 		$_SESSION['lastAction'] = [ "deleteResult" => $feature->erase() ];
 	}
 
@@ -1960,7 +1960,7 @@ class Controlpanel extends Base {
 	* rewrite 2020-09
 	*
 	* @param	array		$date	Lists the new item order
-	*/	
+	*/
 	public function ajaxCollectionItemsort( array $data, int $userID = 0 ) : void
 	{
 		// quietly drop out on user mismatch
@@ -1979,13 +1979,13 @@ class Controlpanel extends Base {
 		}
 		exit;
 	}
-	
+
 	/**
 	* AJAX sort chapters
 	* rewrite 2020-09
 	*
 	* @param	array		$date	Lists the new chapter order
-	*/	
+	*/
 	public function ajaxStoryChaptersort( array $data ) : void
 	{
 		$chapters = new \DB\SQL\Mapper($this->db, $this->prefix.'chapters');

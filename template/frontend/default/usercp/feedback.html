@@ -73,7 +73,7 @@
 	<check if="{{@extra.sub.1 == 'written'}}">
 	<true>
 		<td><a href="{{@BASE}}/userCP/feedback/{{@extra.sub.0}}/{{@extra.sub.1}}/edit/id={{@extra.type}},{{ @row['fid'] }};returnpath=/userCP/feedback/{{@extra.sub.0}}/{{@extra.sub.1}}/{{@extra.type}}/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}">{ICON:edit}</a></td>
-		<td><a href="{{@BASE}}/userCP/feedback/{{@extra.sub.0}}/{{@extra.sub.1}}/delete/id={{@extra.type}},{{ @row['fid'] }};returnpath=/userCP/feedback/{{@extra.sub.0}}/{{@extra.sub.1}}/{{@extra.type}}/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}" class="deleteItem" title="{{ @row['name'] }}">{ICON:trash}</a></td>
+		<td><a href="{{@BASE}}/userCP/feedback/{{@extra.sub.0}}/{{@extra.sub.1}}/delete/id={{@extra.type}},{{ @row['fid'] }};returnpath=/userCP/feedback/{{@extra.sub.0}}/{{@extra.sub.1}}/{{@extra.type}}/order={{@sort.order}},{{@sort.direction}}/page={{@@paginate.page}}" class="deleteItem" title="{{ "'{@row['title']}' {@LN__by} '{@row['name']}'" }}">{ICON:trash}</a></td>
 	</true>
 	<false>
 		<td>{ICON:following}</td>

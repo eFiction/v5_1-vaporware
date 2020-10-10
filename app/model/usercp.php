@@ -4,7 +4,7 @@ namespace Model;
 class UserCP extends Controlpanel
 {
 	protected $menu = [];
-	
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -20,9 +20,9 @@ class UserCP extends Controlpanel
 				$allowed=[];
 				// get associated author and curator data
 				$authorData = $this->exec("SELECT U.uid, CONCAT(U.username, ' (',COUNT(DISTINCT SA.lid), ')') as label, IF(U.uid={$_SESSION['userID']},1,0) as curator
-												FROM `tbl_users`U 
-													LEFT JOIN `tbl_stories_authors`SA ON ( U.uid = SA.aid AND SA.type='M' ) 
-												WHERE U.uid = {$_SESSION['userID']} OR U.curator = {$_SESSION['userID']} 
+												FROM `tbl_users`U
+													LEFT JOIN `tbl_stories_authors`SA ON ( U.uid = SA.aid AND SA.type='M' )
+												WHERE U.uid = {$_SESSION['userID']} OR U.curator = {$_SESSION['userID']}
 												GROUP BY U.uid
 												ORDER BY curator DESC, label ASC");
 				foreach ( $authorData as $aD )
@@ -41,9 +41,9 @@ class UserCP extends Controlpanel
 					$status = [ 'id' => $data['uid'], 0 => 0, 1 => 0, 6 => 0, 9 => 0 ];
 
 					// get story count by completion status
-					$authorData = $this->exec("SELECT S.completed, COUNT(DISTINCT S.sid) as count 
+					$authorData = $this->exec("SELECT S.completed, COUNT(DISTINCT S.sid) as count
 													FROM `tbl_stories`S
-														INNER JOIN `tbl_stories_authors`SA ON (S.sid = SA.sid AND SA.aid = :aid AND SA.type='M') 
+														INNER JOIN `tbl_stories_authors`SA ON (S.sid = SA.sid AND SA.aid = :aid AND SA.type='M')
 													GROUP BY S.completed", [ ":aid" => $data['uid'] ]);
 					foreach ( $authorData as $aD )
 					{
@@ -73,7 +73,7 @@ class UserCP extends Controlpanel
 
 					// get second sub menu segment and place under selected author
 					$sub2 = $this->panelMenu('author_sub', $status);
-					
+
 					foreach ( $sub as $sKey => $sData )
 					{
 						if ( $sKey == "sub" ) $menu = array_merge($menu, $sub2);
@@ -91,13 +91,13 @@ class UserCP extends Controlpanel
 			// Add sub menu
 			elseif ( [] != $sub = $this->panelMenu($selected, $data) )
 				$this->menu[$selected]["sub"] = $sub;
-			
+
 			// will not work for sub menus yet
 			$this->menu[$selected]['selected'] = 1;
 		}
 		return $this->menu;
 	}
-	
+
 	protected function panelMenu($selected=FALSE, array $data=[])
 	{
 		$f3 = \Base::instance();
@@ -105,17 +105,17 @@ class UserCP extends Controlpanel
 		$menu = [];
 
 		$menuItems = $this->exec(str_replace("@WHERE@", ($selected?"= :selected;":"IS NULL;"), $sql) , [":selected"=> $selected], 120);
-		
+
 		foreach ( $menuItems as $item )
 		{
 			if ( $item['evaluate']=="" OR isset($this->config['optional_modules'][$item['evaluate']]) )
 			{
 				$item["label"] = explode("%%",$item["label"]);
-				
+
 				// Get count for an item if not already available
 				if( isset($item['label'][2]) AND empty($this->menuCount[$item['label'][1]]) )
 					$this->getMenuCount($item['label'][1]);
-				
+
 				if ( $item["label"][0] == "" )
 				{
 					// Authoring sub-menu
@@ -124,21 +124,21 @@ class UserCP extends Controlpanel
 						$link = str_replace("%ID%", $id, $item["link"]);
 						$menu[$link] = [ "label" => $label, "icon" => $item["icon"] ];
 						if ( $data['ID'] == $id ) $menu['sub'] = FALSE;
-					}	
+					}
 				}
 				else
 				{
 					// Item with count
 					if ( isset($item["label"][1]) AND isset($item["label"][2]) )
 						$label = $f3->get('LN__'.$item["label"][0],$this->menuCount[$item["label"][1]][$item["label"][2]]);
-					
+
 					// Authoring sub-menu
 					elseif ( isset($item["label"][1]) AND isset($data[$item["label"][1]]) )
 						$label = $f3->get('LN__'.$item["label"][0],$data[$item["label"][1]]);
-					
+
 					// Simple menu entry
 					else $label = $f3->get('LN__'.$item["label"][0]);
-					
+
 					if ( isset ( $data['id']) ) $item["link"] = str_replace('%ID%', $data['id'], $item["link"]);
 					$menu[$item["link"]] = [ "label" => $label, "icon" => $item["icon"] ];
 				}
@@ -146,7 +146,7 @@ class UserCP extends Controlpanel
 		}
 		return $menu;
 	}
-	
+
 	public function getMenuCount($module="")
 	{
 		if ( $module == "LIB" )
@@ -164,7 +164,7 @@ class UserCP extends Controlpanel
 				else $sql[]= "SET @recs := NULL";
 				$sql[]= "SET @ser  := (SELECT COUNT(1) FROM `tbl_collections` WHERE `ordered` = 1 and `uid` = {$_SESSION['userID']});";
 				$sql[]= "SET @coll := (SELECT COUNT(1) FROM `tbl_collections` WHERE `ordered` = 0 and `uid` = {$_SESSION['userID']});";
-				
+
 				$sql[]= "SELECT @bms as bookmark,@favs as favourite,@recs as recommendation,@ser as series,@coll as collection;";
 
 				$data = $this->exec($sql)[0];
@@ -187,7 +187,7 @@ class UserCP extends Controlpanel
 			}
 
 			$this->menuCount['data']['library'] = $counter;
-			
+
 			$this->menuCount['LIB']  = 	[
 											"BMS"	=> $counter['bookmark']['sum'],
 											"FAVS"	=> $counter['favourite']['sum'],
@@ -199,7 +199,7 @@ class UserCP extends Controlpanel
 		elseif ( $module == "MSG" OR $module == "SB" )
 		{
 			$user = \User::instance();
-			
+
 			if ( NULL == $data = json_decode(@$user->cache_messaging,TRUE) )
 			{
 				$data = $this->userCacheRecount("messaging");
@@ -207,14 +207,14 @@ class UserCP extends Controlpanel
 				$user->save();
 			}
 			$this->menuCount['data']['messaging'] = $data;
-			
+
 			$this->menuCount['SB']  = [ "SB" => $data['shoutbox']['sum'] ];
 			$this->menuCount['MSG'] = [ "UN" => $data['unread']['sum'] ];
 		}
 		elseif ( $module == "FB" )
 		{
 			$user = \User::instance();
-			
+
 			if ( NULL == $data = json_decode(@$user->cache_feedback,TRUE) )
 			{
 				$data = $this->userCacheRecount("feedback");
@@ -245,17 +245,17 @@ class UserCP extends Controlpanel
 			$this->menuCount['PL'] = [ "PL" => $data ];
 		}
 	}
-	
+
 	public function getCounter($module)
 	{
 		return @$this->menuCount['data'][$module];
 	}
-	
+
 	public function startGetStats() : array
 	{
 		if ( FALSE === \Cache::instance()->exists("userStats_.{$_SESSION['userID']}", $stats) )
 		{
-			$stats = 
+			$stats =
 			[
 				// count times this user was set as favourite author
 				"fav_a" => (new \DB\SQL\Mapper($this->db, $this->prefix."user_favourites"))->count(['item=? AND type=?',$_SESSION['userID'],'AU']),
@@ -263,15 +263,15 @@ class UserCP extends Controlpanel
 				"fav_s" => (new \DB\SQL\Mapper($this->db, $this->vprefix."statsUserStoryFavBM"))->count(['aid=? AND type=? and bookmark=0',$_SESSION['userID'],'M']),
 				// count reviews this user has received for stories
 				"revre" => (new \DB\SQL\Mapper($this->db, $this->vprefix."statsUserStoryReviews"))->count(['aid=? AND type=?',$_SESSION['userID'],'M']),
-			
+
 			];
 			\Cache::instance()->set("userStats_.{$_SESSION['userID']}", $stats, 10);
 		}
 		return $stats;
 	}
 
-	
-/*	
+
+/*
 	public function chapterLoadList($sid)
 	moved to parent
 */
@@ -279,15 +279,15 @@ class UserCP extends Controlpanel
 	public function authorStoryStatus($sid)
 	{
 		$sql = "SELECT S.title, S.validated, S.completed
-					FROM `tbl_stories`S 
+					FROM `tbl_stories`S
 						LEFT JOIN `tbl_stories_authors`A ON ( S.sid = A.sid AND A.type='M' )
 						INNER JOIN `tbl_users`U ON ( A.aid = U.uid AND ( U.uid = {$_SESSION['userID']} OR U.curator = {$_SESSION['userID']} ) )
 					WHERE S.sid=:sid";
-		
+
 		$data = $this->exec($sql, [":sid" => $sid] );
 		return ( empty($data) ) ? NULL : $data[0];
 	}
-	
+
 	public function authorStoryDelete(int $storyID, int $authorID)
 	{
 		$sql = "SELECT S.completed, A2.aid
@@ -296,10 +296,10 @@ class UserCP extends Controlpanel
 						LEFT JOIN  `tbl_stories_authors`A2 ON ( S.sid = A2.sid AND A2.type='M')
 					WHERE S.sid=:sid;";
 		$data = $this->exec($sql, [":sid" => $storyID, ":aid" => $authorID] );
-		
+
 		if ( sizeof($data)==0 )
 			return FALSE;
-		
+
 		// If the story previosly wasn't, it will now be moved to the deleted folder.
 		if ( $data[0]['completed']>0 )
 		{
@@ -315,14 +315,14 @@ class UserCP extends Controlpanel
 			return $this->storyDelete($storyID);
 		}
 	}
-	
+
 	public function authorStoryList( string $select, int $author, array $sort, int $page )
 	{
 		$limit = 20;
 		$pos = $page - 1;
-		
+
 		$sql = "SELECT SQL_CALC_FOUND_ROWS S.sid,S.title, S.validated as story_validated, S.completed, UNIX_TIMESTAMP(S.updated) as updated, Ch.validated as chapter_validated
-					FROM `tbl_stories`S 
+					FROM `tbl_stories`S
 						LEFT JOIN `tbl_stories_authors`A ON ( S.sid = A.sid AND A.type='M' )
 							INNER JOIN `tbl_users`U ON ( A.aid = U.uid AND ( U.uid = {$_SESSION['userID']} OR U.curator = {$_SESSION['userID']} ) )
 						LEFT JOIN `tbl_chapters`Ch ON ( Ch.sid = S.sid )
@@ -345,11 +345,11 @@ class UserCP extends Controlpanel
 			default:
 				return FALSE;
 		}
-		
+
 		$sql .= " GROUP BY S.sid
 				 ORDER BY chapter_validated ASC, {$sort['order']} {$sort['direction']}
 					LIMIT ".(max(0,$pos*$limit)).",".$limit;
-		
+
 		$data = $this->exec($sql, [":aid" => $author] );
 
 		$this->paginate(
@@ -357,7 +357,7 @@ class UserCP extends Controlpanel
 			"/userCP/author/uid={$author}/{$select}/order={$sort['link']},{$sort['direction']}",
 			$limit
 		);
-		
+
 		return $data;
 	}
 
@@ -366,23 +366,23 @@ class UserCP extends Controlpanel
 		$this->exec("UPDATE `tbl_users`U set U.curator = NULL WHERE U.uid = :uid;", [ ":uid" => ($uid ?: $_SESSION['userID']) ]);
 		return TRUE;
 	}
-	
+
 	public function authorCuratorGet() : array
 	{
 		$data = $this->exec("SELECT C.username, C.uid
-								FROM `tbl_users`U 
+								FROM `tbl_users`U
 									INNER JOIN `tbl_users`C ON ( U.curator = C.uid AND U.uid = {$_SESSION['userID']} )
 							");
 
 		$return['self'] = ( sizeof($data) ) ? json_encode ( array ( "name"	=> $data[0]['username'], "id" => $data[0]['uid'] ) ) : "";
-		
+
 		$return['others'] = $this->exec("SELECT U.username, U.uid
 											FROM `tbl_users`U
 												INNER JOIN `tbl_users`C ON ( U.curator = C.uid AND C.uid = {$_SESSION['userID']} )
 											");
 		return $return;
 	}
-	
+
 	public function authorCuratorSet( int $uid ) : bool
 	{
 		$data = $this->exec("SELECT U.uid FROM `tbl_users`U WHERE U.uid = :uid AND U.groups > 0;",[":uid" => $uid]);
@@ -390,7 +390,7 @@ class UserCP extends Controlpanel
 		$this->exec("UPDATE `tbl_users`U set U.curator = {$data[0]['uid']} WHERE U.uid = {$_SESSION['userID']};");
 		return TRUE;
 	}
-	
+
 	public function feedbackHomeStats( array $data ) : array
 	{
 		$chapters = $this->exec("SELECT COUNT(1) as count FROM `tbl_chapters`C INNER JOIN `tbl_stories_authors`SA ON ( C.sid = SA.sid ) WHERE SA.aid = {$_SESSION['userID']};")[0]['count'];
@@ -413,43 +413,60 @@ class UserCP extends Controlpanel
 
 		return $stats;
 	}
-	
-	public function saveFeedback( array $post, array $params ) : array
+
+	/**
+	* Save review edit
+	* rewrite 2020-10 to include user ID check
+	*
+	* @param	array		$post		Data sent from the form
+	* @param	array		$params	review selection
+	*
+	* @return	int			Counted changes
+	*/
+	public function saveFeedback( array $post, array $params ) : int
 	{
-		$sql = "UPDATE `tbl_feedback`
-				SET `text` = :text
-				WHERE `fid` = :fid AND `type` = :type;";
-		return $this->exec( $sql,
-					[
-						":text"	=> $post['comment'],
-						":fid"	=> $params['id'][1],
-						":type"	=> $params['id'][0],
-					]
-		);
+
+		$fb = new \DB\SQL\Mapper($this->db, $this->prefix."feedback");
+		$fb->load(array('fid=? AND type=? AND writer_uid=?',$params['id'][1],$params['id'][0],$_SESSION['userID']));
+
+		if ( $fb->fid == NULL )
+			return 0;
+
+		$fb->text = $post['comment'];
+		$change = $fb->changed("text");
+		$fb->save();
+
+		return $change;
 		// no recount required, editing a feedback does not change stats
 	}
-	
-	public function deleteFeedback( array $post, array $params ) : array
+
+	/**
+	* Delete review
+	* rewrite 2020-10 to include user ID check
+	*
+	* @param	array		$params	review selection
+	*
+	* @return	int			Result
+	*/
+	public function deleteFeedback( array $params ) : int
 	{
+		$fb = new \DB\SQL\Mapper($this->db, $this->prefix."feedback");
+		$fb->load(array('fid=? AND type=? AND writer_uid=?',$params['id'][1],$params['id'][0],$_SESSION['userID']));
+
+		if ( $fb->fid == NULL )
+			return 0;
+
 		// drop user feedback stat cache
 		\Model\Routines::dropUserCache("feedback");
 		// purge stats cache, forcing re-cache
 		\Cache::instance()->clear('stats');
-
-		$sql = "DELETE FROM `tbl_feedback`
-				WHERE `fid` = :fid AND `type` = :type;";
-		return $this->exec( $sql,
-					[
-						":fid"	=> $params['id'][1],
-						":type"	=> $params['id'][0],
-					]
-		);
+		return 	$fb->erase();
 	}
-	
+
 	public function friendsAdd( string $username )
 	{
 		$sql = "INSERT INTO `tbl_user_friends` (`user_id`, `friend_id`)
-					SELECT '{$_SESSION['userID']}', U.uid 
+					SELECT '{$_SESSION['userID']}', U.uid
 				FROM `tbl_users`U WHERE U.username = :friend;
 				ON DUPLICATE KEY UPDATE `active`= 1";
 
@@ -487,7 +504,7 @@ class UserCP extends Controlpanel
 		$children = $this->exec("SELECT COUNT(1) FROM `tbl_feedback` WHERE `reference` = :reference AND `type` = 'C' ", [ ":reference" => $reference ] )[0]["COUNT(1)"];
 		return (bool)$children;
 	}
-	
+
 	public function reviewDelete( int $fid ) : bool
 	{
 		$bind = [ ":fid" => $fid ];
@@ -499,7 +516,7 @@ class UserCP extends Controlpanel
 			$_SESSION['lastAction']['error'] = "badID";
 			return FALSE;
 		}
-		
+
 		if ( $result = $this->exec("DELETE FROM `tbl_feedback` WHERE `fid` = :fid", $bind) )
 		{
 			// if something was deleted, decrement review counter and trigger recount
@@ -513,7 +530,7 @@ class UserCP extends Controlpanel
 		$_SESSION['lastAction']['error'] = "unknown";
 		return FALSE;
 	}
-	
+
 	public function ajax($key, $data, $limitation=NULL)
 	{
 		$bind = NULL;
@@ -562,11 +579,11 @@ class UserCP extends Controlpanel
 					$this->getCategories
 					(
 						$c,
-						$this->exec("SELECT C.cid,C.parent_cid 
+						$this->exec("SELECT C.cid,C.parent_cid
 										FROM `tbl_categories`C
 									WHERE {$where};", [ ":categories" => $bind ] )
 					);
-					
+
 					if ( sizeof($c) ) $categories = " OR rCC.catid IN (".implode(",",$c).")";
 				}
 				//$where[] = " Ch.catid=-1 ";
@@ -578,10 +595,10 @@ class UserCP extends Controlpanel
 				}
 				$where = " AND ( ".implode(" OR", $where) .") ";
 				*/
-				
+
 				//$ajax_sql = "SELECT Ch.charname as name, Ch.charid as id from `tbl_characters`Ch WHERE Ch.charname LIKE :charname {$where} ORDER BY Ch.charname ASC LIMIT 5";
 				$ajax_sql = "SELECT Ch.charname as name, Ch.charid as id
-								FROM `tbl_characters`Ch 
+								FROM `tbl_characters`Ch
 								LEFT JOIN `tbl_character_categories`rCC ON ( Ch.charid = rCC.charid )
 							WHERE Ch.charname LIKE :charname AND ( rCC.catid IS NULL ".($categories??"")." )
 							GROUP BY id
@@ -608,12 +625,12 @@ class UserCP extends Controlpanel
 		if ( isset($ajax_sql) ) return $this->exec($ajax_sql, $bind);
 		return NULL;
 	}
-	
+
 	public function msgInbox($offset=0)
 	{
 		$sql = "SELECT M.mid,UNIX_TIMESTAMP(M.date_sent) as date_sent, UNIX_TIMESTAMP(M.date_read) as date_read,M.subject,M.sender as name_id,U.username as name, FALSE as can_revoke
 						FROM `tbl_messaging`M
-							INNER JOIN `tbl_users`U ON ( M.sender = U.uid ) 
+							INNER JOIN `tbl_users`U ON ( M.sender = U.uid )
 						WHERE M.recipient = ".$_SESSION['userID']." AND M.sent IS NULL
 						ORDER BY date_sent DESC";
 		return $this->exec($sql);
@@ -622,22 +639,22 @@ class UserCP extends Controlpanel
 	public function msgOutbox($offset=0)
 	{
 		$sql = "SELECT M.mid,UNIX_TIMESTAMP(M.date_sent) as date_sent, M2.mid as mid_read, UNIX_TIMESTAMP(M2.date_read) as date_read,M.subject,M.recipient as name_id,U.username as name, IF((M2.date_read IS NULL AND M2.mid IS NOT NULL),TRUE,FALSE) as can_revoke
-						FROM `tbl_messaging`M 
+						FROM `tbl_messaging`M
 							LEFT JOIN `tbl_messaging`M2 ON ( M.sent = M2.mid )
-							INNER JOIN `tbl_users`U ON ( M.recipient = U.uid ) 
+							INNER JOIN `tbl_users`U ON ( M.recipient = U.uid )
 						WHERE M.sender = ".$_SESSION['userID']." AND M.sent IS NOT NULL
 						ORDER BY date_sent DESC";
 		return $this->exec($sql);
 	}
-	
+
 	public function msgRead($msgID)
 	{
 		$sql = "SELECT M.mid,UNIX_TIMESTAMP(M.date_sent) as date_sent,UNIX_TIMESTAMP(M.date_read) as date_read,M.subject,M.message,
 								M.sender as sender_id, u1.username as sender,
-								M.recipient as recipient_id, u2.username as recipient 
-						FROM `tbl_messaging`M 
-							INNER JOIN `tbl_users`u1 ON ( M.sender = u1.uid ) 
-							INNER JOIN `tbl_users`u2 ON ( M.recipient = u2.uid ) 
+								M.recipient as recipient_id, u2.username as recipient
+						FROM `tbl_messaging`M
+							INNER JOIN `tbl_users`u1 ON ( M.sender = u1.uid )
+							INNER JOIN `tbl_users`u2 ON ( M.recipient = u2.uid )
 						WHERE M.mid = :mid AND ( M.sender = {$_SESSION['userID']} AND M.sent IS NOT NULL ) OR ( M.recipient = {$_SESSION['userID']} AND M.sent IS NULL ) ORDER BY date_sent DESC";
 		$data = $this->exec($sql, [":mid" => $msgID]);
 		if ( empty($data) ) return FALSE;
@@ -653,7 +670,7 @@ class UserCP extends Controlpanel
 		}
 		return $data[0];
 	}
-	
+
 	public function msgReply($msgID=NULL)
 	{
 		if ( is_numeric($msgID) )
@@ -663,12 +680,12 @@ class UserCP extends Controlpanel
 									IF(M.recipient = {$_SESSION['userID']},u1.username,NULL) as recipient,
 									u1.username as sender
 									FROM `tbl_messaging`M
-									INNER JOIN `tbl_users`u1 ON ( M.sender = u1.uid ) 
-									INNER JOIN `tbl_users`u2 ON ( M.recipient = u2.uid ) 
+									INNER JOIN `tbl_users`u1 ON ( M.sender = u1.uid )
+									INNER JOIN `tbl_users`u2 ON ( M.recipient = u2.uid )
 									WHERE M.mid = :mid AND ( M.sender = {$_SESSION['userID']} OR M.recipient = {$_SESSION['userID']} ) ORDER BY date_sent DESC";
 			$data = $this->exec($sql, [":mid" => $msgID]);
 		}
-		
+
 		if ( empty($data) )
 		{
 			return
@@ -685,12 +702,12 @@ class UserCP extends Controlpanel
 
 		return $data;
 	}
-	
+
 	public function msgSave($save)
 	{
 		// initialize a mapper
 		$message = new \DB\SQL\Mapper($this->db, $this->prefix.'messaging');
-		
+
 		foreach ( $save['recipient'] as $recipient )
 		{
 			// basic data
@@ -719,17 +736,17 @@ class UserCP extends Controlpanel
 			// save outbox copy
 			$message->insert();
 		}
-		
+
 		// if we have no recorded ID, something went wrong
 		if ( empty($outboxID) ) return FALSE;
-		
+
 		return TRUE;
 	}
-	
+
 	public function msgDelete($message)
 	{
 		@list ( $messageID, $action ) = $message;
-		
+
 		// initialize a mapper
 		$message = new \DB\SQL\Mapper($this->db, $this->prefix.'messaging');
 
@@ -748,7 +765,7 @@ class UserCP extends Controlpanel
 			// no such message, might have been deleted
 			if ( $message->dry() )
 				return "alreadydeleted";
-			
+
 			elseif ( $message->date_read == NULL )
 			{
 				// message exists and is unread, delete it on the recipient side
@@ -768,19 +785,19 @@ class UserCP extends Controlpanel
 			// if the message can't be accessed, it's either gone or beyond reach
 			if ( $message->dry() )
 				return "notfound";
-			
+
 			// message found, delete and return result
 			$message->erase();
 			return TRUE;
 		}
 		return NULL;
 	}
-	
+
 	public function pollsList(int $page, array $sort):array
 	{
 		$limit = 10;
 		$pos = $page - 1;
-		
+
 		$sql = "SELECT SQL_CALC_FOUND_ROWS
 					P.poll_id, P.question, P.options, UNIX_TIMESTAMP(P.start_date) as start_date, UNIX_TIMESTAMP(P.end_date) as end_date, P.open_voting,
 					V.option,
@@ -801,14 +818,14 @@ class UserCP extends Controlpanel
 		);
 		return $data;
 	}
-	
+
 	public function shoutboxList($page,$user=FALSE)
 	{
 		$limit = 25;
 		$pos = $page - 1;
 
 		$sql = "SELECT SQL_CALC_FOUND_ROWS S.id, S.uid, U.username, S.message, UNIX_TIMESTAMP(S.date) as timestamp
-					FROM `tbl_shoutbox`S 
+					FROM `tbl_shoutbox`S
 						LEFT JOIN `tbl_users`U ON ( S.uid = U.uid )
 					".
 					(($user)?"WHERE S.uid = {$_SESSION['userID']} ":"")
@@ -823,7 +840,7 @@ class UserCP extends Controlpanel
 		);
 		return $data;
 	}
-	
+
 	public function shoutboxDelete($message)
 	{
 		$sql = "DELETE FROM `tbl_shoutbox` WHERE id = :message AND uid = {$_SESSION['userID']};";
@@ -833,7 +850,7 @@ class UserCP extends Controlpanel
 			\Model\Routines::dropUserCache("messaging");
 			return "success";
 		}
-		
+
 		$trouble = $this->exec("SELECT S.uid FROM `tbl_shoutbox`S WHERE id=:message;", [ ":message" => $message ]);
 
 		// message doesn't exist
@@ -847,7 +864,7 @@ class UserCP extends Controlpanel
 		// might not happen, but let's cover this
 		return "unknown";
 	}
-	
+
 	public function libraryBookFavDelete($params)
 	{
 		if ( empty($params['id'][0]) OR empty($params['id'][1]) ) return FALSE;
@@ -864,15 +881,15 @@ class UserCP extends Controlpanel
 			return FALSE;
 		}
 	}
-	
+
 	public function listBookFav($page, $sort, $params)
 	{
 		$limit = 10;
 		$pos = $page - 1;
-		
+
 		if ( in_array($params[1],["AU","RC","CO","SE","ST"]) )
 		{
-			$sql = $this->sqlMaker("bookfav", $params[1]) . 
+			$sql = $this->sqlMaker("bookfav", $params[1]) .
 					"ORDER BY {$sort['order']} {$sort['direction']}
 					LIMIT ".(max(0,$pos*$limit)).",".$limit;
 		}
@@ -887,7 +904,7 @@ class UserCP extends Controlpanel
 		);
 		return $data;
 	}
-	
+
 	public function loadBookFav($params)
 	{
 		// ?
@@ -895,22 +912,22 @@ class UserCP extends Controlpanel
 
 		if ( $params['id'][0]=="AU" )
 		{
-			$sql = $this->sqlMaker("bookfav", "AU", FALSE) . 
+			$sql = $this->sqlMaker("bookfav", "AU", FALSE) .
 				"WHERE U.uid = :id ";
 		}
 		elseif ( $params['id'][0]=="CO" )
 		{
-			$sql = $this->sqlMaker("bookfav", "CO", FALSE) . 
+			$sql = $this->sqlMaker("bookfav", "CO", FALSE) .
 				"WHERE Coll.collid = :id ";
 		}
 		elseif ( $params['id'][0]=="SE" )
 		{
-			$sql = $this->sqlMaker("bookfav", "SE", FALSE) . 
+			$sql = $this->sqlMaker("bookfav", "SE", FALSE) .
 				"WHERE Coll.collid = :id ";
 		}
 		elseif ( $params['id'][0]=="ST" )
 		{
-			$sql = $this->sqlMaker("bookfav", "ST", FALSE) . 
+			$sql = $this->sqlMaker("bookfav", "ST", FALSE) .
 				"WHERE S.sid = :id ";
 		}
 		else return FALSE;
@@ -926,7 +943,7 @@ class UserCP extends Controlpanel
 		}
 		return FALSE;
 	}
-	
+
 	public function listReviews($page, $sort, $params)
 	{
 		$limit = 10;
@@ -934,7 +951,7 @@ class UserCP extends Controlpanel
 
 		if ( in_array($params[2],["RC","SE","ST"]) )
 		{
-			$sql = $this->sqlMaker("feedback".$params[1], $params[2]) . 
+			$sql = $this->sqlMaker("feedback".$params[1], $params[2]) .
 					 ( $params[1]=="written" ? "GROUP BY F.fid " : "") .
 					"ORDER BY {$sort['order']} {$sort['direction']}
 					LIMIT ".(max(0,$pos*$limit)).",".$limit;
@@ -960,24 +977,29 @@ class UserCP extends Controlpanel
 		{
 			if ( $params['id'][0] == "ST" )
 			{
-				$sql = $this->sqlMaker("feedback".$params[1], "ST", FALSE) . 
+				$sql = $this->sqlMaker("feedback".$params[1], "ST", FALSE) .
 					" AND F.fid = :id ";
 			}
 			elseif ( $params['id'][0] == "C" )
 			{
-				$sql = $this->sqlMaker("feedback".$params[1], "C", FALSE) . 
+				$sql = $this->sqlMaker("feedback".$params[1], "C", FALSE) .
+					" AND F.fid = :id ";
+			}
+			elseif ( $params['id'][0] == "RC" )
+			{
+				$sql = $this->sqlMaker("feedback".$params[1], "RC", FALSE) .
 					" AND F.fid = :id ";
 			}
 		}
 		else return FALSE;
-		
+
 		$data = $this->exec($sql,[ ":id"=>$params['id'][1] ]);
 
 		if ( sizeof($data)==1 AND $data[0]['type']!="" )
 			return $data[0];
 		return FALSE;
 	}
-	
+
 	protected function sqlMaker($module, $type, $inner = TRUE)
 	{
 		$join = $inner ? "INNER" : "LEFT";
@@ -1015,16 +1037,16 @@ class UserCP extends Controlpanel
 				"join"		=> "Rec.recid = Fav.item AND Fav.type='RC'"
 			]
 		];
-		$sql['bookfav'][$type] = "SELECT SQL_CALC_FOUND_ROWS {$select_bookfav[$type]['fields']}, 
+		$sql['bookfav'][$type] = "SELECT SQL_CALC_FOUND_ROWS {$select_bookfav[$type]['fields']},
 						Fav.comments, Fav.visibility, Fav.notify, Fav.fid, Fav.bookmark
-						FROM {$select_bookfav[$type]['from']} 
+						FROM {$select_bookfav[$type]['from']}
 						{$join} JOIN `tbl_user_favourites`Fav ON
-					( {$select_bookfav[$type]['join']} AND Fav.uid = {$_SESSION['userID']} AND Fav.bookmark = :bookmark ) ";		
+					( {$select_bookfav[$type]['join']} AND Fav.uid = {$_SESSION['userID']} AND Fav.bookmark = :bookmark ) ";
 
 		$sql['feedbackwritten'] =
 		[
 			"ST"
-				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, SA.sid as id, Ch.inorder as chapter, GROUP_CONCAT(DISTINCT U.username SEPARATOR ', ') as name, U.uid, F.text, S.title, UNIX_TIMESTAMP(F.datetime) as date 
+				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, SA.sid as id, Ch.inorder as chapter, GROUP_CONCAT(DISTINCT U.username SEPARATOR ', ') as name, U.uid, F.text, S.title, UNIX_TIMESTAMP(F.datetime) as date
 						FROM `tbl_feedback`F
 						INNER JOIN `tbl_stories`S ON ( F.reference = S.sid )
 							{$join} JOIN `tbl_stories_authors`SA ON ( S.sid = SA.sid )
@@ -1034,31 +1056,31 @@ class UserCP extends Controlpanel
 			"C"
 				=>	"SELECT SQL_CALC_FOUND_ROWS
 							F.type as type, F.fid, F.text, UNIX_TIMESTAMP(F.datetime) as date,
-							F2.text as reviewtext, 
-							SA.sid as id, 
-							Ch.inorder as chapter, 
+							F2.text as reviewtext,
+							SA.sid as id,
+							Ch.inorder as chapter,
 							GROUP_CONCAT(DISTINCT U.username SEPARATOR ', ') as name, U.uid, S.title
-						FROM `tbl_feedback`F 
+						FROM `tbl_feedback`F
 							INNER JOIN `tbl_feedback`F2 ON ( F.reference = F2.fid )
-							INNER JOIN `tbl_stories`S ON ( F2.reference = S.sid ) 
-								{$join} JOIN `tbl_stories_authors`SA ON ( S.sid = SA.sid ) 
-									INNER JOIN `tbl_users`U ON ( U.uid = SA.aid ) 
-							LEFT JOIN `tbl_chapters`Ch ON ( F2.reference_sub = Ch.chapid ) 
+							INNER JOIN `tbl_stories`S ON ( F2.reference = S.sid )
+								{$join} JOIN `tbl_stories_authors`SA ON ( S.sid = SA.sid )
+									INNER JOIN `tbl_users`U ON ( U.uid = SA.aid )
+							LEFT JOIN `tbl_chapters`Ch ON ( F2.reference_sub = Ch.chapid )
 						WHERE F.writer_uid = {$_SESSION['userID']} AND F.type='C' ",
 			"CO"
-				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Coll.collid as id, GROUP_CONCAT(DISTINCT U.username SEPARATOR ', ') as name, U.uid, F.text, Coll.title, UNIX_TIMESTAMP(F.datetime) as date 
+				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Coll.collid as id, GROUP_CONCAT(DISTINCT U.username SEPARATOR ', ') as name, U.uid, F.text, Coll.title, UNIX_TIMESTAMP(F.datetime) as date
 						FROM `tbl_feedback`F
 						INNER JOIN `tbl_collections`Coll ON ( F.reference = Coll.collid )
 							INNER JOIN `tbl_users`U ON ( U.uid = Coll.uid )
 						WHERE F.writer_uid = {$_SESSION['userID']} AND F.type='CO' ",
 			"SE"
-				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Coll.collid as id, GROUP_CONCAT(DISTINCT U.username SEPARATOR ', ') as name, U.uid, F.text, Coll.title, UNIX_TIMESTAMP(F.datetime) as date 
+				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Coll.collid as id, GROUP_CONCAT(DISTINCT U.username SEPARATOR ', ') as name, U.uid, F.text, Coll.title, UNIX_TIMESTAMP(F.datetime) as date
 						FROM `tbl_feedback`F
 						INNER JOIN `tbl_collections`Coll ON ( F.reference = Coll.collid )
 							INNER JOIN `tbl_users`U ON ( U.uid = Coll.uid )
 						WHERE F.writer_uid = {$_SESSION['userID']} AND F.type='SE' ",
 			"RC"
-				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Rec.recid as id, Rec.author as name, F.text, Rec.title, Rec.url, UNIX_TIMESTAMP(F.datetime) as date 
+				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Rec.recid as id, Rec.author as name, F.text, Rec.title, Rec.url, UNIX_TIMESTAMP(F.datetime) as date
 						FROM `tbl_feedback`F
 							INNER JOIN `tbl_recommendations`Rec ON ( F.reference = Rec.recid )
 						WHERE F.writer_uid = {$_SESSION['userID']} AND F.type='RC' ",
@@ -1067,7 +1089,7 @@ class UserCP extends Controlpanel
 		$sql['feedbackreceived'] =
 		[
 			"ST"
-				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, SA.sid as id, Ch.inorder as chapter, IF(F.writer_uid>0,U.username,F.writer_name) as name, U.uid, F.text, S.title, UNIX_TIMESTAMP(F.datetime) as date 
+				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, SA.sid as id, Ch.inorder as chapter, IF(F.writer_uid>0,U.username,F.writer_name) as name, U.uid, F.text, S.title, UNIX_TIMESTAMP(F.datetime) as date
 						FROM `tbl_feedback`F
 							LEFT JOIN `tbl_users`U ON ( F.writer_uid = U.uid )
 							INNER JOIN `tbl_stories_authors`SA ON ( F.reference = SA.sid AND SA.aid = {$_SESSION['userID']} )
@@ -1075,19 +1097,19 @@ class UserCP extends Controlpanel
 								LEFT JOIN `tbl_chapters`Ch ON ( F.reference_sub = Ch.chapid )
 						WHERE F.type='ST' ",
 			"CO"
-				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Coll.collid as id, IF(F.writer_uid>0,U.username,F.writer_name) as name, U.uid, F.text, Coll.title, UNIX_TIMESTAMP(F.datetime) as date 
+				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Coll.collid as id, IF(F.writer_uid>0,U.username,F.writer_name) as name, U.uid, F.text, Coll.title, UNIX_TIMESTAMP(F.datetime) as date
 						FROM `tbl_feedback`F
 							INNER JOIN `tbl_collections`Coll ON ( F.reference = Coll.collid AND Coll.uid = {$_SESSION['userID']} )
 							LEFT JOIN `tbl_users`U ON ( F.writer_uid = U.uid )
 						WHERE F.type='CO' ",
 			"SE"
-				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Coll.collid as id, IF(F.writer_uid>0,U.username,F.writer_name) as name, U.uid, F.text, Coll.title, UNIX_TIMESTAMP(F.datetime) as date 
+				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Coll.collid as id, IF(F.writer_uid>0,U.username,F.writer_name) as name, U.uid, F.text, Coll.title, UNIX_TIMESTAMP(F.datetime) as date
 						FROM `tbl_feedback`F
 							INNER JOIN `tbl_collections`Coll ON ( F.reference = Coll.collid AND Coll.uid = {$_SESSION['userID']} )
 							LEFT JOIN `tbl_users`U ON ( F.writer_uid = U.uid )
 						WHERE F.type='SE' ",
 			"RC"
-				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Rec.recid as id, IF(F.writer_uid>0,U.username,F.writer_name) as name, U.uid, F.text, Rec.title, Rec.url, UNIX_TIMESTAMP(F.datetime) as date 
+				=>	"SELECT SQL_CALC_FOUND_ROWS F.type as type, F.fid, Rec.recid as id, IF(F.writer_uid>0,U.username,F.writer_name) as name, U.uid, F.text, Rec.title, Rec.url, UNIX_TIMESTAMP(F.datetime) as date
 						FROM `tbl_feedback`F
 							INNER JOIN `tbl_recommendations`Rec ON ( F.reference = Rec.recid AND Rec.uid = {$_SESSION['userID']} )
 							LEFT JOIN `tbl_users`U ON ( F.writer_uid = U.uid )
@@ -1097,7 +1119,7 @@ class UserCP extends Controlpanel
 			return $sql[$module][$type];
 		else return NULL;
 	}
-	
+
 	public function saveBookFav($post, $params)
 	{
 		if ( isset($post['delete'] ) )
@@ -1108,7 +1130,7 @@ class UserCP extends Controlpanel
 
 		if ( in_array($params['id'][0],["AU","RC","CO","SE","ST"]) )
 		{
-			$insert = 
+			$insert =
 			[
 				"uid"			=>	$_SESSION['userID'],
 				"item"			=>	$params['id'][1],
@@ -1123,27 +1145,27 @@ class UserCP extends Controlpanel
 		}
 		return FALSE;
 	}
-	
+
 	public function settingsCheckPW($oldPW)
 	{
 		$password = $this->exec("SELECT U.password FROM `tbl_users` U where ( U.uid = {$_SESSION['userID']} )")[0]['password'];
-		
+
 		if ( password_verify ( $oldPW, $password ) )
 			return TRUE;
-		
+
 		if( $password==md5($oldPW) )
 		{
 			$this->userChangePW( $_SESSION['userID'], $oldPW );
 			return TRUE;
 		}
-		
+
 		return FALSE;
 	}
-	
+
 	public function settingsLoadProfile()
 	{
-		$sql = "SELECT F.field_type as type, F.field_name as name, F.field_title as title, F.field_options as options, I.info 
-					FROM `tbl_user_fields`F 
+		$sql = "SELECT F.field_type as type, F.field_name as name, F.field_title as title, F.field_options as options, I.info
+					FROM `tbl_user_fields`F
 						LEFT OUTER JOIN `tbl_user_info`I ON ( F.field_id = I.field AND I.uid={$_SESSION['userID']} )
 				WHERE F.enabled=1";
 		if([]==$data=$this->exec($sql)) return NULL;
@@ -1153,18 +1175,18 @@ class UserCP extends Controlpanel
 		}
 		return $data;
 	}
-	
+
 	public function settingsSaveProfile($data)
 	{
 		$fields = $this->exec("SELECT F.field_id as id, F.field_type as type, F.field_name as label
 								FROM `tbl_user_fields`F
 								WHERE F.enabled=1;");
-		
+
 		$mapper = new \DB\SQL\Mapper( $this->db, $this->prefix."user_info" );
 		foreach($fields as $field)
 		{
 			$mapper->load(['uid = ? AND field = ?', $_SESSION['userID'], $field['id'] ]);
-			
+
 			// Delete empty field
 			if ( $data[$field['label']]==="" )
 			{
@@ -1185,12 +1207,12 @@ class UserCP extends Controlpanel
 			$mapper->reset();
 		}
 	}
-	
+
 	public function settingsLoadPreferences()
 	{
 		$data = $this->exec("SELECT `alert_feedback`, `alert_comment`, `alert_favourite`, `preferences` FROM `tbl_users`U WHERE U.uid = ".$_SESSION['userID']);
 		if(empty($data)) return FALSE;
-		
+
 		$data = $data[0];
 		$data['p'] = json_decode($data['preferences'],TRUE);
 		return $data;
@@ -1200,11 +1222,11 @@ class UserCP extends Controlpanel
 	{
 		$mapper = new \DB\SQL\Mapper( $this->db, $this->prefix."users" );
 		$mapper->load(['uid = ?', $_SESSION['userID'] ]);
-		
+
 		$mapper->alert_feedback 	= (int)$data['alert_feedback'];
 		$mapper->alert_comment		= (int)$data['alert_comment'];
 		$mapper->alert_favourite	= (int)$data['alert_favourite'];
-		
+
 		$mapper->preferences		= json_encode
 										([
 											"ageconsent"	=> $data['p']['ageconsent'],

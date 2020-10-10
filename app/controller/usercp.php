@@ -10,14 +10,14 @@ class UserCP extends Base
 		$this->template = new \View\UserCP();
 		\Base::instance()->set('systempage', TRUE);
 	}
-	
-	public function beforeroute()//: void
+
+	public function beforeroute() : void
 	{
 		parent::beforeroute();
 		$this->response->addTitle( \Base::instance()->get('LN__UserCP') );
 	}
 
-	public function index(\Base $f3, array $params)//: void
+	public function index(\Base $f3, array $params) : void
 	{
 		$modules = [ "library", "messaging", "author", "feedback", "friends", "settings", "polls" ];
 
@@ -38,11 +38,11 @@ class UserCP extends Base
 			$this->buffer( $this->start($f3, $params) );
 	}
 
-	public function ajax(\Base $f3, array $params)//: void
+	public function ajax(\Base $f3, array $params) : void
 	{
 		$data = [];
-		if ( empty($params['module']) ) return NULL;
-		
+		if ( empty($params['module']) ) return;
+
 		$post = $f3->get('POST');
 
 		switch ( $params['module'] )
@@ -62,19 +62,19 @@ class UserCP extends Base
 		echo json_encode($data);
 		exit;
 	}
-	
-	public function start(\Base $f3, array $params)//: void
+
+	public function start(\Base $f3, array $params) : string
 	{
 		// no additional work required here
 		$this->showMenu();
-		
+
 		// get some user stats
 		$stats = $this->model->startGetStats();
-		
+
 		return $this->template->start($stats);
 	}
-	
-	public function author(\Base $f3, array $params)//: void
+
+	public function author(\Base $f3, array $params) : string
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_MyLibrary') );
 		// Menu must be built at first because it also generates the list of allowed authors
@@ -87,7 +87,7 @@ class UserCP extends Base
 		{
 			if ( array_key_exists("curator", $params) )
 				return $this->authorCurator($f3, $params);
-			
+
 			elseif ( array_key_exists("uid", $params) AND isset($allowed_authors[$params['uid']]) AND isset ($params[1]) )
 			{
 				switch ( $params[1] )
@@ -107,16 +107,16 @@ class UserCP extends Base
 				}
 			}
 		}
-		
+
 		return $this->authorHome( $f3, $params );
 	}
-	
-	protected function authorCurator(\Base $f3, array $params): string
+
+	protected function authorCurator(\Base $f3, array $params) : string
 	{
 		// Get the current curator and list of people being curated
 		$data = $this->model->authorCuratorGet();
 		$change = FALSE;
-		
+
 		// extract the curator id from the form
 		$curator_id = $f3->get('POST.curator_id');
 
@@ -125,14 +125,14 @@ class UserCP extends Base
 
 		elseif ( $curator_id!==NULL OR isset($params['remove']) )
 			$change = $this->model->authorCuratorRemove(@$params['id']);
-			
+
 		// Strip all requests and reload data
 		if ($change) $f3->reroute("/userCP/author/curator", false);
-		
+
 		return $this->template->authorCurator($data);
 	}
 
-	protected function authorHome(\Base $f3, array $params): string
+	protected function authorHome(\Base $f3, array $params) : string
 	{
 		// Future: load stuff, like to-do, open ends ...
 		if ( $_SESSION['groups']&5 )
@@ -140,16 +140,16 @@ class UserCP extends Base
 			$data = [];
 		}
 		else $data = FALSE;
-		
+
 		return $this->template->authorHome($data);
 	}
-	
-	protected function authorStoryAdd(\Base $f3, int $uid): string
+
+	protected function authorStoryAdd(\Base $f3, int $uid) : string
 	{
 		// check for an attempt to impersonate a different author
 		if(FALSE===in_array($uid, $_SESSION['allowed_authors']))
 			$f3->reroute("/userCP/author", false);
-		
+
 		$data = [ "uid" => $uid ];
 		// Check data
 		if ( sizeof($_POST) )
@@ -163,14 +163,14 @@ class UserCP extends Base
 				}
 			}
 		}
-		
+
 		return $this->template->authorStoryAdd($data);
 	}
-	
-	protected function authorStorySelect(array $params): string
+
+	protected function authorStorySelect(array $params) : string
 	{
 		if ( empty($params['uid']) ) return FALSE;
-		
+
 		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
 
 		// search/browse
@@ -189,11 +189,11 @@ class UserCP extends Base
 
 		if ( FALSE === $data = $this->model->authorStoryList($params[1],$params['uid'],$sort,$page) )
 			return FALSE;
-		
+
 		return $this->template->authorStoryList($data, $sort, $params);
 	}
 
-	protected function authorStoryEdit(\Base $f3, array $params): string
+	protected function authorStoryEdit(\Base $f3, array $params) : string
 	{
 		if ( isset($params['sid']) AND  ( [] !== $storyData = $this->model->storyLoadInfo($params['sid'], $params['uid']) ) )
 		{
@@ -302,8 +302,8 @@ class UserCP extends Base
 		$return = !empty($params['returnpath']) ? $params['returnpath'] : "userCP/author/uid={$params['uid']}";
 		$f3->reroute($return, false);
 	}
-	
-	public function feedback(\Base $f3, array $params)//: void
+
+	public function feedback(\Base $f3, array $params) : string
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Reviews') );
 
@@ -313,9 +313,9 @@ class UserCP extends Base
 		// delete function get's accompanied by a pseudo-post, this doesn't count here. Sorry dude
 		if( NULL != $post = $f3->get('POST') )
 		{
-			if ( array_key_exists("delete",$post) )
+			if ( array_key_exists("confirm_delete",$post) )
 			{
-				$this->model->deleteFeedback($post, $params);
+				$this->model->deleteFeedback($params);
 				$f3->reroute($params['returnpath'], false);
 				exit;
 			}
@@ -324,7 +324,6 @@ class UserCP extends Base
 				if ( FALSE === $result = $this->model->saveFeedback($post, $params) )
 				{
 					$_SESSION['lastAction'] = [ "modified" => "unknown" ];
-					//$this->libraryBookFavEdit($f3, $params);
 				}
 				else
 				{
@@ -345,16 +344,16 @@ class UserCP extends Base
 				return \View\Base::stub("reviews");
 				break;
 			default:
-				$this->feedbackHome($f3, $params);
+				return $this->feedbackHome($f3, $params);
 		}
 
 	}
-	
-	protected function feedbackReviews(\Base $f3, array $params)//: void
+
+	protected function feedbackReviews(\Base $f3, array $params) : string
 	{
 		if ( empty($params[1]) OR !in_array($params[1], [ "written","received" ]) )
 			$f3->reroute("/userCP/feedback/reviews/written", false);
-		
+
 		// Build upper micro-menu
 		$select = $params[1];
 		$counter = $this->counter['r'.$params[1][0]]['details'];
@@ -369,11 +368,11 @@ class UserCP extends Base
 			];
 			$this->buffer ( $this->template->upperMenu($menu_upper, $counter, "feedback/reviews/".$params[1], "comments") );
 		}
-		
+
 		// End of menu
-		
+
 		if(array_key_exists("edit",$params))
-			$this->feedbackReviewsEdit($f3, $params);
+			return $this->feedbackReviewsEdit($f3, $params);
 		if(array_key_exists("save",$params))
 			$this->feedbackReviewsSave($f3, $params);
 		elseif(array_key_exists("delete",$params))
@@ -403,12 +402,14 @@ class UserCP extends Base
 			$data = $this->model->listReviews($page, $sort, $params);
 
 			$extra = [ "sub" => [ $params[0], $params[1] ], "type" => $params[2] ];
-			
+
 			return $this->template->feedbackListReviews($data, $sort, $extra);
 		}
+		// nothing yet ...
+		return "";
 	}
-	
-	protected function feedbackReviewsEdit(\Base $f3, array $params)//: void
+
+	protected function feedbackReviewsEdit(\Base $f3, array $params) : string
 	{
 		if ( FALSE === $data = $this->model->loadReview($params) )
 		{
@@ -416,7 +417,7 @@ class UserCP extends Base
 			$f3->reroute("/userCP/feedback/reviews", false);
 			exit;
 		}
-		$this->buffer ( $this->template->libraryFeedbackEdit($data, $params) );
+		return $this->template->libraryFeedbackEdit($data, $params);
 	}
 
 	protected function feedbackReviewsSave(\Base $f3, array $params)//: void
@@ -446,7 +447,7 @@ class UserCP extends Base
 				if ( FALSE === $this->model->reviewDeleteTree($params['id'][1]) )
 				{
 					// Set a session note to show after reroute
-					
+
 					// drop out with an error
 					return FALSE;
 				}
@@ -462,14 +463,13 @@ class UserCP extends Base
 		}
 		return TRUE;
 	}
-	
+
 	protected function feedbackHome(\Base $f3, array $params)//: void
 	{
 		$stats = $this->model->feedbackHomeStats($this->counter);
-		$this->buffer ( $this->template->feedbackHome($stats) );
-		//return "Noch nix";
+		return $this->template->feedbackHome($stats);
 	}
-	
+
 	public function friends(\Base $f3, array $params)//: void
 	{
 		//$this->response->addTitle( $f3->get('LN__UserMenu_Settings') );
@@ -485,12 +485,12 @@ class UserCP extends Base
 
 		$this->showMenu("friends");
 	}
-	
+
 	public function friendsList(\Base $f3, array $params)//: void
 	{
-		
+
 	}
-	
+
 	protected function friendsUpdate(\Base $f3, array $params)//: void
 	{
 		if ( isset($params['add']) )
@@ -498,8 +498,8 @@ class UserCP extends Base
 		if ( isset($params['remove']) )
 			$this->model->friendsRemove($params['remove']);
 		//print_r($params);exit;
-		
-		
+
+
 		// return to member page on empty data
 		$f3->reroute
 		(
@@ -508,7 +508,7 @@ class UserCP extends Base
 		);
 		exit;
 	}
-		
+
 
 	public function settings(\Base $f3, array $params)//: void
 	{
@@ -530,7 +530,7 @@ class UserCP extends Base
 
 		$this->showMenu("settings");
 	}
-	
+
 	protected function settingsProfile(\Base $f3, array $params)//: void
 	{
 		/*
@@ -546,7 +546,7 @@ class UserCP extends Base
 			$this->model->settingsSaveProfile($post['form']);
 		}
 		$profile = $this->model->settingsLoadProfile();
-		
+
 		$this->buffer ( $this->template->settingsProfile($profile) );
 	}
 
@@ -561,7 +561,7 @@ class UserCP extends Base
 			$f3->reroute("/userCP/settings/preferences", false);
 		}
 		$preferences = $this->model->settingsLoadPreferences();
-		
+
 		$this->buffer ( $this->template->settingsPreferences($preferences) );
 	}
 
@@ -581,7 +581,7 @@ class UserCP extends Base
 			}
 			else $feedback = "error";
 		}
-		
+
 		$this->buffer ( $this->template->settingsChangePW($feedback) );
 	}
 
@@ -596,7 +596,7 @@ class UserCP extends Base
 
 		$sub = [ "bookmark", "favourite", "recommendations", "series", "collections" ];
 		if ( !in_array(@$params[0], $sub) ) $params[0] = "";
-		
+
 		$this->showMenu("library");
 
 		switch ( $params[0] )
@@ -616,7 +616,7 @@ class UserCP extends Base
 				$this->buffer ( "Empty page");
 		}
 	}
-	
+
 	private function libraryBookFav(\Base $f3, array $params)//: void
 	{
 		// delete function get's accompanied by a pseudo-post, this doesn't count here. Sorry dude
@@ -631,7 +631,7 @@ class UserCP extends Base
 			elseif ( $params[0] == "recommendation" )
 			{
 				//
-				
+
 			}
 			else
 			{
@@ -651,7 +651,7 @@ class UserCP extends Base
 		// Build upper micro-menu
 		$counter = $this->counter[$params[0]]['details'];
 		$menu_upper = [];
-		
+
 		if ( is_array($counter) )
 		{
 			$menu_upper =
@@ -668,7 +668,7 @@ class UserCP extends Base
 
 		if(array_key_exists("edit",$params))
 			$this->libraryBookFavEdit($f3, $params);
-		
+
 		if ( isset($params[1]) AND isset($counter[$params[1]]) )
 		{
 			$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
@@ -685,15 +685,15 @@ class UserCP extends Base
 			$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "name";
 			$sort["order"]		= $allow_order[$sort["link"]];
 			$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="desc") ?	"desc" : "asc";
-			
+
 			$data = $this->model->listBookFav($page, $sort, $params);
-			
+
 			$extra = [ "sub" => $params[0], "type" => $params[1] ];
-			
+
 			$this->buffer ( $this->template->libraryBookFavList($data, $sort, $extra) );
 		}
 	}
-	
+
 	private function libraryBookFavEdit(\Base $f3, array $params) : void
 	{
 		if ( FALSE !== $data = $this->model->loadBookFav($params) )
@@ -701,7 +701,7 @@ class UserCP extends Base
 			$this->buffer ( $this->template->libraryBookFavEdit($data, $params) );
 		}
 	}
-	
+
 	private function libraryCollections(\Base $f3, array $params) : void
 	{
 		if ( $params[0]=="collections" )
@@ -891,19 +891,19 @@ class UserCP extends Base
 				{
 					$f3->set('lookup_error', 0);
 				}
-				
+
 				// server has found something
 				elseif ( @$data['lookup']['http_code']==200 )
 					$f3->set('lookup_success', 1);
 				// server has found something but it's not the plain 'OK' code
 				elseif ( @$data['lookup']['http_code']>200 AND @$data['lookup']['http_code']<300 )
 					$f3->set('lookup_success', 0);
-	
+
 				// Server replies with a permanent moved status
 				elseif ( @$data['lookup']['http_code']==301 OR @$data['lookup']['http_code']==308 )
 				{
 					// if the only difference is a change from http to https, silently alter the value and inform the user.
-					if ( str_replace("http:", "https:", $data['url']) == @$data['lookup']['redirect_url'] OR 
+					if ( str_replace("http:", "https:", $data['url']) == @$data['lookup']['redirect_url'] OR
 							"https://".$data['url'] == $data['lookup']['redirect_url'] )
 					{
 						$data['url'] = $data['lookup']['redirect_url'];
@@ -914,7 +914,7 @@ class UserCP extends Base
 						$f3->set('lookup_moved', 0);
 					}
 				}
-				
+
 				elseif ( @$data['lookup']['http_code']>=400 )
 				{
 					$f3->set('lookup_error', 0);
@@ -931,7 +931,7 @@ class UserCP extends Base
 				exit;
 			}
 		}
-		
+
 		// page will always be an integer > 0
 		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
 
@@ -948,7 +948,7 @@ class UserCP extends Base
 		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "id";
 		$sort["order"]		= $allow_order[$sort["link"]];
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
-		
+
 		$this->buffer
 		(
 			$this->template->recommendationList
@@ -959,13 +959,13 @@ class UserCP extends Base
 		);
 
 	}
-	
+
 	public function messaging(\Base $f3, array $params) : void
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Message') );
-		
+
 		$sub = [ "outbox", "read", "write", "delete" ];
-		
+
 		if ( !in_array(@$params[0], $sub) ) $params[0] = "";
 
 		$this->showMenu("messaging");
@@ -998,7 +998,7 @@ class UserCP extends Base
 				);
 		}
 	}
-	
+
 	public function msgRead(\Base $f3, array $params)//: void
 	{
 		if ( $data = $this->model->msgRead($params['id']) )
@@ -1008,7 +1008,7 @@ class UserCP extends Base
 		// todo: make a better error page
 		else $this->buffer( "*** No such message or access violation!");
 	}
-	
+
 	public function msgDelete(\Base $f3, array $params)//: void
 	{
 		$result = $this->model->msgDelete($params['message']);
@@ -1017,14 +1017,14 @@ class UserCP extends Base
 		$f3->reroute($params['returnpath'], false);
 		exit;
 	}
-	
+
 	public function msgWrite(\Base $f3, array $params)//: void
 	{
 		if( isset($_POST['recipient']) )
 			$this->msgSave($f3);
 
 		$data = $this->model->msgReply(@$params['reply']);
-		
+
 		$this->buffer
 		(
 			$this->template->msgWrite
@@ -1033,7 +1033,7 @@ class UserCP extends Base
 			)
 		);
 	}
-	
+
 	// todo: add reroute based on the outcome of the model
 	protected function msgSave(\Base $f3)
 	{
@@ -1050,22 +1050,22 @@ class UserCP extends Base
 			$status = $this->model->msgSave($save); // return TRUE
 		}
 	}
-	
+
 	protected function polls(\Base $f3, array $params)//: void
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Polls') );
 		$this->showMenu("polls");
-		
+
 		if ( isset($params['id']) )
 		{
-			
-			
+
+
 			return $params['id'];
 		}
-		
+
 		// page will always be an integer > 0
 		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
-		
+
 		// search/browse
 		$allow_order = array (
 			"id"		=>	"poll_id",
@@ -1084,14 +1084,14 @@ class UserCP extends Base
 		$sort['data']['member']= ( $sort['direction']=="desc" OR $sort['link']!='member' )? "asc" : "desc";
 
 		$polls = $this->model->pollsList($page, $sort);
-		
+
 		return $this->template->pollsList( $polls, $sort );
 	}
-	
+
 	protected function shoutbox(\Base $f3, array $params)//: void
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Shoutbox',0) );
-		
+
 		$this->showMenu("shoutbox");
 
 		// Check for form data
@@ -1109,10 +1109,10 @@ class UserCP extends Base
 				$f3->reroute($params['returnpath'], false);
 				exit;
 			}
-			
+
 			// save changes - to come
-			
-			
+
+
 			// reroute
 			if ( $params['returnpath']=="" ) $params['returnpath'] = "/userCP/messaging/shoutbox";
 			$f3->reroute($params['returnpath'], false);
@@ -1123,20 +1123,20 @@ class UserCP extends Base
 			// load message
 
 		}
-		
+
 
 		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
 		$data = $this->model->shoutboxList($page);
-		
+
 		$this->buffer( $this->template->shoutboxList($data) );
 	}
-	
+
 	protected function showMenu($selected=FALSE, array $data=[])//: void
 	{
 		$menu = $this->model->showMenu($selected, $data);
 
 		$this->buffer ( $this->template->showMenu($menu), "LEFT" );
-		
+
 		if($selected) $this->counter = $this->model->getCounter($selected);
 	}
 }

@@ -22,14 +22,14 @@ class Frontend extends Template
 			- process tags
 			- prepare data for outer page rendering
 		*/
-		
+
 		if ( FALSE==\Config::getPublic('maintenance') OR $_SESSION['groups']&64 )
 			$body =  $this->post_render(
 										$this->tagWork(
 												\Template::instance()->render('main/body.html')
 										)
 								);
-		else 
+		else
 			$body =  $this->post_render(
 										$this->tagWork(
 												\Template::instance()->render('main/body.maintenance.html')
@@ -46,7 +46,7 @@ class Frontend extends Template
 							);
 
 		$f3->set('BODY', $body);
-		
+
 		return \Template::instance()->render('index.html');
     }
 
@@ -88,7 +88,7 @@ class Frontend extends Template
 		}
 		else return $tpl;
 	}
-	
+
 	private function post_render($buffer)
 	{
 		$this->f3->set( 'JS_HEAD', @implode("\n", @$this->f3->JS['head']) );
@@ -104,7 +104,7 @@ class Frontend extends Template
 		}
 
 		else $this->f3->set('TITLE', $this->config['page_title']);
-		
+
 		switch($this->config['debug'])
 		{
 			case 5:
@@ -132,20 +132,20 @@ class Frontend extends Template
 
 		return $buffer;
 	}
-	
+
 	private function honeypot()
 	{
-		$links = 
+		$links =
 		[
-			'<a href="http://efiction.org/credits.php"><!-- give_credits --></a>',
-			'<a href="http://efiction.org/credits.php"><img src="give_credits.gif" height="1" width="1" border="0"></a>',
-			'<a href="http://efiction.org/credits.php" style="display: none;">give_credits</a>',
-			'<div style="display: none;"><a href="http://efiction.org/credits.php">give_credits</a></div>',
-			'<a href="http://efiction.org/credits.php"></a>',
-			'<!-- <a href="http://efiction.org/credits.php">give_credits</a> -->',
-			'<div style="position: absolute; top: -250px; left: -250px;"><a href="http://efiction.org/credits.php">give_credits</a></div>',
-			'<a href="http://efiction.org/credits.php"><span style="display: none;">give_credits</span></a>',
-			'<a href="http://efiction.org/credits.php"><div style="height: 0px; width: 0px;"></div></a>'
+			'<a href="https://efiction.org/credits.php"><!-- give_credits --></a>',
+			'<a href="https://efiction.org/credits.php"><img src="give_credits.gif" height="1" width="1" border="0"></a>',
+			'<a href="https://efiction.org/credits.php" style="display: none;">give_credits</a>',
+			'<div style="display: none;"><a href="https://efiction.org/credits.php">give_credits</a></div>',
+			'<a href="https://efiction.org/credits.php"></a>',
+			'<!-- <a href="https://efiction.org/credits.php">give_credits</a> -->',
+			'<div style="position: absolute; top: -250px; left: -250px;"><a href="https://efiction.org/credits.php">give_credits</a></div>',
+			'<a href="https://efiction.org/credits.php"><span style="display: none;">give_credits</span></a>',
+			'<a href="https://efiction.org/credits.php"><div style="height: 0px; width: 0px;"></div></a>'
 		];
 		return $links[array_rand($links)];
 	}
@@ -159,8 +159,8 @@ class TemplateFilter extends \Prefab
 	* Example: {{nl2br(@data.description),500,3 | crop,raw }}
 	* 2020-09
 	*
-	* @param	string	$text			
-	* @param	int		$characters		
+	* @param	string	$text
+	* @param	int		$characters
 	* @param	int		$paragraphs		Optional
 	*
 	* @return	string					Cropped text
@@ -171,7 +171,7 @@ class TemplateFilter extends \Prefab
 		$regular = $paragraphs===NULL ? '/((?:\s*\.\s*)+)/' : '/((?:\R|<\s*br\s*\/?>\s*|&lt;\s*br\s*\/?&gt;\s*)+)/';
 		$original = $text;
 
-		// crop by letter count, but make an attempt to let the sentence be completed
+		// crop by letter count, but make an attempt to let the sentence be completed.
 		// if paragraph = 0 is provided, also complete the paragraph
 		if ( $characters > 0 AND (int)$paragraphs<1 )
 		{
@@ -201,13 +201,13 @@ class TemplateFilter extends \Prefab
 						PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE
 					),
 					// start slicing with element #0
-					0, 
+					0,
 					// take $characters slices and include their original delimiters
 					$count*2-(int)($paragraphs!==NULL)
 				)
 			);
 		}
-		
+
 		// limit the amount of paragraphs returned.
 		// will respect character limitations made above
 		if ( (int)$paragraphs>0 )
@@ -230,7 +230,7 @@ class TemplateFilter extends \Prefab
 						PREG_SPLIT_NO_EMPTY | PREG_SPLIT_DELIM_CAPTURE
 					),
 					// start slicing with element #0
-					0, 
+					0,
 					// take $paragraphs slices and include their original delimiters
 					$paragraphs*2-1
 				)
@@ -240,12 +240,12 @@ class TemplateFilter extends \Prefab
 		if ( $readmore )
 		{
 			$remains = substr( $original, strlen($text) );
-			$text .= \Template::instance()->render('main/moretext.html', 'text/html', [ "remains" => $remains ] );
+			$text = \Template::instance()->render('main/moretext.html', 'text/html', [ "text" => $text, "remains" => $remains ] );
 		}
 
 		return $text;
 	}
-	
+
 	public function cropmore( string $text, int $characters=150, int $paragraphs=NULL)
 	{
 		$text = $this->crop( $text, $characters, $paragraphs, TRUE);
