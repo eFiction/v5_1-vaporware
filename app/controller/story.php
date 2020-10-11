@@ -54,14 +54,14 @@ class Story extends Base
 		}
 		$this->buffer ($data);
 	}
-	
+
 	public function save(\Base $f3, array $params)
 	{
 		list($requestpath, $returnpath) = array_pad(explode(";returnpath=",$params['*']), 2, '');
 		//@list($story, $view, $selected) = explode(",",$requestpath);
 		$params['returnpath'] = $returnpath;
 
-		/* maybe deprecated? 
+		/* maybe deprecated?
 
 		if ( $params['action']=="read" )
 		{
@@ -70,21 +70,21 @@ class Story extends Base
 
 			elseif ( isset($_POST['write']) )
 				$data = $f3->get('POST');
-			
+
 			// write review or reply to a review
 
 			if( is_numeric($story) AND isset($data) AND ($_SESSION['userID']!=0 || \Config::getPublic('allow_guest_reviews')) )
 			{
 				echo "Panik, schon wieder?";
 				$errors = $this->validateReview($data['write']);
-				
+
 				if ( sizeof($errors)==0 )
 				{
 					// For now let's assume this always returns a proper result
 					@list($insert_id, $routine_type, $routine_id) = $this->model->saveReview($story, $data);
 					// Run notification routines
 					Routines::instance()->notification($routine_type, $routine_id);
-					
+
 					// return to where we came from
 					$return = (empty($params['returnpath']) ? $requestpath."#r".$insert_id : $returnpath);
 					$f3->reroute($params['returnpath'], false);
@@ -98,13 +98,13 @@ class Story extends Base
 			else
 			{
 				// Error reporting
-				
+
 			}
-			
+
 
 		}
 		*/
-			
+
 		if ( $params['action']=="reviews" )
 		{
 			/*
@@ -116,31 +116,30 @@ class Story extends Base
 			{
 				@list($feedback,$hash) = explode("-", $params['*']);
 				@list($story,$chapter,$review) = explode(",", $feedback);
-				
+
 				if ( $chapter[0] == "r" )
 				{
 					$chapter = $this->model->getChapterByReview( substr($chapter, 1) );
 				}
-				
+
 				$requestpath = "{$story},{$chapter},{$review}#{$hash}";
 			}
 		}
-		
+
 		// If nothing else has worked so far, return to where we came from and pretend this was intentional
 		$f3->reroute($requestpath, false);
 		exit;
 	}
-	
-	public function ajax(\Base $f3, array $params)//: void
+
+	public function ajax(\Base $f3, array $params) : void
 	{
 		if ( isset($params['segment']) AND $params['segment']=="search" )
 		{
 			$query = $f3->get('POST');
 			$item = NULL;
 
-			//if ( is_array($query) ) list ( $item, $bind ) = each ( $query );
 			if ( is_array($query) )
-				$data = $this->model->searchAjax( key($query), value($query) );
+				$data = $this->model->searchAjax( key($query), current($query) );
 			echo json_encode($data);
 
 			exit;
@@ -150,15 +149,15 @@ class Story extends Base
 		{
 			/*
 				receive a new review or comment via AJAX-form
-				
+
 				Input data is:
-				
+
 				array: POST.write
 							- name (only defined if guest)
 							- text
 				array: POST.structure
 			*/
-			$structure = 
+			$structure =
 			[
 				"story"		=> (int)$f3->get('POST.structure.element'),
 				"chapter"	=> (int)$f3->get('POST.structure.subelement'),
@@ -169,7 +168,7 @@ class Story extends Base
 			$errors = [];
 			$relocate = FALSE;
 
-			
+
 			if($_SESSION['userID']!=0 || \Config::getPublic('allow_guest_reviews') )
 			{
 				if ( isset($_POST['write']) )
@@ -204,7 +203,7 @@ class Story extends Base
 			exit;
 		}
 	}
-	
+
 	protected function validateReview(array $data): array
 	{
 		$errors = [];
@@ -227,7 +226,7 @@ class Story extends Base
 			if (preg_match("/\b(?:(?:https?|ftp):\/\/|www\.)[-a-z0-9+&@#\/%?=~_|!:,.;]*[-a-z0-9+&@#\/%=~_|]/i",$data['text']))
 				$errors[]= 'GuestURL';
 		}
-		
+
 		return $errors;
 	}
 
@@ -236,10 +235,10 @@ class Story extends Base
 		if ( isset($params['*']) ) $get = $this->parametric($params['*']);
 
 		$data = $this->model->intro();
-		
+
 		return $this->template->viewList($data);
 	}
-	
+
 	public function author(int $id): array
 	{
 		list($info, $data) = $this->model->author($id);
@@ -247,7 +246,7 @@ class Story extends Base
 		$stories = $this->template->viewList($data);
 		return [ $info[0], $stories];
 	}
-	
+
 	protected function contests(array $params)
 	{
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
@@ -258,7 +257,7 @@ class Story extends Base
 			{
 				// no contest
 				\Base::instance()->reroute("/story/contests", false);
-				exit;			
+				exit;
 			}
 			if ( isset($params['entries']) )
 			{
@@ -267,33 +266,33 @@ class Story extends Base
 			}
 			else $buffer = $this->template->contestShow($contest,$params['returnpath']);
 		}
-	
+
 		if ( empty($buffer) )
 		{
 			$data = $this->model->contestsList();
-			
+
 			$buffer = $this->template->contestList($data);
 		}
 
 		return $buffer;
 	}
-	
+
 	protected function updates(array $params): string
 	{
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
-		
+
 		if ( isset($params['date']) AND $selection = explode("-",$params['date']) )
 		{
 			$year = $selection[0];
 			$month = isset($selection[1]) ? min($selection[1],12) : FALSE;
 			$day = isset($selection[2]) ? min($selection[2],date("t", mktime(0, 0, 0, $month, 1, $year))) : FALSE;
-			
+
 			$data = $this->model->updates($year, $month, $day);
 			return $this->template->viewList($data);
 		}
 		else return $this->intro($params);
 	}
-	
+
 	protected function categories(array $params): string
 	{
 		$id = empty($params['*']) ? 0 : $params['*'];
@@ -309,14 +308,14 @@ class Story extends Base
 			return "stub *controller-story-categories*";
 		}
 	}
-	
+
 	protected function printer(string $id)
 	{
 		$id = explode(",",$id);
 		$printer = $id[1] ?? "paper";
 //		$printer = ($id[1]=="") ? "paper" : $id[1];
 		$id = $id[0];
-		
+
 		if ( $printer == "epub" )
 		{
 			// Get the main story data, check if the story is public and an eBook is available.
@@ -326,7 +325,7 @@ class Story extends Base
 				echo "";
 				exit;
 			}
-			
+
 			if($file = realpath("tmp/epub/s{$epubData['sid']}.zip"))
 			{
 				$filesize = filesize($file);
@@ -336,12 +335,12 @@ class Story extends Base
 			{
 				list($ebook, $filesize) = $this->createEPub($epubData['sid']);
 			}
-			
+
 			if ( $ebook )
 			{
 				// http://stackoverflow.com/questions/93551/how-to-encode-the-filename-parameter-of-content-disposition-header-in-http
 				$filename = rawurlencode ( $epubData['title']." by ".$epubData['authors'].".epub" );
-				
+
 				header("Content-type: application/epub+zip; charset=utf-8");
 				header("Content-Disposition: attachment; filename=\"{$filename}\"; filename*=utf-8''".$filename);
 				header("Content-length: ".$filesize);
@@ -361,11 +360,11 @@ class Story extends Base
 			//
 		}
 	}
-	
+
 	private function createEPub(int $sid): array
 	{
 		$epubData = $this->model->epubData($sid)[0];
-		
+
 		\Base::instance()->set('UI', "template/epub/");
 		$filename = realpath("tmp/epub")."/s{$epubData['sid']}.zip";
 
@@ -382,7 +381,7 @@ class Story extends Base
 										),
 										$epubData['title']
 									);
-		
+
 		\Base::instance()->set('EPUB', $epubData);
 
 		$body = "";
@@ -394,7 +393,7 @@ class Story extends Base
 
 		// The folder *should* exist, but creating it and ignoring the outcome is the quickest way of making sure it really is there
 		@mkdir("tmp/epub",0777,TRUE);
-		
+
 		// Auto-detect TidyHTML class
 		if ( TRUE === class_exists('tidy') )
 		{
@@ -428,12 +427,12 @@ class Story extends Base
 			//$zip->addEmptyDir('OEBPS/Images');
 			$zip->addEmptyDir('OEBPS/Styles');
 			$zip->addEmptyDir('OEBPS/Text');
-			
+
 			// add style sheet
 			$zip->addFromString('OEBPS/Styles/stylesheet.css', $this->template->epubCSS() );
 
 		    // title.xhtml
-	    	$zip->addFromString('OEBPS/Text/title.xhtml', 
+	    	$zip->addFromString('OEBPS/Text/title.xhtml',
 											$xml.$this->template->epubPage(
 															$this->template->epubTitle(),
 															$epubData['title'],
@@ -452,7 +451,7 @@ class Story extends Base
 				{
 					$chapterText = $this->model->getChapterText( $epubData['sid'], $chapter['inorder'], FALSE );
 					$chapterTOC[] = array ( "number" => $n, "title" => "{$chapter['title']}" );
-					
+
 					$body = $this->template->epubChapter(
 															$chapter['title'],
 															strip_tags(
@@ -464,23 +463,23 @@ class Story extends Base
 	    														$elements_allowed
 		    												)
 													);
-					
+
 					if ( isset($tidyConfig) )
 					{
 						$tidy->parseString($body, $tidyConfig, 'utf8');
 						$tidy->cleanRepair();
 						$body = $tidy->body();
 					}
-					
+
 					$page = $this->template->epubPage(
 															$body,
 															$chapter['title'],
 															$epubData['language']
 														);
 
-					
 
-					$zip->addFromString('OEBPS/Text/chapter'.($n++).'.xhtml', 
+
+					$zip->addFromString('OEBPS/Text/chapter'.($n++).'.xhtml',
 											$xml.$page
 											);
 
@@ -490,7 +489,7 @@ class Story extends Base
 
 			// root.opf
 		    $zip->addFromString('OEBPS/content.opf', $xml.$this->template->epubRoot( $chapterTOC ) );
-			
+
 			// TOC
 			$zip->addFromString('OEBPS/toc.ncx', $xml.$this->template->epubTOC( $chapterTOC ) );
 
@@ -502,19 +501,19 @@ class Story extends Base
 		return [ @fopen($filename,'rb'), filesize($filename) ];
 
 	}
-	
+
 	public function collections(array $params)//: void
 	{
 		$type = $params['action'];
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
-		
+
 		if ( isset($params['id']) )
 		{
 			if ( NULL === $collection = $this->model->{$type."Load"}((int)$params['id']) )
 			{
 				// no contest
 				\Base::instance()->reroute("/story/".$type, false);
-				exit;			
+				exit;
 			}
 			return $this->template->{$type."Show"}($collection);
 			//else $buffer = $this->template->contestShow($contest,$params['returnpath']);
@@ -524,8 +523,8 @@ class Story extends Base
 			$data = $this->model->{$type."List"}();
 			return $this->template->{$type."List"}($data);
 		}
-		
-		
+
+
 	}
 
 	public function search(\Base $f3, array $params)
@@ -555,7 +554,7 @@ class Story extends Base
 										);
 		}
 		$this->template->addTitle($f3->get('LN__Search'));
-		
+
 		// Author
 		if ( empty($searchData['author']) )
 			$f3->set('prepopulateData.author',"[]");
@@ -598,7 +597,7 @@ class Story extends Base
 			}
 			$return = implode(";",$return);
 			$data = $this->model->search( $searchData, $return, $searchForm );
-			
+
 			// Show a header, the view will select browse or search template
 			$this->buffer ( $this->template->searchHead($searchData, $return, $searchForm) );
 
@@ -609,7 +608,7 @@ class Story extends Base
 		else
 			$this->buffer ( $this->template->searchHead() );
 	}
-	
+
 	protected function searchCleanInput(&$arr=array()): array
 	{
 		$arr = is_array($arr) ? $arr : explode(",",$arr);
@@ -621,12 +620,12 @@ class Story extends Base
 	protected function read(array $id)//: void
 	{
 		@list($story, $view, $selected) = explode(",",$id['*']);
-		
+
 		// do away with malformed requests right here
 		if ( $story == "" OR !is_numeric($story) )
 		{
 			\Base::instance()->reroute("/story", false);
-			exit;			
+			exit;
 		}
 		elseif($storyData = $this->model->getStory($story,empty($view)?1:$view))
 		{
@@ -667,7 +666,7 @@ class Story extends Base
 		}
 		else return "__Error, not found";
 	}
-	
+
 	protected function reviews(string $id)//: void
 	{
 		@list($story, $chapter, $selected) = explode(",",$id);
@@ -682,7 +681,7 @@ class Story extends Base
 		}
 		else return "__Error, not found";
 	}
-	
+
 	public function storyBlocks(string $select): string
 	{
 		$select = explode(".",$select);
@@ -698,7 +697,7 @@ class Story extends Base
 			$items = (isset($select[1]) AND is_numeric($select[1])) ? $select[1] : 5;
 			$data = $this->model->blockNewStories($items);
 			$size = isset($select[2]) ? $select[2] : 'large';
-			
+
 			return $this->template->blockStory("new", $data, $size);
 		}
 		elseif ( $select[0] == "random" )
@@ -706,7 +705,7 @@ class Story extends Base
 			$items = (isset($select[1]) AND is_numeric($select[1])) ? $select[1] : 1;
 			// cached for 1 minute
 			$data = $this->model->blockRandomStory($items);
-			
+
 			return $this->template->blockStory("random", $data);
 		}
 		elseif ( $select[0] == "featured" )
@@ -718,7 +717,7 @@ class Story extends Base
 			$items = (isset($select[1]) AND is_numeric($select[1])) ? $select[1] : 1;
 			$order = $select[2] ?? NULL;
 			$data = $this->model->blockFeaturedStory($items,$order);
-			
+
 			return $this->template->blockStory("featured", $data);
 		}
 		elseif ( $select[0] == "recommend" )
@@ -731,20 +730,20 @@ class Story extends Base
 			*/
 			$items = (isset($select[1]) AND is_numeric($select[1])) ? $select[1] : 1;
 			$order = $select[2] ?? NULL;
-			
+
 			$data = $this->model->blockRecommendedStory($items,$order);
-			
+
 			return $this->template->blockStory("recommended", $data);
 		}
 		elseif ( $select[0] == "tagcloud" )
 		{
 			// Get number of desired items from template call or set to maximum items from config
 			$items = (isset($select[2]) AND is_numeric($select[2])) ? $select[2] : \Config::getPublic('tagcloud_elements');
-			
+
 			// if there is a minimum amount of items requested, make sure the template call does not request less items
 			if ( 0 < \Config::getPublic('tagcloud_minimum_elements') )
 				$items = max(\Config::getPublic('tagcloud_minimum_elements'),$items);
-			
+
 			$data = $this->model->blockTagcloud($items);
 
 			// If size of data is below minimum element threshhold, don't bother building a tagcloud
@@ -759,7 +758,7 @@ class Story extends Base
 			if ( empty(\Config::getPublic('optional_modules')['contests']) ) return "";
 			// get the data
 			$data = $this->model->blockContests( ($select[1]??FALSE), ($select[2]??FALSE) );
-			
+
 			return $this->template->blockContests($data);
 		}
 		/*
@@ -781,7 +780,7 @@ class Story extends Base
 						$time = strtotime('tomorrow') - time();
 				}
 
-				// apply default TTL values 
+				// apply default TTL values
 				if ( empty($time) )
 				{
 					$time = "900"; // 15 minutes, that's the default amount of fame-time
@@ -793,17 +792,17 @@ class Story extends Base
 				\Cache::instance()->set('fameData', $data, $time);
 				\Cache::instance()->set('fameTime', $data, $select[2]);
 			}
-			
+
 			/*
 				update the TTL if a change was made to the template
 				this will not work if the template does not provide a TTL
-				
+
 				in this case, the TTL has to be calculated again, bloating this update
 				skipping for now until finding a better solution
-				
+
 			if ( isset($select[2]) AND $select[2] != \Cache::instance()->get('fameTime') )
 				\Cache::instance()->set('fameData', \Cache::instance()->get('fameTime') );
-			
+
 
 			return $this->template->blockStory("random", $data, $select[2]);
 		}
@@ -811,7 +810,7 @@ class Story extends Base
 		return "";
 	}
 
-	
+
 }
 
 function uuid_v5(string $namespace, string $name)//: ?string

@@ -14,6 +14,8 @@ code, kbd, pre, tt {
 h1, h2, h3, h4, h5, h6 {
 	font-family: 'Quicksand', sans-serif;
 	font-weight: 300;
+	margin: 5px;
+	padding: 5px;
 	}
 
 h1 {
@@ -33,9 +35,12 @@ h4 {
 	font-size: 18pt;
 }
 h5 {
+	text-align: center;
 	font-size: 16pt;
 	border-bottom: 1px solid #efefef;
 }
 h6 {
-	font-size: 14pt;
+	text-align: center;
+	font-size: 13pt;
+	border-bottom: 1px dashed #efefef;
 }
