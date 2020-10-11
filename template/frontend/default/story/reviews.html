@@ -47,6 +47,19 @@
 							success(saveComment(data));
 						}, 500);
 					},
+					postComment: function(commentJSON, success, error) {
+						$.ajax({
+						  type: 'POST',
+						  url: '{{@BASE}}/story/ajax/postreview',
+						datatype: 'JSON',
+						  data: commentJSON,
+						  success: function(comment) {
+							alert(comment);
+							success(comment)
+						  },
+						  error: error
+						});
+					},
 					putComment: function(data, success, error) {
 						setTimeout(function() {
 							success(saveComment(data));
@@ -55,16 +68,6 @@
 					deleteComment: function(data, success, error) {
 						setTimeout(function() {
 							success();
-						}, 500);
-					},
-					upvoteComment: function(data, success, error) {
-						setTimeout(function() {
-							success(data);
-						}, 500);
-					},
-					validateAttachments: function(attachments, callback) {
-						setTimeout(function() {
-							callback(attachments);
 						}, 500);
 					},
 				});

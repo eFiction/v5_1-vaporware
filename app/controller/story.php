@@ -202,6 +202,18 @@ class Story extends Base
 			echo json_encode($reviews);
 			exit;
 		}
+
+		elseif ( isset($params['segment']) AND $params['segment']=="postreview" )
+		{
+			$parent = (int)$f3->get('POST.parent');
+
+			//
+			//var_dump ( $params );
+			//echo json_encode(["success" => "Texte"]);
+			header('Content-type:application/json;charset=utf-8');
+			echo json_encode("Texte");
+			exit;
+		}
 	}
 
 	protected function validateReview(array $data): array

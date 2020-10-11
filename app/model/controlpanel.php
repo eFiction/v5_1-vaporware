@@ -409,6 +409,7 @@ class Controlpanel extends Base {
 
 		if (sizeof($data)==1 AND $data[0]['sid']!="")
 		{
+			$data[0]['contests'] = $this->exec("SELECT C.conid,C.title,C.active,rC.relid FROM `view_contestsList`C LEFT JOIN `tbl_contest_relations`rC ON ( C.conid = rC.conid AND rC.type='ST' AND rC.relid = ".$data[0]['sid']." ) WHERE C.active != 'closed' OR rC.relid IS NOT NULL");
 			$data[0]['ratings'] = $this->exec("SELECT rid, rating, ratingwarning FROM `tbl_ratings`");
 			return $data[0];
 		}
@@ -478,6 +479,8 @@ class Controlpanel extends Base {
 
 		// Step two: check for changes in relation tables
 
+		// check for contest participation
+		$this->relationStoryContest( $story->sid, $post['contest']??[] );
 		// Check tags:
 		$i += $this->relationStoryTag( $story->sid, $post['tags'] );
 		// Check Characters:
@@ -869,8 +872,12 @@ class Controlpanel extends Base {
 		return TRUE;
 	}
 
-	public function rebuildContestCache( int $conid ) : bool
+	public function cacheContest( $conList ) : bool
 	{
+		if ( is_numeric($conList) )
+			$conList[] = (int)$conList;
+		$i=0;
+
 		$sql = "SELECT SELECT_OUTER.conid,
 					GROUP_CONCAT(DISTINCT tid,',',tag,',',description,',',tgid ORDER BY `order`,tgid,tag ASC SEPARATOR '||') AS tagblock,
 					GROUP_CONCAT(DISTINCT charid,',',charname ORDER BY charname ASC SEPARATOR '||') AS characterblock,
@@ -894,28 +901,30 @@ class Controlpanel extends Base {
 					)AS SELECT_OUTER
 				GROUP BY conid ORDER BY conid ASC";
 
-		$item = $this->exec($sql, [':conid' => $conid] );
+		foreach ( $conList as $conid )
+		{
+			if ([] !== $item = $this->exec($sql, [':conid' => $conid] ))
+			{
+				$item = $item[0];
 
-		if ( empty($item) ) return FALSE;
+				$tagblock['simple'] = $this->cleanResult($item['tagblock']);
+				if($tagblock['simple']!==NULL) foreach($tagblock['simple'] as $t)
+					$tagblock['structured'][$t[2]][] = [ $t[0], $t[1], $t[2], $t[3] ];
 
-		$item = $item[0];
-
-		$tagblock['simple'] = $this->cleanResult($item['tagblock']);
-		if($tagblock['simple']!==NULL) foreach($tagblock['simple'] as $t)
-			$tagblock['structured'][$t[2]][] = [ $t[0], $t[1], $t[2], $t[3] ];
-
-		$this->update
-		(
-			'tbl_contests',
-			[
-				'cache_tags'		=> json_encode($tagblock),
-				'cache_characters'	=> json_encode($this->cleanResult($item['characterblock'])),
-				'cache_categories'	=> json_encode($this->cleanResult($item['categoryblock'])),
-				'cache_stories'		=> json_encode($this->cleanResult($item['storyblock'])),
-			],
-			['conid=?',$conid]
-		);
-		return TRUE;
+				$this->update
+				(
+					'tbl_contests',
+					[
+						'cache_tags'		=> json_encode($tagblock),
+						'cache_characters'	=> json_encode($this->cleanResult($item['characterblock'])),
+						'cache_categories'	=> json_encode($this->cleanResult($item['categoryblock'])),
+						'cache_stories'		=> json_encode($this->cleanResult($item['storyblock'])),
+					],
+					['conid=?',$conid]
+				);
+			}
+		}
+		return $i;
 	}
 
 
@@ -1244,6 +1253,44 @@ class Controlpanel extends Base {
 		if ( isset( $recounts ) )
 			$this->recountTags( $recounts, $character );
 		return $i;
+	}
+
+	public function relationStoryContest( int $storyID, array $contests ) : void
+	{
+		$data = array_keys( $contests, "on" );
+		$relations = new \DB\SQL\Mapper($this->db, $this->prefix.'contest_relations');
+		$contest = new \DB\SQL\Mapper($this->db, $this->vprefix.'contestsList');
+		$i = 0;
+
+		foreach ( $relations->find(array('`relid` = ? AND `type` = "ST"',$storyID)) as $X )
+		{
+			$temp=array_search($X['conid'], $data);
+			if ( $temp===FALSE AND $contest->count(array('`conid` = ? AND `active` != "closed"', $X['conid'])) )
+			{
+				$recounts[] = $X['conid'];
+				// Excess relation, drop from table
+				$relations->erase(['lid=?',$X['lid']]);
+				$i++;
+			}
+			elseif ( $temp ) unset($data[$temp]);
+		}
+
+		// Link any contest currently not linked
+		if ( sizeof($data)>0 )
+		{
+			foreach ( $data as $temp)
+			{
+				// Add relation to table
+				$relations->reset();
+				$relations->conid = $temp;
+				$relations->relid = $storyID;
+				$relations->type =  "ST";
+				$relations->save();
+				$recounts[] = $temp;
+				$i++;
+			}
+		}
+		if( isset($recounts)) $this->cacheContest( $recounts );
 	}
 
 	/**

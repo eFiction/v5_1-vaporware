@@ -5,11 +5,11 @@ class AdminCP extends Controlpanel {
 
 	protected $menu = [];
 	protected $access = [];
-	
+
 	public function ajax(string $key, array $data, array $params = [])
 	{
 		$bind = NULL;
-		
+
 		if ( $key == "search" )
 		{
 			if(isset($data['tagname']))
@@ -74,16 +74,16 @@ class AdminCP extends Controlpanel {
 					$this->getCategories
 					(
 						$c,
-						$this->exec("SELECT C.cid,C.parent_cid 
+						$this->exec("SELECT C.cid,C.parent_cid
 										FROM `tbl_categories`C
 									WHERE {$where};", [ ":categories" => $bind ] )
 					);
-					
+
 					if ( sizeof($c) ) $categories = " OR rCC.catid IN (".implode(",",$c).")";
 				}
-				
+
 				$ajax_sql = "SELECT Ch.charname as name, Ch.charid as id
-								FROM `tbl_characters`Ch 
+								FROM `tbl_characters`Ch
 								LEFT JOIN `tbl_character_categories`rCC ON ( Ch.charid = rCC.charid )
 							WHERE Ch.charname LIKE :charname AND ( rCC.catid IS NULL ".($categories??"")." )
 							GROUP BY id
@@ -127,7 +127,7 @@ class AdminCP extends Controlpanel {
 			// unified
 			if(isset($data['collectionsort']))
 				$this->ajaxCollectionItemsort($data);
-			
+
 			elseif(isset($data['chaptersort']))
 				$this->ajaxStoryChaptersort($data);
 
@@ -136,7 +136,7 @@ class AdminCP extends Controlpanel {
 		if ( isset($ajax_sql) ) return $this->exec($ajax_sql, $bind);
 		return NULL;
 	}
-	
+
 	protected function getCategories(array &$c, array $data)
 	{
 		foreach ( $data as $d )
@@ -144,20 +144,20 @@ class AdminCP extends Controlpanel {
 			// take note of this category
 			$c[] = $d['cid'];
 			// if a parent category exists, traverse the tree
-			if ( $d['parent_cid'] > 0 ) 
+			if ( $d['parent_cid'] > 0 )
 				$this->getCategories($c, $this->exec("SELECT C.cid, C.parent_cid FROM `tbl_categories`C WHERE `cid` = {$d['parent_cid']};"));
 		}
 	}
-	
+
 	public function settingsFields($select)
 	{
 		$f3 = \Base::instance();
-		
+
 		$sql = "SELECT `name`, `value`, `form_type`, `can_edit`
-					FROM `tbl_config` 
-					WHERE 
-						`admin_module` LIKE :module 
-						AND `can_edit` > 0 
+					FROM `tbl_config`
+					WHERE
+						`admin_module` LIKE :module
+						AND `can_edit` > 0
 					ORDER BY `section_order` ASC";
 		$data = $this->exec($sql,[ ":module" => $select ]);
 		foreach ( $data as &$d )
@@ -174,12 +174,12 @@ class AdminCP extends Controlpanel {
 		}
 		return [ "section" => $select, "fields" => $data];
 	}
-	
+
 	public function saveKeys($data)
 	{
 		$affected=0;
 		$sqlUpdate = "UPDATE `tbl_config` SET `value` = :value WHERE `name` = :key and `admin_module` = :section;";
-		
+
 		foreach ( $data as $section => $fields )
 		{
 			foreach($fields as $key => $value)
@@ -192,16 +192,16 @@ class AdminCP extends Controlpanel {
 		// Force re-caching right now
 		\Cache::instance()->clear('config');
 		\Base::instance()->set('CONFIG', \Config::instance()->load() );
-		
+
 		return [ $affected, FALSE ]; // prepare for error check
 	}
-	
+
 	public function jsonPrepop($rawData)
 	{
 		if ( $rawData == NULL ) return "[]";
 		foreach ( parent::cleanResult($rawData) as $tmp )
 			$data[] = [ "id" => $tmp[0], "name" => $tmp[1] ];
-		return json_encode( $data );	
+		return json_encode( $data );
 	}
 
 	//public function checkAccess($link, $exists = FALSE)
@@ -216,7 +216,7 @@ class AdminCP extends Controlpanel {
 		$sql = "SELECT M.label, M.link, M.icon, M.child_of, M.link, M.evaluate, ";
 		if ( !($_SESSION['groups']&128) )
 		{
-			$sql .= "M.requires 
+			$sql .= "M.requires
 					FROM `tbl_menu_adminpanel`M2
 						LEFT JOIN `tbl_menu_adminpanel`M ON ( M2.link = M.child_of OR M2.link=M.link )
 					WHERE M2.child_of IS NULL AND M2.active = 1
@@ -228,13 +228,13 @@ class AdminCP extends Controlpanel {
 				$select = " OR `child_of` = :selected ";
 
 			$sql .= "1 as requires
-					FROM `tbl_menu_adminpanel`M 
+					FROM `tbl_menu_adminpanel`M
 					WHERE ( `child_of` IS NULL {$select})
 					ORDER BY M.child_of,M.order ASC";
 		}
 
 		$data = $this->exec($sql, [":selected"=> $selected]);
-		
+
 		foreach ( $data as $item )
 		{
 			// fixed to return 0 if module disabled or not present
@@ -269,7 +269,7 @@ class AdminCP extends Controlpanel {
 
 		return $menu;
 	}
-	
+
 //	public function menuShowUpper($selected=FALSE)
 	public function menuShowUpper($selected=FALSE)
 	{
@@ -280,7 +280,7 @@ class AdminCP extends Controlpanel {
 				ORDER BY M.order ASC";
 		return $this->exec( $sql, [ ":selected" => $selected ] );
 	}
-	
+
 	protected function menuSecure($menu)
 	{
 		foreach ( $menu as &$m )
@@ -295,8 +295,8 @@ class AdminCP extends Controlpanel {
 	* Add a new category
 	* rewrite 2020-09
 	*
-	* @param	int		$parent_cid		
-	* @param	array	$data			
+	* @param	int		$parent_cid
+	* @param	array	$data
 	*
 	* @return	int						New category's ID
 	*/
@@ -315,20 +315,20 @@ class AdminCP extends Controlpanel {
 		if ( $categories->dry() )	$leveldown = 0;
 		else 						$leveldown = $categories->leveldown + 1;
 		$categories->reset();
-		
+
 		$categories->category 		= $data['category'];
 		$categories->description 	= $data['description'];
 		$categories->locked 		= isset($data['locked'])?1:0;
 		$categories->inorder		= $count;
 		$categories->leveldown		= $leveldown;
 		$categories->parent_cid		= $parent_cid;
-		
+
 		$categories->save();
 
 		// recount parent category, if applicable
 		if ( $parent_cid>0 )
 			$this->cacheCategories($parent_cid);
-		
+
 		// create the rather boring cache for the new category
 		$this->cacheCategories($categories->_id);
 
@@ -336,7 +336,7 @@ class AdminCP extends Controlpanel {
 
 		return $categories->_id;
 	}
-	
+
 	public function categories()
 	{
 		return $this->exec("SELECT Cat.cid as id, Cat.category FROM `tbl_categories`Cat ORDER BY Cat.category ASC;");
@@ -344,17 +344,17 @@ class AdminCP extends Controlpanel {
 
 	public function categoryListFlat()
 	{
-		$sql = "SELECT 
+		$sql = "SELECT
 					C.cid, C.parent_cid, C.category, C.locked, C.leveldown, C.inorder, C.stats,
-					COUNT(C1.cid) as counter 
-				FROM `tbl_categories`C 
-				INNER JOIN `tbl_categories`C1 ON C.parent_cid=C1.parent_cid 
-				GROUP BY C.cid 
+					COUNT(C1.cid) as counter
+				FROM `tbl_categories`C
+				INNER JOIN `tbl_categories`C1 ON C.parent_cid=C1.parent_cid
+				GROUP BY C.cid
 				ORDER BY C.leveldown DESC, C.inorder ASC";
 		$data = $this->exec($sql);
 
 		if ( sizeof($data) == 0 ) return NULL;
-		
+
 		foreach ( $data as $item )
 		{
 			$item['stats'] = json_decode($item['stats'],TRUE);
@@ -376,11 +376,11 @@ class AdminCP extends Controlpanel {
 	public function categoryLoadPossibleParents(int $cid)
 	{
 		$sql = "SELECT C.cid, C.parent_cid, C.leveldown, C.category
-					FROM `tbl_categories`C 
-					INNER JOIN `tbl_categories`C2 ON ( ( C.parent_cid = C2.parent_cid OR C.cid = C2.parent_cid )AND C2.cid = :cid ) 
+					FROM `tbl_categories`C
+					INNER JOIN `tbl_categories`C2 ON ( ( C.parent_cid = C2.parent_cid OR C.cid = C2.parent_cid )AND C2.cid = :cid )
 				WHERE C.cid != :cid2
 				ORDER BY C.leveldown, C.inorder ASC ";
-		
+
 		$data = $this->exec($sql, [":cid" => $cid, ":cid2" => $cid ]);
 
 		return $data;
@@ -391,12 +391,12 @@ class AdminCP extends Controlpanel {
 		$category=new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
 		$category->load(array('cid=?',$cid));
 		$parent_cid = $category->parent_cid;
-		$category->copyfrom( 
-			[ 
-				"category" => $data['category'], 
+		$category->copyfrom(
+			[
+				"category" => $data['category'],
 				"description" => $data['description'],
 				"locked" => isset($data['locked']) ? : 0,
-				"parent_cid" => $data['parent_cid'], 
+				"parent_cid" => $data['parent_cid'],
 			]
 		);
 
@@ -413,7 +413,7 @@ class AdminCP extends Controlpanel {
 								WHERE rSC.cid = :catID
 							) AS C ON C.sid = S.sid
 						SET S.cache_categories = NULL;", [":catID" => $cid]);
-			
+
 			$recache = TRUE;
 		}
 
@@ -431,7 +431,7 @@ class AdminCP extends Controlpanel {
 				$new_level = $parent->leveldown+1;
 			}
 			$this->categoryLevelAdjust($cid, $new_level);
-			
+
 			$category->save();
 
 			$this->cacheCategories($parent_cid);
@@ -469,14 +469,14 @@ class AdminCP extends Controlpanel {
 
 		return $i;
 	}
-	
+
 	protected function categoryLevelAdjust( int $cid, int $level)
 	{
 		$category=new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
 		$category->load(array('cid=?',$cid));
 		$category->leveldown = $level;
 		$category->save();
-		
+
 		$subCategories = new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
 		$subCategories->load(array('parent_cid=?',$cid));
 		while ( !$subCategories->dry() )
@@ -485,20 +485,20 @@ class AdminCP extends Controlpanel {
 			$subCategories->next();
 		}
 	}
-	
+
 	public function categoryMove(int $catID=0, $direction=NULL, $parent=NULL)
 	{
 		if ( $parent === NULL )
 		{
-			$sql = "SELECT C.parent_cid 
-						FROM `tbl_categories`C 
+			$sql = "SELECT C.parent_cid
+						FROM `tbl_categories`C
 						WHERE C.`cid`= :catID";
 
 			$data = $this->exec ( $sql, [ ":catID" => $catID ] );
 			if ( empty($data[0]) OR !is_numeric($data[0]['parent_cid']) ) return FALSE;
 			$parent = $data[0]['parent_cid'];
 		}
-		
+
 		$categories = new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
 		$categories->load(
 			["parent_cid = ?", $parent ],
@@ -514,10 +514,10 @@ class AdminCP extends Controlpanel {
 
 		// init vacant spot
 		$vacant = -1;
-		
+
 		while ( !$categories->dry() )
 		{  // gets dry when we passed the last record
-			if ( $direction == "up" ) $i--; 
+			if ( $direction == "up" ) $i--;
 			else $i++;
 			if ( $categories->cid == $catID AND $direction!==NULL )
 			{
@@ -536,7 +536,7 @@ class AdminCP extends Controlpanel {
 			elseif ( $direction == "up" AND $i == $vacant-1 )
 				$categories->inorder = ($i+1);
 
-			else 
+			else
 				$categories->inorder = $i;
 
 			$categories->save();
@@ -546,7 +546,7 @@ class AdminCP extends Controlpanel {
 		$this->cacheCategories($parent);
 		return $parent;
 	}
-	
+
 	public function categoryDelete( int $cid )
 	{
 		$delete = new \DB\SQL\Mapper($this->db, $this->prefix.'categories');
@@ -562,14 +562,14 @@ class AdminCP extends Controlpanel {
 		}
 		else return FALSE;
 	}
-	
+
 	public function characterList(int $page, array $sort, int $category)
 	{
 		/*
 		$tags = new \DB\SQL\Mapper($this->db, $this->prefix.'characters' );
 		$data = $tags->paginate($page, 10, NULL, [ 'order' => "{$sort['order']} {$sort['direction']}", ] );
 		*/
-		
+
 		// Only global characters
 		if ( $category == 0 )
 		{
@@ -594,7 +594,7 @@ class AdminCP extends Controlpanel {
 		$pos = $page - 1;
 
 		$sql = "SELECT SQL_CALC_FOUND_ROWS Ch.charid, Ch.charname, Ch.count, GROUP_CONCAT(Cat.category SEPARATOR ', ') as category
-				FROM `tbl_characters`Ch 
+				FROM `tbl_characters`Ch
                 {$join}
                 LEFT JOIN `tbl_character_categories`rCC ON ( Ch.charid = rCC.charid )
 					LEFT JOIN `tbl_categories`Cat ON ( rCC.catid=Cat.cid )
@@ -604,20 +604,20 @@ class AdminCP extends Controlpanel {
 				LIMIT ".(max(0,$pos*$limit)).",".$limit;
 
 		$data = $this->exec($sql);
-				
+
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
 			"/adminCP/archive/characters{$url}/order={$sort['link']},{$sort['direction']}",
 			$limit
 		);
-				
+
 		return $data;
 	}
 
 	public function characterCategories()
 	{
 		return $this->exec("SELECT Cat.cid as id, Cat.category as name, COUNT(DISTINCT rCC.charid) as counted
-							FROM `tbl_categories`Cat 
+							FROM `tbl_categories`Cat
 								LEFT JOIN `tbl_character_categories`rCC ON ( Cat.cid = rCC.catid )
 							GROUP BY Cat.cid
 							HAVING counted > 0
@@ -638,7 +638,7 @@ class AdminCP extends Controlpanel {
 		}
 		return [];
 	}
-	
+
 	public function characterAdd(string $name)
 	{
 		$character=new \DB\SQL\Mapper($this->db, $this->prefix.'characters');
@@ -647,7 +647,7 @@ class AdminCP extends Controlpanel {
 		$character->save();
 		return $character->get('_id');
 	}
-	
+
 	public function characterSave(int $charid, array $data)
 	{
 		$character=new \DB\SQL\Mapper($this->db, $this->prefix.'characters');
@@ -666,13 +666,13 @@ class AdminCP extends Controlpanel {
 								WHERE rST.tid = :tagID AND rST.character = 1
 							) AS T ON T.sid = S.sid
 						SET S.cache_characters = NULL;", [":tagID" => $charid]);
-			
+
 			$recache = TRUE;
 		}
 
 		$i += $character->changed("biography");
 		$character->save();
-		
+
 		// open a db mapper to the relation table
 		$relations = new \DB\SQL\Mapper($this->db, $this->prefix.'character_categories');
 
@@ -694,7 +694,7 @@ class AdminCP extends Controlpanel {
 				// already in database
 				else unset($categories[$temp]);
 			}
-			
+
 			// Insert any character/category relations not already present
 			if ( sizeof($categories)>0 )
 			{
@@ -715,7 +715,7 @@ class AdminCP extends Controlpanel {
 			// drop all relations for this character
 			$i += $relations->erase(array('`charid` = ?',$charid));
 		}
-		
+
 		// do we need to regenerate story cache?
 		if ( isset($recache) )
 		{
@@ -751,20 +751,20 @@ class AdminCP extends Controlpanel {
 	{
 		$character=new \DB\SQL\Mapper($this->db, $this->prefix.'characters');
 		$character->load(array('charid=? and (count=0 OR count IS NULL)',$charid));
-		
+
 		$_SESSION['lastAction'] = [ "deleteResult" => $character->erase() ];
 	}
-	
+
 	public function contestsList(int $page, array $sort) : array
 	{
 		$limit = 20;
 		$pos = $page - 1;
 
 		$sql = "SELECT SQL_CALC_FOUND_ROWS
-					C.conid, C.title, 
+					C.conid, C.title,
 					C.active, C.votable,
-					UNIX_TIMESTAMP(C.date_open) as date_open, UNIX_TIMESTAMP(C.date_close) as date_close, UNIX_TIMESTAMP(C.vote_close) as vote_close, 
-					C.cache_tags, C.cache_characters, 
+					UNIX_TIMESTAMP(C.date_open) as date_open, UNIX_TIMESTAMP(C.date_close) as date_close, UNIX_TIMESTAMP(C.vote_close) as vote_close,
+					C.cache_tags, C.cache_characters,
 					U.username, COUNT(R.lid) as count
 				FROM `tbl_contests`C
 					LEFT JOIN `tbl_users`U ON ( C.uid = U.uid )
@@ -774,7 +774,7 @@ class AdminCP extends Controlpanel {
 				LIMIT ".(max(0,$pos*$limit)).",".$limit;
 
 		$data = $this->exec($sql);
-				
+
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
 			"/adminCP/archive/contests",
@@ -789,8 +789,8 @@ class AdminCP extends Controlpanel {
 		$sql = "SELECT C.conid as id, C.title, C.summary, C.description, C.concealed, C.date_open, C.date_close, C.vote_close,
 					C.active, C.votable,
 					GROUP_CONCAT(T.tid,',',T.label SEPARATOR '||') as tag_list,
-					GROUP_CONCAT(Ch.charid,',',Ch.charname SEPARATOR '||') as character_list, 
-					GROUP_CONCAT(Cat.cid,',',Cat.category SEPARATOR '||') as category_list, 
+					GROUP_CONCAT(Ch.charid,',',Ch.charname SEPARATOR '||') as character_list,
+					GROUP_CONCAT(Cat.cid,',',Cat.category SEPARATOR '||') as category_list,
 					U.uid, U.username
 					FROM `tbl_contests`C
 					LEFT JOIN `tbl_users`U ON ( C.uid=U.uid )
@@ -801,7 +801,7 @@ class AdminCP extends Controlpanel {
 					WHERE C.conid = :conid";
 
 		$data = $this->exec($sql, [":conid" => $conid ]);
-		if (sizeof($data)==1) 
+		if (sizeof($data)==1)
 		{
 			$data[0]['date_open'] = ($data[0]['date_open']>0)
 				? $this->timeToUser($data[0]['date_open'],  $this->config['date_format'])
@@ -830,7 +830,7 @@ class AdminCP extends Controlpanel {
 		$contest->save();
 		return $contest->get('_id');			// return new ID for edit form
 	}
-	
+
 	public function contestSave($conid, array $data)
 	{
 		if( empty($data['title']) )
@@ -842,7 +842,7 @@ class AdminCP extends Controlpanel {
 		if ( $data['date_close'] < $data['date_open'] ) $data['date_close'] = $data['date_open'];
 
 		$contest->load(array('conid=?',$conid));
-		$contest->copyfrom( 
+		$contest->copyfrom(
 			[
 				"title"			=> $data['title'],
 				"concealed"		=> isset($data['concealed']) ? 1 : 0,
@@ -869,22 +869,22 @@ class AdminCP extends Controlpanel {
 		$i += $contest->changed("date_open");
 		$i += $contest->changed("date_close");
 		$i += $contest->changed("vote_close");
-		
+
 		$contest->save();
-		
+
 		// update relation table
 		$this->contestRelation( $conid, $data['tag'], "T" );
 		$this->contestRelation( $conid, $data['character'], "CH" );
 		$this->contestRelation( $conid, $data['category'], "CA" );
 
-		$this->rebuildContestCache($contest->conid);
+		$this->cacheContest($contest->conid);
 
 		// drop contest block cache
 		\Cache::instance()->clear('blockContestsCache');
-		
+
 		return $i;
 	}
-	
+
 	private function contestRelation( $conid, $data, $type )
 	{
 		// Check tags:
@@ -900,7 +900,7 @@ class AdminCP extends Controlpanel {
 			}
 			else unset($data[$temp]);
 		}
-		
+
 		// Insert any tag IDs not already present
 		if ( sizeof($data)>0 )
 		{
@@ -919,20 +919,20 @@ class AdminCP extends Controlpanel {
 		}
 		unset($relations);
 	}
-	
+
 	public function contestLoadEntries(int $conid, int $page, array $sort)
 	{
 		$limit = 10;
 		$pos = $page - 1;
 
-		$sql = "SELECT SQL_CALC_FOUND_ROWS 
+		$sql = "SELECT SQL_CALC_FOUND_ROWS
 				E.* FROM (
-					SELECT 
+					SELECT
 						IF(S.sid IS NULL,Coll.collid,S.sid) as id,
-						IF(S.title IS NULL,Coll.title,S.title) as title, 
-						IF(S.cache_authors IS NULL,Coll.cache_authors,S.cache_authors) as cache_authors, 
-						IF(S.validated IS NULL,'39',S.validated) as validated, 
-						IF(S.completed IS NULL,'9',S.completed) as completed, 
+						IF(S.title IS NULL,Coll.title,S.title) as title,
+						IF(S.cache_authors IS NULL,Coll.cache_authors,S.cache_authors) as cache_authors,
+						IF(S.validated IS NULL,'39',S.validated) as validated,
+						IF(S.completed IS NULL,'9',S.completed) as completed,
 						RelC.type, RelC.lid, Coll.ordered
 						FROM `tbl_contest_relations`RelC
 							LEFT JOIN `tbl_stories`S ON ( S.sid = RelC.relid AND RelC.type='ST' )
@@ -944,13 +944,13 @@ class AdminCP extends Controlpanel {
 				LIMIT ".(max(0,$pos*$limit)).",".$limit;
 
 		$data = $this->exec($sql, [":conid" => $conid ]);
-		
+
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
 			"/adminCP/archive/contests/id={$conid}/entries/order={$sort['link']},{$sort['direction']}",
 			$limit
 		);
-		
+
 		if ( sizeof($data)>0 )
 		{
 			foreach ($data as &$dat)
@@ -1023,14 +1023,14 @@ class AdminCP extends Controlpanel {
 	public function featuredList ( int $page, array $sort, string &$status ): array
 	{
 		/*
-		int status = 
+		int status =
 			1: active
 			2: past
 			3: upcoming
 		*/
 		$limit = 20;
 		$pos = $page - 1;
-		
+
 		switch( $status )
 		{
 			case "upcoming":
@@ -1048,8 +1048,8 @@ class AdminCP extends Controlpanel {
 				(
 					"%JOIN%",
 					$join,
-					"SELECT SQL_CALC_FOUND_ROWS S.title, S.sid, S.summary, S.cache_authors, S.cache_rating, 
-							IF(F.start IS NULL OR STATUS IS NOT NULL,NULL,UNIX_TIMESTAMP(F.start)) as start, 
+					"SELECT SQL_CALC_FOUND_ROWS S.title, S.sid, S.summary, S.cache_authors, S.cache_rating,
+							IF(F.start IS NULL OR STATUS IS NOT NULL,NULL,UNIX_TIMESTAMP(F.start)) as start,
 							IF(F.end IS NULL OR STATUS IS NOT NULL,NULL,UNIX_TIMESTAMP(F.end)) as end
 						FROM `tbl_stories`S
 						INNER JOIN `tbl_featured`F ON ( F.type='ST' AND F.id = S.sid AND (%JOIN%) )
@@ -1058,7 +1058,7 @@ class AdminCP extends Controlpanel {
 				);
 
 		$data = $this->exec($sql);
-		
+
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
 			"/adminCP/stories/featured/select={$status}/order={$sort['link']},{$sort['direction']}",
@@ -1068,7 +1068,7 @@ class AdminCP extends Controlpanel {
 			$dat['cache_authors'] = json_decode($dat['cache_authors'], TRUE);
 		return $data;
 	}
-	
+
 	public function featuredLoad( int $sid )
 	{
 		$sql = "SELECT SQL_CALC_FOUND_ROWS S.title, S.sid, S.summary, F.status, F.start, F.end, F.uid, U.username, S.cache_authors, S.cache_rating
@@ -1094,9 +1094,9 @@ class AdminCP extends Controlpanel {
 		$feature=new \DB\SQL\Mapper($this->db, $this->prefix.'featured');
 		$feature->load(array('id=? AND type="ST"',$sid));
 		// copy form data, also used to create a new feature
-		$feature->copyfrom( 
-			[ 
-				"status"	=> ($data['status']>0) ? $data['status'] : NULL, 
+		$feature->copyfrom(
+			[
+				"status"	=> ($data['status']>0) ? $data['status'] : NULL,
 				"id"		=> $sid,
 				"uid"		=> $_SESSION['userID']
 			]
@@ -1127,7 +1127,7 @@ class AdminCP extends Controlpanel {
 		// save date
 		$feature->save();
 	}
-	
+
 	public function logGetCount()
 	{
 		$count = [];
@@ -1146,7 +1146,7 @@ class AdminCP extends Controlpanel {
 		}
 		return $count;
 	}
-	
+
 	public function logGetData($sub=FALSE, $page, array $sort)
 	{
 		$limit = 50;
@@ -1165,7 +1165,7 @@ class AdminCP extends Controlpanel {
 			$data = $this->exec($sql, [":sub" => $sub]);
 		else
 			$data = $this->exec($sql);
-		
+
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
 			"/adminCP/home/logs/".($sub?"type={$sub}/":"")."order={$sort['link']},{$sort['direction']}",
@@ -1190,7 +1190,7 @@ class AdminCP extends Controlpanel {
 					if ( preg_match("/.+\?sid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>(.*?)<\/.+\s(\d).*/i", $item['action'], $matches) )
 					// matching _LOG_ADMIN_DEL_CHAPTER
 					{
-						$item['action'] = [ 
+						$item['action'] = [
 							'sid' => $matches[1], 'title' => $matches[2],
 							'aid' => $matches[3], 'name' => $matches[4],
 							'chapter' => $matches[5]
@@ -1237,7 +1237,7 @@ class AdminCP extends Controlpanel {
 					if ( preg_match("/.+\?sid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>(.*?)<\/.+/i", $item['action'], $matches) )
 					// matching _LOG_ADMIN_EDIT_AUTHOR
 					{
-						$item['action'] = [ 
+						$item['action'] = [
 							'sid'     => $matches[1], 'title'    => $matches[2],
 							'fromaid' => $matches[3], 'fromname' => $matches[4],
 							'toaid'   => $matches[5], 'toname'   => $matches[6]
@@ -1247,7 +1247,7 @@ class AdminCP extends Controlpanel {
 					elseif ( preg_match("/.+\?sid=(\d*)'>(.*?)<\/.+\?uid=(\d*)'>(.*?)<\/.+(\d).*/i", $item['action'], $matches) )
 					// matching _LOG_ADMIN_EDIT_CHAPTER
 					{
-						$item['action'] = [ 
+						$item['action'] = [
 							'sid' => $matches[1], 'title' => $matches[2],
 							'aid' => $matches[3], 'author' => $matches[4],
 							'chapter' => $matches[5]
@@ -1282,8 +1282,8 @@ class AdminCP extends Controlpanel {
 				elseif ( $item['type']=="RG" AND preg_match('/(\w+[\s\w]*)\s+\((\d*)\).*/iU', $item['action'], $matches) )
 				// matching _LOG_REGISTER & _LOG_ADMIN_REG
 				{
-					$item['action'] = [ 
-							'name'=>$matches[1], 'uid'=>$matches[2], 
+					$item['action'] = [
+							'name'=>$matches[1], 'uid'=>$matches[2],
 							'admin'=>($matches[2]!=$item['uid_reg'])
 					];
 				}
@@ -1317,21 +1317,21 @@ class AdminCP extends Controlpanel {
 						$item['subtype'] = 'r';
 					}
 				}
-				
+
 				/*
-				
+
 				define ("_LOG_BAD_LOGIN", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> hat ein falsches Passwort beim einloggen eingegeben.");
 				define ("_LOG_BAD_LOGIN", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> entered a wrong password trying to log in.");
 
 				define ("_LOG_EDIT_REVIEW", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> hat    <a href='reviews.php?reviewid=%4\$d'>ein Review</a> für '%3\$s' bearbeitet.");
 				define ("_LOG_EDIT_REVIEW", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> edited <a href='reviews.php?reviewid=%4\$d'>a review  </a> for '%3\$s'.");
-				
+
 				AM
 				("_LOG_RECALCREVIEWS", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> recalculated the reviews.");
 				("_LOG_CATCOUNTS", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> recalculated the category counts.");
 				("_LOG_OPTIMIZE", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> optimized the database tables.");
 				("_LOG_BACKUP", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> backed up the database tables.");
-				
+
 				*/
 
 				if ( is_array($item['action']) )
@@ -1364,10 +1364,10 @@ class AdminCP extends Controlpanel {
 				$item['action'] = json_decode($item['action'], TRUE);
 			}
 		}
-				
+
 		return $data;
 	}
-	
+
 	protected function logResaveData($item)
 	{
 		$this->update(
@@ -1380,7 +1380,7 @@ class AdminCP extends Controlpanel {
 				"id = {$item['id']}"
 		);
 	}
-	
+
 	public function pollList(int $page, array $sort) : array
 	{
 		$limit = 15;
@@ -1432,7 +1432,7 @@ class AdminCP extends Controlpanel {
 			$data['cache'] = $this->pollBuildCache($data['id']);
 		// build the result array from the cache field
 		else $data['cache'] = json_decode($data['cache'],TRUE);
-		
+
 		// each line is one option
 		$data['options'] = implode("\n", json_decode($data['options'],TRUE)??[]);
 
@@ -1440,11 +1440,11 @@ class AdminCP extends Controlpanel {
 		$data['start_date'] = $data['start_date'] == ""
 								? ""
 								: $this->timeToUser($data['start_date'], $this->config['date_preset']." ".$this->config['time_preset']);
-								
+
 		$data['end_date'] = $data['end_date'] == ""
 								? ""
 								: $this->timeToUser($data['end_date'], $this->config['date_preset']." ".$this->config['time_preset']);
-		
+
 		return $data;
 	}
 
@@ -1453,9 +1453,9 @@ class AdminCP extends Controlpanel {
 		$poll=new \DB\SQL\Mapper($this->db, $this->prefix.'poll');
 		$poll->load(array('poll_id=?',$id));
 
-		$poll->copyfrom( 
-			[ 
-				"question"		=> $data['question'], 
+		$poll->copyfrom(
+			[
+				"question"		=> $data['question'],
 				"start_date"	=> $data['start_date'] == ""
 									? NULL
 									: \DateTime::createFromFormat($this->config['date_preset']." ".$this->config['time_preset'], $data['start_date'])->format('Y-m-d H:i'),
@@ -1471,11 +1471,11 @@ class AdminCP extends Controlpanel {
 		$i += $poll->changed("start_date");
 		$i += $poll->changed("end_date");
 		$i += $poll->changed("options");
-		
+
 		// drop cache if the options were edited
 		if ( $poll->changed("options") )
 			$poll->cache = NULL;
-		
+
 		$poll->save();
 
 		return $i;
@@ -1498,16 +1498,16 @@ class AdminCP extends Controlpanel {
 		$ratings=new \DB\SQL\Mapper($this->db, $this->prefix.'ratings');
 		$ratings->load(null,['order'=>'inorder DESC']);
 		$inorder = $ratings->inorder + 1;
-		
+
 		$ratings->reset();
-		
+
 		$ratings->rating	= $rating;
 		$ratings->inorder	= $inorder;
 
 		$ratings->save();
 		return $ratings->_id;
 	}
-	
+
 	public function ratingList()
 	{
 		$sql = "SELECT R.rid, R.inorder, R.rating, R.rating_age, R.ratingwarning, COUNT(S.sid) as counter
@@ -1518,7 +1518,7 @@ class AdminCP extends Controlpanel {
 		$data = $this->exec($sql);
 		return $data;
 	}
-	
+
 	public function ratingLoad( $rid )
 	{
 		$sql = "SELECT R.rid, R.inorder, R.rating, R.rating_age, R.rating_image, R.ratingwarning, R.warningtext, COUNT(S.sid) as counter
@@ -1527,18 +1527,18 @@ class AdminCP extends Controlpanel {
 					WHERE R.rid = :rid
 					GROUP BY R.rid;";
 		$data = $this->exec($sql, [ ":rid" => $rid ]);
-		
-		if (sizeof($data)!=1) 
+
+		if (sizeof($data)!=1)
 			return NULL;
 
-		return $data[0];	
+		return $data[0];
 	}
-	
+
 	public function ratingSave($rid, array $data)
 	{
 		$rating=new \DB\SQL\Mapper($this->db, $this->prefix.'ratings');
 		$rating->load(array('rid=?',$rid));
-		$rating->copyfrom( 
+		$rating->copyfrom(
 			[
 				"rating" 		=> $data['rating'],
 				"rating_age"	=> ($data['rating_age']=="") ? NULL : $data['rating_age'],
@@ -1562,16 +1562,16 @@ class AdminCP extends Controlpanel {
 
 		$i += $rating->changed("rating_age");
 		$i += $rating->changed("warningtext");
-		
+
 		$_SESSION['lastAction'] = [ "changes" => $i ];
 
 		$rating->save();
 		return TRUE;
 	}
-	
+
 	public function ratingDelete($oldID, $newID)
 	{
-		
+
 		$this->exec
 		(
 			"UPDATE `tbl_stories` SET `ratingid` = :new, `cache_rating` = '{$this->ratingCache($newID)}' WHERE `tbl_stories`.`ratingid` = :old;",
@@ -1580,12 +1580,12 @@ class AdminCP extends Controlpanel {
 
 		$rating=new \DB\SQL\Mapper($this->db, $this->prefix.'ratings');
 		$moved = $rating->erase(array('rid=?',$oldID));
-		
+
 		$_SESSION['lastAction'] = [ "moved" => $moved ];
-		
+
 		return TRUE;
 	}
-	
+
 	protected function ratingCache( $rid )
 	{
 		$data = $this->exec("SELECT CONCAT_WS(',',`rid`,`rating`,`ratingwarning`,`rating_image`) as rating
@@ -1593,7 +1593,7 @@ class AdminCP extends Controlpanel {
 						WHERE `tbl_ratings`.`rid` = :new;",
 					[ ":new" => $rid ]
 		);
-		
+
 		if ( isset($data[0]['rating']) )
 			return json_encode(explode(",",$data[0]['rating']));
 		else
@@ -1602,19 +1602,19 @@ class AdminCP extends Controlpanel {
 
 	public function storyAddCheck(array $formData)
 	{
-		$sql = "SELECT S.sid, S.title 
-					FROM `tbl_stories`S 
-						INNER JOIN `tbl_stories_authors`A ON ( S.sid = A.sid ) 
+		$sql = "SELECT S.sid, S.title
+					FROM `tbl_stories`S
+						INNER JOIN `tbl_stories_authors`A ON ( S.sid = A.sid )
 					WHERE S.title LIKE :title and A.aid IN(:aid)";
 		$similarExists = $this->exec($sql,  [ ':title' => $formData['new_title'], ':aid' => $formData['new_author'] ] );
-		
+
 		// no hits, seems to be a new story
 		if ( sizeof($similarExists) == 0 ) return NULL;
-		
+
 		// might be an existing title up for dual entry, let's notify the mod/admin
 		$sqlAuthors = "SELECT U.uid as id, U.username as name FROM `tbl_users`U WHERE FIND_IN_SET(U.uid,:uid);";
 		$authors = $this->exec($sqlAuthors,  [ ':uid' => $formData['new_author'] ] );
-		
+
 		return [ "storyInfo" => $similarExists[0], "preAuthor" => json_encode($authors) ];
 	}
 
@@ -1622,7 +1622,7 @@ class AdminCP extends Controlpanel {
 	{
 		$limit = 20;
 		$pos = $page - 1;
-		
+
 		$sql = "SELECT SQL_CALC_FOUND_ROWS
 					S.sid, S.title, IF(S.validated >= 20 AND S.validated <= 30,1,0) as pStory,
 					COUNT(DISTINCT Ch.chapid) as pChapters,
@@ -1630,7 +1630,7 @@ class AdminCP extends Controlpanel {
 						Ch4.chapid IS NULL
 						AND
 						(
-							Ch2.chapid<MIN(Ch.chapid) 
+							Ch2.chapid<MIN(Ch.chapid)
 							OR (COUNT(Ch.chapid)=0 AND Ch3.chapid IS NOT NULL)
 						)
 					,1,0) as blocked,
@@ -1640,10 +1640,10 @@ class AdminCP extends Controlpanel {
 				FROM `tbl_stories`S
 					LEFT JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid AND Ch.validated >= 20 AND Ch.validated <= 30 )
 						LEFT JOIN `tbl_chapters`Ch2 ON
-						( 
-							(Ch.validated >= 20 AND Ch.validated <= 30) 
-							AND (Ch2.validated >= 10 AND Ch2.validated <= 20) 
-							AND Ch.sid = Ch2.sid 
+						(
+							(Ch.validated >= 20 AND Ch.validated <= 30)
+							AND (Ch2.validated >= 10 AND Ch2.validated <= 20)
+							AND Ch.sid = Ch2.sid
 							AND Ch2.inorder < Ch.inorder
 						)
 					LEFT JOIN `tbl_chapters`Ch3 ON ( S.sid = Ch3.sid AND Ch3.validated >= 10 AND Ch3.validated <= 20 )
@@ -1654,7 +1654,7 @@ class AdminCP extends Controlpanel {
 				GROUP BY S.sid
 				ORDER BY blocked ASC, pChapters DESC, lastdate ASC
 				LIMIT ".(max(0,$pos*$limit)).",".$limit;
-				
+
 		$data = $this->exec($sql);
 
 		$this->paginate(
@@ -1662,7 +1662,7 @@ class AdminCP extends Controlpanel {
 			"/adminCP/stories/pending/order={$sort['link']},{$sort['direction']}",
 			$limit
 		);
-				
+
 		return $data;
 	}
 
@@ -1670,24 +1670,24 @@ class AdminCP extends Controlpanel {
 	{
 		$jobs = $this->exec("SELECT
 						S.sid, S.title, S.completed, S.storynotes, S.summary, S.translation, S.trans_from, S.trans_to,
-						IF(S.validated >= 20 AND S.validated <= 30,1,0) as pStory, 
+						IF(S.validated >= 20 AND S.validated <= 30,1,0) as pStory,
 						IF(
 							Ch4.chapid IS NULL
 							AND
 							(
-								Ch2.chapid<MIN(Ch.chapid) 
+								Ch2.chapid<MIN(Ch.chapid)
 								OR (COUNT(Ch.chapid)=0 AND Ch3.chapid IS NOT NULL)
 							)
 						,1,0) as blocked,
-						S.cache_authors, S.cache_tags, S.cache_characters, S.cache_categories, S.cache_rating, 
+						S.cache_authors, S.cache_tags, S.cache_characters, S.cache_categories, S.cache_rating,
 						Ch.chapid, Ch.title as chap_title, UNIX_TIMESTAMP(Ch.created) as chap_lastdate, Ch.inorder as chap_inorder
 					FROM `tbl_stories`S
 						LEFT JOIN `tbl_chapters`Ch ON ( S.sid = Ch.sid AND Ch.validated >= 20 AND Ch.validated <= 30 )
 							LEFT JOIN `tbl_chapters`Ch2 ON
-							( 
-								(Ch.validated >= 20 AND Ch.validated <= 30) 
-								AND (Ch2.validated >= 10 AND Ch2.validated <= 20) 
-								AND Ch.sid = Ch2.sid 
+							(
+								(Ch.validated >= 20 AND Ch.validated <= 30)
+								AND (Ch2.validated >= 10 AND Ch2.validated <= 20)
+								AND Ch.sid = Ch2.sid
 								AND Ch2.inorder < Ch.inorder
 							)
 						LEFT JOIN `tbl_chapters`Ch3 ON ( S.sid = Ch3.sid AND Ch3.validated >= 10 AND Ch3.validated <= 20 )
@@ -1698,22 +1698,22 @@ class AdminCP extends Controlpanel {
 					ORDER BY Ch.inorder ASC;",
 				[":sid"=>$sid]
 		);
-		
+
 		if ( sizeof($jobs)>0 )
 		{
-			$data = 
+			$data =
 			[
 				"story"			=> $jobs[0],
 				"chapterList"	=> [],
 			];
-			
+
 			if ( $jobs[0]['chapid']!==NULL )
 			// Only build a chapter list if there are chapters that require validation
 			{
 				$data['chapterList'] = $this->chapterLoadList($sid);
 				$first  = 0;
 				$closed = 0;
-				
+
 				foreach ( $data['chapterList'] as $key => &$chapter )
 				{
 					if ( $chapter['validated'] >= 20 AND $chapter['validated'] <= 29 AND $closed == 0 )
@@ -1737,7 +1737,7 @@ class AdminCP extends Controlpanel {
 				}
 				// tag the last chapter that can be validated
 				$data['chapterList'][$last]['last'] = TRUE;
-				
+
 			}
 
 			if ( sizeof($jobs)==1 AND $jobs[0]['chapid']==NULL )
@@ -1751,13 +1751,13 @@ class AdminCP extends Controlpanel {
 		}
 		return NULL;
 	}
-	
+
 	public function storyValidatePending($sid, $chapid = FALSE)
 	{
 		if 		( $_SESSION['groups']&128 ) $validated = 33;
 		elseif 	( $_SESSION['groups']&64 )	$validated = 32;
 		else								$validated = 32;
-		
+
 		if ( $chapid )
 		{
 			// Try to set validation on chapter
@@ -1791,7 +1791,7 @@ class AdminCP extends Controlpanel {
 		$story->load(array('sid=?',$sid));
 		return $story;
 	}
-	
+
 	public function tagAdd(string $name) : int
 	{
 		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'tags');
@@ -1811,19 +1811,19 @@ class AdminCP extends Controlpanel {
 		$pos = $page - 1;
 
 		$sql = "SELECT SQL_CALC_FOUND_ROWS T.tid,T.tgid,T.label,T.count,G.description as `group`
-				FROM `tbl_tags`T 
+				FROM `tbl_tags`T
 				LEFT JOIN `tbl_tag_groups`G ON ( T.tgid=G.tgid)
 				ORDER BY {$sort['order']} {$sort['direction']}
 				LIMIT ".(max(0,$pos*$limit)).",".$limit;
 
 		$data = $this->exec($sql);
-				
+
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
 			"/adminCP/archive/tags/edit/order={$sort['link']},{$sort['direction']}",
 			$limit
 		);
-				
+
 		return $data;
 	}
 
@@ -1842,7 +1842,7 @@ class AdminCP extends Controlpanel {
 		//if ( TRUE === $i = $tag->changed("tgid") ) $this->tagGroupRecount();
 		$i = $tag->changed("tgid");
 		$i += $tag->changed("label");
-		
+
 		if ( $i )
 		{
 			// drop tag cache for all stories that use this tag
@@ -1854,10 +1854,10 @@ class AdminCP extends Controlpanel {
 								WHERE rST.tid = :tagID AND rST.character = 0
 							) AS T ON T.sid = S.sid
 						SET S.cache_tags = NULL;", [":tagID" => $tid]);
-			
+
 			$recache = TRUE;
 		}
-		
+
 		$i += $tag->changed("description");
 		$tag->save();
 
@@ -1896,7 +1896,7 @@ class AdminCP extends Controlpanel {
 
 		return $i;
 	}
-	
+
 	public function tagDelete(int $tid)
 	{
 		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'tags');
@@ -1922,9 +1922,9 @@ class AdminCP extends Controlpanel {
 	{
 		/*
 		CREATE OR REPLACE VIEW tbl_list_tag_groups AS SELECT G.tgid,G.description,COUNT(T.tid) as `count`
-				FROM `tbl_tag_groups`G 
+				FROM `tbl_tag_groups`G
 				LEFT JOIN `tbl_tags`T ON ( G.tgid = T.tgid )
-		
+
 
 		$tags = new \DB\SQL\Mapper($this->db, 'tbl_list_tag_groups' );
 		$data = $tags->paginate($page, 10, NULL, [ 'order' => "{$sort['order']} {$sort['direction']}", ] );
@@ -1933,14 +1933,14 @@ class AdminCP extends Controlpanel {
 		$pos = $page - 1;
 
 		$sql = "SELECT SQL_CALC_FOUND_ROWS G.tgid,G.description,COUNT(T.tid) as `count`
-				FROM `tbl_tag_groups`G 
+				FROM `tbl_tag_groups`G
 				LEFT JOIN `tbl_tags`T ON ( G.tgid = T.tgid )
 				GROUP BY G.tgid
 				ORDER BY {$sort['order']} {$sort['direction']}
 				LIMIT ".(max(0,$pos*$limit)).",".$limit;
 
 		$data = $this->exec($sql);
-				
+
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
 			"/adminCP/archive/tags/edit/",
@@ -1949,13 +1949,13 @@ class AdminCP extends Controlpanel {
 
 		return $data;
 	}
-	
+
 	public function tagGroupLoad(int $tgid)
 	{
 		$sql = "SELECT TG.tgid as id, TG.label as label, TG.description FROM `tbl_tag_groups`TG WHERE TG.tgid = :tgid";
 		return $this->exec($sql, [":tgid" => $tgid ])[0]??NULL;
 	}
-	
+
 	public function tagGroupSave(int $tgid, array $data)
 	{
 		$taggroup=new \DB\SQL\Mapper($this->db, $this->prefix.'tag_groups');
@@ -1968,7 +1968,7 @@ class AdminCP extends Controlpanel {
 		$taggroup->save();
 		return $i;
 	}
-	
+
 	public function tagGroupDelete(int $tgid)
 	{
 		$tag=new \DB\SQL\Mapper($this->db, $this->prefix.'tags');
@@ -1988,13 +1988,13 @@ class AdminCP extends Controlpanel {
 		$sql = "SELECT SQL_CALC_FOUND_ROWS `uid`, `username`, `realname`, `groups` FROM `tbl_users` WHERE `groups` > 16 ORDER BY groups,username ASC";
 		return $this->exec($sql);
 	}
-	
+
 	public function listUserFields()
 	{
 		$sql = "SELECT `field_id`, `field_type`, `field_name`, `field_title`, `field_options`, `enabled` FROM `tbl_user_fields` ORDER BY `field_type` ASC";
 		return $this->exec($sql);
 	}
-	
+
 	public function memberAdd(array $member)
 	{
 		// load member list
@@ -2004,7 +2004,7 @@ class AdminCP extends Controlpanel {
 			return 0;
 		if ( 1 == sizeof($members->find(array('username=?',$member['new_name']))) )
 			return 0;
-		
+
 		$kv = [
 			'login'		=> $member['new_name'],
 			'username'	=> $member['new_name'],
@@ -2014,7 +2014,7 @@ class AdminCP extends Controlpanel {
 		$userID = $this->insertArray($this->prefix.'users', $kv );
 
 		// Log successful user creation
-		if ( $userID > 0 ) 
+		if ( $userID > 0 )
 			\Logging::addEntry(
 				"RG",
 				json_encode([
@@ -2027,17 +2027,17 @@ class AdminCP extends Controlpanel {
 			);
 		return $userID;
 	}
-	
+
 	public function memberDataSave(int $uid, array $data)
 	{
 		$member=new \DB\SQL\Mapper($this->db, $this->prefix.'users');
 		$member->load(array('uid=?',$uid));
-		
+
 		if(NULL === $member->uid) return FALSE;
-		
-		$member->copyfrom( 
-			[ 
-				"login"			=> $data['login'], 
+
+		$member->copyfrom(
+			[
+				"login"			=> $data['login'],
 				"username"		=> $data['username'],
 				"realname"		=> $data['realname'],
 				"email"			=> $data['email'],
@@ -2050,12 +2050,12 @@ class AdminCP extends Controlpanel {
 		$i += $member->changed("realname");
 		$i += $member->changed("email");
 		$i += $member->changed("registered");
-		
+
 		$member->save();
-		
+
 		return $i;
 	}
-	
+
 	public function memberGroupSave(int $uid, array $groups)
 	{
 		$member=new \DB\SQL\Mapper($this->db, $this->prefix.'users');
@@ -2068,17 +2068,17 @@ class AdminCP extends Controlpanel {
 		else
 		{
 			$g = 0;
-			
+
 			// user
 			if ( isset($groups[1]) )	$g = $g | 1;
 			// trusted user (includes user)
 			if ( isset($groups[2]) )	$g = $g | 3;
-			
+
 			// author
 			if ( isset($groups[4]) )	$g = $g | 4;
 			// trusted author (includes author)
 			if ( isset($groups[8]) )	$g = $g | 12;
-			
+
 			// lector (includes trusted user)
 			if ( isset($groups[16]) )	$g = $g | 19;
 			// moderator (includes trusted lector)
@@ -2087,7 +2087,7 @@ class AdminCP extends Controlpanel {
 			if ( isset($groups[64]) )	$g = $g | 127;
 			// admin (includes all below)
 			if ( isset($groups[128]) )	$g = $g | 255;
-			
+
 			/*
 			Session mask (bit-wise)
 
@@ -2100,15 +2100,15 @@ class AdminCP extends Controlpanel {
 			- user (trusted)	 2
 			- user (active)		 1
 			- guest/banned		 0
-			*/			
+			*/
 			$member->groups = $g;
-			
+
 		}
-	
+
 		$member->save();
 		return $member->changed("groups");
 	}
-	
+
 	public function listUsers($page, array $sort, $search=NULL)
 	{
 		$limit = 20;
@@ -2121,9 +2121,9 @@ class AdminCP extends Controlpanel {
 
 		if ( $search['fromlevel'] )
 			$sql .= " AND `groups` >= POW(2,{$search['fromlevel']})";
-		else 
+		else
 			$sql .= " AND `groups` >= 1";
-		
+
 		if ( $search['tolevel'] )
 			$sql .=	" AND groups < POW(2,".($search['tolevel']+1).") ";
 
@@ -2149,7 +2149,7 @@ class AdminCP extends Controlpanel {
 		);
 		return $data;
 	}
-	
+
 	//public function loadUser(int $uid)
 	public function loadUser($uid)
 	{
@@ -2157,26 +2157,26 @@ class AdminCP extends Controlpanel {
 					FROM `tbl_users`
 					WHERE uid = :uid;";
 		$data = $this->exec( $sql, [ ":uid" => $uid ] );
-		
+
 		if ( sizeof($data)==1 ) $user = $data[0];
 		else return FALSE;
-		
+
 		$sql = "SELECT F.field_id as id, F.field_title as title, F.field_type as type, F.field_options as options, I.info
 					FROM `tbl_user_fields`F
 					LEFT JOIN `tbl_user_info`I ON ( F.field_id = I.field AND I.uid = :uid )
 					WHERE F.enabled = 1
 					ORDER BY F.field_type, F.field_order";
 		$user['fields'] = $this->exec( $sql, [ ":uid" => $uid ] );
-		
+
 		foreach ( $user['fields'] as &$field )
 		{
 			if ( $field['type']==2 )
 				$field['options'] = json_decode($field['options'],TRUE);
 		}
-		
+
 		return $user;
 	}
-	
+
 //	public function listCustompages(int $page, array $sort)
 	public function listCustompages($page, array $sort)
 	{
@@ -2218,9 +2218,9 @@ class AdminCP extends Controlpanel {
 			return FALSE;
 		}
 		$textblock->load(array('id=?',$id));
-		$textblock->copyfrom( 
-			[ 
-				"label"		=> $data['label'], 
+		$textblock->copyfrom(
+			[
+				"label"		=> $data['label'],
 				"title"		=> $data['title'],
 				"content"	=> $data['content'],
 				"as_page"	=> isset($data['page']) ? : 0,
@@ -2231,12 +2231,12 @@ class AdminCP extends Controlpanel {
 		$i += $textblock->changed("title");
 		$i += $textblock->changed("content");
 		$i += $textblock->changed("as_page");
-		
+
 		$textblock->save();
 
 		return $i;
 	}
-	
+
 	public function addCustompage( string $label )
 	{
 		$textblock=new \DB\SQL\Mapper($this->db, $this->prefix.'textblocks');
@@ -2272,13 +2272,13 @@ class AdminCP extends Controlpanel {
 				LIMIT ".(max(0,$pos*$limit)).",".$limit;
 
 		$data = $this->exec($sql);
-				
+
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
 			"/adminCP/home/news/order={$sort['link']},{$sort['direction']}",
 			$limit
 		);
-				
+
 		return $data;
 	}
 
@@ -2321,9 +2321,9 @@ class AdminCP extends Controlpanel {
 		}
 		$news->load(array('nid=?',$id));
 
-		$news->copyfrom( 
-			[ 
-				"headline"	=> $data['headline'], 
+		$news->copyfrom(
+			[
+				"headline"	=> $data['headline'],
 				"newstext"	=> $data['newstext'],
 				"datetime"	=> $data['datetime'] == ""
 									? NULL
@@ -2334,12 +2334,12 @@ class AdminCP extends Controlpanel {
 		$i  = $news->changed("headline");
 		$i += $news->changed("newstext");
 		$i += $news->changed("datetime");
-		
+
 		$news->save();
 
 		return $i;
 	}
-	
+
 	public function newsDelete( int $id )
 	{
 		$delete = new \DB\SQL\Mapper($this->db, $this->prefix.'news');
@@ -2364,10 +2364,10 @@ class AdminCP extends Controlpanel {
 			"/adminCP/home/shoutbox/order={$sort['link']},{$sort['direction']}",
 			$limit
 		);
-				
+
 		return $data;
 	}
-	
+
 	public function shoutDelete(int $id)
 	{
 		$delete = new \DB\SQL\Mapper($this->db, $this->prefix.'shoutbox');
@@ -2380,7 +2380,7 @@ class AdminCP extends Controlpanel {
 	{
 		$sql = "SELECT S.id, S.message FROM `tbl_shoutbox`S WHERE `id` = :id";
 		$data = $this->exec($sql, [":id" => $id ]);
-		if (sizeof($data)!=1) 
+		if (sizeof($data)!=1)
 			return NULL;
 
 		return $data[0];
@@ -2397,15 +2397,15 @@ class AdminCP extends Controlpanel {
 		$shout->save();
 		return $i;
 	}
-	
+
 	public function getLanguageConfig()
 	{
 		$sql = "SELECT `name`, `value`, `form_type`
-					FROM `tbl_config` 
-					WHERE 
+					FROM `tbl_config`
+					WHERE
 						`admin_module` LIKE 'settings_language_file'";
 		$data = $this->exec($sql);
-		
+
 		foreach ( $data as $dat )
 			$config[$dat['name']] = $dat['value'];
 
@@ -2414,7 +2414,7 @@ class AdminCP extends Controlpanel {
 
 		return $config;
 	}
-	
+
 	public function saveLanguage($data)
 	{
 		$default = $data['lang_default'];
@@ -2425,7 +2425,7 @@ class AdminCP extends Controlpanel {
 			if ( $key == $default ) $dat['available'] = TRUE;
 			if ( $dat['available'] == TRUE ) $available[$key] = $dat['localname'];
 		}
-		
+
 		$post["settings_language_file"] =
 			[
 				"language_available" 	=> json_encode($available),
@@ -2437,11 +2437,11 @@ class AdminCP extends Controlpanel {
 	public function getLayoutConfig()
 	{
 		$sql = "SELECT `name`, `value`, `form_type`
-					FROM `tbl_config` 
-					WHERE 
+					FROM `tbl_config`
+					WHERE
 						`admin_module` LIKE 'settings_layout_file'";
 		$data = $this->exec($sql);
-		
+
 		foreach ( $data as $dat )
 			$config[$dat['name']] = $dat['value'];
 
@@ -2450,27 +2450,27 @@ class AdminCP extends Controlpanel {
 
 		return $config;
 	}
-	
+
 	public function saveLayout($data)
 	{
 		$default = $data['lay_default'];
 		unset($data['lay_default']);
-		
+
 		foreach ( $data as $key => &$dat )
 		{
 			if ( $key == $default ) $dat['available'] = TRUE;
 			if ( $dat['available'] == TRUE ) $available[$key] = $dat['name'];
 		}
-		
+
 		$post["settings_layout_file"] =
 			[
 				"layout_available" 	=> json_encode($available),
 				"layout_default"	=> $default,
 			];
-			
+
 		return $this->saveKeys($post);
 	}
-	
+
 	public function deleteOrphanRelations()
 	{
 		// remove orphaned story-author relations
@@ -2482,14 +2482,14 @@ class AdminCP extends Controlpanel {
 		// remove orphaned story-tag relations
 		$sql = "DELETE FROM `tbl_stories_tags`
 					WHERE NOT EXISTS (SELECT * FROM `tbl_stories` WHERE `tbl_stories_tags`.`sid` = `tbl_stories`.`sid`);";
-		
+
 	}
-	
+
 	public function maintenanceRecountChapters()
 	{
 		return $this->exec
 		("UPDATE `tbl_stories`S
-			SET chapters = 
+			SET chapters =
 				( SELECT COUNT(DISTINCT chapid) as chapters
 					FROM `tbl_chapters`C WHERE C.sid = S.sid AND C.validated >= 30
 				);"
@@ -2502,24 +2502,24 @@ class AdminCP extends Controlpanel {
 		// clear stats of all categories
 		$sql = "UPDATE `tbl_categories` SET `stats` = NULL";
 		$this->exec($sql);
-		
+
 		// mySQL runs on a pretty tight CONCAT limit, better make some room here ...
 		$this->exec("SET SESSION group_concat_max_len = 1000000;");
 		$categories = new \DB\SQL\Mapper($this->db, $this->prefix.'categories' );
-		
+
 		// start with lowest level and work up all the way to the root
 		do
 		{
-			$sql = "SELECT C.cid, C.category, COUNT(DISTINCT S.sid) as counted, C.parent_cid as parent, C.leveldown, 
-						GROUP_CONCAT(DISTINCT C1.category SEPARATOR '||' ) as sub_categories, 
+			$sql = "SELECT C.cid, C.category, COUNT(DISTINCT S.sid) as counted, C.parent_cid as parent, C.leveldown,
+						GROUP_CONCAT(DISTINCT C1.category SEPARATOR '||' ) as sub_categories,
 						GROUP_CONCAT(DISTINCT C1.stats SEPARATOR '||' ) as sub_stats
-				FROM `tbl_categories`C 
+				FROM `tbl_categories`C
 					INNER JOIN (SELECT leveldown FROM `tbl_categories` WHERE `stats` = '' ORDER BY leveldown DESC LIMIT 0,1) c2 ON ( C.leveldown = c2.leveldown )
 					LEFT JOIN `tbl_stories_categories`SC ON ( C.cid = SC.cid )
 					LEFT JOIN `tbl_stories`S ON ( S.sid = SC.sid )
 					LEFT JOIN `tbl_categories`C1 ON ( C.cid = C1.parent_cid )
 				GROUP BY C.cid";
-				
+
 			// process all categories of that level
 			do {
 				$items = $this->exec( $sql );
@@ -2539,7 +2539,7 @@ class AdminCP extends Controlpanel {
 							{
 								$item['counted'] += $sub_stats[$key]->count;
 								$sub[] =
-								[ 
+								[
 									'id' 	=> $sub_stats[$key]->cid,
 									'count' => $sub_stats[$key]->count,
 									'name'	=> $value,
@@ -2549,11 +2549,11 @@ class AdminCP extends Controlpanel {
 					}
 					$stats = json_encode([ "count" => (int)$item['counted'], "cid" => $item['cid'], "sub" => $sub ]);
 					unset($sub);
-					
+
 					$categories->load(array('cid=?',$item['cid']));
 					$categories->stats = $stats;
 					$categories->save();
-					
+
 					$change = ($change) ? : $categories->changed();
 				}
 			} while ( $change != FALSE );
