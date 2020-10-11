@@ -106,6 +106,12 @@ class Redirect extends Base
 		{
 			$redirect = "/home/contact";
 		}
+		elseif ( $params['a']=="challenges" AND isset($this->config['optional_modules']['contests']) )
+		{
+			$redirect = "/story/contests";
+			if ( preg_match( '/(\d+)/', $params['b'], $challenge ) )
+				$redirect .= "/id=".$challenge[0];
+		}
 		
 		if ( isset($COOKIE['redirect_seen'] ) ) $f3->reroute($redirect, false);
 		else $this->buffer( $this->template->inform($redirect) );
