@@ -48,11 +48,16 @@
 
 <check if="{{sizeof(@data)}}">
 	<true>
-	<check if="{{ isset(@form_error) }}">
-		<section class="hero is-warning is-small">
-		{{ @form_error }}
-		</section>
-	</check>
+
+<!-- error notification v4 -->
+<check if="{{ isset(@load_error) }}">
+	<div class="notification is-warning">
+		<button class="delete"></button>
+		{{ @LN__FailedLoad }}
+	</div>
+</check>
+<!-- END: error notification -->
+
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="paginate.html" /></F3:check>
 <table class="table is-striped is-hoverable is-fullwidth">
 <thead>

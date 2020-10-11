@@ -114,14 +114,15 @@ return array(
 	'Reg_Done'				=> 'Die Registrierung war erfolgreich',
 //	'Reg_Mail'				=> '',
 	'Reg_MailFail'			=> 'Der Server hat versucht, dir eine Mail zu schicken, konnte diesen Vorgang aber nicht abschließen',
-	
+
 // [5] Global -- System
 'CookieText'	=> 'Diese Website benutzt Cookies, um das Krümelmonster zu füttern.',
 'CookieInfo'	=> 'Mehr über die echten Gründe.',
 'CookieAccept'	=> 'Akzeptiert!',
 'Month_Calendar' => '{0,date,custom,%B %Y}',	// using php strftime
 'Weekday' => '{0,date,custom,%A}',
-'FailedLoadItem'	=> 'Failed to load {0}',
+'FailedLoadItem'	=> '{0} konnte nicht geladen werden',
+'FailedLoad'	=> 'Fehler beim Laden',
 
 // [6] Global -- Forms
 'CaptchaMismatch'	=> 'Captcha stimmt nicht überein',
@@ -365,7 +366,7 @@ return array(
 			'other	{# Geschichten} }',
 	'Library_Series' 		=> 'Serien ({0})',
 	'Library_Collections'	=> 'Sammlungen ({0})',
-			
+
 'UserMenu_Feedback' => 'Feedback',
 'UserMenu_Reviews' => 'Bewertungen',
 	'UserMenu_ReviewsWritten'	=> 'Bewertungen geschrieben ({0})',
@@ -616,7 +617,7 @@ return array(
 	'TypeSeriesExplain'		=> 'Serien sind sortiert und sollten einen Handlungsverlauf darstellen',
 	'CreateTypeCollection'	=> 'eine Sammlung',
 	'TypeCollectionExplain'	=> 'Sammlungen sind unsortiert und bündeln thematisch oder andersartig verbundene Geschichten',
-	
+
 
 'CannotDeleteUsedElement'	=> 'Kann ein Element, dass zurzeit verwendet wird, nicht löschen.',
 'ElementDeleted'	=> 'Element gelöscht',

@@ -40,7 +40,7 @@ return array(
 'Title' 		=>	'Title',
 'Author' 		=>	'Author',
 'Privacy'		=> 	'Privacy',
-'total'			=>	'total',					
+'total'			=>	'total',
 'MoveUp'		=> 'Move upwards',
 'MoveDown'		=> 'Move downwards',
 'ShowDetails'	=> 'Show details',
@@ -122,6 +122,7 @@ return array(
 'Month_Calendar' => '{0,date,custom,%B %Y}',	// using php strftime
 'Weekday' => '{0,date,custom,%A}',
 'FailedLoadItem'	=> 'Failed to load {0}',
+'FailedLoad'	=> 'Failed to load this item',
 
 // [6] Global -- Forms 12
 'CaptchaMismatch'	=> 'Captcha did not match',
@@ -322,7 +323,7 @@ return array(
 'UserMenu_Polls'			=> '{0, plural,'.
 			'zero	{Polls},'.
 			'other	{Polls (#)} }',
-	
+
 'UserMenu_Authoring' => 'Authoring',
 'UserMenu_AddStory' => 'Add Story',
 	'Authoring_Finished'	=> 'Finished ({0})',
@@ -374,7 +375,7 @@ return array(
 	'UserMenu_CommentsReceived'	=> 'Comments received ({0})',
 'UserMenu_Settings' => 'Settings',
 	'UserMenu_Preferences' => 'Preferences',
-	
+
 'UCP_Pref_Alerts'			=>	'Notifications',
 	'UCP_Pref_AlertOn'			=> 'Notify me when ...',
 	'UCP_Pref_AlertFeedback'	=> '... I receive feedback',

@@ -18,7 +18,7 @@ class AdminCP extends Base
 	{
 		$this->response = new \View\Backend();
 		\Registry::set('VIEW',$this->response);
-		
+
 		$this->response->addTitle( \Base::instance()->get('LN__AdminCP') );
 	}
 
@@ -26,11 +26,11 @@ class AdminCP extends Base
 	{
 		$menu = $this->model->menuShow($selected,(string)$module);
 		$this->buffer
-		( 
-			$this->template->menuShow($menu), 
+		(
+			$this->template->menuShow($menu),
 			"LEFT"
 		);
-		
+
 		if ( isset($menu[$this->moduleBase]['sub']) AND sizeof($menu[$this->moduleBase]['sub'])>0 )
 			\Base::instance()->set('accessSub', TRUE);
 	}
@@ -50,12 +50,12 @@ class AdminCP extends Base
 		foreach ( $menu as $m ) $link[] = $m['link'];
 		return $link??[];
 	}
-	
+
 	public function fallback(\Base $f3, array $params): void
 	{
 		$f3->reroute('/adminCP/home', false);
 	}
-	
+
 	public function __archive(\Base $f3, array $params ): void
 	{
 		// declare module
@@ -93,14 +93,14 @@ class AdminCP extends Base
 				$this->buffer( $this->template->access() );
 		}
 	}
-	
+
 	public function archiveAjax(\Base $f3, array $params): void
 	{
 		$data = [];
 		if ( empty($params['module']) ) return;
 
 		$post = $f3->get('POST');
-		
+
 		if ( $params['module']=="search" )
 			$data = $this->model->ajax("search", $post);
 
@@ -129,7 +129,7 @@ class AdminCP extends Base
 		$data['Ebook'] = $this->model->settingsFields('archive_ebook');
 		$this->buffer( $this->template->settingsFields($data, "archive/home", $feedback) );
 	}
-	
+
 	protected function archiveSubmit(\Base $f3, array $feedback = [ NULL, NULL ]): void
 	{
 		if ( isset($_POST['form_data']) )
@@ -142,7 +142,7 @@ class AdminCP extends Base
 		$data['Reviews'] = $this->model->settingsFields('archive_reviews');
 		$this->buffer( $this->template->settingsFields($data, "archive/submit", $feedback) );
 	}
-	
+
 	protected function archiveContests(\Base $f3, array $params): string
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Contests') );
@@ -228,10 +228,10 @@ class AdminCP extends Base
 		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "id";
 		$sort["order"]		= $allow_order[$sort["link"]];
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
-		
+
 		return $this->template->contestsList($this->model->contestsList($page, $sort), $sort);
 	}
-	
+
 	protected function archiveContestsEntries(\Base $f3, array $params, array $data)
 	{
 		if ( isset($params['remove']) )
@@ -242,12 +242,12 @@ class AdminCP extends Base
 			if ( isset($params['page']) )  $url .= "/page=".$params['page'];
 			$f3->reroute($url, false);
 			exit;
-			
+
 		}
 
 		// page will always be an integer > 0
 		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
-		
+
 		// search/browse
 		$allow_order = array (
 			"id"		=>	"lid",
@@ -303,7 +303,7 @@ class AdminCP extends Base
 			}
 			elseif ( isset($_POST['charid']) ) $params['id'] = $f3->get('POST.charid');
 		}
-		
+
 		if( isset ($params['id']) )
 		{
 			$data = $this->model->characterLoad($params['id']);
@@ -325,7 +325,7 @@ class AdminCP extends Base
 		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "name";
 		$sort["order"]		= $allow_order[$sort["link"]];
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="desc") ?	"desc" : "asc";
-		
+
 		return $this->template->characterList
 				(
 					$this->model->characterList($page, $sort, $category),
@@ -334,7 +334,7 @@ class AdminCP extends Base
 					$sort
 				);
 	}
-	
+
 	protected function archiveTagsIndex(\Base $f3, array $params, $feedback): void
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Tags') );
@@ -343,10 +343,10 @@ class AdminCP extends Base
 		$allowedSubs = $this->menuShowUpper("archive/tags");
 
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
-		
+
 		if ( isset($params['groups']) )
 			$this->archiveTagsGroups($f3, $params);
-		
+
 		elseif ( isset($params['cloud']) )
 		{
 			if (isset($_POST['form_data']))
@@ -359,7 +359,7 @@ class AdminCP extends Base
 		else
 			$this->archiveTagsEdit($f3, $params);
 	}
-	
+
 	protected function archiveTagsEdit(\Base $f3, $params): void
 	{
 
@@ -389,7 +389,7 @@ class AdminCP extends Base
 			}
 			elseif ( isset($_POST['tid']) ) $params['id'] = $f3->get('POST.tid');
 		}
-		
+
 		if( isset ($params['id']) AND is_numeric($params['id']) )
 		{
 			if ( $data = $this->model->tagLoad($params['id']) )
@@ -424,16 +424,16 @@ class AdminCP extends Base
 		$sort['data']['label'] = ( $sort['direction']=="desc" OR $sort['link']!='label' ) ? "asc" : "desc";
 		$sort['data']['group'] = ( $sort['direction']=="desc" OR $sort['link']!='group' ) ? "asc" : "desc";
 		$sort['data']['count'] = ( $sort['direction']=="desc" OR $sort['link']!='count' ) ? "asc" : "desc";
-		
+
 		$data = $this->model->tagList($page, $sort);
 		$this->buffer ( $this->template->tagList($data, $sort) );
 	}
-	
+
 	protected function archiveTagsGroups(\Base $f3, array $params): void
 	{
 		//$segment = "archive/tags/groups";
 		//if(!$this->model->checkAccess($segment)) return FALSE;
-		
+
 		if ( isset($params['delete']) )
 		{
 			if ( $this->model->tagGroupDelete( (int)$params['delete'] ) )
@@ -453,7 +453,7 @@ class AdminCP extends Base
 			}
 		}
 
-		if( isset ($params['id']) ) 
+		if( isset ($params['id']) )
 		{
 			if ($data = $this->model->tagGroupLoad($params['id']))
 			{
@@ -482,15 +482,15 @@ class AdminCP extends Base
 		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "group";
 		$sort["order"]		= $allow_order[$sort["link"]];
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="desc") ?	"desc" : "asc";
-		
+
 		$data = $this->model->tagGroupsList($page, $sort);
 		$this->buffer ( $this->template->tagGroupList($data, $sort) );
 	}
-	
+
 	protected function archiveCategories(\Base $f3, array $params): void
 	{
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
-		
+
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Categories') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Categories') );
 
@@ -510,7 +510,7 @@ class AdminCP extends Base
 				// Attempted to add category, but failed
 				if ( @$newID === FALSE )
 					$errors = '__failAddCategory';
-				
+
 				$parent_info = $this->model->categoryLoad($parent_cid);
 				// Non-existent category, go back to overview
 				if ( $parent_info === FALSE ) $f3->reroute('/adminCP/archive/categories', false);
@@ -523,7 +523,7 @@ class AdminCP extends Base
 					'info'		=> @$parent_info,
 				];
 				$this->buffer( $this->template->categoryAdd( $f3, $data ) );
-				
+
 				// Leave function without creating further forms or mishap
 				return;
 			}
@@ -531,7 +531,7 @@ class AdminCP extends Base
 			{
 				$f3->set('changes', 1);
 			}
-			
+
 		}
 		elseif ( isset($params['delete']) )
 		{
@@ -595,10 +595,10 @@ class AdminCP extends Base
 	protected function archiveRatings(\Base $f3, array $params): void
 	{
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
-		
+
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Ratings') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Ratings') );
-		
+
 		if ( isset($params['delete']) )
 		{
 			$data = $this->model->ratingLoad($params['delete']);
@@ -625,7 +625,7 @@ class AdminCP extends Base
 				exit;
 			}
 		}
-		
+
 		if( isset ($params['id']) )
 		{
 			$data = $this->model->ratingLoad($params['id']);
@@ -677,7 +677,7 @@ class AdminCP extends Base
 				$this->buffer( $this->template->access() );
 		}
 	}
-	
+
 	protected function homeIndex(\Base $f3): void
 	{
 		// silently attempt to get version information
@@ -685,7 +685,7 @@ class AdminCP extends Base
 		@curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 		$versions = @curl_exec($ch);
 		@curl_close($ch);
-		
+
 		$compare['base'] = $f3->get('APP_VERSION');
 
 		if ($versions)
@@ -695,7 +695,7 @@ class AdminCP extends Base
 			if ( @$version['stable'] ) $compare['stable'] = version_compare ( $version['stable'], $compare['base'] );
 		}
 		else $version = FALSE;
-		
+
 		$this->buffer( $this->template->homeWelcome($version, $compare) );
 	}
 
@@ -703,7 +703,7 @@ class AdminCP extends Base
 	{
 		$this->buffer( "<a href='http://efiction.org/wiki/Main_Page'>http://efiction.org/wiki/Main_Page</a>" );
 	}
-	
+
 	protected function homeCustompages(\Base $f3, array $params): void
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_CustomPages') );
@@ -745,7 +745,7 @@ class AdminCP extends Base
 				}
 			}
 		}
-		
+
 		if( isset ($params['id']) )
 		{
 			if ( NULL !== $data = $this->model->loadCustompage($params['id']) )
@@ -775,7 +775,7 @@ class AdminCP extends Base
 		$sort['data']['id'] = 	 ( $sort['direction']=="desc" OR $sort['link']!='id' ) ? "asc" : "desc";
 		$sort['data']['label'] = ( $sort['direction']=="desc" OR $sort['link']!='label' ) ? "asc" : "desc";
 		$sort['data']['title'] = ( $sort['direction']=="desc" OR $sort['link']!='title' ) ? "asc" : "desc";
-		
+
 		$data = $this->model->listCustompages($page, $sort);
 
 		$this->buffer ( $this->template->custompageList($data, $sort) );
@@ -790,7 +790,7 @@ class AdminCP extends Base
 		}
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Logs') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Logs') );
-		
+
 		$menuCount = $this->model->logGetCount();
 
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
@@ -811,7 +811,7 @@ class AdminCP extends Base
 		$sort["order"]		= $allow_order[$sort["link"]];
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
 
-		
+
 		$this->buffer
 		(
 			$this->template->logList
@@ -823,14 +823,14 @@ class AdminCP extends Base
 			)
 		);
 	}
-	
+
 	protected function homePolls(\Base $f3, array $params): string
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Polls') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Polls') );
 
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
-		
+
 		if ( isset($params['delete']) )
 		{
 			if ( $this->model->pollDelete( (int)$params['delete'] ) )
@@ -877,7 +877,7 @@ class AdminCP extends Base
 				}
 			}
 		}
-		
+
 		if( isset ($params['id']) )
 		{
 			$data = $this->model->pollLoad((int)$params['id']);
@@ -910,7 +910,7 @@ class AdminCP extends Base
 					$sort
 				);
 		}
-	
+
 	protected function homeShoutbox(\Base $f3, array $params): void
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Shoutbox') );
@@ -970,7 +970,7 @@ class AdminCP extends Base
 			}
 			else $f3->set('loadResult', 0);
 		}
-		
+
 		$this->buffer
 		(
 			$this->template->shoutList
@@ -980,13 +980,13 @@ class AdminCP extends Base
 			)
 		);
 	}
-	
+
 	protected function homeMaintenance(\Base $f3, array $params): string
 	{
 		$this->model->maintenanceRecountCategories();
 		return "";
 	}
-	
+
 	protected function homeNews(\Base $f3, array $params): void
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_News') );
@@ -1041,7 +1041,7 @@ class AdminCP extends Base
 				}
 			}
 		}
-		
+
 		if( isset ($params['id']) )
 		{
 			if ( NULL !== $data = $this->model->newsLoad($params['id']) )
@@ -1073,7 +1073,7 @@ class AdminCP extends Base
 		$sort['data']['date'] =   ( $sort['direction']=="desc" OR $sort['link']!='date' ) ? "asc" : "desc";
 		$sort['data']['title'] =  ( $sort['direction']=="desc" OR $sort['link']!='title' ) ? "asc" : "desc";
 		$sort['data']['author'] = ( $sort['direction']=="desc" OR $sort['link']!='author' ) ? "asc" : "desc";
-		
+
 		$this->buffer
 		(
 			$this->template->newsList
@@ -1127,7 +1127,7 @@ class AdminCP extends Base
 		if ( empty($params['module']) ) return;
 
 		$post = $f3->get('POST');
-		
+
 		if ( $params['module']=="search" )
 			$data = $this->model->ajax("userSearch", $post);
 
@@ -1149,7 +1149,7 @@ class AdminCP extends Base
 	protected function membersEdit(\Base $f3, array $params): string
 	{
 		if( isset($params['*']) ) $params = $this->parametric($params['*']);
-		
+
 		if( empty($params['uid']) OR !is_numeric($params['uid']) )
 			return $this->membersEditSearchForm($f3, $params);
 
@@ -1164,13 +1164,13 @@ class AdminCP extends Base
 					$this->model->memberGroupSave($params['uid'], $f3->get('POST.group'));
 			}
 		}
-		
+
 		if( FALSE === $memberdata = $this->model->loadUser($params['uid']) )
 			return "__failed";
-		
+
 		return $this->template->userEdit($memberdata, $params['returnpath']);
 	}
-			
+
 	protected function membersEditSearchForm(\Base $f3, array $params): string
 	{
 		if(!empty($params['term']))
@@ -1179,7 +1179,7 @@ class AdminCP extends Base
 			$search['follow'][] = "term={$params['term']}";
 		}
 		else $search['term'] = NULL;
-		
+
 		if(isset($params['fromlevel']))
 		{
 			if(isset($params['tolevel']) AND $params['fromlevel']>$params['tolevel'] )
@@ -1189,16 +1189,16 @@ class AdminCP extends Base
 			$search['follow'][] = "fromlevel={$search['fromlevel']}";
 		}
 		else $search['fromlevel'] = NULL;
-		
+
 		if(isset($params['tolevel']))
 		{
 			$search['tolevel'] = (int)$params['tolevel'];
 			$search['follow'][] = "tolevel={$search['tolevel']}";
 		}
 		else $search['tolevel'] = NULL;
-		
+
 		$search['follow'] = (isset($search['follow'])) ? implode("/",$search['follow'])."/" : "";
-		
+
 		// search/browse
 		$allow_order = array (
 				"id"		=>	"uid",
@@ -1214,7 +1214,7 @@ class AdminCP extends Base
 		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "date";
 		$sort["order"]		= $allow_order[$sort["link"]];
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
-		
+
 		$data = $this->model->listUsers($page, $sort, $search);
 		return $this->template->userEditList($data, $sort, $search);
 	}
@@ -1242,20 +1242,20 @@ class AdminCP extends Base
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Profile') );
 
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
-		
+
 		if ( isset($params['edit']) AND is_numeric($params['edit']) )
 		{
-			
+
 			return TRUE;
 		}
-		
+
 		// Get all available user fields
 		$fields = $this->model->listUserFields();
-		
+
 		// Group array by field type
 		foreach ( $fields as $field )
 			$data[$field['field_type']][] = $field;
-		
+
 		$this->buffer ( $this->template->userFieldsList( $data ) );
 	}
 
@@ -1357,7 +1357,7 @@ class AdminCP extends Base
 		else
 			// Sava data from special forms (language, layout)
 			$this->feedback = $this->settingsSaveLLData($f3, $params);
-		
+
 		$this->__settings($f3, $params);
 	}
 
@@ -1368,13 +1368,13 @@ class AdminCP extends Base
 		// get the active modules configuration
 		$activeModules = \Config::getPublic('optional_modules');
 
-		// check if an active module is selected
+		// check if an active module is selected *todo*
 		if ( @$activeModules[$params[0]] )
 		{
 			$this->buffer (print_r($params, 1));
 			$this->buffer (print_r($activeModules, 1));
 		}
-		
+
 		//\Base::instance()->set('menu_upper', $activeModules);
 		// create setting fields for the optional modules
 		foreach ( $activeModules as $active => $status )
@@ -1385,7 +1385,7 @@ class AdminCP extends Base
 			}
 		}
 	}
-	
+
 	protected function settingsDateTime(\Base $f3, array $params): string
 	{
 		return $this->template->settingsDateTime();
@@ -1404,16 +1404,16 @@ class AdminCP extends Base
 			$data['active'] = array_key_exists($data['locale'], $languageConfig['language_available']);
 			$languageFiles[] = $data;
 		}
-		
+
 		return $this->template->language($languageFiles, $languageConfig);
 	}
 
  	protected function settingsLayout(\Base $f3, array $params): string
 	{
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Layout') );
-		
+
 		$layoutConfig = $this->model->getLayoutConfig();
-		
+
 		// Folder list with ***x cleanup - anyone with a windows server, is this working?
 		$entries = array_diff(scandir("./template/frontend"), array('..', '.'));
 		foreach ( $entries as $entry )
@@ -1426,7 +1426,7 @@ class AdminCP extends Base
 				$layoutFiles[] = $data;
 			}
 		}
-		
+
 		$iconset = $this->template->layoutIcons();
 
 		return $this->template->layout($layoutFiles, $layoutConfig).$iconset;
@@ -1491,20 +1491,20 @@ class AdminCP extends Base
 				$this->buffer( $this->template->access() );
 		}
 	}
-	
+
 	public function storiesAjax(\Base $f3, array $params): void
 	{
 		$data = [];
 		if ( empty($params['module']) ) return;
 
 		$post = $f3->get('POST');
-		
+
 		if ( $params['module']=="search" )
 			$data = $this->model->ajax("storySearch", $post);
 
 		elseif ( $params['module']=="editMeta" )
 			$data = $this->model->ajax("editMeta", $post, $this->parametric($params['*']??""));
-		
+
 		elseif ( $params['module']=="featured" )
 			$data = $this->model->ajax("storySearch", $post);
 
@@ -1512,7 +1512,7 @@ class AdminCP extends Base
 		{
 			$data = $this->model->ajax("storySort", $post);
 		}
-		
+
 		echo json_encode($data);
 		exit;
 	}
@@ -1523,7 +1523,7 @@ class AdminCP extends Base
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Stories_Pending') );
 
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
-		
+
 		if ( isset($params['validate']) )
 		{
 			if ( isset($params['story']) AND NULL!==$situation=$this->model->storyLoadPending($params['story']) )
@@ -1577,7 +1577,7 @@ class AdminCP extends Base
 				exit;
 			}
 		}
-		
+
 		if( isset ($params['story']) )
 		{
 			if ( NULL !== $data = $this->model->storyLoadPending($params['story']) )
@@ -1590,7 +1590,7 @@ class AdminCP extends Base
 					$chapterText = $this->model->getChapterText( $data['story']['sid'], $data['story']['chap_inorder'], FALSE );
 					return $this->template->storyValidateChapter($data['story'], $chapterText, $params['returnpath']);
 				}
-				
+
 				// no chapter selected, let's look at the story overview
 				return $this->template->storyValidatePending($data, $params['returnpath']);
 			}
@@ -1627,7 +1627,7 @@ class AdminCP extends Base
 					$sort
 				);
 	}
-	
+
 	protected function storiesEdit(\Base $f3, array $params): void
 	{
 		if ( isset($params['*']) )
@@ -1701,7 +1701,7 @@ class AdminCP extends Base
 					}
 					else
 					{
-						
+
 						if ( 0 < $i = $this->model->storySaveChanges($params['story'], $f3->get('POST.form')) )
 							$_SESSION['lastAction']['save_success'] = $i;
 						$f3->reroute("/adminCP/stories/edit/story={$storyInfo['sid']};returnpath=".$params['returnpath'], false);
@@ -1755,7 +1755,7 @@ class AdminCP extends Base
 			$f3->reroute("adminCP/stories/edit", false);
 		}
 	}
-	
+
 	protected function storiesAdd(\Base $f3, array $params): void
 	{
 		if ( isset($_POST['form']) && !empty($_POST['form']['new_title']) )
@@ -1774,7 +1774,7 @@ class AdminCP extends Base
 		}
 		else $this->buffer( $this->template->storyAddForm() );
 	}
-	
+
 	protected function storiesHome(\Base $f3, array $params)
 	{
 		$this->buffer( \View\Base::stub() );
@@ -1785,7 +1785,7 @@ class AdminCP extends Base
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Featured') );
 		//$allowedSubs = $this->menuShowUpper("stories/featured");
 		$this->menuShowUpper("stories/featured");
-		
+
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 
 		if ( isset( $_POST['sid'] ) )
@@ -1818,7 +1818,7 @@ class AdminCP extends Base
 		else
 		{
 			$select = $params['select'] ?? "current";
-			
+
 			$allow_order = array (
 				"id"		=>	"S.sid",
 				"title"		=>	"S.title",
@@ -1828,17 +1828,17 @@ class AdminCP extends Base
 			$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "title";
 			$sort["order"]		= $allow_order[$sort["link"]];
 			$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="desc") ?	"desc" : "asc";
-			
+
 			$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
 
 			$data = $this->model->featuredList($page, $sort, $select);
 			$this->buffer( $this->template->featuredList($data, $sort, $select) );
-			
+
 			return;
 		}
 
 	}
-	
+
 	protected function storiesCollections(\Base $f3, array $params)
 	{
 		if ( $params['module']=="collections" )
@@ -1855,7 +1855,7 @@ class AdminCP extends Base
 		}
 
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
-		
+
 		// so we want to delete from inside the edit form
 		if( isset($params['delete']) )
 		{
@@ -1920,13 +1920,13 @@ class AdminCP extends Base
 				return;
 			}
 			// edit the collection/series
-			elseif ( NULL !== $data = $this->model->collectionLoad($params['id']) )
+			elseif ( [] !== $data = $this->model->collectionLoad($params['id']) )
 			{
 				$data['editor'] = $params['editor'] ?? ((empty($_SESSION['preferences']['useEditor']) OR $_SESSION['preferences']['useEditor']==0) ? "plain" : "visual");
 				$this->buffer( $this->template->collectionEdit($data, $this->model->storyEditPrePop($data), $module, @$params['returnpath']) );
 				return;
 			}
-			else $f3->set('form_error', "__failedLoad");
+			else $f3->set('load_error', TRUE);
 		}
 
 		// page will always be an integer > 0
@@ -1956,14 +1956,14 @@ class AdminCP extends Base
 			)
 		);
 	}
-	
+
 	protected function storiesRecommendations(\Base $f3, array $params)
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Recommendations') );
 		$this->menuShowUpper("stories/recommendations");
 
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
-		
+
 		// so we want to delete from inside the edit form
 		if( isset($params['delete']) )
 		{
@@ -2001,7 +2001,7 @@ class AdminCP extends Base
 		{
 			$params['id'] = $this->model->recommendationAdd($f3->get('POST.new_data') );
 		}
-		
+
 		if( isset ($params['id']) )
 		{
 			if ( [] !== $data = $this->model->recommendationLoad($params['id']) )
@@ -2011,19 +2011,19 @@ class AdminCP extends Base
 				{
 					$f3->set('lookup_error', 0);
 				}
-				
+
 				// server has found something
 				elseif ( @$data['lookup']['http_code']==200 )
 					$f3->set('lookup_success', 1);
 				// server has found something but it's not the plain 'OK' code
 				elseif ( @$data['lookup']['http_code']>200 AND @$data['lookup']['http_code']<300 )
 					$f3->set('lookup_success', 0);
-	
+
 				// Server replies with a permanent moved status
 				elseif ( @$data['lookup']['http_code']==301 OR @$data['lookup']['http_code']==308 )
 				{
 					// if the only difference is a change from http to https, silently alter the value and inform the user.
-					if ( str_replace("http:", "https:", $data['url']) == @$data['lookup']['redirect_url'] OR 
+					if ( str_replace("http:", "https:", $data['url']) == @$data['lookup']['redirect_url'] OR
 							"https://".$data['url'] == $data['lookup']['redirect_url'] )
 					{
 						$data['url'] = $data['lookup']['redirect_url'];
@@ -2034,7 +2034,7 @@ class AdminCP extends Base
 						$f3->set('lookup_moved', 0);
 					}
 				}
-				
+
 				elseif ( @$data['lookup']['http_code']>=400 )
 				{
 					$f3->set('lookup_error', 0);
@@ -2051,7 +2051,7 @@ class AdminCP extends Base
 				exit;
 			}
 		}
-		
+
 		// page will always be an integer > 0
 		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
 
@@ -2068,7 +2068,7 @@ class AdminCP extends Base
 		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "id";
 		$sort["order"]		= $allow_order[$sort["link"]];
 		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="asc") ?	"asc" : "desc";
-		
+
 		$this->buffer
 		(
 			$this->template->recommendationList

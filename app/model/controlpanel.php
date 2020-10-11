@@ -26,9 +26,9 @@ class Controlpanel extends Base {
 						WHERE S.sid = :sid ";
 			$countBind = [ ":sid" => $storyID, ":uidU" => $userID, ":uidC" => $userID ];
 
-			$chapterCount = $this->exec($countSQL, $countBind)[0];
+			$chapterCount = current($this->exec($countSQL, $countBind));
 
-			if ( empty($chapterCount) OR $chapterCount['uid']==NULL )
+			if ( $chapterCount===FALSE OR $chapterCount['uid']==NULL )
 				return 0;
 
 			// set the initial validation status
@@ -38,11 +38,9 @@ class Controlpanel extends Base {
 		else
 		{
 			// coming from adminCP, no need to check user permission
-			$chapterCount = $this->exec("SELECT COUNT(Ch.chapid) as chapters, MAX(Ch.inorder) as lastorder
+			if ( FALSE === $chapterCount = current($this->exec("SELECT COUNT(Ch.chapid) as chapters, MAX(Ch.inorder) as lastorder
 											FROM `tbl_chapters`Ch
-										WHERE `sid` = :sid ", [ ":sid" => $storyID ])[0];
-
-			if ( empty($chapterCount) )
+										WHERE `sid` = :sid ", [ ":sid" => $storyID ])) )
 				return 0;
 
 			// set the initial validation status
@@ -715,11 +713,8 @@ class Controlpanel extends Base {
 					)AS SELECT_OUTER
 				GROUP BY sid ORDER BY sid ASC";
 
-		$item = $this->exec($sql, [':sid' => $sid] );
-
-		if ( empty($item) ) return FALSE;
-
-		$item = $item[0];
+		if ( FALSE === $item = current($this->exec($sql, [':sid' => $sid])) )
+			return FALSE;
 
 		// only build tag tree when there is a tag set
 		if($item['tagblock']!==NULL)
@@ -790,11 +785,9 @@ class Controlpanel extends Base {
 						GROUP BY Coll.collid
 					) AS SERIES
 				LEFT JOIN `tbl_ratings`R ON (R.rid = max_rating_id);";
-		$item = $this->exec($sql, [':collection' => $collID] );
 
-		if ( empty($item) ) return FALSE;
-
-		$item = $item[0];
+		if ( FALSE === $item = current($this->exec($sql, [':collection' => $collID])) )
+			return FALSE;
 
 		$tagblock['simple'] = $this->cleanResult($item['tagblock']);
 		if($tagblock['simple']!==NULL) foreach($tagblock['simple'] as $t)
@@ -817,7 +810,7 @@ class Controlpanel extends Base {
 
 	/**
 	* rebuild the stats cache for all collections that were added to or removed from a story
-	* ot that hat a story added to or removed from
+	* ot that had a story added to or removed from
 	* rewrite 2020-09
 	*
 	* @param	array		$recID	ID of recommendation to be re-cached
@@ -848,11 +841,9 @@ class Controlpanel extends Base {
 						WHERE R.recid = :recid
 					)AS SELECT_OUTER
 					GROUP BY recid ORDER BY recid ASC;;";
-		$item = $this->exec($sql, [':recid' => $recID] );
 
-		if ( empty($item) ) return FALSE;
-
-		$item = $item[0];
+		if ( FALSE === $item = current($this->exec($sql, [':recid' => $recID] )) )
+			return FALSE;
 
 		$tagblock['simple'] = $this->cleanResult($item['tagblock']);
 		if($tagblock['simple']!==NULL) foreach($tagblock['simple'] as $t)
@@ -872,7 +863,15 @@ class Controlpanel extends Base {
 		return TRUE;
 	}
 
-	public function cacheContest( $conList ) : bool
+	/**
+	* rebuild the stats cache for all contests that had a story added or removed
+	* 2020-10
+	*
+	* @param	array		$conList	List of contests to be re-cached
+	*
+	* @return	int
+	*/
+	public function cacheContest( $conList ) : int
 	{
 		if ( is_numeric($conList) )
 			$conList[] = (int)$conList;
@@ -903,10 +902,8 @@ class Controlpanel extends Base {
 
 		foreach ( $conList as $conid )
 		{
-			if ([] !== $item = $this->exec($sql, [':conid' => $conid] ))
+			if (FALSE !== $item = current($this->exec($sql, [':conid' => $conid])) )
 			{
-				$item = $item[0];
-
 				$tagblock['simple'] = $this->cleanResult($item['tagblock']);
 				if($tagblock['simple']!==NULL) foreach($tagblock['simple'] as $t)
 					$tagblock['structured'][$t[2]][] = [ $t[0], $t[1], $t[2], $t[3] ];
@@ -968,7 +965,7 @@ class Controlpanel extends Base {
 			// set the cursor to the current category
 			$categories->load(['cid = ?', $catID]);
 
-			$item = $this->exec($sql, [":cid" => $catID])[0];
+			$item = current($this->exec($sql, [":cid" => $catID]));
 
 			if ( $item['sub_categories']==NULL ) $sub = NULL;
 			else
@@ -1061,7 +1058,6 @@ class Controlpanel extends Base {
 		// refuse to leave an empty author list behind (unless stated otherwise)
 		if(sizeof($mainauthor) or ($allowEmptyAuthor))
 		{
-
 			// clean up supporting authors
 			foreach ( $supDB->find(array('`sid` = ? AND `type` = ?',$storyID,'S')) as $X )
 			{
@@ -1400,7 +1396,7 @@ class Controlpanel extends Base {
 		$data = $this->exec( $sql );
 
 		$this->paginate(
-			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			current($this->exec("SELECT FOUND_ROWS() as found"))['found'],
 			( $userID )
 				? "/userCP/library/".(($module=="collections")?"collections":"series")."/order={$sort['link']},{$sort['direction']}"
 				: "/adminCP/stories/".(($module=="collections")?"collections":"series")."/order={$sort['link']},{$sort['direction']}",
@@ -1410,7 +1406,7 @@ class Controlpanel extends Base {
 		return $data;
 	}
 
-	public function collectionLoad(int $collid, int $userID=0)
+	public function collectionLoad(int $collid, int $userID=0) : array
 	{
 		// if not coming from the admin panel, restrict to self
 		$where = ($userID) ? "AND Coll.uid = {$userID}" : "";
@@ -1433,10 +1429,8 @@ class Controlpanel extends Base {
 					WHERE Coll.collid = :collid @WHERE@
 					GROUP BY Coll.collid";
 
-		$tmp = $this->exec(str_replace("@WHERE@", $where, $sql), [":collid" => $collid ])[0] ?? [];
-
-		if (sizeof($tmp)==0)
-			return NULL;
+		if ( FALSE === $tmp = current($this->exec(str_replace("@WHERE@", $where, $sql), [":collid" => $collid ])) )
+			return [];
 
 		$data =
 		[
@@ -1799,7 +1793,7 @@ class Controlpanel extends Base {
 		$data = $this->exec( $sql );
 
 		$this->paginate(
-			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			current($this->exec("SELECT FOUND_ROWS() as found"))['found'],
 			( $userID )
 				? "/userCP/library/recommendations/order={$sort['link']},{$sort['direction']}"
 				: "/adminCP/stories/recommendations/order={$sort['link']},{$sort['direction']}",
