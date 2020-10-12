@@ -964,7 +964,7 @@ class AdminCP extends Controlpanel {
 		return $data;
 	}
 
-	public function contestEntryAdd(int $conID, int $entryID, string $type="S")// : void
+	public function contestEntryAdd(int $conID, int $entryID, string $type="S") : void
 	{
 		if ( $type == "S" )
 		{
@@ -998,10 +998,13 @@ class AdminCP extends Controlpanel {
 			}
 			else $addResult = 0;
 		}
+		// re-cache this contest
+		if ( $addResult ) $this->cacheContestEntries( $conID );
+
 		$this->f3->set("addResult",$addResult);
 	}
 
-	public function contestEntryRemove(int $conID, int $linkID)
+	public function contestEntryRemove(int $conID, int $linkID) : void
 	{
 		$link=new \DB\SQL\Mapper($this->db, $this->prefix.'contest_relations');
 		$link->load(array("conid=? AND lid=?",$conID, $linkID));
@@ -1009,13 +1012,17 @@ class AdminCP extends Controlpanel {
 		$_SESSION['lastAction'] = [ "deleteResult" => $link->erase() ];
 		// drop contest block cache
 		\Cache::instance()->clear('blockContestsCache');
+		// re-cache this contest
+		$this->cacheContestEntries( $conID );
 	}
 
-	public function contestDelete(int $conid)
+	public function contestDelete(int $conid) : void
 	{
 		$contest=new \DB\SQL\Mapper($this->db, $this->prefix.'contests');
 		$contest->load(array('conid=?',$conid));
-		$_SESSION['lastAction'] = [ "deleteResult" => $contest->erase() ];
+		if ( 0 < $i = $contest->erase() )
+			$this->exec("DELETE FROM `tbl_contest_relations` WHERE conid = '{$conid}';");
+		$_SESSION['lastAction'] = [ "deleteResult" => $i ];
 		// drop contest block cache
 		\Cache::instance()->clear('blockContestsCache');
 	}

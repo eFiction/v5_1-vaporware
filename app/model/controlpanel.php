@@ -864,7 +864,7 @@ class Controlpanel extends Base {
 	}
 
 	/**
-	* rebuild the stats cache for all contests that had a story added or removed
+	* rebuild the stats cache after editing the properties
 	* 2020-10
 	*
 	* @param	array		$conList	List of contests to be re-cached
@@ -874,20 +874,18 @@ class Controlpanel extends Base {
 	public function cacheContest( $conList ) : int
 	{
 		if ( is_numeric($conList) )
-			$conList[] = (int)$conList;
+			$conList = (array)(int)$conList;
 		$i=0;
 
 		$sql = "SELECT SELECT_OUTER.conid,
 					GROUP_CONCAT(DISTINCT tid,',',tag,',',description,',',tgid ORDER BY `order`,tgid,tag ASC SEPARATOR '||') AS tagblock,
 					GROUP_CONCAT(DISTINCT charid,',',charname ORDER BY charname ASC SEPARATOR '||') AS characterblock,
-					GROUP_CONCAT(DISTINCT cid,',',category ORDER BY category ASC SEPARATOR '||' ) as categoryblock,
-					GROUP_CONCAT(DISTINCT sid,',',title ORDER BY title ASC SEPARATOR '||' ) as storyblock
+					GROUP_CONCAT(DISTINCT cid,',',category ORDER BY category ASC SEPARATOR '||' ) as categoryblock
 					FROM
 					(
 						SELECT C.conid,
 								TG.description,TG.order,TG.tgid,T.label as tag,T.tid,
 								Cat.cid, Cat.category,
-								S.sid, S.title,
 								Ch.charid, Ch.charname
 							FROM `tbl_contests`C
 								LEFT JOIN `tbl_contest_relations`rC ON ( rC.conid = C.conid )
@@ -895,7 +893,6 @@ class Controlpanel extends Base {
 										LEFT JOIN `tbl_tag_groups`TG ON ( TG.tgid = T.tgid )
 									LEFT JOIN `tbl_characters`Ch ON ( Ch.charid = rC.relid AND rC.type = 'CH' )
 									LEFT JOIN `tbl_categories`Cat ON ( rC.relid = Cat.cid AND rC.type = 'CA' )
-									LEFT JOIN `tbl_stories`S ON ( rC.relid = S.sid AND rC.type = 'ST' )
 							WHERE C.conid = :conid
 					)AS SELECT_OUTER
 				GROUP BY conid ORDER BY conid ASC";
@@ -915,9 +912,51 @@ class Controlpanel extends Base {
 						'cache_tags'		=> json_encode($tagblock),
 						'cache_characters'	=> json_encode($this->cleanResult($item['characterblock'])),
 						'cache_categories'	=> json_encode($this->cleanResult($item['categoryblock'])),
-						'cache_stories'		=> json_encode($this->cleanResult($item['storyblock'])),
 					],
 					['conid=?',$conid]
+				);
+			}
+		}
+		return $i;
+	}
+
+	/**
+	* rebuild the stats cache for all contests that had a story added or removed
+	* 2020-10
+	*
+	* @param	array		$conList	List of contests to be re-cached
+	*
+	* @return	int
+	*/
+	public function cacheContestEntries( $conList ) : int
+	{
+		if ( is_numeric($conList) )
+			$conList = (array)(int)$conList;
+		$i=0;
+
+		$sql = "SELECT
+						GROUP_CONCAT(DISTINCT id,',',title,',',type ORDER BY title ASC SEPARATOR '||' ) as entryblock
+					FROM
+					(
+						SELECT
+								IF(S.sid IS NULL,Co.collid,S.sid) as id, IF(S.sid IS NULL,Co.title,S.title) as title, IF(S.sid IS NULL,'CO','ST') as type
+							FROM `tbl_contests`C
+								LEFT JOIN `tbl_contest_relations`rC ON ( rC.conid = C.conid )
+									LEFT JOIN `tbl_stories`S ON ( rC.relid = S.sid AND rC.type = 'ST' )
+									LEFT JOIN `tbl_collections`Co ON ( rC.relid = Co.collid AND rC.type = 'CO' )
+							WHERE C.conid = :conid
+							GROUP BY rC.relid
+					)AS SELECT_OUTER";
+
+		foreach ( $conList as $conid )
+		{
+			if (FALSE !== $item = current($this->exec($sql, [':conid' => $conid])) )
+			{
+				$this->update
+				(
+					'tbl_contests',
+					[ 'cache_stories'		=> json_encode($this->cleanResult($item['entryblock'])), ],
+					[ 'conid=?',$conid ]
 				);
 			}
 		}
@@ -944,7 +983,7 @@ class Controlpanel extends Base {
 			when building the job list
 		*/
 		if ( is_numeric($catList) )
-			$catList[] = (int)$catList;
+			$catList = (array)(int)$catList;
 
 		if ( [] == $jobs = $this->cacheCategoriesGetParent( $categories, $catList ) )
 			return FALSE;
@@ -1286,7 +1325,7 @@ class Controlpanel extends Base {
 				$i++;
 			}
 		}
-		if( isset($recounts)) $this->cacheContest( $recounts );
+		if( isset($recounts)) $this->cacheContestEntries( $recounts );
 	}
 
 	/**

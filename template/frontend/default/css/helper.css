@@ -1,6 +1,7 @@
 /* wrapper to load required css files */
 @import url(helper/barfiller.css);
 @import url(helper/bulma-badge.min.css);
+@import url(helper/bulma-switch.min.css);
 @import url(helper/bulma.tooltip.css);
 @import url(helper/cookieconsent.css);
 @import url(helper/jquery.comments.css);

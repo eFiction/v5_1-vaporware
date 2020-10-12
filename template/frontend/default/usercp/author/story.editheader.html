@@ -50,38 +50,41 @@
 				<div class="column is-one-quarter"><h6>{{@LN__Characters}} </h6></div>
 				<div class="column is-three-quarters"><input class="input" type="text" id="character-select" name="form[characters]" /></div>
 {*		<!-- end of special fields -->	*}
+
 				<div class="column is-full"><h6>{{@LN__Foreword}}</h6><textarea class="textarea" placeholder="{{@LN__StoryForewordExplained}}" name="form[story_notes]">{{@data.storynotes}}</textarea></div>
 				<div class="column is-full"><h6>{{@LN__Summary}}</h6><textarea class="textarea" placeholder="{{@LN__StorySummaryExplained}}" name="form[story_summary]">{{@data.summary}}</textarea></div>
+
+{*		<!-- contest fields -->	*}
 				<check if="{{ sizeof(@data.contests) }}">
 					<div class="column is-full"><h6>{{@LN__Contests}}</h6>
 						<div class="columns is-multiline">
-						<repeat group="{{ @data.contests }}" value="{{ @contest }}">
-							<check if="{{ @contest.active!='closed' }}">
-								<true>
-  								<div class="column is-1"><input type="checkbox" name=form[contest][{{@contest.conid}}] <check if="{{ @contest.relid }}">checked="checked"</check>></div>
-									<div class="column is-11">{{@contest.title}}</div>
-									</true>
-									<false><div class="column is-1">{ICON:lock}</div>
-									<div class="column is-11">{{@contest.title}}</div></false>
-								</check>
+						<repeat group="{{ @data.contests }}" value="{{ @contest }}" counter="{{@i}}">
+							<div class="column is-full">
+								<div class="field">
+								  <input id="switch{{@i}}" type="checkbox" name="form[contest][{{@contest.conid}}]" class="switch is-rounded is-outlined" <check if="{{ @contest.relid }}">checked="checked"</check> <check if="{{ @contest.active=='closed' }}">disabled</check> />
+								  <label for="switch{{@i}}">{{@contest.title}}</label>
+								</div>
+							</div>
 						</repeat>
 					</div>
 					</div>
 				</check>
+{*		<!-- end contest fields -->	*}
+
 {*		<!-- story status fields -->	*}
 				<div class="column is-one-third">
 					<h6>{{@LN__UCP_statusValidated}}:<br/>
 					<strong>{{ ${"LN__UCP_statusValidated_".@data.validated.0} }}</strong></h6>
-<check if="{{@data.validated.0<3}}">
-	<check if="{{@_SESSION.groups&8}}">
-		<true>
-					<check if="{{@data.validchapters>0}}"><input type="checkbox" name="form[mark_validated]" />{{@LN__UCP_FinishStory}}</check>
-		</true>
-		<false>
-					<input type="checkbox" name="form[request_validation]" <check if="{{@data.validated.0==2}}">checked="checked" </check>/>{{@LN__UCP_RequestValidation}}
-		</false>
-	</check>
-</check>
+					<check if="{{@data.validated.0<3}}">
+						<check if="{{@_SESSION.groups&8}}">
+							<true>
+										<check if="{{@data.validchapters>0}}"><input type="checkbox" name="form[mark_validated]" />{{@LN__UCP_FinishStory}}</check>
+							</true>
+							<false>
+										<input type="checkbox" name="form[request_validation]" <check if="{{@data.validated.0==2}}">checked="checked" </check>/>{{@LN__UCP_RequestValidation}}
+							</false>
+						</check>
+					</check>
 				</div>
 				<div class="column is-one-third">
 					<h6>{{@LN__UCP_statusValidatedReason}}:<br/>
@@ -203,5 +206,4 @@ $(document).ready(function() {
     	prePopulate: {{@prePop.char | raw}}
     });
 });
-
 </script>
