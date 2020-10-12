@@ -114,7 +114,11 @@
 <div class="field is-horizontal">
 	<div class="field-label is-normal"></div>
 	<div class="field-body">
-		<div class="field">
+			<div class="field">
+			  <input id="switch" type="checkbox" name="form_data[concealed]" class="switch is-rounded is-outlined" <check if="{{ @data.concealed==1 }}">checked="checked"</check> />
+			  <label for="switch">{{@LN__hidden}}</label>
+			</div>
+{*
 			<div class="control">
 				<label class="checkbox">
 				<input type="checkbox" name="form_data[concealed]" value="1"<check if="{{@data.concealed==1}}"> checked="checked"</check>>
@@ -127,6 +131,7 @@
 				<a href="{{@BASE}}/adminCP/archive/contests/id={{ @data['id'] }}/entries;returnpath={{@returnpath}}">{{@LN__ACP_EditContestEntries}}</a>
 			</div>
 		</div>
+		*}
 		<div class="field">
 			<check if="\Config::getPublic('advanced_editor') == TRUE ">
 			<div class="control">
