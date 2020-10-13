@@ -1,3 +1,16 @@
+<div class="columns">
+	<div class="column is-half">
+		<check if="{{empty(@returnpath)}}">
+			<true><a href="{{@BASE}}/adminCP/archive/contests">{ICON:arrow-left} {{@LN__ReturnToOverview}}</a></true>
+			<false><a href="{{@BASE}}{{@returnpath}}">{ICON:arrow-left} {{@LN__ReturnToOverview}}</a></false>
+		</check>
+	</div>
+	<div class="column is-half">
+		<a href="{{@BASE}}/adminCP/archive/contests/id={{ @data['id'] }};returnpath={{@returnpath}}">{ICON:arrow-left} {{@LN__EditHeader}}</a>
+	</div>
+</div>
+
+
 <include href="header.list.html" />
 
 <h1>{{@data.title}}</h1>
@@ -47,7 +60,7 @@
 
 <thead>
 	<tr>
-		<th>&nbsp;</th>	
+		<th>&nbsp;</th>
 		<th>&nbsp;</th>
 		<th><a href="{{@BASE}}/adminCP/archive/contests/id={{@data.id}}/entries/order=id,{{@sort.data.id}}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>">
 			<check if="{{ @sort.link=='id' }}">

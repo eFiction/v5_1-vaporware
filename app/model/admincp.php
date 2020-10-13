@@ -768,7 +768,7 @@ class AdminCP extends Controlpanel {
 					U.username, COUNT(R.lid) as count
 				FROM `tbl_contests`C
 					LEFT JOIN `tbl_users`U ON ( C.uid = U.uid )
-					LEFT JOIN `tbl_contest_relations`R ON ( C.conid = R.conid AND R.type='ST' )
+					LEFT JOIN `tbl_contest_relations`R ON ( C.conid = R.conid AND (R.type='ST' OR R.type='CO') )
 				GROUP BY C.conid
 				ORDER BY {$sort['order']} {$sort['direction']}
 				LIMIT ".(max(0,$pos*$limit)).",".$limit;

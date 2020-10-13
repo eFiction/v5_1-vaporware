@@ -1,3 +1,15 @@
+<div class="columns">
+	<div class="column is-half">
+		<check if="{{empty(@returnpath)}}">
+			<true><a href="{{@BASE}}/adminCP/archive/contests">{ICON:arrow-left} {{@LN__ReturnToOverview}}</a></true>
+			<false><a href="{{@BASE}}{{@returnpath}}">{ICON:arrow-left} {{@LN__ReturnToOverview}}</a></false>
+		</check>
+	</div>
+	<div class="column is-half">
+		<a href="{{@BASE}}/adminCP/archive/contests/id={{ @data['id'] }}/entries;returnpath={{@returnpath}}">{ICON:arrow-right} {{@LN__ACP_EditContestEntries}}</a>
+	</div>
+</div>
+
 <include href="header.list.html" />
 
 <form action="{{@BASE}}/adminCP/archive/contests/id={{ @data.id }}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">
@@ -118,20 +130,6 @@
 			  <input id="switch" type="checkbox" name="form_data[concealed]" class="switch is-rounded is-outlined" <check if="{{ @data.concealed==1 }}">checked="checked"</check> />
 			  <label for="switch">{{@LN__hidden}}</label>
 			</div>
-{*
-			<div class="control">
-				<label class="checkbox">
-				<input type="checkbox" name="form_data[concealed]" value="1"<check if="{{@data.concealed==1}}"> checked="checked"</check>>
-				{{@LN__hidden}}
-				</label>
-			</div>
-		</div>
-		<div class="field">
-			<div class="control">
-				<a href="{{@BASE}}/adminCP/archive/contests/id={{ @data['id'] }}/entries;returnpath={{@returnpath}}">{{@LN__ACP_EditContestEntries}}</a>
-			</div>
-		</div>
-		*}
 		<div class="field">
 			<check if="\Config::getPublic('advanced_editor') == TRUE ">
 			<div class="control">

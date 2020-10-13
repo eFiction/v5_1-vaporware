@@ -1,3 +1,5 @@
+<check if="{{!empty(@returnpath)}}"><a href="{{@BASE}}{{@returnpath}}">{ICON:arrow-left} {{@LN__ReturnToOverview}}</a></check>
+
 <include href="header.list.html" />
 
 <form action="{{@BASE}}/adminCP/home/news/id={{@data.id}}/editor={{ @data.editor=='visual' ? "visual" : "plain" }}<check if="{{!empty(@returnpath)}}">;returnpath={{@returnpath}}</check>" method="post">

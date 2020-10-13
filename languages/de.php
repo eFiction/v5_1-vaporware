@@ -47,6 +47,9 @@ return array(
 'HideDetails'	=> 'Details verbergen',
 'Entries' 		=> '{0, plural, zero {Keine Einträge}, one	{Ein Eintrag}, other	{# Einträge} }',
 'URL'			=> 'URL', //db
+'PrevPage'	=> 'Vorherige Seite',
+'NextPage'	=> 'Nächste Seite',
+'GotoPage' => 'Gehe zu Seite {0}',
 
 // [2] Global -- Login related
 'Login'			=> 'Anmelden',

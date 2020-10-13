@@ -1,23 +1,23 @@
 <br />
 <nav class="pagination is-centered" role="navigation" aria-label="pagination">
-  <a class="pagination-previous" {{(@paginate.page==1) ? 'disabled' : 'href="'.@BASE . @paginate.route . @paginate.prefix.(@paginate.page-1).'"'}}>{ICON:angle-double-left} Previous</a>
-  <a class="pagination-next" {{(@paginate.page==@paginate.count) ? 'disabled' : 'href="'.@BASE . @paginate.route . @paginate.prefix.(@paginate.page+1).'"'}}>Next page{ICON:angle-double-right}</a>
+  <a class="pagination-previous" {{(@paginate.page==1) ? 'disabled' : 'href="'.@BASE . @paginate.route . @paginate.prefix.(@paginate.page-1).'"'}}>{ICON:angle-double-left}&nbsp;{{@LN__PrevPage}}</a>
+  <a class="pagination-next" {{(@paginate.page==@paginate.count) ? 'disabled' : 'href="'.@BASE . @paginate.route . @paginate.prefix.(@paginate.page+1).'"'}}>{{@LN__NextPage}}&nbsp;{ICON:angle-double-right}</a>
   <!-- inner link list -->
   <ul class="pagination-list">
 
 	<!-- show link to first page -->
 	<check if="{{(@paginate.firstPage > 1)}}">
-		<li><a class="pagination-link" href="{{@BASE . @paginate.route . @paginate.prefix}}1" aria-label="__GotoPage 1">1</a></li>
+		<li><a class="pagination-link" href="{{@BASE . @paginate.route . @paginate.prefix}}1" aria-label="{{ @LN__GotoPage, '1' | format }}">1</a></li>
 	</check>
 
 	<!-- separator between first page and current range -->
 	<check if="{{(@paginate.firstPage > 2)}}">
 		<li><span class="pagination-ellipsis">&hellip;</span></li>
 	</check>
-	
+
 	<!-- current range -->
 	<loop from="{{ @i=@paginate.firstPage }}" to="{{ @i<(@paginate.lastPage+1)	}}" step="{{ @i++ }}">
-		<li><a class="pagination-link{{@i == @paginate.page ? ' is-current':'' }}" aria-label="__GotoPage {{@i}}" href="{{@BASE . @paginate.route . @paginate.prefix.@i}}">{{@i}}</a></li>
+		<li><a class="pagination-link{{@i == @paginate.page ? ' is-current':'' }}" aria-label="{{ @LN__GotoPage, @i | format }}" href="{{@BASE . @paginate.route . @paginate.prefix.@i}}">{{@i}}</a></li>
 	</loop>
 
 	<!-- separator between last page and current range -->
@@ -27,7 +27,7 @@
 
 	<!-- show link to last page -->
 	<check if="{{(@paginate.lastPage < @paginate.count)}}">
-		<li><a class="pagination-link{{@paginate.count == @paginate.page ? ' is-current':'' }}" href="{{@BASE . @paginate.route . @paginate.prefix.@paginate.count}}" aria-label="__GotoPage {{ @paginate.count }}">{{ @paginate.count }}</a></li>
+		<li><a class="pagination-link{{@paginate.count == @paginate.page ? ' is-current':'' }}" href="{{@BASE . @paginate.route . @paginate.prefix.@paginate.count}}" aria-label="{{ @LN__GotoPage, @paginate.count | format }}">{{ @paginate.count }}</a></li>
 	</check>
   </ul>
 </nav>
