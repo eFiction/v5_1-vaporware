@@ -531,6 +531,8 @@ return array(
 'ACP_Categories_Error_badID' => 'Kann die Kategorien nicht löschen, keine gültige ID gefunden!',
 
 'ACP_NewMember'	=> 'Neues Mitglied hinzufügen',
+'NewMemberAdded' => 'Neues Mitglied wurde hinzugefügt',
+'NewMemberNotAdded' => 'Neues Mitglied konnte nicht hinzugefügt werden',
 
 // 'ACP_Tags'				=> 'Tags',
 'ACP_NewTag'			=> 'Neuen Tag hinzufügen',

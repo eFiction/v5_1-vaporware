@@ -1992,7 +1992,7 @@ class AdminCP extends Controlpanel {
 
 	public function listTeam()
 	{
-		$sql = "SELECT SQL_CALC_FOUND_ROWS `uid`, `username`, `realname`, `groups` FROM `tbl_users` WHERE `groups` > 16 ORDER BY groups,username ASC";
+		$sql = "SELECT SQL_CALC_FOUND_ROWS `uid`, `username`, `realname`, `groups` FROM `tbl_users` WHERE `groups` > 16 ORDER BY groups DESC,username ASC";
 		return $this->exec($sql);
 	}
 
@@ -2002,7 +2002,7 @@ class AdminCP extends Controlpanel {
 		return $this->exec($sql);
 	}
 
-	public function memberAdd(array $member)
+	public function memberAdd(array $member) : int
 	{
 		// load member list
 		$members=new \DB\SQL\Mapper($this->db, $this->prefix.'users');
@@ -2019,7 +2019,7 @@ class AdminCP extends Controlpanel {
 			'groups'	=> $member['new_group'],
 		];
 		$userID = $this->insertArray($this->prefix.'users', $kv );
-
+echo $userID;
 		// Log successful user creation
 		if ( $userID > 0 )
 			\Logging::addEntry(

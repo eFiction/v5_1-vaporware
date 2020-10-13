@@ -1,19 +1,20 @@
-<check if="{{isset(@addResult)}}">
-	<check if="{{@addResult>0}}">
-		<true>
-			<div class="notification is-success">
-				<button class="delete"></button>
-				{@LN__Added}
-			</div>
-		</true>
-		<false>
-			<div class="notification is-warning">
-				<button class="delete"></button>
-				{@LN__FailedAdd}
-			</div>
-		</false>
-	</check>
+<!-- success notification v4 -->
+<check if="{{ isset(@addResult) AND @addResult>0 }}">
+	<div class="notification is-success">
+		<button class="delete"></button>
+		{{ @LN__NewMemberAdded }}
+	</div>
 </check>
+<!-- END: success notification -->
+<!-- error notification v4 -->
+<check if="{{ isset(@addResult) AND @addResult==0 }}">
+	<div class="notification is-danger">
+		<button class="delete"></button>
+		{{ @LN__NewMemberNotAdded }}
+	</div>
+</check>
+<!-- END: error notification -->
+
 {{@LN__ACP_NewMember}}
 
 <form method="post" action="{{@BASE}}/adminCP/members/add">

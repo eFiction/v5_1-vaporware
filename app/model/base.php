@@ -15,25 +15,25 @@ class Base extends \Prefab {
 		$this->prefix = ( $this->config == NULL ) ? \Config::getPublic('prefix') : $this->config['prefix'];
 		$this->vprefix = "v_".$this->prefix;
 	}
-	
+
 	public function exec($cmds,$args=NULL,$ttl=0,$log=TRUE)
 	{
 		$result = $this->db->exec(str_replace(["`tbl_", "`view_"], ["`{$this->prefix}", "`v_{$this->prefix}"], $cmds), $args,$ttl,$log);
 		return $result;
 	}
-	
+
 	public function log()
 	{
 		return $this->db->log(TRUE);
 	}
-	
+
 	//foreign keys, currently not used
 	public function getFKeys()
 	{
 		$sql = "SELECT CONSTRAINT_NAME as fk, TABLE_NAME as tbl
-					FROM information_schema.TABLE_CONSTRAINTS 
+					FROM information_schema.TABLE_CONSTRAINTS
 				WHERE
-					information_schema.TABLE_CONSTRAINTS.CONSTRAINT_TYPE = 'FOREIGN KEY' 
+					information_schema.TABLE_CONSTRAINTS.CONSTRAINT_TYPE = 'FOREIGN KEY'
 					AND information_schema.TABLE_CONSTRAINTS.TABLE_SCHEMA = '".$this->db->name()."'
 					AND information_schema.TABLE_CONSTRAINTS.TABLE_NAME LIKE '{$this->prefix}%';";
 		return $this->exec($sql);
@@ -41,7 +41,7 @@ class Base extends \Prefab {
 
 	public function newPasswordQuality($password1, $password2)
 	{
-		$this->password_regex = '/^(?=^.{'.$this->config['reg_min_password'].',}$)(?:.*?(?>((?(1)(?!))[a-z]+)|((?(2)(?!))[A-Z]+)|((?(3)(?!))[0-9]+)|((?(4)(?!))[^a-zA-Z0-9\s]+))){'.$this->config['reg_password_complexity'].'}.*$/s';		
+		$this->password_regex = '/^(?=^.{'.$this->config['reg_min_password'].',}$)(?:.*?(?>((?(1)(?!))[a-z]+)|((?(2)(?!))[A-Z]+)|((?(3)(?!))[0-9]+)|((?(4)(?!))[^a-zA-Z0-9\s]+))){'.$this->config['reg_password_complexity'].'}.*$/s';
 		// Passwords match?
 		if( $password1 == "" OR $password2 == "" )
 			return "missing";
@@ -52,10 +52,10 @@ class Base extends \Prefab {
 		// Passwords meets the criteria required?
 		if ( preg_match( $this->password_regex, $password1, $matches) != 1 )
 			return "criteria";
-		
+
 		return TRUE;
 	}
-	
+
 	public function userChangePW($uid, $password)
 	{
 		$hash = password_hash( $password, PASSWORD_DEFAULT );
@@ -74,25 +74,25 @@ class Base extends \Prefab {
 			\Base::instance()->set('canAdmin.'.$link, ($this->cAM->requires & $_SESSION['groups']) );
 		}
 	}
-	
+
 	protected function prepare($id, $sql)
 	{
 		$this->sqlTmp[$id]['sql'] = $sql;
 		$this->sqlTmp[$id]['param'] = [];
 	}
-	
+
 	protected function bindValue($id, $label, $value, $type)
 	{
 		$this->sqlTmp[$id]['param'] = array_merge( $this->sqlTmp[$id]['param'], [ $label => $value ] );
 	}
-	
+
 	protected function execute($id)
 	{
 		$data = $this->exec($this->sqlTmp[$id]['sql'], $this->sqlTmp[$id]['param']);
 		unset($this->sqlTmp[$id]);
 		return $data;
 	}
-	
+
 	public function update($table, $data, $where)
 	{
 		$handle = new \DB\SQL\Mapper($this->db,str_replace("tbl_", $this->prefix, $table));
@@ -104,13 +104,12 @@ class Base extends \Prefab {
 		$handle->save();
 		unset($handle);
 	}
-	
-	public function insertArray	($table, $kvpair, $replace=FALSE)
+
+	public function insertArray	(string $table, array $kvpair, bool $replace=FALSE) : int
 	{
 		$keys = array();
 		$values = array();
 
-		//while (list($key, $value) = each($kvpair))
 		foreach( $kvpair as $key => $value )
 		{
 			$keys[] 	= $key;
@@ -152,11 +151,11 @@ class Base extends \Prefab {
 
 			if ( 1 <= $result = $this->execute("insertArray") )
 				return (int)$this->db->lastInsertId();
-			return FALSE;
+			return 0;
 		}
-		return NULL;
+		return 0;
 	}
-	
+
 	protected function timeToUser(string $dbTime, string $formatOut="Y-m-d H:i", bool $timestamp = FALSE): string
 	{
 		$date = new \DateTime($dbTime);
@@ -164,7 +163,7 @@ class Base extends \Prefab {
 
 		if ( empty($tz_user) OR $tz_user == $tz_server )
 			return $date->format($formatOut);
-		
+
 		$date->setTimezone( new \DateTimeZone($tz_user) );
 		return $date->format($formatOut);
 	}
@@ -192,11 +191,11 @@ class Base extends \Prefab {
 
 		return $data;
 	}
-	
+
 	public function storySQL(array $replacements=[])
 	{
 		$sql_StoryConstruct = "SELECT SQL_CALC_FOUND_ROWS
-				S.sid, S.title, S.summary, S.storynotes, S.completed, S.wordcount, UNIX_TIMESTAMP(S.date) as published, UNIX_TIMESTAMP(S.updated) as modified, 
+				S.sid, S.title, S.summary, S.storynotes, S.completed, S.wordcount, UNIX_TIMESTAMP(S.date) as published, UNIX_TIMESTAMP(S.updated) as modified,
 				S.count,GROUP_CONCAT(Coll.collid,',',rCS.inorder,',',Coll.title ORDER BY Coll.title DESC SEPARATOR '||') as in_series @EXTRA@,
 				".((isset($this->config['optional_modules']['contests']))?"GROUP_CONCAT(rSC.relid) as contests,":"")."
 				GROUP_CONCAT(Fav.bookmark,',',Fav.fid SEPARATOR '||') as is_favourite,
@@ -227,7 +226,7 @@ class Base extends \Prefab {
 			"@ORDER@"		=> "",
 			"@LIMIT@"		=> ""
 		];
-		
+
 		// insert custom replacements
 		foreach ( $replacements as $key => $value )
 		{
@@ -254,23 +253,23 @@ class Base extends \Prefab {
 			$whereUser = "";
 			$status = "('P','A')";
 		}
-		
+
 		$sql = "SELECT SQL_CALC_FOUND_ROWS
 					C.collid, C.parent_collection, C.title, C.summary, C.open, C.max_rating,
 					COUNT(DISTINCT rCS.sid) as stories, C.chapters, C.wordcount, C.reviews,
 					C.cache_authors, C.cache_tags, C.cache_characters, C.cache_categories,
 					GROUP_CONCAT(Fav.bookmark,',',Fav.fid SEPARATOR '||') as is_favourite,
 					C2.title as parent_title
-				FROM `tbl_collections`C 
+				FROM `tbl_collections`C
 					LEFT JOIN `tbl_collections`C2 ON ( C.parent_collection = C2.collid )
 					LEFT JOIN `tbl_collection_stories`rCS ON ( C.collid = rCS.collid AND rCS.confirmed = 1 )
 					LEFT JOIN `tbl_user_favourites`Fav ON ( Fav.item = C.collid AND Fav.type IN ('CO','SE') AND Fav.uid = ".(int)$_SESSION['userID'].")
 				WHERE {$whereUser} C.ordered=".(int)$ordered." AND C.chapters>0 AND C.status IN {$status}
 				GROUP BY C.collid
 				LIMIT ".(max(0,$pos*$limit)).",".$limit;
-		return [ $sql, $limit ];	
+		return [ $sql, $limit ];
 	}
-	
+
 	protected function paginate(int $total, string $route, int $limit=10)
 	{
 		/**
@@ -280,14 +279,14 @@ class Base extends \Prefab {
 			Copyright (c) 2012 by ikkez
 			Christian Knuth <mail@ikkez.de>
 			@version 1.4.1
-			
+
 			found at: https://github.com/ikkez/F3-Sugar/blob/master-v3/Pagination/pagination.php
 		**/
 		$f3 = \Base::instance();
-		
+
 		// Define a prefix
 		$prefix = "/page=";
-		
+
 		// Get max page number
 		$count = ceil($total/$limit);
 		if ($count<2) return TRUE;
@@ -320,13 +319,13 @@ class Base extends \Prefab {
 			'lastPage'  => $last_page,
 		]);
 	}
-	
+
 	public function pollBuildCache(int $pollID): array
 	{
 		// create a db map
 		$poll = new \DB\SQL\Mapper($this->db, $this->prefix.'poll');
 		$poll->load(array('poll_id=?',$pollID));
-		
+
 		// attempt a safe retreat when there is no such poll
 		if ( NULL === $poll->poll_id )
 			return [];
@@ -351,7 +350,7 @@ class Base extends \Prefab {
 					WHERE V.poll_id = {$poll->poll_id}
 					GROUP BY V.option;";
 			$votes = $this->exec($sql);
-			
+
 			$poll->votes = sizeof($votes);
 
 			if ( sizeof($votes)>0 )
@@ -377,7 +376,7 @@ class Base extends \Prefab {
 		// write the array to the database
 		$poll->cache = json_encode($data['cache']);
 		$poll->save();
-		
+
 		return $data['cache'];
 	}
 
@@ -397,7 +396,7 @@ class Base extends \Prefab {
 			6 => "wip",
 			9 => "completed",
 		];
-		
+
 		$state['validated'] =
 		[
 			0 => "closed",
@@ -405,7 +404,7 @@ class Base extends \Prefab {
 			2 => "moderationPending",
 			3 => "validated",
 		];
-		
+
 		$state['reason'] =
 		[
 			0 => "none",
@@ -428,7 +427,7 @@ class Base extends \Prefab {
 		];
 	}
 	*/
-	
+
 	/**
 	* Load the actual chapter text
 	* rewrite 2020-09
@@ -456,7 +455,7 @@ class Base extends \Prefab {
 
 		if ( $counting AND \Base::instance()->get('SESSION')['userID'] > 0 )
 		{
-			$sql_tracker = "INSERT INTO `tbl_tracker` (sid,uid,last_chapter) VALUES (".(int)$storyID.", ".\Base::instance()->get('SESSION')['userID'].",".(int)$chapterID.") 
+			$sql_tracker = "INSERT INTO `tbl_tracker` (sid,uid,last_chapter) VALUES (".(int)$storyID.", ".\Base::instance()->get('SESSION')['userID'].",".(int)$chapterID.")
 											ON DUPLICATE KEY
 											UPDATE last_read=NOW(),last_chapter=".(int)$chapterID.";";
 			$this->exec($sql_tracker);
@@ -475,7 +474,7 @@ class Base extends \Prefab {
 		}
 		return($elements);
 	}
-	
+
 	// http://stackoverflow.com/questions/2915748/convert-a-series-of-parent-child-relationships-into-a-hierarchical-tree/2915920#2915920
 	protected function parseTree($tree, $root = null)
 	{
@@ -493,9 +492,9 @@ class Base extends \Prefab {
 				);
 			}
 		}
-		return empty($return) ? null : $return;    
+		return empty($return) ? null : $return;
 	}
-	
+
 	/**
 		This function refreshes the user`s cache for feedback and library count on demand
 	**/
@@ -519,7 +518,7 @@ class Base extends \Prefab {
 			$sql[]= "SET @rw  := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_feedback`F WHERE F.writer_uid={$_SESSION['userID']} AND F.type IN ('RC','SE','ST') GROUP BY F.type) AS F1);";
 			if(array_key_exists("recommendations", $this->config['optional_modules']))
 			{
-				$sql[]= "SET @rr  := (SELECT CONCAT_WS('//', SUM(SC+ST+RC), GROUP_CONCAT(type,',',IF(ST=0,IF(SC=0,RC,SC),ST) SEPARATOR '||')) FROM 
+				$sql[]= "SET @rr  := (SELECT CONCAT_WS('//', SUM(SC+ST+RC), GROUP_CONCAT(type,',',IF(ST=0,IF(SC=0,RC,SC),ST) SEPARATOR '||')) FROM
 							(SELECT F.type, COUNT(SA.lid) as ST, COUNT(C.collid) as SC, COUNT(Rec.recid) as RC
 								FROM `tbl_feedback`F
 									LEFT JOIN `tbl_stories_authors`SA ON ( F.reference = SA.sid AND F.type='ST' AND SA.aid = {$_SESSION['userID']} )
@@ -529,7 +528,7 @@ class Base extends \Prefab {
 			}
 			else
 			{
-				$sql[]= "SET @rr  := (SELECT CONCAT_WS('//', SUM(SC+ST), GROUP_CONCAT(type,',',IF(ST=0,SC,ST) SEPARATOR '||')) FROM 
+				$sql[]= "SET @rr  := (SELECT CONCAT_WS('//', SUM(SC+ST), GROUP_CONCAT(type,',',IF(ST=0,SC,ST) SEPARATOR '||')) FROM
 							(SELECT F.type, COUNT(SA.lid) as ST, COUNT(C.collid) as SC
 								FROM `tbl_feedback`F
 									LEFT JOIN `tbl_stories_authors`SA ON ( F.reference = SA.sid AND F.type='ST' AND SA.aid = {$_SESSION['userID']} )
@@ -540,7 +539,7 @@ class Base extends \Prefab {
 			$sql[]= "SET @st := (SELECT COUNT(1) FROM `tbl_stories_authors` WHERE `aid` = {$_SESSION['userID']} )";
 
 			$sql[]= "SET @cw  := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_feedback`F WHERE F.writer_uid={$_SESSION['userID']} AND F.type IN ('N','C') GROUP BY F.type) AS F1);";
-			$sql[]= "SET @cr  := (SELECT CONCAT_WS('//', SUM(C+N), GROUP_CONCAT(type,',',IF(C=0,N,C) SEPARATOR '||')) FROM 
+			$sql[]= "SET @cr  := (SELECT CONCAT_WS('//', SUM(C+N), GROUP_CONCAT(type,',',IF(C=0,N,C) SEPARATOR '||')) FROM
 							(SELECT F.type, COUNT(F0.fid) as C, COUNT(N.nid) as N
 								FROM `tbl_feedback`F
 									LEFT JOIN `tbl_feedback`F0 ON ( F.reference_sub = F0.reference AND F.type='C' AND F0.writer_uid = {$_SESSION['userID']} )
@@ -555,17 +554,17 @@ class Base extends \Prefab {
 		{
 			// we should not get here without a userID in session, but if we do, better bail out before zeeee error strikes
 			if(empty($_SESSION['userID'])) return NULL;
-			
+
 			$sql[]= "SET @inbox  := (SELECT COUNT(1) FROM `tbl_messaging`M WHERE M.recipient = {$_SESSION['userID']} AND M.sent IS NULL);";
 			$sql[]= "SET @unread := (SELECT COUNT(1) FROM `tbl_messaging`M WHERE M.recipient = {$_SESSION['userID']} AND M.sent IS NULL AND M.date_read IS NULL);";
 			$sql[]= "SET @outbox := (SELECT COUNT(1) FROM `tbl_messaging`M WHERE M.sender = {$_SESSION['userID']} AND M.sent IS NOT NULL);";
-			
+
 			if(array_key_exists("shoutbox", $this->config['optional_modules']))
 			{
 				$sql[]= "SET @shoutbox := (SELECT COUNT(1) FROM `tbl_shoutbox` WHERE `uid` = {$_SESSION['userID']});";
 			}
 			else $sql[]= "SET @shoutbox := NULL";
-			
+
 			$sql[]= "SELECT @inbox as inbox, @unread as unread, @outbox as outbox, @shoutbox as shoutbox;";
 
 			$data = $this->exec($sql)[0];
@@ -608,7 +607,7 @@ class Base extends \Prefab {
 
 		$mapper = new \DB\SQL\Mapper( $this->db, $this->prefix."users" );
 		$mapper->load(['uid = ?', $_SESSION['userID'] ]);
-		
+
 		$mapper->preferences = json_encode
 							([
 								"ageconsent"	=> $pref['ageconsent'],
@@ -621,6 +620,5 @@ class Base extends \Prefab {
 							]);
 		$mapper->save();
 	}
-	
-}
 
+}

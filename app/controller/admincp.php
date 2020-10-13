@@ -1141,7 +1141,7 @@ class AdminCP extends Base
 		{
 			$post = $f3->get('POST');
 			if ( !empty($post['new_name']) )
-				$_SESSION['lastAction'] = [ "addResult" => $this->model->memberAdd($post) ];
+				$f3->set("addResult", $this->model->memberAdd($post) );
 		}
 		return $this->template->userAddForm();
 	}
