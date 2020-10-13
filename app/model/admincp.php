@@ -229,7 +229,7 @@ class AdminCP extends Controlpanel {
 
 			$sql .= "1 as requires
 					FROM `tbl_menu_adminpanel`M
-					WHERE ( `child_of` IS NULL {$select})
+					WHERE ( `child_of` IS NULL {$select} ) AND M.active = 1
 					ORDER BY M.child_of,M.order ASC";
 		}
 
