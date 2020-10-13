@@ -1411,7 +1411,7 @@ class Controlpanel extends Base {
 
 		$newID = $newCollection->_id;
 
-		\Cache::instance()->reset("menuUCPCountLib_.{$_SESSION['userID']}");
+		\Cache::instance()->clear("menuUCPCountLib_{$_SESSION['userID']}");
 
 		return $newID;
 	}
@@ -1690,7 +1690,7 @@ class Controlpanel extends Base {
 		$this->cacheCollections($collection->collid);
 
 		// drop menu cache if type changed:
-		if(isset($data['changetype'])) \Cache::instance()->reset("menuUCPCountLib.{$uid}");
+		if(isset($data['changetype'])) \Cache::instance()->clear("menuUCPCountLib_{$uid}");
 
 		return $i;
 	}
@@ -1715,7 +1715,7 @@ class Controlpanel extends Base {
 		// decide whose menu cache to delete
 		$uid = $collection->uid;
 		$i = $collection->erase();
-		\Cache::instance()->reset("menuUCPCountLib_.{$uid}");
+		\Cache::instance()->clear("menuUCPCountLib_{$uid}");
 
 		// report the result
 		return (int)$i;
@@ -1807,7 +1807,7 @@ class Controlpanel extends Base {
 
 		$recommendation->save();
 
-		\Cache::instance()->reset("menuUCPCountLib_.{$_SESSION['userID']}");
+		\Cache::instance()->clear("menuUCPCountLib_{$_SESSION['userID']}");
 
 		return $recommendation->_id;
 	}
@@ -2022,7 +2022,7 @@ class Controlpanel extends Base {
 			$featured->erase(array("id=? AND type='RC'",$recID))
 		];
 
-		\Cache::instance()->reset("menuUCPCountLib_.{$_SESSION['userID']}");
+		\Cache::instance()->clear("menuUCPCountLib_{$_SESSION['userID']}");
 
 		return array_sum($_SESSION['lastAction']['deleteDetails']);
 	}

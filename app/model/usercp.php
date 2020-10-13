@@ -152,7 +152,7 @@ class UserCP extends Controlpanel
 		if ( $module == "LIB" )
 		{
 			// look for cached data
-			if ( FALSE === \Cache::instance()->exists("menuUCPCountLib_.{$_SESSION['userID']}", $counter) )
+			if ( FALSE === \Cache::instance()->exists("menuUCPCountLib_{$_SESSION['userID']}", $counter) )
 			{
 				// prepare query
 				$sql[]= "SET @bms  := (SELECT CONCAT_WS('//', IF(SUM(counter)>0,SUM(counter),0), GROUP_CONCAT(type,',',counter SEPARATOR '||')) FROM (SELECT SUM(1) as counter, F.type FROM `tbl_user_favourites`F WHERE F.uid={$_SESSION['userID']} AND F.bookmark=1 GROUP BY F.type) AS F1);";
@@ -183,7 +183,7 @@ class UserCP extends Controlpanel
 					else $count['details'] = "";
 				}
 				// cache the result for max 10 minutes or changes occur
-				\Cache::instance()->set("menuUCPCountLib_.{$_SESSION['userID']}", $counter, 600);
+				\Cache::instance()->set("menuUCPCountLib_{$_SESSION['userID']}", $counter, 600);
 			}
 
 			$this->menuCount['data']['library'] = $counter;
@@ -929,6 +929,11 @@ class UserCP extends Controlpanel
 		{
 			$sql = $this->sqlMaker("bookfav", "ST", FALSE) .
 				"WHERE S.sid = :id ";
+		}
+		elseif ( $params['id'][0]=="RC")
+		{
+			$sql = $this->sqlMaker("bookfav", "RC", FALSE) .
+			  "WHERE Rec.recid = :id ";
 		}
 		else return [];
 

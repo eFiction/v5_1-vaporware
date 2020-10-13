@@ -60,7 +60,7 @@
 		<td><a href="{{@BASE}}/adminCP/home/shoutbox/id={{ @row['id'] }}/order={{@sort.order}},{{@sort.direction}}/page={{@paginate.page}}">{ICON:edit}</a></td>
 		<td><a href="{{@BASE}}/adminCP/home/shoutbox/delete={{ @row['id'] }}/order={{@sort.order}},{{@sort.direction}}/page={{@paginate.page}}" class="deleteItem" title="#{{ @row['id'] }}: {{ @row['message'] }}">{ICON:trash}</a></td>
 		<td>{{ @row['id'] }}</td>
-		<td>{{ @row['date'] }}</td>
+		<td>{{ date(\Config::getPublic("datetime_format"), @row.timestamp) }}</td>
 		<td>{{ @row['author'] }}</td>
 		<td>
 			<check if="{{isset(@form_changes.1) AND (@form_changes.0 == @row.id) }}">

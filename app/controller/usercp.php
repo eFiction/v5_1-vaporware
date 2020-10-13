@@ -607,9 +607,8 @@ class UserCP extends Base
 		}
 	}
 
-	private function libraryBookFav(\Base $f3, array $params)//: void
+	private function libraryBookFav(\Base $f3, array $params) : void
 	{
-		// delete function get's accompanied by a pseudo-post, this doesn't count here. Sorry dude
 		if( NULL != $post = $f3->get('POST') )
 		{
 			if ( array_key_exists("confirm_delete",$post) )
@@ -1042,43 +1041,7 @@ class UserCP extends Base
 		}
 	}
 
-	protected function polls(\Base $f3, array $params)//: void
-	{
-		$this->response->addTitle( $f3->get('LN__UserMenu_Polls') );
-		$this->showMenu("polls");
-
-		if ( isset($params['id']) )
-		{
-
-
-			return $params['id'];
-		}
-
-		// page will always be an integer > 0
-		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
-
-		// search/browse
-		$allow_order = array (
-			"id"		=>	"poll_id",
-			"member"	=>	"username",
-			"start"		=>	"start_date",
-			"lable"		=>	"question",
-		);
-
-		// sort order
-		$sort["link"]		= (isset($allow_order[@$params['order'][0]]))	? $params['order'][0] 		: "start";
-		$sort["order"]		= $allow_order[$sort["link"]];
-		$sort["direction"]	= (isset($params['order'][1])&&$params['order'][1]=="desc") ?	"desc" : "asc";
-
-		// sort icons
-		$sort['data']['start'] = ( $sort['direction']=="desc" OR $sort['link']!='start' ) ? "asc" : "desc";
-		$sort['data']['member']= ( $sort['direction']=="desc" OR $sort['link']!='member' )? "asc" : "desc";
-
-		$polls = $this->model->pollsList($page, $sort);
-
-		return $this->template->pollsList( $polls, $sort );
-	}
-
+	/* todo */
 	protected function shoutbox(\Base $f3, array $params)//: void
 	{
 		$this->response->addTitle( $f3->get('LN__UserMenu_Shoutbox',0) );
