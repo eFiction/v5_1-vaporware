@@ -15,7 +15,17 @@
 <repeat group="{{ @logEntries }}" value="{{ @row }}">
 <tr>
 	<td>{{ date( \Config::getPublic('date_format'), @row.timestamp) }}&nbsp;</td>
-	<td><check if="{{NULL===@row.uid}}"><true><del>{{@row.action.name}}</del></true><false>{{@row.username}}</false></check>&nbsp;</td>
+	<td>
+		<check if="{{NULL===@row.uid}}">
+			<true><del>{{@row.action.name??"<i>@LN__DeletedUser</i>"}}</del></true>
+			<false>
+				<check if="{{ @row.uid==0}}">
+					<true><i>{{@row.action.name}}</i></true>
+					<false><a href="{{@BASE}}/members/{{@row.username}}">{{@row.username}}</a></false>
+				</check>
+			</false>
+		</check>
+	</td>
 	<check if="{{is_array(@row.action)}}">
 		<true>
 			<switch expr="{{ @row.type }}">
@@ -23,28 +33,70 @@
 					<td colspan="2">{{@row.action.job}}</td>
 				</case>
 				<case value="DL" break="TRUE">
-					<td>__storyDel</td>
-					<td>{{@row.action.title}}</td>
-					{*<pre>{{print_r(@row.action,TRUE)}}</pre> *}
+					<switch expr="{{ @row.subtype }}">
+						<case value="s" break="TRUE">
+							<td colspan="2">{{@LN__Log_seriesDelete, @row.action.title | format }}</td>
+						</case>
+						<case value="f" break="TRUE">
+							<td colspan="2">F: {{@LN__Log_storyDelete, @row.action.title | format }}</td>
+						</case>
+						<case value="c" break="TRUE">
+							<td colspan="2">{{@LN__Log_storyChapterDelete, @row.action.title | format }}</td>
+						</case>
+						<default>
+							<td colspan="2">{{@LN__Log_storyDelete, @row.action.title | format }}</td>
+						</default>
+					</switch>
 				</case>
 				<case value="EB" break="TRUE">
-					<td>__editNick</td>
-					<td>{{@row.action.oldname}} -> {{@row.action.newname}}</td>
+					<td colspan="2">{{@LN__Log_editNick, @row.action.oldname, @row.action.newname | format}}</td>
 					{*<pre>{{print_r(@row.action,TRUE)}}</pre>*}
 				</case>
+{* <!-- Editing of story/series --> *}
 				<case value="ED" break="TRUE">
-					<td>__storyEdit</td>
-					<td>{{@row.action.title}}</td>
+					<td colspan="2">
+					<switch expr="{{ @row.subtype }}">
+						<case value="s" break="TRUE">
+							<check if="{{ @row.action.seriestitle===NULL }}">*D*</check>
+							{{@LN__Log_seriesEdit, @row.action.title | format }}
+							<check if="{{ @row.action.title != @row.action.seriestitle }}">{{ @row.action.seriestitle }}</check>
+						</case>
+						<case value="c" break="TRUE">
+							<check if="{{ @row.action.storytitle===NULL }}">*D*</check>
+							{{@LN__Log_storyChapterEdit, @row.action.title, @row.action.chapter | format }}
+							<check if="{{ @row.action.title != @row.action.storytitle }}">{{ @row.action.storytitle }}</check>
+						</case>
+						<default>
+							<check if="{{ @row.action.storytitle===NULL }}">*D*</check>
+							{{@LN__Log_storyEdit, @row.action.title | format }}
+							<check if="{{ @row.action.title != @row.action.storytitle }}">{{ @row.action.storytitle }}</check>
+						</default>
+					</switch>
+					</td>
+				</case>
+{* <!-- Use of lost password --> *}
+				<case value="LP" break="TRUE">
+					<td colspan="2">__useLostPassword</td>
+				</case>
+				<case value="RE" break="TRUE">
+					<td>__writeReview</td>
+					<td>{{@row.action.storytitle}}: {{@row.action.review}}</td>
 					{*<pre>{{print_r(@row.action,TRUE)}}</pre>*}
 				</case>
 				<case value="RG" break="TRUE">
-					<td colspan="2"><check if="{{@row.action.admin==1}}"><true>__hasRegistered {{@row.action.name}}</true><false>__registeredSelf</false></check></td>
-					{*<pre>{{print_r(@row.action,TRUE)}}</pre> *}
+					<td colspan="2"><check if="{{@row.action.admin==1}}">
+						<true>{{@LN__Log_hasAddedMember, @row.action.name | format}}</true>
+						<false>{{@LN__Log_hasRegistered }}</false>
+					</check></td>
+				</case>
+				<case value="RJ" break="TRUE">
+					<td colspan="2">
+						<check if="{{ @row.storytitle===NULL }}"></check>
+						<pre>{{print_r(@row.action,TRUE)}}</pre>
+					</td>
 				</case>
 				<case value="VS" break="TRUE">
-					<td>__storyValidate</td>
-					<td>{{@row.action.title}}</td>
-					{*<pre>{{print_r(@row.action,TRUE)}}</pre> *}
+					<td colspan="2">{{@LN__Log_storyValidate, @row.action.title | format }}</td>
 				</case>
 				<default>
 					<td colspan="2"><pre>{{print_r(@row.action,TRUE)}}</pre></td>
@@ -53,7 +105,7 @@
 		</true>
 		<false><td colspan="2">{{@row.action|raw}}</td></false>
 	</check>
-	<td>[{*{{ @row.ip }}: *}{{@@row.country}}] ({{@row.id}})</td>
+	<td>{*[{{ @row.ip }}: {{@@row.action.origin.1}}] *}({{@row.id}})</td>
 </tr>
 </repeat>
 </table>

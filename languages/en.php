@@ -468,8 +468,9 @@ return array(
 	'AdminMenu_Logs_ED' => 'Edit Story',
 	'AdminMenu_Logs_LP' => 'Lost Password',
 	'AdminMenu_Logs_RE' => 'Reviews',
-	'AdminMenu_Logs_RG' => 'Registration',
 	'AdminMenu_Logs_RF' => 'Registration failure',
+	'AdminMenu_Logs_RG' => 'Registration',
+	'AdminMenu_Logs_RJ' => 'Rejection',
 	'AdminMenu_Logs_VS' => 'Validations',
 'AdminMenu_Shoutbox' => 'Shoutbox',
 'AdminMenu_Polls' => 'Polls',
@@ -587,6 +588,17 @@ return array(
 'ACP_Custom_LabelOnly'	=> 'Enter a short and unique label',
 'CreateNewPage'			=> 'Create new page or textblock',
 'DuplicateLabel'		=> 'Label already exists',
+
+'Log_hasAddedMember' => 'has added member `{0}`',
+'Log_editNick'			=> 'has changed the username `{0}` to `{1}`',
+'Log_hasRegistered'	=> 'has registered as a member',
+'Log_storyEdit' 		=> 'has edited story `{0}`',
+'Log_storyValidate' => 'has validated story `{0}`',
+'Log_storyDelete' 		=> 'has deleted story `{0}`',
+'Log_storyChapterEdit' 		=> 'has editet chapter {1} from story `{0}`',
+'Log_storyChapterDelete' 		=> 'has deleted a chapter from story `{0}`',
+'Log_seriesEdit'			=> 'has edited series `{0}`',
+'Log_seriesDelete' 		=> 'has deleted series `{0}`',
 
 // Custom pages
 'TextblockLabel'		=> 'Label/link for this texblock',

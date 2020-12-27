@@ -531,7 +531,7 @@ class UserCP extends Controlpanel
 		return FALSE;
 	}
 
-	public function ajax($key, $data, $limitation=NULL)
+	public function ajax(string $key, array $data, array $params = [])
 	{
 		$bind = NULL;
 
@@ -569,14 +569,32 @@ class UserCP extends Controlpanel
 			{
 				if ( isset($params['categories']) )
 				{
+					// build a SQL selection for given categories to find all parent categories
 					$where = ( is_array($params['categories']) )
 						? "FIND_IN_SET(C.cid, :categories)"
 						: "C.cid = :categories";
+					// bind current categories as search parameter
 					$bind = ( is_array($params['categories']) )
 						? implode(",",$params['categories'])
 						: $params['categories'];
+					// initialize empty result array
 					$c = [];
-					$this->getCategories
+					// get parent categories
+					$this->ajaxGetParentCategories
+					(
+						$c,
+						$this->exec("SELECT C.cid,C.parent_cid
+										FROM `tbl_categories`C
+									WHERE {$where};", [ ":categories" => $bind ] )
+					);
+
+					// opposite direction: rewrite the SQL selection to find child categories
+					$where = ( is_array($params['categories']) )
+						? "FIND_IN_SET(C.parent_cid, :categories)"
+						: "C.parent_cid = :categories";
+					// bind remains the same, result array from above being used
+					// get child categories
+					$this->ajaxGetChildCategories
 					(
 						$c,
 						$this->exec("SELECT C.cid,C.parent_cid
@@ -586,17 +604,7 @@ class UserCP extends Controlpanel
 
 					if ( sizeof($c) ) $categories = " OR rCC.catid IN (".implode(",",$c).")";
 				}
-				//$where[] = " Ch.catid=-1 ";
-				/*if ( $limitation )
-				{
-					$limitation = explode(",",$limitation);
-					foreach ( $limitation as $limit )
-						$where[] = " FIND_IN_SET({$limit}, Ch.catid)";
-				}
-				$where = " AND ( ".implode(" OR", $where) .") ";
-				*/
 
-				//$ajax_sql = "SELECT Ch.charname as name, Ch.charid as id from `tbl_characters`Ch WHERE Ch.charname LIKE :charname {$where} ORDER BY Ch.charname ASC LIMIT 5";
 				$ajax_sql = "SELECT Ch.charname as name, Ch.charid as id
 								FROM `tbl_characters`Ch
 								LEFT JOIN `tbl_character_categories`rCC ON ( Ch.charid = rCC.charid )

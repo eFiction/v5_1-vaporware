@@ -62,7 +62,15 @@ class AdminCP extends Controlpanel {
 			}
 			elseif(isset($data['character']))
 			{
-				if ( isset($params['categories']) )
+				// default SQL search limitation: only 'unbound' characters
+				$ajax_sql_where="AND rCC.catid IS NULL";
+
+ 				if ( isset($params['skipcheck']) AND $params['skipcheck']=='true' )
+				{
+					// told to skip any character bindings
+					$ajax_sql_where="";
+				}
+				elseif ( isset($params['categories']) )
 				{
 					$where = ( is_array($params['categories']) )
 						? "FIND_IN_SET(C.cid, :categories)"
@@ -71,7 +79,7 @@ class AdminCP extends Controlpanel {
 						? implode(",",$params['categories'])
 						: $params['categories'];
 					$c = [];
-					$this->getCategories
+					$this->ajaxGetParentCategories
 					(
 						$c,
 						$this->exec("SELECT C.cid,C.parent_cid
@@ -79,13 +87,28 @@ class AdminCP extends Controlpanel {
 									WHERE {$where};", [ ":categories" => $bind ] )
 					);
 
-					if ( sizeof($c) ) $categories = " OR rCC.catid IN (".implode(",",$c).")";
+					// opposite direction: rewrite the SQL selection to find child categories
+					$where = ( is_array($params['categories']) )
+						? "FIND_IN_SET(C.parent_cid, :categories)"
+						: "C.parent_cid = :categories";
+					// bind remains the same, result array from above being used
+					// get child categories
+					$this->ajaxGetChildCategories
+					(
+						$c,
+						$this->exec("SELECT C.cid,C.parent_cid
+										FROM `tbl_categories`C
+									WHERE {$where};", [ ":categories" => $bind ] )
+					);
+
+					// if process above did return usable categories, allow characters bound to them
+					if ( sizeof($c) ) $ajax_sql_where="AND ( rCC.catid IS NULL OR rCC.catid IN (".implode(",",$c).") )";
 				}
 
 				$ajax_sql = "SELECT Ch.charname as name, Ch.charid as id
 								FROM `tbl_characters`Ch
 								LEFT JOIN `tbl_character_categories`rCC ON ( Ch.charid = rCC.charid )
-							WHERE Ch.charname LIKE :charname AND ( rCC.catid IS NULL ".($categories??"")." )
+							WHERE Ch.charname LIKE :charname {$ajax_sql_where}
 							GROUP BY id
 							ORDER BY Ch.charname ASC LIMIT 5";
 
@@ -135,18 +158,6 @@ class AdminCP extends Controlpanel {
 
 		if ( isset($ajax_sql) ) return $this->exec($ajax_sql, $bind);
 		return NULL;
-	}
-
-	protected function getCategories(array &$c, array $data)
-	{
-		foreach ( $data as $d )
-		{
-			// take note of this category
-			$c[] = $d['cid'];
-			// if a parent category exists, traverse the tree
-			if ( $d['parent_cid'] > 0 )
-				$this->getCategories($c, $this->exec("SELECT C.cid, C.parent_cid FROM `tbl_categories`C WHERE `cid` = {$d['parent_cid']};"));
-		}
 	}
 
 	public function settingsFields($select)
@@ -1180,6 +1191,8 @@ class AdminCP extends Controlpanel {
 		);
 
 		$geo = \Web\Geo::instance();
+		$stories = new \DB\SQL\Mapper($this->db, $this->prefix.'stories');
+		$series  = new \DB\SQL\Mapper($this->db, $this->prefix.'collections');
 
 		foreach ( $data as &$item )
 		{
@@ -1207,7 +1220,7 @@ class AdminCP extends Controlpanel {
 					elseif ( preg_match("/(.*<\/a>)*+.*\'(.*)\'.*/i", $item['action'], $matches) )
 					// matching _LOG_ADMIN_DEL_SERIES
 					{
-						$item['action'] = [ 'seriestitle' => $matches[2] ];
+						$item['action'] = [ 'title' => $matches[2] ];
 						$item['subtype'] = 's';
 					}
 					elseif ( preg_match("/.*?\?uid=(\d*)\'>(.*?)<.*\?sid=(\d*)\'>(.*?)<.*\?uid=(\d*)\'>(.*?)<.*\?seriesid=(\d*)\'>(.*?)<.*/i", $item['action'], $matches) )
@@ -1217,7 +1230,7 @@ class AdminCP extends Controlpanel {
 							'uid' => $matches[1], 'uname' => $matches[2],
 							'sid' => $matches[3], 'sname' => $matches[4],
 							'aid' => $matches[5], 'aname' => $matches[6],
-							'seriesid' => $matches[7], 'sername' => $matches[8],
+							'seriesid' => $matches[7], 'title' => $matches[8],
 						];
 						$item['subtype'] = 'f';
 					}
@@ -1294,6 +1307,14 @@ class AdminCP extends Controlpanel {
 							'admin'=>($matches[2]!=$item['uid_reg'])
 					];
 				}
+				elseif ( $item['type']=="RJ" AND preg_match('/.+\?sid=(\d+)\'>(.*?)<\/a>\s+\((.+?)\)(?:.+?)>(.+?)/U', $item['action'], $matches) )
+				{
+					// _LOG_REJECTION
+					$item['action'] = [
+						'sid' 	 => $matches[1], 'title'  => $matches[2],
+						'chapter'=> $matches[3], 'reason' => $matches[4],
+					];
+				}
 				elseif ( $item['type']=="VS" )
 				{
 					if ( preg_match("/.+\?sid=(\d+)\'>(.+?)<\/a> \(.+?(\d+).+\?uid=(\d+)\'>(.+?)</i", $item['action'], $matches) )
@@ -1326,6 +1347,7 @@ class AdminCP extends Controlpanel {
 				}
 
 				/*
+				_LOG_REJECTION
 
 				define ("_LOG_BAD_LOGIN", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> hat ein falsches Passwort beim einloggen eingegeben.");
 				define ("_LOG_BAD_LOGIN", "<a href='viewuser.php?uid=%2\$d'>%1\$s</a> entered a wrong password trying to log in.");
@@ -1370,6 +1392,12 @@ class AdminCP extends Controlpanel {
 				// eFiction 5
 				$item['action'] = json_decode($item['action'], TRUE);
 			}
+
+			if ( isset($item['action']['sid']) )
+				$item['action']['storytitle'] = $stories->load(array('sid=?',$item['action']['sid'])) ? $stories->title : NULL;
+			if ( isset($item['action']['seriesid']) )
+				$item['action']['seriestitle'] = $series->load(array('collid=?',$item['action']['seriesid'])) ? $series->title : NULL;
+
 		}
 
 		return $data;

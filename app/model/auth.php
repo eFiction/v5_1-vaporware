@@ -4,14 +4,14 @@ namespace Model;
 class Auth extends Base
 {
 
-	public function userLoad($login, $password, $uid=-1)
+	public function userLoad(string $login, string $password, int $uid=-1) : int
 	{
 		$this->prepare("userQuery", "SELECT U.password, U.uid FROM `tbl_users` U where ( U.login = :login OR U.uid = :uid ) AND U.groups > 0");
 		$this->bindValue("userQuery", ":login", $login, \PDO::PARAM_STR);
 		$this->bindValue("userQuery", ":uid",	 $uid,	 \PDO::PARAM_INT);
 		$user = $this->execute("userQuery");
-		
-		if(sizeof($user)==0) return FALSE;
+
+		if(sizeof($user)==0) return 0;
 		else $user = $user[0];
 
 		if ( password_verify ( $password, $user['password'] ) )
@@ -26,13 +26,13 @@ class Auth extends Base
 		}
 		else
 		{
-			return FALSE;
+			return 0;
 		}
 
 		$this->userSession($user['uid']);
 		return $user['uid'];
 	}
-	
+
 	public function userRecovery($username, $email)
 	{
 		$data = $this->exec(
@@ -43,7 +43,7 @@ class Auth extends Base
 			return $data[0];
 		return NULL;
 	}
-	
+
 	public function setRecoveryToken($uid)
 	{
 		$token = md5(time());
@@ -56,40 +56,40 @@ class Auth extends Base
 
 		return $token;
 	}
-	
+
 	public function dropRecoveryToken($uid)
 	{
 		// $uid and $token are safe
 		$this->exec("DELETE FROM `tbl_user_info` WHERE `uid` = {$uid} AND `field` = -1;");
 	}
-	
+
 	public function getRecoveryToken($token)
 	{
 		// $ip is safe
 		$recovery = $this->exec(
 			"SELECT U.uid, I.info as token
-				FROM `tbl_users`U 
+				FROM `tbl_users`U
 					INNER JOIN `tbl_user_info`I ON (U.uid=I.uid AND I.field=-1)
 				WHERE I.info LIKE CONCAT_WS( '//', :token , INET6_ATON('{$_SERVER['REMOTE_ADDR']}'), '%' );",
 			[":token" => $token]
 		);
 		// no token found
 		if ( sizeof($recovery)==0 ) return FALSE;
-		
+
 		// token expired
 		$token = explode("//",$recovery[0]['token']);
 		if((time()-$token[2])>3600)
 			return FALSE;
-		
+
 		// return token
 		return $recovery[0]['uid'];
 	}
-	
-	
-	public function userSession($uid)
+
+
+	public function userSession(int $uid)
 	{
 		$session = new \DB\SQL\Mapper($this->db, $this->prefix."sessions");
-		$session->load(array('session=?',$_SESSION['session_id']));
+		$session->load(array('session=?',$this->f3->get('SESSION.session_id')));
 		$session->user=$uid;
 		$session->save();
 	}
@@ -97,12 +97,12 @@ class Auth extends Base
 	public function createSession()
 	{
 		$session_id = md5(time().openssl_random_pseudo_bytes(32));
-		
+
 		$this->f3->set('SESSION.session_id', $session_id );
 		$this->exec(
 				"INSERT INTO `tbl_sessions`(`session`, `user`, `lastvisited`, `ip`)
 				VALUES
-				('{$_SESSION['session_id']}', '{NULL}', NOW(), INET6_ATON('{$_SERVER['REMOTE_ADDR']}') );"
+				('$session_id', '{NULL}', NOW(), INET6_ATON('{$_SERVER['REMOTE_ADDR']}') );"
 			);
 
 		setcookie
@@ -122,14 +122,14 @@ class Auth extends Base
 	{
 		// future project: switch to f3-session handler
 		// $this->session = new \DB\SQL\Session($this->db, $this->prefix."session_new");
-		
+
 		// cleanup sessions
 		$sql[] = "DELETE FROM `tbl_sessions` WHERE (user = 0 AND TIMESTAMPDIFF(MINUTE,`lastvisited`,NOW())>60 )
-																						OR 
+																						OR
 																						TIMESTAMPDIFF(MONTH,`lastvisited`,NOW())>1;";
 
-		$sql[] = "SET @guests  := (SELECT COUNT(DISTINCT S.session) 
-										FROM `tbl_sessions`S 
+		$sql[] = "SET @guests  := (SELECT COUNT(DISTINCT S.session)
+										FROM `tbl_sessions`S
 											WHERE S.user = 0
 											AND NOT (S.session = '{$session_id}' AND INET6_NTOA(S.ip) = '{$_SERVER['REMOTE_ADDR']}')
 											AND TIMESTAMPDIFF(MINUTE,S.lastvisited,NOW())<15
@@ -143,27 +143,22 @@ class Auth extends Base
 											);";
 		$sql[] = "UPDATE `tbl_sessions`S SET lastvisited = CURRENT_TIMESTAMP WHERE S.session = '{$session_id}' AND S.ip = INET6_ATON('{$_SERVER['REMOTE_ADDR']}');";
 
-		$sql[] = "SELECT S.session, UNIX_TIMESTAMP(S.lastvisited) as time, S.ip, IF(S.user,S.user,0) as userID, 
-						U.username, U.groups, U.preferences, U.cache_messaging, 
-						GROUP_CONCAT(DISTINCT U2.uid) as allowed_authors, 
+		$sql[] = "SELECT S.session, UNIX_TIMESTAMP(S.lastvisited) as time, S.ip, IF(S.user,S.user,0) as userID,
+						U.username, U.groups, U.preferences, U.cache_messaging,
+						GROUP_CONCAT(DISTINCT U2.uid) as allowed_authors,
 						@guests, @members
-							FROM `tbl_sessions`S 
-							INNER JOIN `tbl_users` U ON ( IF(S.user,S.user = U.uid,U.uid=0) )
+							FROM `tbl_sessions`S
+							LEFT JOIN `tbl_users` U ON ( IF(S.user,S.user = U.uid,U.uid=0) )
 								LEFT JOIN `tbl_users`U2 ON ( (U.uid = U2.uid OR U.uid = U2.curator) AND (U.groups&4) )
 						WHERE S.session = '{$session_id}' AND INET6_NTOA(S.ip) = '{$_SERVER['REMOTE_ADDR']}';";
-						
-/*
-	To do: create a cache field, move message status, curator to that field to reduce DB usage
-
-*/
-// IF(admin,IF(TIMESTAMPDIFF(MINUTE,`admin`,NOW())<15,1,0),0) as admin_active, 
 
 		$user = $this->exec($sql)[0];
+
 		if ( $user['session'] > '' && $user['userID'] > 0 )
 		{
 			$_SESSION['userID']	= $user['userID'];
-			
-			$this->f3->set('usercount', 
+
+			$this->f3->set('usercount',
 					[
 						"member"	=>	$user['@members']+1,
 						"guest"		=>	$user['@guests']
@@ -173,7 +168,7 @@ class Auth extends Base
 			if ( NULL == $user['cache_messaging'] = json_decode($user['cache_messaging'],TRUE) )
 			{
 				$user['cache_messaging'] = $this->userCacheRecount("messaging");
-				
+
 				$userInstance = \User::instance();
 				$userInstance->cache_messaging = json_encode($user['cache_messaging']);
 				$userInstance->save();
@@ -192,8 +187,8 @@ class Auth extends Base
 		else
 		{
 			$_SESSION['userID']	= FALSE;
-			
-			$this->f3->set('usercount', 
+
+			$this->f3->set('usercount',
 					[
 						"member"	=>	$user['@members'],
 						"guest"		=>	$user['@guests']+1
@@ -207,16 +202,16 @@ class Auth extends Base
 	public function validateAJAXSession($session_id)
 	{
 		// this is a cut-down session handler, used in AJAX context.
-		$sql[] = "SELECT S.session, UNIX_TIMESTAMP(S.lastvisited) as time, S.ip, IF(S.user,S.user,0) as userID, 
+		$sql[] = "SELECT S.session, UNIX_TIMESTAMP(S.lastvisited) as time, S.ip, IF(S.user,S.user,0) as userID,
 						U.username, U.groups, U.preferences,
 						GROUP_CONCAT(DISTINCT U2.uid) as allowed_authors
-							FROM `tbl_sessions`S 
+							FROM `tbl_sessions`S
 							INNER JOIN `tbl_users` U ON ( IF(S.user,S.user = U.uid,U.uid=0) )
 								LEFT JOIN `tbl_users`U2 ON ( (U.uid = U2.uid OR U.uid = U2.curator) AND U.groups&5 )
 						WHERE S.session = '{$session_id}' AND INET6_NTOA(S.ip) = '{$_SERVER['REMOTE_ADDR']}';";
 
 		$user = $this->exec($sql)[0];
-	
+
 		if ( $user['session'] > '' && $user['userID'] > 0 )
 		{
 			$_SESSION['userID']	= $user['userID'];
@@ -247,7 +242,7 @@ class Auth extends Base
 			$error['count']++;
 			$error['accept'] = TRUE;
 		}
-		
+
 		// Check data entered
 		if(empty($register['login']) OR trim($register['login'])=="" )
 		{
@@ -265,7 +260,7 @@ class Auth extends Base
 				$error['login'] = "taken";
 			}
 		}
-		
+
 		if(empty($register['email']) OR trim($register['email'])=="" )
 		{
 			$error['count']++;
@@ -291,7 +286,7 @@ class Auth extends Base
 				}
 			}
 		}
-		
+
 		/*
 			Password check
 		*/
@@ -300,7 +295,7 @@ class Auth extends Base
 			$error['count']++;
 			$error['password'] = $pw_error;
 		}
-		
+
 		/*
 			Captcha check
 		*/
@@ -316,7 +311,7 @@ class Auth extends Base
 			if ( $this->config['reg_sfs_usage'] == TRUE )
 			{
 				$register['ip'] = $_SERVER['REMOTE_ADDR'];
-				
+
 				$error = array_merge ( $error, $this->checkInputSFS($register) );
 			}
 			else
@@ -337,11 +332,11 @@ class Auth extends Base
 				]
 		*/
 		$url = "http://api.stopforumspam.org/api?f=json";
-		
+
 		if ( $this->config['reg_sfs_check_mail'] 		== TRUE ) $url .= "&email=".$data['email'];
 		if ( $this->config['reg_sfs_check_ip'] 			== TRUE ) $url .= "&ip=".$data['ip'];
 		if ( $this->config['reg_sfs_check_username']	== TRUE ) $url .= "&username=".$data['login'];
-		
+
 		$handle=FALSE; $i=0;
 
 		/*
@@ -353,7 +348,7 @@ class Auth extends Base
 		{
 			$sfsCheck = @curl_init($url);
 			@curl_setopt($sfsCheck, CURLOPT_RETURNTRANSFER, true);
-			
+
 			while( !$handle AND $i++ < 5 )
 			{
 				$handle = @curl_exec($sfsCheck);
@@ -366,7 +361,7 @@ class Auth extends Base
 				  $sfs = json_decode($handle,TRUE);
 				}
 			}
-			@curl_close($sfsCheck);			
+			@curl_close($sfsCheck);
 		}
 		else
 		{
@@ -375,7 +370,7 @@ class Auth extends Base
 				'timeout' => 1.0
 				)
 			));
-			
+
 			while( !$handle AND $i++ < 5 )
 			{
 				$handle = @fopen($url, 'r', false, $context);
@@ -430,7 +425,7 @@ class Auth extends Base
 				$deny = "connect";
 			}
 		}
-		
+
 		if ( isset($save) )
 		{
 			if ( $save == "green" )
@@ -481,31 +476,31 @@ class Auth extends Base
 										"hideTags"		=> NULL,
 									]);
 		$newUser->save();
-		
+
 		return $newUser->_id;
 	}
-	
+
 	public function newuserSetStatus($userID, $status, $mod)
 	{
 		// $userID, $status and $mod are safe
 		$this->exec("INSERT INTO `tbl_user_info` (uid,field,info) VALUES ({$userID},'{$status}','{$mod}')
 						ON DUPLICATE KEY UPDATE info='{$mod}' ");
 	}
-	
+
 	public function newuserEmailLink(array $token)
 	{
 		$newInfo = new \DB\SQL\Mapper($this->db, $this->prefix."user_info");
 		$newInfo->load(array('uid=? AND field=? AND info=?',$token[0], '-2', $token[1]));
-		
+
 		if ( $newInfo->uid != $token[0]) return FALSE;
-		
+
 		$newUser = new \DB\SQL\Mapper($this->db, $this->prefix."users");
 		$newUser->load(array('uid=?',$newInfo->uid));
 		$newUser->groups = 1;
 		$newUser->save();
-		
+
 		$newInfo->erase();
-		
+
 		return TRUE;
 	}
 }

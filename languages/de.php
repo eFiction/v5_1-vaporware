@@ -468,8 +468,9 @@ return array(
 	'AdminMenu_Logs_ED' => 'Geschichten bearbeitet',
 	'AdminMenu_Logs_LP' => 'Passwort verloren',
 	'AdminMenu_Logs_RE' => 'Reviews',
-	'AdminMenu_Logs_RG' => 'Registrierungen',
 	'AdminMenu_Logs_RF' => 'Fehler bei der Registrierung',
+	'AdminMenu_Logs_RG' => 'Registrierungen',
+	'AdminMenu_Logs_RJ' => 'Ablehnungen',
 	'AdminMenu_Logs_VS' => 'Bestätigungen',
 'AdminMenu_Shoutbox' => 'Shoutbox',
 'AdminMenu_Polls' => 'Umfragen',
@@ -587,6 +588,15 @@ return array(
 //'ACP_Custom_LabelOnly'	=> 'Enter a short and unique label',
 'CreateNewPage'			=> 'Neue Seite oder neuen Textblock anlegen',
 'DuplicateLabel'		=> 'Bezeichner existiert bereits',
+
+'Log_hasAddedMember' => 'hat Mitglied `{0}` angelegt',
+'Log_editNick'			=> 'hat den Benutzernamen von `{0}` zu `{1}` geändert',
+'Log_hasRegistered'	=> 'hat sich registriert',
+'Log_storyEdit' 		=> 'hat die Geschichte `{0}` bearbeitet',
+'Log_storyValidate' => 'hat die Geschichte `{0}` freigeschaltet',
+'Log_storyDelete' 		=> 'hat die Geschichte `{0}` gelöscht',
+'Log_storyChapterDelete' 		=> 'hat ein Kapitel der Geschichte `{0}` gelöscht',
+'Log_seriesDelete' 		=> 'hat die Serie `{0}` gelöscht',
 
 // Custom pages
 //'TextblockLabel'		=> 'Label/link for this texblock',

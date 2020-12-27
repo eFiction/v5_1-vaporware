@@ -48,7 +48,7 @@
 				<div class="column is-one-quarter"><h6>{{@LN__Tags}} </h6></div>
 				<div class="column is-three-quarters"><input class="input" type="text" id="tag-select" name="form[tags]" /></div>
 
-				<div class="column is-one-quarter"><h6>{{@LN__Characters}} </h6></div>
+				<div class="column is-one-quarter"><h6>{{@LN__Characters}} </h6><input type="checkbox" id="skipcheck" /></div>
 				<div class="column is-three-quarters"><input class="input" type="text" id="character-select" name="form[characters]" /></div>
 {*		<!-- end of special fields -->	*}
 				<div class="column is-full"><h6>{{@LN__Foreword}}</h6><textarea class="textarea" placeholder="{{@LN__StoryForewordExplained}}" name="form[story_notes]">{{@data.storynotes}}</textarea></div>
@@ -180,7 +180,7 @@ $(document).ready(function() {
 $(document).ready(function() {
     $("#character-select").tokenInput(function(){
 	// include currently selected categories in every request
-		return "{{$BASE}}/adminCP/ajax/stories/editMeta/categories=" + $('#category-select').val();
+		return "{{$BASE}}/adminCP/ajax/stories/editMeta/categories=" + $('#category-select').val() +"/skipcheck=" + $('#skipcheck')[0].checked;
 	},{
     	method: "post",
     	queryParam: "character",

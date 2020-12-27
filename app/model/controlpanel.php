@@ -2036,6 +2036,43 @@ class Controlpanel extends Base {
 	}
 
 	/**
+	* AJAX get category parents for use in character search
+	* rewrite 2020-12
+	*
+	* @param	array		$c			Collect all entries in here
+	* @param	array		$data		Categories that have to be traversed
+	*/
+	public function ajaxGetParentCategories(array &$c, array $data)
+	{
+		foreach ( $data as $d )
+		{
+			// take note of this category
+			$c[] = $d['cid'];
+			// if a parent category exists, traverse the tree
+			if ( $d['parent_cid'] > 0 )
+				$this->ajaxGetParentCategories($c, $this->exec("SELECT C.cid, C.parent_cid FROM `tbl_categories`C WHERE `cid` = {$d['parent_cid']};"));
+		}
+	}
+
+	/**
+	* AJAX get category children for use in character search
+	* 2020-12
+	*
+	* @param	array		$c			Collect all entries in here
+	* @param	array		$data		Categories that have to be traversed
+	*/
+	public function ajaxGetChildCategories(array &$c, array $data) : void
+	{
+		foreach ( $data as $d )
+		{
+			// take note of this category
+			$c[] = $d['cid'];
+			// try to load categories that have this item as parent
+			$this->ajaxGetChildCategories($c, $this->exec("SELECT C.cid, C.parent_cid FROM `tbl_categories`C WHERE `parent_cid` = {$d['cid']};"));
+		}
+	}
+
+	/**
 	* AJAX sort collection items
 	* rewrite 2020-09
 	*

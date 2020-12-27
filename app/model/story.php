@@ -492,7 +492,7 @@ class Story extends Base
 		else return FALSE;
 	}
 
-	public function categories( $cid )
+	public function categories( int $cid ) : array
 	{
 		// $cid is safe
 		// Get categories below selected category
@@ -506,7 +506,7 @@ class Story extends Base
 		{
 			foreach ( $data['elements'] as &$entry ) $entry['stats'] = json_decode($entry['stats'],TRUE);
 		}
-		else return FALSE;
+		else return [];
 
 		// If not in root, get parent category information
 		if ( $cid > 0 )
