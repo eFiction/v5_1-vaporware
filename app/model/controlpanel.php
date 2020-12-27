@@ -128,7 +128,7 @@ class Controlpanel extends Base {
 
 	/**
 	* Save chapter info/description
-	* rewrite 2020-09
+	* rewrite 2020-12 : fix word count, add XML commentary stripping
 	*
 	* @param	int		$chapterID	Chapter ID
 	* @param	array	$post		Data sent from the form
@@ -138,6 +138,8 @@ class Controlpanel extends Base {
 	*/
 	public function chapterSave( int $chapterID, array $post, string $power = 'U' ) : int
 	{
+		// when copying from MS Word and others, remove XML commentary
+		$post['chapter_text'] = preg_replace("/(?=<!--)([\s\S]*?-->)/m", "", $post['chapter_text']);
 		// plain and visual return different newline representations, this will bring things to standard.
 		$chaptertext = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $post['chapter_text']);
 
@@ -147,7 +149,8 @@ class Controlpanel extends Base {
 		$chapter->title 	= $post['chapter_title'];
 		$chapter->notes 	= $post['chapter_notes'];
 		$chapter->endnotes 	= $post['chapter_endnotes'];
-		$chapter->wordcount	= max(count(preg_split("/\p{L}[\p{L}\p{Mn}\p{Pd}'\x{2019}]{0,}/u",$chaptertext))-1, 0);
+		// count unicode words, after stripping all html tags
+		$chapter->wordcount = (int)preg_match_all('/(?:\p{L}(?:\p{L}|\p{M}|\p{P})*+)/mu', preg_replace("/<[^>]*>/", "", $chaptertext));
 
 		// Treat validation input based on module
 		// 'A'dmin has more power
