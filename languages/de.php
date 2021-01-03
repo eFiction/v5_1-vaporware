@@ -286,7 +286,7 @@ return array(
 'UserField_Type5'	=> 'Custom Code',	// _FIELDCUSTOM
 'UserField_Type6'	=> 'Text',			// _TEXT
 //'Nickname'			=> 'Nickname',
-//'Realname'			=> 'Realname',
+'Realname'			=> 'Richtiger Name',
 'UserGroup'			=> 'Benutzergruppe',
 
 'Author'	=> 'Autor',

@@ -19,7 +19,7 @@
 </div>
 
 <div class="field">
-  <label class="label">{@LN__RealName}</label>
+  <label class="label">{{@LN__Realname}}</label>
   <div class="control has-icons-left has-icons-right">
     <input class="input" type="text" value="{{@data.realname}}" name="data[realname]">
 	<span class="icon is-small is-left">
@@ -71,8 +71,8 @@
 				</select>
 			</case>
 			<case value="3" break="TRUE">
-				<input type="radio" id="yes" name="field[{{@field.id}}]" value="1"<check if="{{@field.info==1}}"> checked="checked"</check>> <label for="yes"> {{@LN__yes}}</label> 				
-				<input type="radio" id="no"  name="field[{{@field.id}}]" value="0"<check if="{{@field.info==0}}"> checked="checked"</check>> <label for="no" > {{@LN__no}}</label> 				
+				<input type="radio" id="yes" name="field[{{@field.id}}]" value="1"<check if="{{@field.info==1}}"> checked="checked"</check>> <label for="yes"> {{@LN__yes}}</label>
+				<input type="radio" id="no"  name="field[{{@field.id}}]" value="0"<check if="{{@field.info==0}}"> checked="checked"</check>> <label for="no" > {{@LN__no}}</label>
 			</case>
 			<default>
 				<input type="text" name="field[{{@field.id}}]" value="{{@field.info}}" />
