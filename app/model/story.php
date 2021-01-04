@@ -700,59 +700,6 @@ class Story extends Base
 		return $indexFlat;
 	}
 
-	public function loadReviewsArray(int $sid, $chapid) : array
-	{
-		$r = [];
-		$limit=20;
-
-		$reviews=new \DB\SQL\Mapper($this->db, $this->vprefix.'loadStoryReviews');
-		$items = is_numeric($chapid)?
-			$items=$reviews->paginate(0,$limit,array('review_story=? AND review_chapter=?',$sid, $chapid)):
-			$items=$reviews->paginate(0,$limit,array('review_story=?',$sid));
-
-		foreach($items['subset'] as $review)
-		{
-			$parents[] = $review['review_id'];
-			// jQuery.comments requires comments to have a date at least of the parent
-			// eFiction 3 did not record reply dates, so we'll have to fake this
-			$datesave[$review['review_id']] = $review['date_review'];
-			$r[] =
-			[
-				"id" 		=> $review['review_id'],
-				"parent" 	=> NULL,
-				"created"	=> date( 'Y-m-d', $review['date_review']),
-				"content"	=> preg_replace("/<br\\s*\\/>\\s*/i", "\n", $review['review_text']),
-				"creator"	=> $review['review_writer_uid'],
-				"fullname"	=> $review['review_writer_name'],
-			];
-
-		}
-		unset($reviews,$items);
-
-		if(isset($parents))
-		{
-			$comments=new \DB\SQL\Mapper($this->db, $this->vprefix.'loadStoryReviewComments');
-			$items=$comments->paginate(0,$limit,array('review_id IN ('.implode(",",$parents).')'));
-			foreach($items['subset'] as $comment)
-			{
-				$r[] =
-				[
-					"id" 		=> $comment['comment_id'],
-					"parent" 	=> $comment['review_id'],
-					"created"	=> date( 'Y-m-d',
-										$comment['date_comment']!=NULL?:$datesave[$comment['review_id']]
-										),
-					"content"	=> preg_replace("/<br\\s*\\/>\\s*/i", "\n", $comment['comment_text']),
-					"creator"	=> $comment['comment_writer_uid'],
-					"fullname"	=> $comment['comment_writer_name'],
-				];
-			}
-		}
-
-		// WHERE F2.type='C' AND F2.reference IN (".implode(",",$parents).")
-		return $r;
-	}
-
 	public function saveReview($structure, $data)
 	{
 		/*
@@ -1082,6 +1029,159 @@ class Story extends Base
 									ORDER BY C.inorder ASC ",
 								[ ":sid" => $sid ] );
 		return $chapters;
+	}
+
+	/**
+	* AJAX load reviews (and comments)
+	* rewrite 2021-01-04 to work with http://viima.github.io/jquery-comments/
+	*
+	* @param	int		$sid 			story ID
+	* @param	int		$chapid 	chapter ID (optional)
+	*
+	* @return	array		Result
+	*/
+	public function ajaxReviewsLoad(int $sid, $chapid) : array
+	{
+		$r = [];
+		$limit=20;
+
+		$reviews=new \DB\SQL\Mapper($this->db, $this->vprefix.'loadStoryReviews');
+		$items = is_numeric($chapid)?
+			$items=$reviews->paginate(0,$limit,array('review_story=? AND review_chapter=?',$sid, $chapid)):
+			$items=$reviews->paginate(0,$limit,array('review_story=?',$sid));
+
+		foreach($items['subset'] as $review)
+		{
+			$parents[] = $review['review_id'];
+			// jQuery.comments requires comments to have a date at least of the parent
+			// eFiction 3 did not record reply dates, so we'll have to fake this
+			$datesave[$review['review_id']] = $review['date_review'];
+			$r[] =
+			[
+				"id" 		=> $review['review_id'],
+				"parent" 	=> NULL,
+				"created"	=> date( 'Y-m-d', $review['date_review']),
+				"modified"	=> date( 'Y-m-d', $review['date_review']),
+				"content"	=> preg_replace("/<br\\s*\\/>\\s*/i", "\n", $review['review_text']),
+				"creator"	=> $review['review_writer_uid'],
+				"fullname"	=> $review['review_writer_name'],
+				"created_by_current_user" => ($review['review_writer_uid']==$_SESSION['userID']),
+			];
+
+		}
+		unset($reviews,$items);
+
+		if(isset($parents))
+		{
+			$comments=new \DB\SQL\Mapper($this->db, $this->vprefix.'loadStoryReviewComments');
+			$items=$comments->paginate(0,$limit,array('review_id IN ('.implode(",",$parents).')'));
+			foreach($items['subset'] as $comment)
+			{
+				$r[] =
+				[
+					"id" 		=> $comment['comment_id'],
+					"parent" 	=> $comment['parent_item']?:$comment['review_id'],
+					"created"	=> date( 'Y-m-d', max($comment['date_comment'], $datesave[$comment['review_id']]) ),
+					"modified"	=> date( 'Y-m-d', max($comment['date_comment'], $datesave[$comment['review_id']]) ),
+					"content"	=> preg_replace("/<br\\s*\\/>\\s*/i", "\n", $comment['comment_text']),
+					"creator"	=> $comment['comment_writer_uid'],
+					"fullname"	=> $comment['comment_writer_name'],
+					"created_by_current_user" => ($comment['comment_writer_uid']==$_SESSION['userID']),
+				];
+			}
+		}
+
+		return $r;
+	}
+
+	/**
+	* AJAX write reviews (and comments)
+	* 2021-01-04 to work with http://viima.github.io/jquery-comments/
+	*
+	* @param	int			$parent 		parent comment
+	* @param	int			$storyID 		story ID
+	* @param	int			$chapterID 	chapter ID
+	* @param  string	$content 		comment or review content
+	*
+	* @return int			DB id of saved entry
+	*/
+	public function ajaxReviewAdd(int $parent, int $storyID, int $chapterID, string $content) : int
+	{
+		$newReview = new \DB\SQL\Mapper($this->db, $this->prefix."feedback");
+
+		if ( $parent==0 )	{
+			$newReview->reference 		= $storyID;
+			$newReview->reference_sub = $chapterID;
+			$newReview->type 					= 'ST';
+		}
+		else {
+			$parentData = new \DB\SQL\Mapper($this->db, $this->prefix."feedback");
+			$newReview->reference			= $parentData->load("fid = ".$parent)->reference;
+			$newReview->reference_sub = $parent;
+			$newReview->type 					= 'C';
+		}
+
+		$newReview->writer_uid 		= $_SESSION['userID'];
+		$newReview->text 					= $content;
+		$newReview->datetime 			= date('Y-m-d H:i:s');
+		$newReview->save();
+
+		return $newReview->_id;
+	}
+
+	/**
+	* AJAX edit reviews (and comments)
+	* 2021-01-04 to work with http://viima.github.io/jquery-comments/
+	*
+	* @param	int			$reviewID 	element id
+	* @param  string	$content 		comment or review content
+	*
+	* @return string	Current date to saturate the AJAX reply
+	*/
+	public function ajaxReviewEdit(int $reviewID, string $content) : ?string
+	{
+		$editReview = new \DB\SQL\Mapper($this->db, $this->prefix."feedback");
+		$editReview->load(
+			[
+				'writer_uid = :uid and fid = :fid',
+				':uid'=>$_SESSION['userID'],
+				':fid'=>$reviewID
+			]);
+		if($editReview->fid>0)
+		{
+			$editReview->text = $content;
+			$editReview->save();
+			return date('Y-m-d H:i:s');
+		}
+		die(header("HTTP/1.0 403 Not allowed"));
+	}
+
+	/**
+	* AJAX delete reviews (and comments)
+	* 2021-01-04 to work with http://viima.github.io/jquery-comments/
+	*
+	* @param	int			$reviewID 	element id
+	*
+	* @return string	Current date to saturate the AJAX reply
+	*/
+	/**
+	* todo: check for cild elements before allowing to delete
+	*/
+	public function ajaxReviewDrop(int $reviewID) :void
+	{
+		$editReview = new \DB\SQL\Mapper($this->db, $this->prefix."feedback");
+		$editReview->load(
+			[
+				'writer_uid = :uid and fid = :fid',
+				':uid'=>$_SESSION['userID'],
+				':fid'=>$reviewID
+			]);
+		if($editReview->fid>0)
+		{
+			$editReview->erase();
+			return;
+		}
+		die(header("HTTP/1.0 403 Not allowed"));
 	}
 
 }

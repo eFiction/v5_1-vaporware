@@ -9,9 +9,31 @@
 
 <script type="text/javascript">
 			$(function() {
-				$('#comments-container').comments({
+
+				function saveComment(commentJSON, success, error, type) {
+					$.ajax({
+						type: 'POST',
+						url: '{{@BASE}}/story/ajax/'+type,
+						datatype: 'JSON',
+						data: Object.assign(commentJSON, {"chapterID": {{ @story.chapid }}, "storyID": {{ @story.sid }} }),
+						success: function(comment) {
+							if (type=='editreview')
+								success(JSON.parse(comment));
+							else
+								success(comment);
+						},
+						error: function(error)
+						{
+							alert('*Forbidden/Error*');
+							location.reload();
+						}
+					});
+				}
+
+			$('#comments-container').comments({
 					profilePictureURL: '',
-					currentUserId: 1,
+					youText: 'Me',
+					currentUserId: {{ @_SESSION.userID }},
 					roundProfilePictures: true,
 					textareaRows: 1,
 					enableAttachments: false,
@@ -19,10 +41,11 @@
 					enablePinging: false,
 					enableNavigation: false,
 					enableUpvoting: false,
+					enableReplying: true,
+					deleteText: '',
+
+					forceResponsive: true,
 					scrollContainer: $(window),
-					searchUsers: function(term, success, error) {
-						success([]);
-					},
 					getComments: function(success, error) {
 						setTimeout(function() {
 						$.ajax({
@@ -31,45 +54,32 @@
 							data: { sid: {{@story.sid}}<check if="isset(@story.chapid)">, chapid: {{@story.chapid}}</check> },
 							datatype: 'JSON',
 							success: function(commentsArray2) {
-								comments = JSON.parse(commentsArray2);
-								parser = new DOMParser();
-								comments.forEach(function(item,index,arr) {
-									arr[index]['content'] = parser.parseFromString(arr[index]['content'],'text/html').documentElement.textContent;
-								});
+								comments = Object.values(JSON.parse(commentsArray2));
 								success(comments);
 							},
 							error: error
 						});
 						}, 500);
 					},
-					postComment: function(data, success, error) {
-						setTimeout(function() {
-							success(saveComment(data));
-						}, 500);
-					},
+
 					postComment: function(commentJSON, success, error) {
-						$.ajax({
-						  type: 'POST',
-						  url: '{{@BASE}}/story/ajax/postreview',
-						datatype: 'JSON',
-						  data: commentJSON,
-						  success: function(comment) {
-							alert(comment);
-							success(comment)
-						  },
-						  error: error
-						});
-					},
-					putComment: function(data, success, error) {
 						setTimeout(function() {
-							success(saveComment(data));
+							saveComment(commentJSON, success, error, 'postreview');
 						}, 500);
 					},
-					deleteComment: function(data, success, error) {
+
+					putComment: function(commentJSON, success, error) {
 						setTimeout(function() {
-							success();
+							saveComment(commentJSON, success, error, 'editreview');
 						}, 500);
 					},
+
+					deleteComment: function(commentJSON, success, error) {
+						setTimeout(function() {
+							saveComment(commentJSON, success, error, 'dropreview');
+						}, 500);
+					},
+
 				});
 			});
 		</script>

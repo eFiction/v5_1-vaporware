@@ -197,8 +197,9 @@ class Story extends Base
 
 		elseif ( isset($params['segment']) AND $params['segment']=="getreviews" )
 		{
-			$reviews = $this->model->loadReviewsArray($f3->get('POST.sid'), $f3->get('POST.chapid'));
+			$reviews = $this->model->ajaxReviewsLoad($f3->get('POST.sid'), $f3->get('POST.chapid'));
 
+			header('Content-type:application/json;charset=utf-8');
 			echo json_encode($reviews);
 			exit;
 		}
@@ -206,12 +207,31 @@ class Story extends Base
 		elseif ( isset($params['segment']) AND $params['segment']=="postreview" )
 		{
 			$parent = (int)$f3->get('POST.parent');
+			$storyID = (int)$f3->get('POST.storyID');
+			$chapterID = (int)$f3->get('POST.chapterID');
 
-			//
-			//var_dump ( $params );
-			//echo json_encode(["success" => "Texte"]);
+			$_POST['id'] = $this->model->ajaxReviewAdd($parent, $storyID, $chapterID, $f3->get('POST.content') );
+
 			header('Content-type:application/json;charset=utf-8');
-			echo json_encode("Texte");
+			echo json_encode($f3->get('POST'));
+			exit;
+		}
+
+		elseif ( isset($params['segment']) AND $params['segment']=="editreview" )
+		{
+			$reviewID = (int)$f3->get('POST.id');
+
+			$_POST['modified'] = $this->model->ajaxReviewEdit($reviewID, $f3->get('POST.content') );
+
+			header('Content-type:application/json;charset=utf-8');
+			echo json_encode($f3->get('POST'));
+			exit;
+		}
+
+		elseif ( isset($params['segment']) AND $params['segment']=="dropreview" )
+		{
+			$reviewID = (int)$f3->get('POST.id');
+			$this->model->ajaxReviewDrop($reviewID);
 			exit;
 		}
 	}
