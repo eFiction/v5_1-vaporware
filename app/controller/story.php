@@ -140,9 +140,7 @@ class Story extends Base
 
 			if ( is_array($query) )
 				$data = $this->model->searchAjax( key($query), current($query) );
-			echo json_encode($data);
-
-			exit;
+			exit(json_encode($data));
 		}
 
 		elseif ( isset($params['segment']) AND $params['segment']=="review_comment_form" )
@@ -198,40 +196,56 @@ class Story extends Base
 		elseif ( isset($params['segment']) AND $params['segment']=="getreviews" )
 		{
 			$reviews = $this->model->ajaxReviewsLoad($f3->get('POST.sid'), $f3->get('POST.chapid'));
-
+			// return as JSON type, otherwise the script will fail
 			header('Content-type:application/json;charset=utf-8');
-			echo json_encode($reviews);
-			exit;
+			exit(json_encode($reviews));
 		}
 
 		elseif ( isset($params['segment']) AND $params['segment']=="postreview" )
 		{
-			$parent = (int)$f3->get('POST.parent');
-			$storyID = (int)$f3->get('POST.storyID');
-			$chapterID = (int)$f3->get('POST.chapterID');
-
-			$_POST['id'] = $this->model->ajaxReviewAdd($parent, $storyID, $chapterID, $f3->get('POST.content') );
-
+			if ( $_SESSION['userID'] == 0 )
+			{
+				echo "noguest";
+				exit(header("HTTP/1.0 403 Not allowed"));
+			}
+			// get data from the _POST
+			$data = $f3->get('POST');
+			// save and add the returned id to the data
+			if ( FALSE === $data['id'] = $this->model->ajaxReviewAdd((int)$data['parent'], $data['storyID'], $data['chapterID'], $data['content'] ) )
+			{
+				echo "nosave";
+				exit(header("HTTP/1.0 403 Not allowed"));
+			}
+			// return as JSON type, otherwise the script will fail
 			header('Content-type:application/json;charset=utf-8');
-			echo json_encode($f3->get('POST'));
-			exit;
+			exit(json_encode($data));
 		}
 
 		elseif ( isset($params['segment']) AND $params['segment']=="editreview" )
 		{
 			$reviewID = (int)$f3->get('POST.id');
 
-			$_POST['modified'] = $this->model->ajaxReviewEdit($reviewID, $f3->get('POST.content') );
-
+			if ( "noedit" == $modified = $this->model->ajaxReviewEdit($reviewID, $f3->get('POST.content') ) )
+			{
+				exit(header("HTTP/1.0 403 Not allowed"));
+				echo "noedit";
+			}
+			// add the modification date to the original POST data
+			$_POST['modified'] = $modified;
+			// return as JSON type, otherwise the script will fail
 			header('Content-type:application/json;charset=utf-8');
-			echo json_encode($f3->get('POST'));
-			exit;
+			exit(json_encode($f3->get('POST')));
 		}
 
 		elseif ( isset($params['segment']) AND $params['segment']=="dropreview" )
 		{
 			$reviewID = (int)$f3->get('POST.id');
-			$this->model->ajaxReviewDrop($reviewID);
+			// model should not return anything, if it does, it's an error tag
+			if ( "" !== $error = $this->model->ajaxReviewDrop($reviewID) )
+			{
+				echo $error;
+				exit(header("HTTP/1.0 403 Not allowed"));
+			}
 			exit;
 		}
 	}

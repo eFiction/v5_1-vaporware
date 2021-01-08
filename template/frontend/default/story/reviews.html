@@ -17,14 +17,11 @@
 						datatype: 'JSON',
 						data: Object.assign(commentJSON, {"chapterID": {{ @story.chapid }}, "storyID": {{ @story.sid }} }),
 						success: function(comment) {
-							if (type=='editreview')
-								success(JSON.parse(comment));
-							else
 								success(comment);
 						},
 						error: function(error)
 						{
-							alert('*Forbidden/Error*');
+							alert('*Forbidden/Error*: '+ error.responseText);
 							location.reload();
 						}
 					});
@@ -42,6 +39,7 @@
 					enableNavigation: false,
 					enableUpvoting: false,
 					enableReplying: true,
+					readOnly: {{@_SESSION['userID']==0?"true":"false"}},
 					deleteText: '',
 
 					forceResponsive: true,
@@ -54,7 +52,7 @@
 							data: { sid: {{@story.sid}}<check if="isset(@story.chapid)">, chapid: {{@story.chapid}}</check> },
 							datatype: 'JSON',
 							success: function(commentsArray2) {
-								comments = Object.values(JSON.parse(commentsArray2));
+								comments = Object.values(commentsArray2);
 								success(comments);
 							},
 							error: error

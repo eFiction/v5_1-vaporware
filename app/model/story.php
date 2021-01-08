@@ -1105,7 +1105,7 @@ class Story extends Base
 	*
 	* @return int			DB id of saved entry
 	*/
-	public function ajaxReviewAdd(int $parent, int $storyID, int $chapterID, string $content) : int
+	public function ajaxReviewAdd(int $parent, int $storyID, int $chapterID, string $content) : ?int
 	{
 		$newReview = new \DB\SQL\Mapper($this->db, $this->prefix."feedback");
 
@@ -1153,7 +1153,7 @@ class Story extends Base
 			$editReview->save();
 			return date('Y-m-d H:i:s');
 		}
-		die(header("HTTP/1.0 403 Not allowed"));
+		return "noedit";
 	}
 
 	/**
@@ -1167,21 +1167,27 @@ class Story extends Base
 	/**
 	* todo: check for cild elements before allowing to delete
 	*/
-	public function ajaxReviewDrop(int $reviewID) :void
+	public function ajaxReviewDrop(int $reviewID) : ?string
 	{
-		$editReview = new \DB\SQL\Mapper($this->db, $this->prefix."feedback");
-		$editReview->load(
+		$dropReview = new \DB\SQL\Mapper($this->db, $this->prefix."feedback");
+		// check that this entry has no follow ups
+		if ( 0 != $dropReview->count(["(`reference` = {$reviewID} AND `reference_sub` IS NULL) OR `reference_sub` = {$reviewID}"]) ) return "hasfollow";
+		// reset the cursor
+		$dropReview->reset();
+		$dropReview->load(
 			[
 				'writer_uid = :uid and fid = :fid',
 				':uid'=>$_SESSION['userID'],
 				':fid'=>$reviewID
 			]);
-		if($editReview->fid>0)
+		// if the feedback could be loaded, it can be deleted
+		if($dropReview->fid>0)
 		{
-			$editReview->erase();
-			return;
+			$dropReview->erase();
+			return "";
 		}
-		die(header("HTTP/1.0 403 Not allowed"));
+		// assuming the feedback did exist, it must have failed to load due to user mismatch
+		return "notallowed";
 	}
 
 }
