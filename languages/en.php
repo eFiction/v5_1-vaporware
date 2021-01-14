@@ -853,6 +853,7 @@ return array(
 'Poll_Options'		=> 'Reply options',
 'Poll_NoVotes'		=> 'No votes were cast for this poll',
 'Poll_NoActivePolls'	=> 'Currently, there are no active polls',
+'Poll_LoginToVote'	=> 'Log in to vote',
 
 // Archive News
 'News_Headline'	=> 'Headline',

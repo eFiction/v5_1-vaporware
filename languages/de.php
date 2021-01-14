@@ -595,7 +595,9 @@ return array(
 'Log_storyEdit' 		=> 'hat die Geschichte `{0}` bearbeitet',
 'Log_storyValidate' => 'hat die Geschichte `{0}` freigeschaltet',
 'Log_storyDelete' 		=> 'hat die Geschichte `{0}` gelöscht',
+'Log_storyChapterEdit'		=> 'hat Kapitel {1} der Geschichte `{0}` bearbeitet',
 'Log_storyChapterDelete' 		=> 'hat ein Kapitel der Geschichte `{0}` gelöscht',
+'Log_seriesEdit'			=> 'hat die Serie `{0}` bearbeitet',
 'Log_seriesDelete' 		=> 'hat die Serie `{0}` gelöscht',
 
 // Custom pages
@@ -632,7 +634,6 @@ return array(
 	'TypeSeriesExplain'		=> 'Serien sind sortiert und sollten einen Handlungsverlauf darstellen',
 	'CreateTypeCollection'	=> 'eine Sammlung',
 	'TypeCollectionExplain'	=> 'Sammlungen sind unsortiert und bündeln thematisch oder andersartig verbundene Geschichten',
-
 
 'CannotDeleteUsedElement'	=> 'Kann ein Element, dass zurzeit verwendet wird, nicht löschen.',
 'ElementDeleted'	=> 'Element gelöscht',
@@ -836,7 +837,7 @@ return array(
 'Button_writeComment'	=> 'Kommentar schreiben',
 
 // Polls
-'PollBox'		=> 'Polls',
+'PollBox'		=> 'Umfragen',
 'AllPolls'		=> 'Show all polls',
 'PollOpenSince'	=> 'Umfrage wurde am {0} gestartet',
 'PollOUFN'		=> 'Umfrage ist bis auf Weiteres geöffnet',
@@ -852,6 +853,7 @@ return array(
 'Poll_Options'		=> 'Antwortmöglichkeiten',
 'Poll_NoVotes'		=> 'Es wurden keine Stimmen für diese Umfrage abgegeben',
 'Poll_NoActivePolls'	=> 'Momentan gibt es keine aktiven Umfragen',
+'Poll_LoginToVote'	=> 'Log in to vote',
 
 // Archiv News'
 'News_Headline'	=> 'Schlagzeile',
