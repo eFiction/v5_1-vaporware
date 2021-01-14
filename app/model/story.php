@@ -1023,7 +1023,7 @@ class Story extends Base
 
 	public function epubChapters($sid)
 	{
-		$chapters = $this->exec("SELECT C.title, C.inorder
+		$chapters = $this->exec("SELECT C.title, C.inorder, C.chapid
 									FROM `tbl_chapters`C
 									WHERE C.validated >= 30 AND C.sid = :sid
 									ORDER BY C.inorder ASC ",

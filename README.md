@@ -1,7 +1,7 @@
 # v5_1-vaporware
 
 // ----------------------------------------------------------------------\
-// Copyright (c) 2015-2019 Rainer Volkrodt <rainer@volkrodt.de>\
+// Copyright (c) 2015-2021 Rainer Volkrodt <rainer@volkrodt.de>\
 // Following the footsteps of eFiction 3\
 // Copyright (c) 2007 by Tammy Keefer,\
 // which was based on eFiction 1.1\

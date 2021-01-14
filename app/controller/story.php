@@ -495,7 +495,7 @@ class Story extends Base
 				$n = 1;
 				foreach($chapters as $chapter)
 				{
-					$chapterText = $this->model->getChapterText( $epubData['sid'], $chapter['inorder'], FALSE );
+					$chapterText = $this->model->getChapterText( $epubData['sid'], $chapter['chapid'], FALSE );
 					$chapterTOC[] = array ( "number" => $n, "title" => "{$chapter['title']}" );
 
 					$body = $this->template->epubChapter(
