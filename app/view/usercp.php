@@ -20,7 +20,7 @@ class UserCP extends Base
 		$this->f3->set('panel_menu', $menu);
 		return $this->render('usercp/menu.html');
 	}
-	
+
 	public function upperMenu(array $menu, $counter, $path, $sub)
 	{
 		$this->f3->set('menu_upper', $menu);
@@ -30,13 +30,13 @@ class UserCP extends Base
 
 		return $this->render('usercp/menu.upper.html');
 	}
-	
+
 	public function start (array $stats)
 	{
 		$this->f3->set('stats', $stats);
 		return $this->render('usercp/start.html');
 	}
-	
+
 	public function authorHome($data=[])
 	{
 		$this->f3->set('message', $data);
@@ -53,11 +53,11 @@ class UserCP extends Base
 		$this->f3->set('select', $params[1]);
 		return $this->render('usercp/author/story.list.html');
 	}
-	
+
 	public function authorStoryAdd(array $data)
 	{
 		$this->f3->set('storyAdd', $data);
-		
+
 		return $this->render('usercp/author/story.add.html');
 	}
 
@@ -75,7 +75,7 @@ class UserCP extends Base
 		$this->f3->set('prePop', $prePop);
 		$this->f3->set('data', $storyData);
 		$this->f3->set('chapterList', $chapterList);
-		
+
 		return $this->render('usercp/author/story.editheader.html');
 	}
 
@@ -83,13 +83,16 @@ class UserCP extends Base
 	{
 		if($chapterData['editor']=="visual")
 		{
+			// load TinyMCE and config
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
+			// replace \n breaks with html breaks
+			$chapterData['chaptertext'] = str_replace("\n", "<br/>", $chapterData['chaptertext']);
 		}
 
 		$this->f3->set('data', $chapterData);
 		$this->f3->set('chapterList', $chapterList);
-		
+
 		return $this->render('usercp/author/story.editchapter.html');
 	}
 
@@ -113,7 +116,7 @@ class UserCP extends Base
 			$person_is = "Sender";
 			$date_means = "Received";
 		}
-		
+
 		if( isset($_SESSION['lastAction']) )
 		{
 			$this->f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
@@ -132,7 +135,7 @@ class UserCP extends Base
 	{
 		$this->f3->set('message', $data);
 		$this->f3->set('forward',($data['sender_id']==$_SESSION['userID']) );
-		
+
 		return $this->render('usercp/messaging/read.html');
 	}
 
@@ -141,14 +144,14 @@ class UserCP extends Base
 		$this->f3->set('write_data', $data);
 		return $this->render('usercp/messaging/write.html');
 	}
-	
+
 	public function pollsList(array $data, array $sort)
 	{
 		$this->f3->set('polls', $data);
 		$this->f3->set('sort', $sort);
 		return $this->render('usercp/polls.list.html');
 	}
-	
+
 	public function shoutboxList($data)
 	{
 		//\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
@@ -158,11 +161,11 @@ class UserCP extends Base
 			$this->f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
 			unset($_SESSION['lastAction']);
 		}
-		
+
 		$this->f3->set('shouts', $data);
 		return $this->render('usercp/shoutbox.list.html');
 	}
-	
+
 	public function libraryBookFavList(array $data, array $sort, array $extra)
 	{
 		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
@@ -172,17 +175,17 @@ class UserCP extends Base
 		$this->f3->set('extra', $extra);
 		return $this->render('usercp/library/bookFavList.html');
 	}
-	
+
 	public function libraryBookFavEdit($data, $params)
 	{
 		$this->f3->set('data', $data);
 		$this->f3->set('block', $params[0]);
 		$this->f3->set('returnpath', $params['returnpath']);
 		$this->f3->set('saveError', @$params['error']);
-		
+
 		return $this->render('usercp/library/bookFavEdit.html');
 	}
-	
+
 	public function libraryCollectionsList(array $data, array $sort, string $module) : string
 	{
 		foreach ( $data as $key => $value )
@@ -191,7 +194,7 @@ class UserCP extends Base
 		$this->f3->set('data', 		$data);
 		$this->f3->set('module', 	$module);
 		$this->f3->set('sort', $sort);
-		
+
 		return $this->render('usercp/library/collections.list.html');
 	}
 
@@ -223,7 +226,7 @@ class UserCP extends Base
 	public function feedbackHome(array $data)
 	{
 		$this->javascript( 'head', TRUE, "piechart.js" );
-		
+
 		$this->f3->set('stats', $data);
 		return $this->render('usercp/feedback.home.html');
 	}
@@ -251,16 +254,16 @@ class UserCP extends Base
 		$this->f3->set('direction', $params[1]);
 		$this->f3->set('returnpath', $params['returnpath']);
 		$this->f3->set('saveError', @$params['error']);
-		
+
 		return $this->render('usercp/feedback.edit.html');
 	}
-	
+
 	public function recommendationList( array $data, array $sort ) : string
 	{
 		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 		$this->f3->set('data', $data);
 		$this->f3->set('sort', $sort);
-		
+
 		return $this->render('usercp/library/recommendation.list.html');
 	}
 
@@ -275,30 +278,30 @@ class UserCP extends Base
 		$this->f3->set('prePop', 	$prePop);
 		$this->f3->set('data', 		$data);
 		$this->f3->set('returnpath', $returnpath);
-		
+
 		return $this->render('usercp/library/recommendation.edit.html');
 	}
 
 	public function settingsChangePW($feedback)
 	{
 		$this->f3->set('feedback', $feedback);
-		
+
 		return $this->render('usercp/changepw.html');
 	}
-	
+
 	public function settingsProfile($fields)
 	{
 		$this->f3->set('fields', $fields);
-		
+
 		return $this->render('usercp/settings.profile.html');
 	}
-	
+
 	public function settingsPreferences($data)
 	{
 		$this->f3->set('data', $data);
 		$this->f3->set('language_available', \Config::getPublic('language_available'));
-		
+
 		return $this->render('usercp/settings.preferences.html');
 	}
-	
+
 }

@@ -20,12 +20,12 @@ class AdminCP extends Base
 		$this->f3->set('panel_menu', $menu);
 		return $this->render('main/menu.html');
 	}
-	
+
 	public function access()
 	{
 		return $this->render('main/access.html');
 	}
-	
+
 	public function settingsFields($data,$target,$feedback)
 	{
 		$this->f3->set('form_target', $target);
@@ -49,7 +49,7 @@ class AdminCP extends Base
 		$this->f3->set('feedback', $feedback);
 		return $this->render('archive/category.list.html');
 	}
-	
+
 	public function categoryAdd( \Base $f3, array $data )
 	{
 		$data = array_merge (
@@ -62,7 +62,7 @@ class AdminCP extends Base
 		$this->f3->set('data', $data);
 		return $this->render('archive/category.edit.html');
 	}
-	
+
 	public function categoryEdit(array $data)
 	{
 		if(empty($data['job'])) $data['job'] = "id";
@@ -94,7 +94,7 @@ class AdminCP extends Base
 		$this->f3->set('returnpath', $returnpath);
 		return $this->render('archive/character.edit.html');
 	}
-	
+
 	public function contestsList(array $data, array $sort)
 	{
 		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
@@ -114,7 +114,7 @@ class AdminCP extends Base
 
 		return $this->render('archive/contest.list.html');
 	}
-	
+
 	public function contestEdit(array $data, $returnpath)
 	{
 		if($data['editor']=="visual" AND $this->config['advanced_editor']==TRUE )
@@ -138,7 +138,7 @@ class AdminCP extends Base
 		$this->f3->set('data', $data);
 		$this->f3->set('sort', $sort);
 		$this->f3->set('returnpath', $returnpath);
-		
+
 		return \Template::instance()->render('archive/contest.entries.html');
 	}
 
@@ -208,7 +208,7 @@ class AdminCP extends Base
 	{
 		$this->f3->set('data',	$data);
 		$this->f3->set('config',$config);
-		
+
 		return $this->render('settings/language.html');
 	}
 
@@ -216,10 +216,10 @@ class AdminCP extends Base
 	{
 		$this->f3->set('data',	$data);
 		$this->f3->set('config',$config);
-		
+
 		return $this->render('settings/layout.html');
 	}
-	
+
 	public function layoutIcons()
 	{
 		$icons = Iconset::instance()->_data;
@@ -240,10 +240,10 @@ class AdminCP extends Base
 		$this->f3->set('sub', $sub);
 		return $this->render('home/log_list.html');
 	}
-	
+
 	public function logView()
 	{
-		
+
 	}
 
 	public function newsEdit(array $data, string $returnpath)
@@ -261,7 +261,7 @@ class AdminCP extends Base
 
 		return $this->render('home/news.edit.html');
 	}
-	
+
 	public function newsList(array $data, array $sort)
 	{
 		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
@@ -282,7 +282,7 @@ class AdminCP extends Base
 		$this->f3->set('data', $data);
 		return $this->render('archive/rating.edit.html');
 	}
-	
+
 	public function ratingDelete(array $data, array $ratings)
 	{
 		$this->f3->set('data', 		$data);
@@ -290,7 +290,7 @@ class AdminCP extends Base
 
 		return $this->render('archive/rating.delete.html');
 	}
-	
+
 	public function ratingList(array $data)
 	{
 		if( isset($_SESSION['lastAction']) )
@@ -302,21 +302,21 @@ class AdminCP extends Base
 		$this->f3->set('ratingList', $data);
 		return $this->render('archive/rating.list.html');
 	}
-	
+
 	public function collectionsList(array $data, array $sort, string $module) : string
 	{
 		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
-	
+
 		foreach ( $data as $key => $value )
 			$this->dataProcess($data[$key], $key);
 
 		$this->f3->set('data', 		$data);
 		$this->f3->set('module', 	$module);
 		$this->f3->set('sort', $sort);
-		
+
 		return $this->render('stories/collections.list.html');
 	}
-	
+
 	public function collectionEdit(array $data, array $prePop, string $module, string $returnpath="" )
 	{
 		if($data['editor']=="visual" AND $this->config['advanced_editor']==TRUE )
@@ -332,7 +332,7 @@ class AdminCP extends Base
 
 		return $this->render('stories/collection.edit.html');
 	}
-	
+
 	public function collectionItems(array $data, string $module, string $returnpath="" ) : string
 	{
 		$this->f3->set('data', 			$data);
@@ -351,7 +351,7 @@ class AdminCP extends Base
 
 		return $this->render('home/poll.list.html');
 	}
-	
+
 	public function pollEdit(array $data, string $returnpath)
 	{
 		$this->javascript( 'head', TRUE, "jquery.datetimepicker.js" );
@@ -368,7 +368,7 @@ class AdminCP extends Base
 		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 		$this->f3->set('data', 		 $data);
 		$this->f3->set('sort', $sort);
-		
+
 		return $this->render('stories/recommendation.list.html');
 	}
 
@@ -383,7 +383,7 @@ class AdminCP extends Base
 		$this->f3->set('prePop', 	$prePop);
 		$this->f3->set('data', 		$data);
 		$this->f3->set('returnpath', $returnpath);
-		
+
 		return $this->render('stories/recommendation.edit.html');
 	}
 
@@ -392,10 +392,10 @@ class AdminCP extends Base
 		$this->f3->set('data', $data);
 		$this->f3->set('sort', $sort);
 		$this->f3->set('page', $page);
-		
+
 		return $this->render('home/shout.edit.html');
 	}
-	
+
 	public function shoutList(array $data, array $sort)
 	{
 		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
@@ -404,12 +404,12 @@ class AdminCP extends Base
 		$this->f3->set('sort', $sort);
 		return $this->render('home/shout.list.html');
 	}
-	
+
 	public function storySearch()
 	{
 		return $this->render('stories/search.html');
 	}
-	
+
 	public function storyAddForm( array $data = [] )
 	{
 		if ( sizeof($data)>0 )
@@ -425,7 +425,7 @@ class AdminCP extends Base
 		}
 		return $this->render('stories/story.add.html');
 	}
-	
+
 	public function storyMetaEdit(array $storyData, array $chapterList, array $prePop)
 	{
 		$storyData['storynotes'] = preg_replace("/<br\\s*\\/>\\s*/i", "\n", $storyData['storynotes']);
@@ -434,7 +434,7 @@ class AdminCP extends Base
 		$this->f3->set('prePop', $prePop);
 		$this->f3->set('data', $storyData);
 		$this->f3->set('chapterList', $chapterList);
-		
+
 		return $this->render('stories/edit.header.html');
 	}
 
@@ -442,8 +442,11 @@ class AdminCP extends Base
 	{
 		if($chapterData['editor']=="visual" AND $this->config['advanced_editor']==TRUE )
 		{
+			// load TinyMCE and config
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
+			// replace \n breaks with html breaks
+			$chapterData['chaptertext'] = str_replace("\n", "<br/>", $chapterData['chaptertext']);
 		}
 
 		$this->f3->set('data', $chapterData);
@@ -458,7 +461,7 @@ class AdminCP extends Base
 		$this->f3->set('sort', $sort);
 		return $this->render('stories/pending.list.html');
 	}
-	
+
 	public function storyValidatePending(array $data, $returnpath)
 	{
 		$data['story']['cache_authors'] 	= json_decode($data['story']['cache_authors'],TRUE);
@@ -471,11 +474,11 @@ class AdminCP extends Base
 		$this->f3->set('returnpath', $returnpath);
 		return $this->render('stories/pending.view.html');
 	}
-	
+
 	public function storyValidateChapter(array $data, $chapterText, $returnpath)
 	{
 		$data['cache_authors'] 	= json_decode($data['cache_authors'],TRUE);
-		
+
 		$this->f3->set('data', 			$data);
 		$this->f3->set('chapterText', 	$chapterText);
 		$this->f3->set('returnpath',	$returnpath);
@@ -517,7 +520,7 @@ class AdminCP extends Base
 		$this->f3->set('grouplist', $data);
 		return $this->render('archive/tagGroup.list.html');
 	}
-	
+
 	public function tagEdit(array $data, string $returnpath)
 	{
 		$this->f3->set('data', $data);
@@ -530,24 +533,24 @@ class AdminCP extends Base
 		$this->f3->set('data', $data);
 		return $this->render('archive/tagGroup.edit.html');
 	}
-	
+
 	public function userFieldsEdit()
 	{
 
 	}
-	
+
 	public function userFieldsList(array $fieldData)
 	{
 		$this->f3->set('data', $fieldData);
 		return $this->render('members/fields.list.html');
 	}
-	
+
 	public function userTeamList($teamData)
 	{
 		$this->f3->set('data', $teamData);
 		return $this->render('members/team.list.html');
 	}
-	
+
 	public function userAddForm() //(array $post, int $result)
 	{
 		if( isset($_SESSION['lastAction']) )
@@ -558,7 +561,7 @@ class AdminCP extends Base
 
 		return $this->render('members/member.add.html');
 	}
-	
+
 	public function userEditList(array $data, array $sort, $search)
 	{
 		$this->f3->set('data', $data);
