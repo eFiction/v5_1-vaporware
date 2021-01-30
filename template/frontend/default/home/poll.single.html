@@ -1,69 +1,84 @@
 <h4>{{ @data.question }}</h4>
 <br/>
+
+<!-- Main container -->
+<nav class="level">
+  <!-- Left side -->
+  <div class="level-left">
+		{{@LN__PollOpenSince, date(@CONFIG.datetime_format, @data.start_date) | format }}
+  </div>
+
+  <!-- Right side -->
+  <div class="level-right">
+		<check if="{{ @data.end_date==NULL }}"">
+			<true>
+				{{@LN__PollOUFN}}
+			</true>
+			<false>
+				<check if="{{ @data.end_date < time() }}"">
+					<true>
+						{{@LN__PollClosedOn, date(@CONFIG.datetime_format, @data.end_date) | format }}
+					</true>
+					<false>
+						{{@LN__PollCloseOn, date(@CONFIG.datetime_format, @data.end_date) | format }}
+					</false>
+				</check>
+			</false>
+		</check>
+  </div>
+</nav>
+
+
 <check if="{{ @data.canview AND !@data.canvote }}">
 	<check if="{{ @data.votes>0 }}">
 	<true>
 	<repeat group="{{@data.cache}}" key="{{ @option }}" value="{{@res}}" counter="{{ @ctr }}">
 		<p>{{ @option }} ({{ @res }})</p>
-		<progress class="progress is-medium" value="{{ (int)((@data.votes==0)?0:(@res*100*@factor)/@data.votes) }}" max="100">{{@res}}</progress>
+		<progress class="progress is-medium" value="{{ (int)@res*@data.factor }}" max="100">{{@res}}</progress>
 	</repeat>
-
 
 	</true>
 	<false>
-	{LN__*Poll_NoVotes}
+		<section class="hero is-medium">
+			<div class="hero-body">
+				<div class="container">
+					{{@LN__Poll_NoVotes}}
+				</div>
+			</div>
+		</section>
 	</false>
 	</check>
 </check>
 
 <check if="{{ @data.canvote }}">
-<form>
+<form method="post" action="{{@BASE}}/home/polls/id={{@data.id}}">
 	<repeat group="{{@data.options}}" key="{{ @id }}" value="{{@opt}}" counter="{{ @ctr }}">
-		<p><input type="radio" id="option{{@ctr}}" name="poll" value="{{ @id+1 }}" <check if="{{ @data.myvote==(@id+1) }}">checked="checked"</check>>
+		<p><input type="radio" id="option{{@ctr}}" name="option" value="{{ @id+1 }}" <check if="{{ @data.myvote==(@id+1) }}">checked="checked"</check>>
 		<check if="{{ @data.open_voting }}">
 			<true>
 				<label for="option{{@ctr}}">{{ @opt }} ({{ @data['cache'][@opt] }})</label></p>
-				<progress class="progress is-medium" value="{{ (int)((@data.votes==0)?0:((@data['cache'][@opt]*100*@factor)/@data.votes)) }}" max="100">{{@data['cache'][@opt]}}</progress>
+				<progress class="progress is-medium" value="{{ (int)(@data['cache'][@opt]*@data.factor) }}" max="100">{{@data['cache'][@opt]}}</progress>
 			</true>
 			<false>
 				<label for="option{{@ctr}}">{{ @opt }}</label></p><br/>
 			</false>
 		</check>
 	</repeat>
+  <p><input type="radio" name="novote" id="option0" value="0" <check if="{{ empty(@data.myvote) }}">checked="checked"</check> />
+  <label for="option0">**novote</label></p><br/>
 	<check if="{{@_SESSION['userID']}}">
 	<true>
 		<input type="submit">
 	</true>
 	<false>
-		{LN__*LoginToVote}
+		<section class="hero is-small">
+			<div class="hero-body">
+				<div class="container">
+					{{@LN__Poll_LoginToVote}}
+				</div>
+			</div>
+		</section>
 	</false>
 	</check>
 </form>
 </check>
-
-<!-- Main container -->
-<nav class="level">
-  <!-- Left side -->
-  <div class="level-left">
-	{{@LN__PollOpenSince, date(@CONFIG.datetime_format, @data.start_date) | format }}
-  </div>
-
-  <!-- Right side -->
-  <div class="level-right">
-	<check if="{{ @data.end_date==NULL }}"">
-		<true>
-			{{@LN__PollOUFN}}
-		</true>
-		<false>
-			<check if="{{ @data.end_date < time() }}"">
-				<true>
-					{{@LN__PollClosedOn, date(@CONFIG.datetime_format, @data.end_date) | format }}
-				</true>
-				<false>
-					{{@LN__PollCloseOn, date(@CONFIG.datetime_format, @data.end_date) | format }}
-				</false>
-			</check>
-		</false>
-	</check>
-  </div>
-</nav>

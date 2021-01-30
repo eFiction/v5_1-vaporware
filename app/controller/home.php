@@ -9,7 +9,7 @@ class Home extends Base {
 		$this->model = \Model\Home::instance();
 		$this->template = new \View\Home();
 	}
-	
+
 	public function index(\Base $f3, array $params)//: void
 	{
 		switch( @$params['module'] )
@@ -22,9 +22,9 @@ class Home extends Base {
 				break;
 			default:
 				$this->buffer( $this->page($f3, $params) );
-		}		
+		}
 	}
-	
+
 	// maintenance wrapper
 	public function maintenance(\Base $f3)//: void
 	{
@@ -34,7 +34,7 @@ class Home extends Base {
 	public function news(\Base $f3, array $params)//: void
 	{
 		$this->response->addTitle( \Base::instance()->get('LN__News') );
-		
+
 		$this->model->canAdmin('home/news');
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 
@@ -101,6 +101,13 @@ class Home extends Base {
 		}
 	}
 
+	/**
+	* Build template blocks, called from View\frontend
+	*
+	* @param	array		$select		Selection array as parsed from the template
+	*
+	* @return	string						HTML data
+	*/
 	public function blocks(string $select): string
 	{
 		$select = explode(".",$select);
@@ -108,22 +115,23 @@ class Home extends Base {
 		// bad request? no problem, here's your nothing
 		if ( empty($select[0]) )
 			return "";
-		
+
 		elseif ( $select[0]=="news" )
 		{
 			$items = min(($select[1]??1),3);
-			
+
 			$data = $this->model->loadNewsOverview($items);
 			return $this->template->newsBlock($data);
 		}
 		elseif ( $select[0]=="poll" )
 		{
-			$data = $this->model->listPolls();
+			// load n polls (0=unlimited)
+			$data = $this->model->pollListBlock($select[1]??0);
 			return $this->template->pollBlock($data);
 		}
 	}
 
-	public function page(\Base $f3, array $params)//: void
+	public function page(\Base $f3, array $params): string
 	{
 		// did we ask for a page and can it be loaded?
 		if ( isset($params['*']) AND ( [] !== $page = $this->model->loadPage($params['*'])) )
@@ -139,31 +147,38 @@ class Home extends Base {
 			return $this->template->welcome();
 	}
 
-	public function poll(\Base $f3, array $params)//: void
+	public function poll(\Base $f3, array $params): ?string
 	{
+		if ($_SESSION['userID']==0) return "";
+		//\Cache::instance()->clear("pollMenuCount");
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
-		
+
+		$closed = isset($params['closed']);
+
 		// load a selected poll
-		if ( isset($params['id']) AND (int)$params['id']>0 )
+		if ( isset($params['id']) AND 0 < $poll = (int)$params['id'] )
 		{
-			if ( [] !== $data = $this->model->loadPoll((int)$params['id']) )
-				return $this->template->pollSingle($data);
+			// check the _POST for a submitted option from a registered member
+			if  ( $_SESSION['userID']>0 AND ( 0 < $vote = (int)$f3->get('POST.option') ) )
+			 	$this->model->pollVoteSave($poll, $vote);
+
+			if ( [] !== $pollData = $this->model->pollSingle( (int)$params['id'], $closed ) )
+			{
+				$count = $this->model->pollCount();
+				return $this->template->pollAll($pollData, $count, $closed, $params['id'] );
+			}
 			//	tell the user that this request failed *todo*
-			//else 
-		}
-		
-		if ( isset($params['last']) )
-		{
-			$data = $this->model->loadPoll(0);
-			return $this->template->pollSingle($data);
+			//else
 		}
 
 		// page will always be an integer > 0
-		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];
+		$page = max( (int)@$params['page']??0 ,1 );
 
-		$polls = $this->model->listPollArchive($page);
-		return $this->template->pollArchive($polls);
+		$pollData = $this->model->pollList( $page, $closed );
+		$count = $this->model->pollCount();
+
+		return $this->template->pollAll($pollData, $count, $closed );
 	}
-	
+
 }
 ?>

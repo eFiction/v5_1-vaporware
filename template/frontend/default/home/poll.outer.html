@@ -1,0 +1,16 @@
+<div class="columns">
+	<div class="column is-one-fifth has-text-left"><check if="{{@closed}}"><a class="button">{ICON:angle-double-left}&nbsp;**Open</a></check>&nbsp;</div>
+	<div class="column is-three-fifth"><check if="{{isset(@paginate.firstPage)}}"><include href="main/paginate.html" /></check>&nbsp;</div>
+	<div class="column is-one-fifth has-text-right"><check if="{{!@closed}}"><a class="button">**Closed&nbsp;{ICON:angle-double-right}</a></check>&nbsp;</div>
+</div>
+
+<include if="{{ @closed }}" href="home/poll.archive.html" />
+<include if="{{ !@closed }}" href="home/poll.single.html" with="data=$polls[0]"/>
+
+<check if="{{sizeof(@polls)>3}}">
+	<div class="columns">
+		<div class="column is-one-fifth has-text-left"><check if="{{@closed}}"><a class="button">{ICON:angle-double-left}&nbsp;**Open</a></check>&nbsp;</div>
+		<div class="column is-three-fifth"><check if="{{isset(@paginate.firstPage)}}"><include href="main/paginate.html" /></check>&nbsp;</div>
+		<div class="column is-one-fifth has-text-right"><check if="{{!@closed}}"><a class="button">**Closed&nbsp;{ICON:angle-double-right}</a></check>&nbsp;</div>
+	</div>
+</check>

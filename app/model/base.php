@@ -273,14 +273,14 @@ class Base extends \Prefab {
 	protected function paginate(int $total, string $route, int $limit=10)
 	{
 		/**
-			Implementing parts of the
+		*	Implementing parts of the
 
-			Pagination class for the PHP Fat-Free Framework
-			Copyright (c) 2012 by ikkez
-			Christian Knuth <mail@ikkez.de>
-			@version 1.4.1
+		*	Pagination class for the PHP Fat-Free Framework
+		*	Copyright (c) 2012 by ikkez
+		*	Christian Knuth <mail@ikkez.de>
+		*	@version 1.4.1
 
-			found at: https://github.com/ikkez/F3-Sugar/blob/master-v3/Pagination/pagination.php
+		*	found at: https://github.com/ikkez/F3-Sugar/blob/master-v3/Pagination/pagination.php
 		**/
 		$f3 = \Base::instance();
 
@@ -288,8 +288,8 @@ class Base extends \Prefab {
 		$prefix = "/page=";
 
 		// Get max page number
-		$count = ceil($total/$limit);
-		if ($count<2) return TRUE;
+		if ( 2 > $count = ceil($total/$limit) )
+			return;
 		// Current page should be at least 1, and $count at max
 		$page = (int)min(max(1,$f3->get('paginate.page')),$count);
 
@@ -320,17 +320,30 @@ class Base extends \Prefab {
 		]);
 	}
 
-	public function pollBuildCache(int $pollID): array
+	/**
+	* (re)build poll cache
+	* 2021-01-10 re-write
+	*
+	* @param	int							$pollID 	selected poll
+	* @param	\DB\SQL\Mapper	$poll 		mapper to this poll
+	* @param	\DB\SQL\Mapper	$ballots 	mapper to the votes
+	*
+	* @return array						cache data
+	*/
+	public function pollBuildCache(int $pollID, \DB\SQL\Mapper $poll = NULL, \DB\SQL\Mapper $ballots = NULL): ?array
 	{
-		// create a db map
-		$poll = new \DB\SQL\Mapper($this->db, $this->prefix.'poll');
-		$poll->load(array('poll_id=?',$pollID));
+		// Open a new poll mapper if required
+		if ( !$poll )
+		{
+			$poll = new \DB\SQL\Mapper($this->db, $this->prefix."poll");
+			$poll->load(["poll_id = ?",$pollID]);
+		}
 
 		// attempt a safe retreat when there is no such poll
 		if ( NULL === $poll->poll_id )
-			return [];
+			return NULL;
 
-		// we need the options array for both styles
+		// where there are no options, there is no poll
 		if ( "" == $options = json_decode($poll->options, TRUE) )
 		{
 			// empty poll
@@ -339,45 +352,31 @@ class Base extends \Prefab {
 			return array();
 		}
 
-		foreach ( $options as $key => $opt )
-			$cache[$key]["opt"] = $opt;
-
 		if ( $poll->results == NULL )
 		// new style poll
 		{
-			$sql = "SELECT V.option, COUNT(DISTINCT vote_id) as votes
-						FROM `tbl_poll_votes`V
-					WHERE V.poll_id = {$poll->poll_id}
-					GROUP BY V.option;";
-			$votes = $this->exec($sql);
-
-			$poll->votes = sizeof($votes);
-
-			if ( sizeof($votes)>0 )
-			foreach ( $votes as $vote )
-			// sql results start with index 1, so we have to adjust for the options that start with index 0
-				$cache[($vote['option']-1)]["res"] = $vote['votes'];
+			// grab _all_ votes from the stack
+			$votes = $ballots ?: new \DB\SQL\Mapper($this->db, $this->prefix."poll_votes");
+			// count their votes, not very afficient but with a limited data set, it should do
+			foreach ($options as $key => $option)
+				$cache_array[$option] = $votes->count('poll_id='.$pollID.' AND option='.($key+1));
+			// save JSON
+			$poll->votes = $votes->count('poll_id='.$pollID);
 		}
 		else
 		// old style poll. this should have been done during upgrade, but just to be on the shaved side of things
 		{
 			$results = json_decode($poll->results, TRUE);
-			foreach ( $results as $key => $res )
-				$cache[$key]["res"] = $res;
+			foreach ( $results as $key => $value )
+				$cache_array[$options[$key]] = $value;
 			$poll->votes = array_sum($results);
 		}
 
-		// assign votes or "0" to the options
-		foreach ( $cache as $c )
-			$data['cache'][$c['opt']] = $c['res']??0;
-		// ... and sort by votes
-		arsort( $data['cache'], SORT_NUMERIC  );
-
-		// write the array to the database
-		$poll->cache = json_encode($data['cache']);
+		// numeric sorting, disabled
+		//arsort( $cache_array, SORT_NUMERIC  );
+		$poll->cache = json_encode($cache_array);
 		$poll->save();
-
-		return $data['cache'];
+		return $cache_array;
 	}
 
 	/*

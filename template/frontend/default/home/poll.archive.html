@@ -1,7 +1,7 @@
-<F3:check if="{{isset(@paginate.firstPage)}}"><include href="main/paginate.html" /></F3:check>
+<h6>{{@LN__PollBox}}</h6>
 
 <repeat group="{{@polls}}" value="{{@poll}}" counter="{{ @ctr }}">
-	<div class="notification is-transparent has-border">
+	<div class="notification is-transparent has-border" id="poll{{@poll.id}}">
 		<div class="columns is-gapless is-multiline">
 			<div class="column is-half">{{ @LN__PollOpenSince, date(@CONFIG.datetime_format, @poll.start_date) | format }}</div>
 			<div class="column is-half has-text-right">
@@ -10,36 +10,52 @@
 						{{@LN__PollOUFN}}
 					</true>
 					<false>
-						<check if="{{ @poll.end_date < time() }}"">
-							<true>
-								{{@LN__PollClosedOn, date(@CONFIG.datetime_format, @poll.end_date) | format }}
-							</true>
-							<false>
-								{{@LN__PollCloseOn, date(@CONFIG.datetime_format, @poll.end_date) | format }}
-							</false>
-						</check>
+						<check if=" {{ @poll.end_date < time() }}"">
+					<true>
+						{{@LN__PollClosedOn, date(@CONFIG.datetime_format, @poll.end_date) | format }}
+					</true>
+					<false>
+						{{@LN__PollCloseOn, date(@CONFIG.datetime_format, @poll.end_date) | format }}
 					</false>
 				</check>
+				</false>
+				</check>
 			</div>
-		
-			<div class="column is-full has-text-centered"><p>{{@poll.question}}</p></div>
+			<div class="column is-full has-text-centered">
+				<p>{{@poll.question}}</p>
+			</div>
 			<div class="column is-full">
 				<check if="{{ @poll.votes>0 }}">
-				<true>
-					<span class="polltoggle">
-						<span class="polltoggle_more"><i class="fas fa-caret-square-down fa-fw"></i> {{@LN__ShowDetails}}</span>
-						<span class="polltoggle_less" style="display:none"><i class="fas fa-caret-square-up fa-fw"></i> {{@LN__HideDetails}}</span>
-					</span>
-					<span class="polltoggle_container" style="display:none">
-					<repeat group="{{@poll.cache}}" key="{{ @option }}" value="{{@res}}" counter="{{ @ctr }}">
-						<p>{{ @option }} ({{ @res }})</p>
-						<progress class="progress is-success" value="{{ (int)((@res*100*@poll.factor)/@poll.votes) }}" max="100">{{@res}}</progress>
-					</repeat>
-					</span>
-				</true>
-				<false>
-					{{@LN__Poll_NoVotes}}
-				</false>
+					<true>
+						<check if="{{ @poll.canvote==0 }}">
+							<true>
+									<check if="{{@poll.id==@selected}}">
+										<true>
+										<span class="polltoggle">
+											<span class="polltoggle_more" style="display:none"><i class="fas fa-caret-square-down fa-fw"></i> {{@LN__ShowDetails}}</span>
+											<span class="polltoggle_less"><i class="fas fa-caret-square-up fa-fw"></i> {{@LN__HideDetails}}</span>
+										</span>
+										<span class="polltoggle_container">
+										</true>
+										<false>
+											<span class="polltoggle">
+											<span class="polltoggle_more"><i class="fas fa-caret-square-down fa-fw"></i> {{@LN__ShowDetails}}</span>
+											<span class="polltoggle_less" style="display:none"><i class="fas fa-caret-square-up fa-fw"></i> {{@LN__HideDetails}}</span>
+										</span>
+										<span class="polltoggle_container" style="display:none">
+										</false>
+									</check>
+									<repeat group="{{@poll.cache}}" key="{{ @option }}" value="{{@res}}" counter="{{ @ctr }}">
+										<p>{{ @option }} ({{ @res }})</p>
+										<progress class="progress is-success" value="{{ (int)(@res*@poll.factor) }}" max="100">{{@res}}</progress>
+									</repeat>
+								</span>
+							</true>
+						</check>
+					</true>
+					<false>
+						{{@LN__Poll_NoVotes}}
+					</false>
 				</check>
 			</div>
 		</div>
@@ -47,25 +63,29 @@
 </repeat>
 
 <script>
-$('.polltoggle').click(function(event) {
-	// remember the state of the selected container
-	var showdiv = $(this).nextAll('.polltoggle_container').attr("style");
-	// close all containers
-	$('.polltoggle_container').hide();
-	// reset all show/hide buttons
-    $('.polltoggle_less').hide();
-    $('.polltoggle_more').show();
-	// was the selected container invisible before
-	if (showdiv!='')
-	{
-		// then show it
-		$(this).nextAll('.polltoggle_container').show();
-		// and change its' button
-		$(this).children('.polltoggle_less').show();
-		$(this).children('.polltoggle_more').hide();
-	}
-	// done, don't go anywhere
-    event.preventDefault()
-});
+	$('.polltoggle').click(function(event) {
+		// remember the state of the selected container
+		var showdiv = $(this).nextAll('.polltoggle_container').attr("style");
+		// close all containers
+		$('.polltoggle_container').hide();
+		// reset all show/hide buttons
+		$('.polltoggle_less').hide();
+		$('.polltoggle_more').show();
+		// was the selected container invisible before
+		if (showdiv != '') {
+			// then show it
+			$(this).nextAll('.polltoggle_container').show();
+			// and change its' button
+			$(this).children('.polltoggle_less').show();
+			$(this).children('.polltoggle_more').hide();
+		}
+		// done, don't go anywhere
+		event.preventDefault()
+	});
+
+	// jump to selected poll, if any
+	$(function() {
+		var top = document.getElementById('poll{{@selected}}').offsetTop;
+		window.scrollTo(0, top);
+	});
 </script>
-<F3:check if="{{isset(@paginate.firstPage) AND sizeof(@polls)>4}}"><include href="main/paginate.html" /></F3:check>
