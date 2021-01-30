@@ -27,7 +27,7 @@ class Story extends Base
 	public function buildTOC($tocData, $storyData)
 	{
 		$this->javascript('body', TRUE, 'jquery.columnizer.js' );
-		$this->javascript('body', FALSE, "$(function(){ $('.columnize').columnize({ columns: 2 }); });" );
+		$this->javascript('body', FALSE, "$(function(){ $('.chapter-box').addClass(\"dontsplit\"); $('.columnize').columnize({ width: 400 }); });" );
 
 		$this->f3->set('tocData', $tocData);
 		$this->f3->set('storyID', $storyData['sid']);

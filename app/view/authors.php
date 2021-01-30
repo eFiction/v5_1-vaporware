@@ -22,8 +22,9 @@ class Authors extends Base
 		// List authors for a specific letter
 		if ( $letter )
 		{
-			$columns = min ( \Config::getPublic('author_letter_columns'), ceil (sizeof($list)/5) );
-			$this->javascript('body', FALSE, "$(function(){ $('.author-grid-wrapper').addClass(\"dontsplit\"); $('.columnize').columnize({ columns: {$columns}, lastNeverTallest: true }); });" );
+			//$columns = min ( \Config::getPublic('author_letter_columns'), ceil (sizeof($list)/5) );
+			//$this->javascript('body', FALSE, "$(function(){ $('.author-grid-wrapper').addClass(\"dontsplit\"); $('.columnize').columnize({ columns: {$columns}, lastNeverTallest: true }); });" );
+			$this->javascript('body', FALSE, "$(function(){ $('.author-grid-wrapper').addClass(\"dontsplit\"); $('.columnize').columnize({ width: 300, lastNeverTallest: true }); });" );
 
 			$this->f3->set('letter',   $letter);
 			$this->f3->set('viewtype', 'small');
@@ -31,7 +32,8 @@ class Authors extends Base
 		// List all authors
 		else
 		{
-			$this->javascript('body', FALSE, "$(function(){ $('.author-grid-wrapper').addClass(\"dontsplit\"); $('.columnize').columnize({ columns: ".\Config::getPublic('author_overview_columns').", lastNeverTallest: true }); });" );
+			//$this->javascript('body', FALSE, "$(function(){ $('.author-grid-wrapper').addClass(\"dontsplit\"); $('.columnize').columnize({ columns: ".\Config::getPublic('author_overview_columns').", lastNeverTallest: true }); });" );
+			$this->javascript('body', FALSE, "$(function(){ $('.author-grid-wrapper').addClass(\"dontsplit\"); $('.columnize').columnize({ width: 300, lastNeverTallest: true }); });" );
 
 			$this->f3->set('viewtype', 'full');
 		}

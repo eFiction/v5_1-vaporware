@@ -1,8 +1,8 @@
 <div class="columnize">
  <repeat group="{{ @tocData }}" value="{{ @toc }}">
-  <div>
+  <div class="chapter-box">
 		[{{ @toc.chapter }}] <a href="{{@BASE}}/story/read/{{@storyID}},{{ @toc.chapter }}">{{ @toc.title }}</a> <check if="{{ @toc['last'] }}==1" >{ICON:visible}</check>
-		<div class="story-info2">
+		<div>
 			{{ @toc.wordcount }} {{@LN__Words}}  &bull;  <a href="{{@BASE}}/story/reviews/{{@storyID}},{{ @toc.chapter }}">{{ @LN__Review_Link_TOC, @toc.reviews | format }}</a>
 		</div>
   </div>
