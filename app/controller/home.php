@@ -159,8 +159,8 @@ class Home extends Base {
 		if ( isset($params['id']) AND 0 < $poll = (int)$params['id'] )
 		{
 			// check the _POST for a submitted option from a registered member
-			if  ( $_SESSION['userID']>0 AND ( 0 < $vote = (int)$f3->get('POST.option') ) )
-			 	$this->model->pollVoteSave($poll, $vote);
+			if  ( $_SESSION['userID']>0 AND isset($_POST['option']) )
+			 	$this->model->pollVoteSave($poll, (int)$f3->get('POST.option'));
 
 			if ( [] !== $pollData = $this->model->pollSingle( (int)$params['id'], $closed ) )
 			{

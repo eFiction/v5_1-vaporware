@@ -252,14 +252,22 @@ class Home extends Base
 		// open the voting booth
 		$ballot = new \DB\SQL\Mapper($this->db, $this->prefix."poll_votes");
 		// load this user's ballot
-		if(!$ballot->load(["poll_id=? AND uid=?",$pollID,$_SESSION['userID']]))
+		if( !$ballot->load(["poll_id=? AND uid=?",$pollID,$_SESSION['userID']]) AND $vote )
 		{
 			$ballot->poll_id = $pollID;
 			$ballot->uid		 = $_SESSION['userID'];
 		}
-		$ballot->option = $vote;
-		$caching = $ballot->changed('option');
-		$ballot->save();
+		if ( $vote )
+		{
+			$ballot->option = $vote;
+			$caching = $ballot->changed('option');
+			$ballot->save();
+		}
+		else
+		{
+			$ballot->erase();
+			$caching = TRUE;
+		}
 
 		// recreate cache if required
 		if ( $caching ) $this->pollBuildCache($pollID, $voting, $ballot);

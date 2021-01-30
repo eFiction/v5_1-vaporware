@@ -64,7 +64,7 @@
 			</false>
 		</check>
 	</repeat>
-  <p><input type="radio" name="novote" id="option0" value="0" <check if="{{ empty(@data.myvote) }}">checked="checked"</check> />
+  <p><input type="radio" name="option" id="option0" value="0" <check if="{{ empty(@data.myvote) }}">checked="checked"</check> />
   <label for="option0">**novote</label></p><br/>
 	<check if="{{@_SESSION['userID']}}">
 	<true>
