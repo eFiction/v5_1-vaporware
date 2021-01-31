@@ -3,21 +3,21 @@
 namespace Controller;
 
 class Authors extends Base {
-	
+
 	public function __construct()
 	{
 		$this->model = \Model\Authors::instance();
 		$this->template = new \View\Authors();
 	}
 
-	public function index(\Base $f3, array $params)//: void
+	public function index(\Base $f3, array $params): void
 	{
 		if ( isset($params['*']) ) $this->parametric($params['*']);
-		
+
 		// set header
 		$header[] = $f3->get('LN__Authors');
 
-		if ( empty($params['id']) )
+		if ( empty($params['*']) )
 		{
 			// Build menu letters
 			$letters = $this->model->letters();
@@ -32,21 +32,22 @@ class Authors extends Base {
 			}
 			else $content = NULL;
 		}
-		elseif ( preg_match("/[a-zA-Z#].*/", $params['id']) )
+		elseif ( preg_match("/[a-zA-Z#].*/", $params['*'][0]) )
 		{
 			// Build menu letters
 			$letters = $this->model->letters();
 
 			// load list of authors starting with letter
-			$letter = $params['id'][0];
+			$letter = $params['*'][0];
 			$data = $this->model->getAuthors($letter);
+
 			// build view
 			$content = $this->template->listing($data, $letter);
 		}
 		elseif ( is_numeric($params['id']) )
 		{
 			$this->buffer ( "{BLOCK:profile.{$params['id']}}", "RIGHT" );
-			list($authorInfo, $content) = \Controller\Story::instance()->author($params['id']);//$this->profile();
+			list($authorInfo, $content) = \Controller\Story::instance()->author($params['id']);
 
 			$header[] = $authorInfo;
 		}
@@ -54,7 +55,7 @@ class Authors extends Base {
 		// build letter list only if there are authors
 		if(!empty($letters)) $menu = $this->model->menuLetters($letters);
 		else $menu = NULL;
-		
+
 		// output
 		$this->buffer ( $this->template->page($header , $menu, $content) );
 	}
