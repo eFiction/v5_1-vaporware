@@ -1,50 +1,51 @@
-<div class="columns">
-	<div class="column">
-<repeat group="{{ @data }}" value="{{ @entry }}" counter="{{ @ctr }}">
-	<div class="story-box">
-		<div class="story-list-head"><a href="{{@BASE}}/story/{{@type}}/id={{@entry.collid}}">{{@entry.title}}</a> {{@LN__by}} <repeat group="{{@entry.cache_authors}}" value="{{@author}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check><a href="{{@BASE}}/members/{{@author.1}}">{{@author.1}}</a></repeat></div>
-		<div class="story-list-actions">
-			&nbsp;
-			<check if="{{ @SESSION['userID']>0 }}">
-				<a href="{{@BASE}}/userCP/library/bookmark/edit/id={{ @type=="collections" ? "CO" : "SE" }},{{@entry.collid}};returnpath={{@PATH}}">
-					<check if="{{isset(@entry.is_favourite.1)}}">
-						<true>{ICON:bookmark:{{@LN__BookmarkRemove, @entry.title | format}}}</true>
-						<false>{ICON:bookmark-off:{{@LN__BookmarkAdd, @entry.title | format}}}</false>
-					</check>
-				</a>&nbsp;
-				<check if="{{isset(@entry.is_favourite.0)}}">
-					<true>
-						<a href="{{@BASE}}/userCP/library/favourite/edit/id={{ @type=="collections" ? "CO" : "SE" }},{{@entry.collid}};returnpath={{@PATH}}" title="{{@LN__FavouriteRemove, @entry.title | format}}">{ICON:favourite}
-					</true>
-					<false>
-						<a href="{{@BASE}}/userCP/library/favourite/edit/id={{ @type=="collections" ? "CO" : "SE" }},{{@entry.collid}};returnpath={{@PATH}}" title="{{@LN__FavouriteAdd, @entry.title | format}}">{ICON:favourite-off}
-					</false>
-				</check>
-				</a>&nbsp;
-			</check>
-			<check if="{{@entry.reviews>0}}">
-				<a href="{{@BASE}}/story/reviews/{{@entry.collid}}" title="{{@LN__TitleReadReviews, @entry.title | format}}">{ICON:comments} {{@entry.reviews}}</a>
-			</check>
-		</div>
-		<div>{{@entry.summary}}</div>
-		<check if="{{!empty(@entry.cache_categories)}}">
-			<div>{ICON:folder} <repeat group="{{@entry.cache_categories}}" value="{{@category}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check>{{@category.1}}</repeat></div>
-		</check>
-		<div class="tags">{ICON:tags}&nbsp;
-			<check if="{{isset(@entry.cache_tags.0)}}">
-				<true><repeat group="{{@entry.cache_tags}}" value="{{@tag}}"><span class="tag">{{@tag.1}}</span></repeat></true>
-				<false>{{@LN__NoTags}}</false>
-			</check>
-		</div>
-		<div class="tags">{ICON:members}&nbsp;
-			<check if="{{isset(@entry.cache_characters.0)}}">
-				<true><repeat group="{{@entry.cache_characters}}" value="{{@chara}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}"> </check><span class="tag">{{@chara.1}}</span></repeat></true>
-				<false>{{@LN__NoTags}}</false>
-			</check>
-		</div>
+<div class="columns is-multiline">
 
-		<div class="story-list-info">{{ @type=='collections' ? @LN__Stories : @LN__Episodes }}: {{@entry.stories}} &bull; {{@LN__Chapters}}: {{@entry.chapters}} &bull; {{@LN__Words}}: {{@entry.wordcount}} &bull; {{@LN__MaxRating}}: {{@entry.max_rating.0}}<check if="{{ @type=='collections' }}"> &bull; {{ ${"LN__CollectionOpen_".@entry.open} }}</check></div>
+<repeat group="{{ @data }}" value="{{ @entry }}" counter="{{ @ctr }}">
+	<div class="column my-2 is-full has-border">
+		<div class="has-border-bottom is-size-5"><a href="{{@BASE}}/story/{{@type}}/id={{@entry.collid}}">{{@entry.title}}</a> {{@LN__by}} <repeat group="{{@entry.cache_authors}}" value="{{@author}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check><a href="{{@BASE}}/members/{{@author.1}}">{{@author.1}}</a></repeat></div>
+		<div class="columns my-1">
+			<div class="column is-10">
+				<check if="{{!empty(@entry.cache_categories)}}">
+					<div class="tags">
+						<repeat group="{{@entry.cache_categories}}" value="{{@category}}"><span class="tag">{ICON:folder}&nbsp;{{@category.1}}</span></repeat>
+					</div>
+				</check>
+			</div>
+			<div class="column is-2 has-text-right">
+				&nbsp;
+				<check if="{{ @SESSION['userID']>0 }}">
+					<a href="{{@BASE}}/userCP/library/bookmark/edit/id={{ @type=="collections" ? "CO" : "SE" }},{{@entry.collid}};returnpath={{@PATH}}">
+						<check if="{{isset(@entry.is_favourite.1)}}">
+							<true>{ICON:bookmark:{{@LN__BookmarkRemove, @entry.title | format}}}</true>
+							<false>{ICON:bookmark-off:{{@LN__BookmarkAdd, @entry.title | format}}}</false>
+						</check>
+					</a>&nbsp;
+					<check if="{{isset(@entry.is_favourite.0)}}">
+						<true>
+							<a href="{{@BASE}}/userCP/library/favourite/edit/id={{ @type=="collections" ? "CO" : "SE" }},{{@entry.collid}};returnpath={{@PATH}}" title="{{@LN__FavouriteRemove, @entry.title | format}}">{ICON:favourite}</a>
+						</true>
+						<false>
+							<a href="{{@BASE}}/userCP/library/favourite/edit/id={{ @type=="collections" ? "CO" : "SE" }},{{@entry.collid}};returnpath={{@PATH}}" title="{{@LN__FavouriteAdd, @entry.title | format}}">{ICON:favourite-off}</a>
+						</false>
+					</check>
+					&nbsp;
+				</check>
+				<check if="{{@entry.reviews>0}}">
+					<a href="{{@BASE}}/story/reviews/{{@entry.collid}}" title="{{@LN__TitleReadReviews, @entry.title | format}}">{ICON:comments} {{@entry.reviews}}</a>
+				</check>
+			</div>
+		<div>{{@entry.summary}}</div>
+		<div class="tags">
+			<check if="{{isset(@entry.cache_tags.0)}}">
+				<true><repeat group="{{@entry.cache_tags}}" value="{{@tag}}"><span class="tag">{ICON:tags}&nbsp;{{@tag.1}}</span></repeat></true>
+				<false>{{@LN__NoTags}}</false>
+			</check>
+			<check if="{{isset(@entry.cache_characters.0)}}">
+				<repeat group="{{@entry.cache_characters}}" value="{{@chara}}"><span class="tag">{ICON:member}&nbsp;{{@chara.1}}</span></repeat>
+			</check>
+		</div>
+		<div class="has-text-centered is-size-7">{{ @type=='collections' ? @LN__Stories : @LN__Episodes }}: {{@entry.stories}} &bull; {{@LN__Chapters}}: {{@entry.chapters}} &bull; {{@LN__Words}}: {{@entry.wordcount}} &bull; {{@LN__MaxRating}}: {{@entry.max_rating.0}}<check if="{{ @type=='collections' }}"> &bull; {{ ${"LN__CollectionOpen_".@entry.open} }}</check></div>
 	</div>
 </repeat>
 
-</div></div>
+</div>

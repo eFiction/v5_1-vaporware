@@ -8,11 +8,11 @@
 <div class="columns">
 	<div class="column">
 	<repeat group="{{ @entries }}" value="{{ @entry }}" counter="{{ @ctr }}">
-		<div class="story-box">
-			<div class="story-list-head">
+		<div class="has-border">
+			<div class="has-border-bottom">
 				<check if="{{@entry.type=='ST'}}">
 					<true>
-						{ICON:text}<a href="{{@BASE}}/story/read/{{@entry.id}}">{{@entry.title}}</a>
+						<a href="{{@BASE}}/story/read/{{@entry.id}}">{{@entry.title}}</a>
 					</true>
 					<false>
 						<check if="{{ @entry.ordered }}">
@@ -28,7 +28,7 @@
 				{{@LN__by}} <repeat group="{{@entry.cache_authors}}" value="{{@author}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check><a href="{{@BASE}}/members/{{@author.1}}">{{@author.1}}</a></repeat>
 			</div>
 			<check if="{{!empty(@entry.cache_categories)}}">
-				<div>{ICON:folder} <repeat group="{{@entry.cache_categories}}" value="{{@category}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check>{{@category.1}}</repeat></div>
+				<div>{ICON:folder}&nbsp; <repeat group="{{@entry.cache_categories}}" value="{{@category}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}">, </check>{{@category.1}}</repeat></div>
 			</check>
 			<div class="tags">{ICON:tags}&nbsp;
 				<check if="{{isset(@story.all_tags.0)}}">

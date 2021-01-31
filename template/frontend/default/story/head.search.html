@@ -69,7 +69,7 @@
 
 <div class="buttons-alignment"><check if="{{!empty(@searchLink)}}"><a class="button is-light" href="{{@BASE}}/story/browse/{{@searchLink}}<check if="{{isset(@paginate.page)}}">/page={{@paginate.page}}</check>">{{@LN__HideSearchForm}}</a></check></div>
 
-</form>
+</form><p class="mt-6"></p>
 <script type="text/javascript">
 $(document).ready(function() {
     $("#tagIn-select").tokenInput("{{@BASE}}/story/ajax/search",{

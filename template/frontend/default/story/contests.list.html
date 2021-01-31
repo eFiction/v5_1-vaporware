@@ -1,11 +1,12 @@
 <F3:check if="{{isset(@paginate.firstPage)}}"><include href="main/paginate.html" /></F3:check>
+<div class="columns is-multiline">
 <repeat group="{{ @contests }}" value="{{ @contest }}" counter="{{ @ctr }}">
-	<div class="contest-box">
-		<div class="contest-list-head">
+	<div class="column my-2 is-full has-border">
+		<div class="has-border-bottom">
 		<nav class="level">
 			<!-- Left side -->
 			<div class="level-left">
-				<div class="level-item">
+				<div class="level-item is-size-5">
 					<a href="{{@BASE}}/story/contests/id={{@contest.conid}}<check if="{{isset(@paginate.page)}}">;returnpath=/story/contests/page={{@paginate.page}}</check>">{{@contest.title}}</a>
 				</div>
 			</div>
@@ -16,29 +17,31 @@
 				<p class="level-item">votable: {{@contest.votable}}</p>
 			</div>
 		</nav>
-			
+
 		</div>
-		<check if="{{!empty(@contest.summary)}}">
-			<true><div class="contest-list-summary">{{@contest.summary |raw}}</div></true>
-			<false><div class="column is-full"><b>{{@LN__Description}}:</b> {{nl2br(@contest.description),200 | cropmore,raw }}</div></false>
-		</check>
+
 		<check if="{{!empty(@contest.cache_categories)}}">
-			<div class="tags">{ICON:folder}
-				<repeat group="{{@contest.cache_categories}}" value="{{@category}}"><span class="tag">{{@category.1}}</span></repeat>
+			<div class="tags mb-0 py-0">
+				<repeat group="{{@contest.cache_categories}}" value="{{@category}}"><span class="tag">{ICON:folder}&nbsp;{{@category.1}}</span></repeat>
 			</div>
 		</check>
-		<div class="tags">{ICON:tags}&nbsp;
-			<check if="{{isset(@contest.cache_tags.simple.0)}}">
-				<true><repeat group="{{@contest.cache_tags.simple}}" value="{{@tag}}"><span class="tag">{{@tag.1}}</span></repeat></true>
-				<false><span class="tag">{{@LN__NoTags}}</span></false>
-			</check>
+
+		<div class="py-4">
+			<check if="{{!empty(@contest.summary)}}">
+			<true>{{@contest.summary |raw}}</true>
+			<false><b>{{@LN__Description}}:</b> {{nl2br(@contest.description),200 | cropmore,raw }}</false>
+		</check>
 		</div>
-		<div class="tags">{ICON:members}&nbsp;
+
+		<div class="tags">
+			<check if="{{isset(@contest.cache_tags.simple.0)}}">
+				<repeat group="{{@contest.cache_tags.simple}}" value="{{@tag}}"><span class="tag">{ICON:tags}&nbsp;{{@tag.1}}</span></repeat>
+			</check>
 			<check if="{{isset(@contest.cache_characters.0)}}">
-				<true><repeat group="{{@contest.cache_characters}}" value="{{@chara}}" counter="{{ @ctr }}"><check if="{{@ctr > 1 }}"> </check><span class="tag">{{@chara.1}}</span></repeat></true>
-				<false><span class="tag">{{@LN__NoCharacters}}</span></false>
+				<repeat group="{{@contest.cache_characters}}" value="{{@chara}}"><span class="tag">{ICON:member}&nbsp;{{@chara.1}}</span></repeat>
 			</check>
 		</div>
 	</div>
 </repeat>
+</div>
 <F3:check if="{{isset(@paginate.firstPage) AND sizeof(@contests)>1}}"><include href="main/paginate.html" /></F3:check>

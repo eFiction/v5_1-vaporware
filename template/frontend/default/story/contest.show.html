@@ -3,8 +3,10 @@
 	<div class="column is-one-half">
 		<div class="is-pulled-right"><a class="button" <check if="{{ @data.entries>0 }}">href="{{@BASE}}/story/contests/id={{@data.id}}/entries"</check>>{{@LN__Entries, @data.entries | format }}</a></div>
 	</div>
+
 	<div class="column is-full"><h4>{{@data.title}}<br />{{@LN__by}} <a href="{{@BASE}}/members/{{@data.username}}">{{@data.username}}</a></h4></div>
-	<div class="column is-one-third">
+
+	<div class="column mx-2 is-third has-border">
 		<switch expr="{{ @data.active }}">
 			<case value="preparing" break="TRUE">
 				<check if="{{ empty(@data.date_open) }}">
@@ -26,7 +28,7 @@
 			</case>
 		</switch>
 	</div>
-	<div class="column is-one-third">
+	<div class="column mx-2 is-third has-border">
 		<switch expr="{{ @data.active }}">
 			<case value="preparing" break="TRUE">
 				<check if="{{ empty(@data.date_close) }}">
@@ -48,7 +50,7 @@
 			</case>
 		</switch>
 	</div>
-	<div class="column is-one-third">
+	<div class="column mx-2 is-third has-border">
 		<switch expr="{{ @data.votable }}">
 			<case value="preparing" break="TRUE">
 				{LN__ContestVotePrepare}
@@ -76,7 +78,5 @@
 		<div class="column is-full"><b>{{@LN__Summary}}:</b> {{@data.summary | raw}}</div>
 	</check>
 	<div class="column is-full"><b>{{@LN__Description}}:</b> {{nl2br(@data.description),500 | cropmore,raw }}</div>
-
 	<hr />
-
 </div>

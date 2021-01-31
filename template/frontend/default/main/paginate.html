@@ -1,4 +1,3 @@
-<br />
 <nav class="pagination is-centered" role="navigation" aria-label="pagination">
   <a class="pagination-previous" {{(@paginate.page==1) ? 'disabled' : 'href="'.@BASE . @paginate.route . @paginate.prefix.(@paginate.page-1).'"'}}>{ICON:angle-double-left}&nbsp;{{@LN__PrevPage}}</a>
   <a class="pagination-next" {{(@paginate.page==@paginate.count) ? 'disabled' : 'href="'.@BASE . @paginate.route . @paginate.prefix.(@paginate.page+1).'"'}}>{{@LN__NextPage}}&nbsp;{ICON:angle-double-right}</a>
@@ -31,4 +30,3 @@
 	</check>
   </ul>
 </nav>
-<br />

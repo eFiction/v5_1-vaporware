@@ -6,12 +6,12 @@
 		</check>
 	</h4>
 
-	<div class="calendar">
+	<div>
 		<check if="{{@data.BACK}}"><true><a href="javascript:getCalendar('{{ @data.BACK }}');">{ICON:angle-left:}</a></true><false>{ICON:angle-left}</false></check>
 		<check if="{{@data.TODAY}}"><true><a href="javascript:getCalendar('{{ @data.TODAY }}');">{ICON:calendar:current}</a></true><false>{ICON:calendar}</false></check>
 		<check if="{{@data.FORWARD}}"><true><a href="javascript:getCalendar('{{ @data.FORWARD }}');">{ICON:angle-right:forward}</a></true><false>{ICON:angle-right}</false></check>
 	</div>
-	<table class="table is-bordered is-striped is-narrow is-hoverable">
+	<table class="table is-bordered is-striped is-narrow is-hoverable is-fullwidth">
 		<tbody>
 			<tr>
 			<repeat group="{{ @data.CELLS }}" value="{{ @cell }}" counter="{{ @ctr }}">

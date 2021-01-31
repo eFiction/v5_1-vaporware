@@ -8,7 +8,7 @@
 
 <!-- open main container -->
 	<div class="container is-fullhd">
-		
+
 		<check if="{{TRUE==\Config::getPublic('maintenance')}}">
 			<article class="message is-warning">
 				<div class="message-body">
@@ -21,7 +21,8 @@
 		</check>
 
 		<a href="{{@BASE}}"><h1>{{@CONFIG.page_title}}</h1></a> {{@CONFIG.page_slogan}}
-		{BLOCK:menu.main}
+
+		<p class="mt-6"></p>
 		
 		<!-- start columns -->
 		<div class="columns">
@@ -34,7 +35,7 @@
 			<!-- regular pages -->
 			<false>
 				<div class="column is-2 is-hidden-touch">
-						{BLOCK:story.tagcloud.20}
+					{BLOCK:story.tagcloud.20}
 					{BLOCK:shoutbox}
 					{{@LEFT}}
 				</div>
@@ -54,7 +55,7 @@
 		<check if="{{ isset(@title_h1) }}">
 				<h1>{{ @title_h1 }}</h1>
 		</check>
-			
+
 		<check if="{{ isset(@title_h3) }}">
 				<h3>{{ @title_h3 }}</h3>
 		</check>
@@ -71,7 +72,7 @@
 			</div>
 		</check>
 		</div><!-- end columns -->
-		
+
 	<!-- end main container -->
 	</div>
 

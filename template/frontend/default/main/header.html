@@ -1,5 +1,8 @@
-<form method="post" action="{{ @BASE }}/login">
-<nav class="navbar has-shadow" role="navigation" aria-label="main navigation">
+<div class="columns">
+	{BLOCK:menu.main} 
+ <div class="column">
+  <form method="post" action="{{ @BASE }}/login">
+	<nav class="navbar" role="navigation" aria-label="main navigation">
 	<div class="navbar-menu">
 	<check if="{{ @SESSION['userID']==0 }}">
 		<true>
@@ -41,7 +44,8 @@
 			</div>
 		</false>
 	</check>
+	<input type="hidden" name="returnpath" value="{{ @PATH }}" />
+	</form>
 	</div>
+ </div>
 </nav>
-<input type="hidden" name="returnpath" value="{{ @PATH }}" />
-</form>
