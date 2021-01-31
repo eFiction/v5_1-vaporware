@@ -19,10 +19,10 @@ class Authors extends Base
 				ORDER BY U.username ASC";
 		$authors = $this->exec($sql,[ ":letter" => $letter."%"]);
 		if(sizeof($authors)==0) return FALSE;
-		
+
 		// Initialize empty list
 		$list = [];
-		
+
 		if ( $letter )
 		{
 			foreach ( $authors as $author )
@@ -41,13 +41,13 @@ class Authors extends Base
 
 		return $list;
 	}
-	
+
 	public function letters()
 	{
 		$BASE = \Base::instance()->get('BASE');
 		$data = $this->exec
-		( 
-			"SELECT LOWER(SUBSTRING(U.username,1,1)) as letter, COUNT(DISTINCT U.username) as counted 
+		(
+			"SELECT LOWER(SUBSTRING(U.username,1,1)) as letter, COUNT(DISTINCT U.username) as counted
 			FROM `tbl_users`U
 				INNER JOIN `tbl_stories_authors`rSA ON ( rSA.aid = U.uid )
 						INNER JOIN `tbl_stories`S ON ( S.sid = rSA.sid
@@ -64,14 +64,9 @@ class Authors extends Base
 		}
 		return $letters;
 	}
-		
+
 	public function menuLetters($letters)
 	{
-/*		$links[] =	[
-							"label"	=> "__overview",
-							"href"	=> [ "", "__overiew" ],
-						];	*/
-
 		// http://php.net/manual/en/control-structures.for.php#107427 <- smart guy
 		$i=0;
 		for($col = 'a'; $col != 'aa'; $col++)
@@ -79,18 +74,17 @@ class Authors extends Base
 			if (isset($letters[$col]))
 			{
 				$i++;
-				$href = [ "/".$col, $letters[$col] ];
+				$href = TRUE;
 			}
 			else
-			{
 				$href = FALSE;
-			}
+
 			$links[] =	[
 								"label"	=> strtoupper($col),
 								"href"	=> $href,
 							];
 		}
-		
+
 		if ( $i < sizeof($letters) )
 			$href = [ "/@", "" ];
 		else
@@ -100,7 +94,7 @@ class Authors extends Base
 							"label"	=> "#",
 							"href"	=> $href,
 						];
-					
+
 		return $links;
 	}
 }
