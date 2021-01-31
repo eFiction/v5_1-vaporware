@@ -206,10 +206,10 @@ class Controlpanel extends Base {
 
 		// Decide if we need to run a recount
 		if (
-			// validation status changed
-			$chapter->changed("validated")
 			// chapter text changed
-			OR $this->chapterContentSave($chapterID, $chaptertext, $chapter)
+			$this->chapterContentSave($chapterID, $chaptertext, $chapter)
+			// validation status changed
+			OR $chapter->changed("validated")
 			)
 		{
 			$recount = TRUE;
