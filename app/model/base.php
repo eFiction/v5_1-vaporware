@@ -495,6 +495,37 @@ class Base extends \Prefab {
 	}
 
 	/**
+	* Process SQL data fields
+	* rewrite 2021-02, moving from \View to \Model
+	*
+	* @param	int		$storyID	Story ID
+	* @param	int		$chapterID	Chapter ID (changed from inorder)
+	* @param	bool	$counting	Are we counting this as a read or do we need the contents for an editing mask
+	*/
+	//protected function dataProcess(&$item, $key=NULL)
+	protected function dataProcess(array &$item)
+	{
+		if (isset($item['modified']))		$item['modified']	= ($item['modified'] > ($item['published'] + (24*60*60) ) ) ?
+																			date(\Config::getPublic('date_format'),$item['modified']) :
+																			NULL;
+		if (isset($item['published']))				$item['published']				= date(\Config::getPublic('date_format'),$item['published']);
+		if (isset($item['wordcount'])) 				$item['wordcount']				= number_format($item['wordcount'], 0, '','.');
+		if (isset($item['count'])) 						$item['count']						= number_format($item['count'], 0, '','.');
+		if (isset($item['cache_categories'])) $item['cache_categories']	= json_decode($item['cache_categories'],TRUE);
+		if (isset($item['cache_rating'])) 		$item['cache_rating']			= json_decode($item['cache_rating'],TRUE);
+		if (isset($item['max_rating'])) 			$item['max_rating']				= json_decode($item['max_rating'],TRUE);
+		if (isset($item['cache_tags'])) 			$item['cache_tags']				= json_decode($item['cache_tags'],TRUE);
+		if (isset($item['cache_characters'])) $item['cache_characters']	= json_decode($item['cache_characters'],TRUE);
+		if (isset($item['cache_stories']))		$item['cache_stories']		= json_decode($item['cache_stories'],TRUE);
+		if (isset($item['cache_authors']))
+			if ( NULL !== $item['authors'] 	= 	$item['cache_authors'] 		= json_decode($item['cache_authors'],TRUE) )
+				array_walk($item['authors'], function (&$v, $k){ $v = $v[1];} );
+		// build a combined tag/character array
+		$item['all_tags'] 			= array_merge( $item['cache_tags']['simple']??[], $item['cache_characters']??[] );
+		//								$item['number']		= isset($item['inorder']) ? "{$item['inorder']}&nbsp;" : "";
+	}
+
+	/**
 		This function refreshes the user`s cache for feedback and library count on demand
 	**/
 	public function userCacheRecount($module="")

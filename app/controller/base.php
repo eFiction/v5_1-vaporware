@@ -11,7 +11,7 @@ class Base extends \Prefab {
 	/**
 	 * set a new view
 	 * @param \View\Base $view
-	 
+
 	public function setView(\View\Base $view) {
 		$this->response = $view;
 	}
@@ -22,8 +22,9 @@ class Base extends \Prefab {
 	public function beforeroute()//:void
 	{
 		$f3 = \Base::instance();
-		$f3->set('current_path', $f3->get('PARAMS')[0]);
-		
+		$this->params = $this->parametric($f3->get('PARAMS.*'));
+		$this->params['current_path'] = $f3->get('PARAMS')[0];
+
 		if($f3->get('AJAX')===TRUE)
 			$this->response = new \View\JSON();
 
@@ -33,16 +34,16 @@ class Base extends \Prefab {
 		\Registry::set('VIEW',$this->response);
 
 		$this->config = $f3->get('CONFIG');
-		
+
 		$this->config['maintenance'] = 0; /* debug */
-		
+
 		// check if a reroute to the privacy page is required
 		/*
 		if
 		(
 			// not in maintenance mode (user can still access privacy page)
 			FALSE == $this->config['maintenance']
-			AND 
+			AND
 			(
 				// no privacy consent cookie set at all
 				empty($f3->get('COOKIE')['privacy_consent'])
@@ -50,14 +51,14 @@ class Base extends \Prefab {
 				// from EU and no GDPR consent
 				( 1 == \Web\Geo::instance()->location()['in_e_u'] AND empty($f3->get('COOKIE')['gdpr_consent']) )
 			)
-			AND 
+			AND
 			// not already on privacy page
 			!( strpos( ($f3->get('PARAMS')[0]), "/privacy" ) === 0 )
 		)
 		$f3->reroute("/privacy/consent;returnpath=".$f3->get('PARAMS')[0], false);
 		*/
 	}
-	
+
 	// Add data for use in regular output
 	protected function buffer(string $content, string $section="BODY", bool $destroy = FALSE)//:void
 	{
@@ -66,14 +67,14 @@ class Base extends \Prefab {
 		else
 			$this->data[$section] .= $content;
 	}
-	
+
 	// Add data for use in JSON output
-	protected function jbuffer(array $content)//:void
+	protected function jbuffer(array $content): void
 	{
 		$this->data["BODY"]  = $content;
 	}
 
-	protected function parametric(string $params): array
+	protected function parametric(?string $params): array
 	{
 		list($params, $returnpath) = array_pad(explode(";returnpath=",$params), 2, '');
 
@@ -106,18 +107,18 @@ class Base extends \Prefab {
 	{
 		if ( $this->config['smtp_server']!="" )
 		{
-			$smtp = new \SMTP ( 
-						$this->config['smtp_server'], 
-						$this->config['smtp_scheme'], 
+			$smtp = new \SMTP (
+						$this->config['smtp_server'],
+						$this->config['smtp_scheme'],
 						$this->config['smtp_port']=="" ? ( $this->config['smtp_scheme']=="ssl" ? 465 : 587 ) : $this->config['smtp_port'],
-						$this->config['smtp_username'], 
+						$this->config['smtp_username'],
 						$this->config['smtp_password']
 			);
 			$smtp->set('From', '"'.$this->config['page_title'].'" <'.$this->config['page_mail'].'>');
 			$smtp->set('To', '"'.$rcpt_name.'" <'.$rcpt_mail.'>');
 			$smtp->set('Subject', $subject);
 			$smtp->set('content_type', 'text/html; charset="utf-8"');
-			
+
 			return $smtp->send($mailText, TRUE);
 		}
 		else
@@ -127,7 +128,7 @@ class Base extends \Prefab {
 			$headers[] = "Content-Type: text/html; charset=utf-8";
 			$headers[] = "From: {$this->config['page_title']} <{$this->config['page_mail']}>";
 			$headers[] = "X-Mailer: PHP/".phpversion();
-			
+
 			return mail(
 				"{$rcpt_name} <{$rcpt_mail}>",	// recipient
 				$subject,						// subject
@@ -136,7 +137,7 @@ class Base extends \Prefab {
 			);
 		}
 	}
-	
+
 	/**
 	 * kick start the View, which creates the response
 	 * based on our previously set content data.
@@ -148,10 +149,10 @@ class Base extends \Prefab {
 	{
 		if (!$this->response)
 			trigger_error('No View has been set.');
-		
+
 		$this->response->data = $this->data;
 		echo $this->response->finish();
-		
+
 		// drop lastAction from session, it's either handled right after being set or never
 		unset($_SESSION['lastAction']);
 	}
