@@ -225,6 +225,10 @@ class Controlpanel extends Base {
 			// recount this story
 			$this->recountStory($chapter->sid);
 
+			// delete ePub cache file
+			if($ePubFile=realpath("tmp/epub/s{$chapter->sid}.zip"))
+				unlink($ePubFile);
+
 			// recount all collections that feature this story
 			$collection=new \DB\SQL\Mapper($this->db, $this->prefix.'collection_stories');
 			$inSeries = $collection->find(array('sid=?',$chapter->sid));
@@ -501,6 +505,11 @@ class Controlpanel extends Base {
 
 		// Rebuild story cache based on new data
 		if ( $i ) $this->rebuildStoryCache($story->sid);
+
+		// delete ePub cache file
+		if($ePubFile=realpath("tmp/epub/s{$chapter->sid}.zip"))
+			unlink($ePubFile);
+
 		return $i;
 	}
 
