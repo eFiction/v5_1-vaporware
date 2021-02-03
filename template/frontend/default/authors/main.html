@@ -9,7 +9,7 @@
 			<li><a href="{{@BASE}}/authors" title="{{ @LN__Overview }}">{{ @LN__Overview }}</a></li>
 			<repeat group="{{ @letters }}" value="{{ @letter }}">
 				<check if="{{ @letter.href }}">
-					<true><li><a href="{{@BASE}}/authors/letter/{{ @letter.label }}" title="{{ @letter.label }}">{{ @letter.label }}</a></li></true>
+					<true><li><a href="{{@BASE}}/authors/{{ @letter.label }}" title="{{ @letter.label }}">{{ @letter.label }}</a></li></true>
 					<false><li>{{ @letter.label }}</li></false>
 				</check>
 			</repeat>

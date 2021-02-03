@@ -30,7 +30,7 @@ if ( FALSE == $config->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
 
 	// member profiles
 	$f3->route(
-	  [ 'GET /members/@user', 
+	  [ 'GET /members/@user',
 		'GET /members/@user/@selection', 'GET /members/@user/@selection/*' ],
 		'Controller\Members->profile' );
 
@@ -44,13 +44,13 @@ if ( FALSE == $config->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
 		'Controller\Story->search' );
 
 	$f3->route(
-	  [ 'GET /authors', 'GET /authors/@id', 'GET /authors/@id/*' ],
+	  [ 'GET /authors', 'GET /authors/*' ],
 		'Controller\Authors->index' );
 
 	$f3->route( 'GET /shoutbox/@action/@sub', 'Controller\Blocks->shoutbox' );
 
 	// Ajax routes
-	$f3->route( 
+	$f3->route(
 			[ 'GET|POST /captcha [ajax]', 'GET|POST /captcha/* [ajax]' ],
 			'Controller\Auth->captcha' );
 	$f3->route( 'GET /blocks/calendar/* [ajax]', 'Controller\Blocks->calendar' );

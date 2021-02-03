@@ -4,7 +4,7 @@
 	<!-- BLOCK:CELL -->
 	<repeat group="{{ @listing }}" key="{{@letter}}" value="{{ @authors }}">
 	<div class="author-grid-wrapper">
-		<div class="author-grid-letter"><a href="{{@BASE}}/authors/letter/{{@letter}}">{{@letter}}</a></div>
+		<div class="author-grid-letter"><a href="{{@BASE}}/authors/{{@letter}}">{{@letter}}</a></div>
 		<ul class="author-grid">
 			<repeat group="{{ @authors }}" value="{{ @author }}">
 			<!-- BLOCK:NAMES -->
@@ -13,7 +13,7 @@
 			</repeat>
 		</ul>
 	</div>
-	</repeat>	
+	</repeat>
 	<!-- END:CELL -->
 </div>
 </true>

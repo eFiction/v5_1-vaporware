@@ -10,13 +10,13 @@ class Story extends Base
 		$this->template = new \View\Story();
 	}
 
-	public function beforeroute()//: void
+	public function beforeroute(): void
 	{
 		parent::beforeroute();
 		$this->template->addTitle( \Base::instance()->get('LN__Stories') );
 	}
 
-	public function index(\Base $f3, array $params)//: void
+	public function index(\Base $f3, array $params): void
 	{
 		switch(@$params['action'])
 		{
@@ -30,24 +30,18 @@ class Story extends Base
 				$this->printer($params['*']);
 				break;
 			case 'categories':
-				$data = $this->categories($params);
+				$data = $this->categories();
 				break;
 			case 'updates':
-				$data = $this->updates($params);
+				$data = $this->updates();
 				break;
 			case 'collections':
 			case 'series':
 				$data = $this->collections($params);
 				break;
 			case 'contests':
-				$data = $this->contests($params);
+				$data = $this->contests();
 				break;
-			/*
-			case 'search':
-			case 'browse':
-				$data = $this->search($f3, $params);
-				break;
-				*/
 			case 'archive':
 			default:
 				$data = $this->intro($params);
@@ -131,7 +125,7 @@ class Story extends Base
 		exit;
 	}
 
-	public function ajax(\Base $f3, array $params) : void
+	public function ajax(\Base $f3, array $params): void
 	{
 		if ( isset($params['segment']) AND $params['segment']=="search" )
 		{
@@ -276,10 +270,8 @@ class Story extends Base
 		return $errors;
 	}
 
-	protected function intro(array $params): string
+	protected function intro(): string
 	{
-		if ( isset($params['*']) ) $get = $this->parametric($params['*']);
-
 		$data = $this->model->intro();
 
 		return $this->template->viewList($data);
@@ -293,24 +285,22 @@ class Story extends Base
 		return [ $info[0], $stories];
 	}
 
-	protected function contests(array $params)
+	protected function contests(): ?string
 	{
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
-
-		if ( isset($params['id']) )
+		if ( isset($this->params['id']) )
 		{
-			if ( NULL === $contest = $this->model->contestLoad((int)$params['id']) )
+			if ( NULL === $contest = $this->model->contestLoad((int)$this->params['id']) )
 			{
 				// no contest
 				\Base::instance()->reroute("/story/contests", false);
 				exit;
 			}
-			if ( isset($params['entries']) )
+			if ( isset($this->params['entries']) )
 			{
 				$entries = $this->model->contestEntries($contest['id']);
 				$buffer = $this->template->contestEntries($contest, $entries);
 			}
-			else $buffer = $this->template->contestShow($contest,$params['returnpath']);
+			else $buffer = $this->template->contestShow($contest,$this->params['returnpath']);
 		}
 
 		if ( empty($buffer) )
@@ -323,11 +313,9 @@ class Story extends Base
 		return $buffer;
 	}
 
-	protected function updates(array $params): string
+	protected function updates(): string
 	{
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
-
-		if ( isset($params['date']) AND $selection = explode("-",$params['date']) )
+		if ( isset($this->params['date']) AND $selection = explode("-",$this->params['date']) )
 		{
 			$year = $selection[0];
 			$month = isset($selection[1]) ? min($selection[1],12) : FALSE;
@@ -336,15 +324,15 @@ class Story extends Base
 			$data = $this->model->updates($year, $month, $day);
 			return $this->template->viewList($data);
 		}
-		else return $this->intro($params);
+		else return $this->intro($this->params);
 	}
 
-	protected function categories(array $params): string
+	protected function categories(): string
 	{
-		$id = empty($params['*']) ? 0 : $params['*'];
-		if(empty($params[3]))
+		if(empty($this->params[3]))
 		{
-			$data = $this->model->categories( (int)$id );
+			// [0] is the index of the selected category, if none is selected this translates to 0
+			$data = $this->model->categories( (int)$this->params[0] );
 
 			return $this->template->categories($data);
 		}
@@ -359,8 +347,13 @@ class Story extends Base
 	{
 		$id = explode(",",$id);
 		$printer = $id[1] ?? "paper";
-//		$printer = ($id[1]=="") ? "paper" : $id[1];
 		$id = $id[0];
+		if( empty($id) or !is_numeric($id) )
+		{
+			// something wrong, let's call base
+			\Base::instance()->reroute("/story", false);
+			exit;
+		}
 
 		if ( $printer == "epub" )
 		{
@@ -457,7 +450,7 @@ class Story extends Base
 		*/
 		file_put_contents($filename, base64_decode("UEsDBAoAAAAAAOmRAT1vYassFAAAABQAAAAIAAAAbWltZXR5cGVhcHBsaWNhdGlvbi9lcHViK3ppcFBLAQIUAAoAAAAAAOmRAT1vYassFAAAABQAAAAIAAAAAAAAAAAAIAAAAAAAAABtaW1ldHlwZVBLBQYAAAAAAQABADYAAAA6AAAAAAA="));
 
-	  	$zip = new \ZipArchive;
+	  $zip = new \ZipArchive;
 		$res = $zip->open($filename);
 		if ($res === TRUE)
 		{
@@ -478,7 +471,7 @@ class Story extends Base
 			$zip->addFromString('OEBPS/Styles/stylesheet.css', $this->template->epubCSS() );
 
 		    // title.xhtml
-	    	$zip->addFromString('OEBPS/Text/title.xhtml',
+	    $zip->addFromString('OEBPS/Text/title.xhtml',
 											$xml.$this->template->epubPage(
 															$this->template->epubTitle(),
 															$epubData['title'],
@@ -548,7 +541,7 @@ class Story extends Base
 
 	}
 
-	public function collections(array $params)//: void
+	public function collections(array $params): ?string
 	{
 		$type = $params['action'];
 		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
@@ -569,8 +562,6 @@ class Story extends Base
 			$data = $this->model->{$type."List"}();
 			return $this->template->{$type."List"}($data);
 		}
-
-
 	}
 
 	public function search(\Base $f3, array $params)
@@ -766,10 +757,8 @@ class Story extends Base
 
 			return $this->template->blockStory("featured", $data);
 		}
-		elseif ( $select[0] == "recommend" )
+		elseif ( $select[0] == "recommend" AND !empty(\Config::getPublic('optional_modules')['recommendations']) )
 		{
-			// break if module not enabled
-			if ( empty(\Config::getPublic('optional_modules')['recommendations']) ) return "";
 			/*
 				$items: 0 = all featured stories
 				$order: "random" or NULL
