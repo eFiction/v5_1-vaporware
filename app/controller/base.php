@@ -9,19 +9,12 @@ class Base extends \Prefab {
 	protected $data = array ( "BODY" => "", "RIGHT" => "", "LEFT" => "" );
 
 	/**
-	 * set a new view
-	 * @param \View\Base $view
-
-	public function setView(\View\Base $view) {
-		$this->response = $view;
-	}
-*/
-	/**
-	 * init the View
-	 */
-	public function beforeroute()//:void
+	* init the View
+	*/
+	public function beforeroute(): void
 	{
 		$f3 = \Base::instance();
+
 		$this->params = $this->parametric($f3->get('PARAMS.*'));
 		$this->params['current_path'] = $f3->get('PARAMS')[0];
 
@@ -60,7 +53,7 @@ class Base extends \Prefab {
 	}
 
 	// Add data for use in regular output
-	protected function buffer(string $content, string $section="BODY", bool $destroy = FALSE)//:void
+	protected function buffer(string $content, string $section="BODY", bool $destroy = FALSE): void
 	{
 		if ( $destroy )
 			$this->data[$section]  = $content;

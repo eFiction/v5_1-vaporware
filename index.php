@@ -32,7 +32,7 @@
 
  **/
 
-// Turn on strict return type declaration for functions 
+// Turn on strict return type declaration for functions
 declare(strict_types=0);
 
 /** initialize the framework **/
@@ -78,10 +78,10 @@ function exception_error_handler($errno, $errstr, $errfile, $errline ) {
             if($f3->get('DEBUG')>0)
             {
                 //echo $errstr."<br>";
-            } 
+            }
         }
     }
-	
+
 set_error_handler('exception_error_handler');
 	*/
 

@@ -18,7 +18,12 @@ class Story extends Base
 
 	public function index(\Base $f3, array $params): void
 	{
-		switch(@$params['action'])
+		$params['*'] = $params['*'] ?? '';
+
+		if ( !empty(\Config::getPublic('optional_modules')['recommendations']) AND @$params['action']=="outread")
+			$data = $this->outread();
+
+		else switch(@$params['action'])
 		{
 			case 'read':
 				$data = $this->read($params);
@@ -47,82 +52,6 @@ class Story extends Base
 				$data = $this->intro($params);
 		}
 		$this->buffer ($data);
-	}
-
-	public function save(\Base $f3, array $params)
-	{
-		list($requestpath, $returnpath) = array_pad(explode(";returnpath=",$params['*']), 2, '');
-		//@list($story, $view, $selected) = explode(",",$requestpath);
-		$params['returnpath'] = $returnpath;
-
-		/* maybe deprecated?
-
-		if ( $params['action']=="read" )
-		{
-			if ( isset($_POST['s_data']) )
-				parse_str($f3->get('POST.s_data'), $data);
-
-			elseif ( isset($_POST['write']) )
-				$data = $f3->get('POST');
-
-			// write review or reply to a review
-
-			if( is_numeric($story) AND isset($data) AND ($_SESSION['userID']!=0 || \Config::getPublic('allow_guest_reviews')) )
-			{
-				echo "Panik, schon wieder?";
-				$errors = $this->validateReview($data['write']);
-
-				if ( sizeof($errors)==0 )
-				{
-					// For now let's assume this always returns a proper result
-					@list($insert_id, $routine_type, $routine_id) = $this->model->saveReview($story, $data);
-					// Run notification routines
-					Routines::instance()->notification($routine_type, $routine_id);
-
-					// return to where we came from
-					$return = (empty($params['returnpath']) ? $requestpath."#r".$insert_id : $returnpath);
-					$f3->reroute($params['returnpath'], false);
-					exit;
-				}
-				else
-				{
-					//echo "<pre>".print_r($params,TRUE).print_r(@$data,TRUE).print_r(@$errors,TRUE)."</pre>";
-				}
-			}
-			else
-			{
-				// Error reporting
-
-			}
-
-
-		}
-		*/
-
-		if ( $params['action']=="reviews" )
-		{
-			/*
-				this is a sort of stub, as it doesn't actually save any data
-				all it does is to process a return-string from the ajax form
-				and build a proper path ro relocate to
-			*/
-			if ( isset($_POST['s_data']) )
-			{
-				@list($feedback,$hash) = explode("-", $params['*']);
-				@list($story,$chapter,$review) = explode(",", $feedback);
-
-				if ( $chapter[0] == "r" )
-				{
-					$chapter = $this->model->getChapterByReview( substr($chapter, 1) );
-				}
-
-				$requestpath = "{$story},{$chapter},{$review}#{$hash}";
-			}
-		}
-
-		// If nothing else has worked so far, return to where we came from and pretend this was intentional
-		$f3->reroute($requestpath, false);
-		exit;
 	}
 
 	public function ajax(\Base $f3, array $params): void
@@ -652,6 +581,24 @@ class Story extends Base
 		foreach( $arr as &$a ) $a = (int)$a;
 		$arr = array_diff($arr, array(0));
 		return $arr;
+	}
+
+	/**
+	* Outread replaces the old recommendations
+	* 2021-02
+	*
+	* @return	string	HTML data
+	*/
+	protected function outread(): string
+	{
+		if ( isset($this->params['id']) AND is_numeric($this->params['id']) AND ( NULL !== $data = $this->model->outreadLoad($this->params['id']) ) )
+		{
+			return $this->template->outreadSingle($data);
+		}
+
+		$data = $this->model->outreadList();
+
+		return print_r($this->params,1);
 	}
 
 	protected function read(array $id)//: void

@@ -832,6 +832,40 @@ class Story extends Base
 						);
 	}
 
+	public function outreadLoad(int $id): ?array
+	{
+		if ( [] == $data = $this->exec("SELECT R.url, R.title, R.author, R.summary, IF(R.date IS NULL,NULL,UNIX_TIMESTAMP(R.date)) AS timestamp,
+																	R.cache_tags, R.cache_characters, R.cache_categories, R.cache_rating,
+																	/*Ra.rating,*/
+																	U.username
+														FROM `tbl_recommendations`R
+														LEFT JOIN `tbl_users`U ON ( R.uid = U.uid )
+														/*LEFT JOIN `tbl_ratings`Ra ON ( R.ratingid = Ra.rid )
+															LEFT JOIN `tbl_recommendation_relations`RRel ON ( R.recid = RRel.recid )
+																LEFT JOIN `tbl_categories`Cat ON ( RRel.relid = Cat.cid   AND RRel.type='CA' )
+																LEFT JOIN `tbl_characters`Ch  ON ( RRel.relid = Ch.charid AND RRel.type='CH' )
+																LEFT JOIN `tbl_tags`T         ON ( RRel.relid = Cat.cid   AND RRel.type='T' )
+																	LEFT JOIN `tbl_tag_groups`TG ON ( T.tgid = TG.tgid )*/
+														WHERE R.recid = :id
+														;",[":id"=>$id]) )
+			return NULL;
+
+		$this->dataProcess($data[0]);
+		return $data[0];
+	}
+
+	public function outreadList(): ?string
+	{
+		$pos = (int)$this->f3->get('params.page') - 1;
+		return $pos;
+		$this->paginate(
+			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
+			"/home/news",
+			$items
+		);
+		return $data;
+	}
+
 	public function blockStats()
 	{
 		if ( "" == $stats = \Cache::instance()->get('statsCache') )

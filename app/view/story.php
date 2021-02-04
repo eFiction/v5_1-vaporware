@@ -38,20 +38,20 @@ class Story extends Base
 	public function commentForm(array $in_structure)
 	{
 		// renaming fields for use in base comment form
-		$out_structure = [ 
+		$out_structure = [
 					"level"			=> $in_structure['level'],
 					"element"		=> $in_structure['story'],
 					"subelement"	=> $in_structure['chapter'],
 					"childof"		=> $in_structure['childof'],
 				];
 
-		$data = [ 
+		$data = [
 					"cancel" 				=> TRUE,
 					"feedback_form_label"	=> ($in_structure['level'] > 0) ? $this->f3->get("LN__Comment") : $this->f3->get("LN__Review"),
 					"postText"				=> \Base::instance()->get('POST.write.text'),
 					"postName"				=> \Base::instance()->get('POST.write.name'),
 				];
-		
+
 		// Label for the submit button
 		if ( $in_structure['level'] == 0 )
 		{
@@ -65,7 +65,7 @@ class Story extends Base
 		// defined in \View\Base
 		return $this->commentFormBase($out_structure,$data);
 	}
-	
+
 	public function readBody($storyData,$content,$dropdown,$view=1)
 	{
 		$this->javascript('body', TRUE, 'chapter.js?' );
@@ -82,11 +82,10 @@ class Story extends Base
 											"view"		=> $view,
 										]);
 		$this->f3->set('returnpath', \Base::instance()->get('PATH') );
-		
-		return $this->render('story/read.body.html');		
+
+		return $this->render('story/read.body.html');
 	}
-	
-	//public function buildReviews($storyData, $reviewData, $chapter, $selected)
+
 	public function buildReviews($storyData)
 	{
 		$this->javascript('body', TRUE, 'jquery.comments.min.js' );
@@ -94,79 +93,74 @@ class Story extends Base
 
 		$this->dataProcess($storyData);
 		$this->f3->set('story', $storyData);
-/* 		$this->f3->set('data', [
-								"reviews" 	=> $reviewData,
-								"selected"	=> $selected,
-								"chapter"	=> $chapter,
-							]); */
+
 		$this->f3->set('returnpath', $this->f3->get('PATH') );
-		
+
 		return $this->render('story/reviews.html');
 	}
 
 	public function dropdown($data,$chapter)
 	{
 		$i=1;
-		//if(sizeof($data) > 1) 
+
 		$dropDown[] = array ( FALSE, "toc", FALSE, \Base::instance()->get("LN__TOC") );
 		foreach ( $data as $item )
 		{
 			$dropDown[] = array ( ($chapter==$item['chapter']), $item['chapter'], $i++, $item['title']);
 		}
-		//$dropDown[] = array ( ($chapter==="reviews"), "reviews", FALSE, \Base::instance()->get("LN__Reviews") );
 		return $dropDown;
 	}
-	
+
 	public function categories($data)
 	{
 		$this->f3->set('categoriesData', $data);
-		
+
 		return $this->render('story/categories.html');
 	}
-	
+
 	public function contestList(array $data)
 	{
 		foreach ( $data as &$dat )
 			$this->dataProcess($dat);
 
 		$this->f3->set('contests', $data);
-		
+
 		return $this->render('story/contests.list.html');
 	}
-	
+
 	public function contestShow(array $data, string $returnpath)
 	{
 		$this->dataProcess($data);
 
 		$this->f3->set('data', $data);
 		$this->f3->set('returnpath', $returnpath=="" ? "/story/contests" : $returnpath );
-		
+
 		return $this->render('story/contest.show.html');
 	}
-	
+
 	public function contestEntries(array $contest, array $entries)
 	{
 		$this->dataProcess($contest);
 		foreach ( $entries as &$entry )
 			$this->dataProcess($entry);
-		
+
 		$this->f3->set('contest', $contest);
 		$this->f3->set('entries', $entries);
-		
+
 		return $this->render('story/contest.entries.html');
 	}
-	
+
 	public function collectionsList(array $data)
 	{
 		foreach ( $data as &$dat )
 			$this->dataProcess($dat);
-		
+
 		$this->f3->set('type', "collections");
 		$this->f3->set('data', $data);
-		
+
 		return $this->render('story/coll-ser.list.html');
 	}
-	
+
 	public function collectionsShow(array $collection)
 	{
 		foreach ( $collection['stories'] as $key => $value )
@@ -176,10 +170,10 @@ class Story extends Base
 		$this->f3->set('type', 		"collections");
 		$this->f3->set('data', 		[$collection['data']]);
 		$this->f3->set('stories', 	$collection['stories']);
-		
+
 		return ($this->render('story/coll-ser.item.html').$this->render('story/listing.html'));
 	}
-	
+
 	public function seriesList(array $data)
 	{
 		foreach ( $data as &$dat )
@@ -187,10 +181,10 @@ class Story extends Base
 
 		$this->f3->set('type', "series");
 		$this->f3->set('data', $data);
-		
+
 		return $this->render('story/coll-ser.list.html');
 	}
-	
+
 	public function seriesShow(array $series)
 	{
 		foreach ( $series['stories'] as $key => $value )
@@ -200,8 +194,14 @@ class Story extends Base
 		$this->f3->set('type', 		"stories");
 		$this->f3->set('data', 		[$series['data']]);
 		$this->f3->set('stories', 	$series['stories']);
-		
+
 		return ($this->render('story/coll-ser.item.html').$this->render('story/listing.html'));
+	}
+
+	public function outreadSingle(array $data): string
+	{
+		$this->f3->set('data', $data);
+		return $this->render('story/outread.single.html');
 	}
 
 	public function epubXMLtag()
@@ -225,7 +225,7 @@ class Story extends Base
 			'base.xhtml',
 			'text/html',
 			[
-				"BODY"		=> $body, 
+				"BODY"		=> $body,
 				"TITLE"		=> $title,
 				"LANGUAGE"	=> $language
 			]
@@ -241,7 +241,7 @@ class Story extends Base
 				'chapter_v3.xhtml',
 				'text/html',
 				[
-					"CONTENT" 		=> $content, 
+					"CONTENT" 		=> $content,
 					"CHAPTER_TITLE" => $title,
 					"LANGUAGE" 		=> $ebook['language']
 				]
@@ -253,7 +253,7 @@ class Story extends Base
 				'chapter_v2.xhtml',
 				'text/html',
 				[
-					"CONTENT" 		=> $content, 
+					"CONTENT" 		=> $content,
 					"CHAPTER_TITLE" => $title,
 				]
 			);
@@ -269,18 +269,18 @@ class Story extends Base
 			'application/xhtml+xml',
 			[
 				"STORY_TITLE"	=>	$ebook['title'],
-				"AUTHOR"		=>	$ebook['authors'],
-		    	"NOTES"			=>	$ebook['storynotes']
+				"AUTHOR"			=>	$ebook['authors'],
+		    "NOTES"				=>	$ebook['storynotes']
 			]
 		);
 	}
-	
+
 	public function epubRoot( $chapterTOC )
 	{
 		$ebook = $this->f3->get('EPUB');
 		if ( $ebook['version']==3 )
 		{
-			
+
 		}
 		elseif ( $ebook['version']==2 )
 		{
@@ -327,7 +327,7 @@ class Story extends Base
 		$this->f3->set('archiveStats', $stats);
 		return $this->render('blocks/stats.html');
 	}
-	
+
 	public function blockStory($type, $stories=[], $extra=NULL)
 	{
 		$blocks = [ "recommended", "featured", "random", "new" ];
@@ -346,7 +346,7 @@ class Story extends Base
 		}
 		else return NULL;
 	}
-	
+
 	public function blockTagcloud($taglist)
 	{
 		$max = current($taglist)['count'];
@@ -365,7 +365,7 @@ class Story extends Base
 
 	public function blockContests($contests)
 	{
-		
+
 		$this->f3->set('contests', $contests);
 		return $this->render('story/block.contest.html');
 	}
