@@ -174,7 +174,7 @@ class Blocks extends Base
 
 	public function buildMenu(string $menuSelect): string
 	{
-		$pageSelect	= explode("/",\Base::instance()->get('PARAMS.0'))[1];
+		$pageSelect	= explode("/",\Base::instance()->get('PARAMS.currentpath'))[1];
 		$menuSelect	= explode(".",$menuSelect);
 
 		$data = $this->model->menuData($pageSelect);

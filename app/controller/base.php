@@ -15,8 +15,30 @@ class Base extends \Prefab {
 	{
 		$f3 = \Base::instance();
 
-		$this->params = $this->parametric($f3->get('PARAMS.*'));
-		$this->params['current_path'] = $f3->get('PARAMS')[0];
+		list($params, $parsedParams['returnpath']) = array_pad(explode(";returnpath=",$f3->get('PARAMS.*')), 2, '');
+
+		if ( $pArray = explode(";", str_replace(["/","&"],";",$params) ) )
+		{
+			foreach ( $pArray as $pKey => $pElement )
+			{
+				$x = explode ( "=", $pElement );
+				if ( isset($x[1]) )
+				{
+					$parsedParams[$x[0]] = explode(",",$x[1]);
+					if ( sizeof($parsedParams[$x[0]])==1 ) $parsedParams[$x[0]] = $x[1];
+				}
+				else
+				{
+					$parsedParams[$x[0]] = TRUE;
+					$parsedParams[$pKey] = $x[0];
+				}
+			}
+		}
+
+		$parsedParams['action'] = $f3->get('PARAMS.action');
+		$parsedParams['currentpath'] = $f3->get('PARAMS.0');
+		$f3->set('paginate.page', max(1,$parsedParams['page']??0));
+		$f3->set('PARAMS',$parsedParams);
 
 		if($f3->get('AJAX')===TRUE)
 			$this->response = new \View\JSON();
@@ -67,35 +89,6 @@ class Base extends \Prefab {
 		$this->data["BODY"]  = $content;
 	}
 
-	protected function parametric(?string $params): array
-	{
-		list($params, $returnpath) = array_pad(explode(";returnpath=",$params), 2, '');
-
-		$r = [];
-		if ( $pArray = explode(";", str_replace(["/","&"],";",$params) ) )
-		{
-			foreach ( $pArray as $pKey => $pElement )
-			{
-				$x = explode ( "=", $pElement );
-				if ( isset($x[1]) )
-				{
-					$r[$x[0]] = explode(",",$x[1]);
-					if ( sizeof($r[$x[0]])==1 ) $r[$x[0]] = $x[1];
-				}
-				else
-				{
-					$r[$x[0]] = TRUE;
-					$r[$pKey] = $x[0];
-				}
-			}
-		}
-
-		if(isset($r['page'])) \Base::instance()->set('paginate.page', max(1,$r['page']));
-		$r['returnpath'] = $returnpath;
-
-		return $r;
-	}
-
 	public function mailman(string $subject, string $mailText, string $rcpt_mail, string $rcpt_name=NULL): bool
 	{
 		if ( $this->config['smtp_server']!="" )
@@ -138,7 +131,7 @@ class Base extends \Prefab {
 	 * and do something else with it.
 	 * @return string
 	 */
-	public function afterroute()//: void
+	public function afterroute(): void
 	{
 		if (!$this->response)
 			trigger_error('No View has been set.');

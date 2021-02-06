@@ -18,12 +18,10 @@ class Story extends Base
 
 	public function index(\Base $f3, array $params): void
 	{
-		$params['*'] = $params['*'] ?? '';
-
-		if ( !empty(\Config::getPublic('optional_modules')['recommendations']) AND @$params['action']=="outread")
+		if ( !empty(\Config::getPublic('optional_modules')['recommendations']) AND $f3->get('PARAMS.action')=="outread")
 			$data = $this->outread();
 
-		else switch(@$params['action'])
+		else switch($f3->get('PARAMS.action'))
 		{
 			case 'read':
 				$data = $this->read($params);
@@ -35,17 +33,17 @@ class Story extends Base
 				$this->printer($params['*']);
 				break;
 			case 'categories':
-				$data = $this->categories();
+				$data = $this->categories($f3);
 				break;
 			case 'updates':
-				$data = $this->updates();
+				$data = $this->updates($f3);
 				break;
 			case 'collections':
 			case 'series':
-				$data = $this->collections($params);
+				$data = $this->collections($f3, $params);
 				break;
 			case 'contests':
-				$data = $this->contests();
+				$data = $this->contests($f3);
 				break;
 			case 'archive':
 			default:
@@ -214,22 +212,22 @@ class Story extends Base
 		return [ $info[0], $stories];
 	}
 
-	protected function contests(): ?string
+	protected function contests(\Base $f3): ?string
 	{
-		if ( isset($this->params['id']) )
+		if ( !empty($f3->get('PARAMS.id')) )
 		{
-			if ( NULL === $contest = $this->model->contestLoad((int)$this->params['id']) )
+			if ( NULL === $contest = $this->model->contestLoad((int)$f3->get('PARAMS.id')) )
 			{
 				// no contest
 				\Base::instance()->reroute("/story/contests", false);
 				exit;
 			}
-			if ( isset($this->params['entries']) )
+			if ( !empty($f3->get('PARAMS.entries')) )
 			{
 				$entries = $this->model->contestEntries($contest['id']);
 				$buffer = $this->template->contestEntries($contest, $entries);
 			}
-			else $buffer = $this->template->contestShow($contest,$this->params['returnpath']);
+			else $buffer = $this->template->contestShow($contest,$f3->get('PARAMS.returnpath'));
 		}
 
 		if ( empty($buffer) )
@@ -242,9 +240,9 @@ class Story extends Base
 		return $buffer;
 	}
 
-	protected function updates(): string
+	protected function updates(\Base $f3): string
 	{
-		if ( isset($this->params['date']) AND $selection = explode("-",$this->params['date']) )
+		if ( NULL !== $date = $f3->get('PARAMS.date') AND $selection = explode("-",$date) )
 		{
 			$year = $selection[0];
 			$month = isset($selection[1]) ? min($selection[1],12) : FALSE;
@@ -253,23 +251,23 @@ class Story extends Base
 			$data = $this->model->updates($year, $month, $day);
 			return $this->template->viewList($data);
 		}
-		else return $this->intro($this->params);
+		else return $this->intro();
 	}
 
-	protected function categories(): string
+	protected function categories(\Base $f3): string
 	{
-		if(empty($this->params[3]))
-		{
+		//if(empty($this->params[3]))
+		//{
 			// [0] is the index of the selected category, if none is selected this translates to 0
-			$data = $this->model->categories( (int)$this->params[0] );
+			$data = $this->model->categories( (int)$f3->get('PARAMS.0') );
 
 			return $this->template->categories($data);
-		}
-		else
-		{
+		//}
+		//else
+		//{
 			// What was I doing here? Need more comments :/
-			return "stub *controller-story-categories*";
-		}
+//			return "stub *controller-story-categories*";
+		//}
 	}
 
 	protected function printer(string $id)
@@ -470,14 +468,13 @@ class Story extends Base
 
 	}
 
-	public function collections(array $params): ?string
+	public function collections(\Base $f3, array $params): ?string
 	{
 		$type = $params['action'];
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
 
-		if ( isset($params['id']) )
+		if ( NULL != $f3->get('PARAMS.id') )
 		{
-			if ( NULL === $collection = $this->model->{$type."Load"}((int)$params['id']) )
+			if ( NULL === $collection = $this->model->{$type."Load"}((int)$f3->get('PARAMS.id')) )
 			{
 				// no contest
 				\Base::instance()->reroute("/story/".$type, false);
@@ -493,17 +490,27 @@ class Story extends Base
 		}
 	}
 
-	public function search(\Base $f3, array $params)
+	public function search(\Base $f3, array $params): void
 	{
-		$searchForm = strpos($params[0],"search");
-		$get = [];
-		if ( isset($params['*']) ) $get = $this->parametric($params['*']);
-		unset($get['page']);
+		$params['searchForm'] = TRUE;
+		$this->browse($f3, $params);
+	}
 
-		// get search data from $_POST
-		$searchData = ($f3->get('POST'));
-		// merge with the $_GET scope (which is basically either or, but that should settle it
-		$searchData = array_filter(array_merge($get, $searchData));
+	public function browse(\Base $f3, array $params): void
+	{
+		$searchData = array_filter(
+		[
+			"story_title"	=> $f3->get('PARAMS.story_title') ?: $f3->get('POST.story_title'),
+			"author"			=> $f3->get('PARAMS.author')			?: $f3->get('POST.author'),
+			"category"		=> $f3->get('PARAMS.category')		?: $f3->get('POST.category'),
+			"characters"	=> $f3->get('PARAMS.characters')	?: $f3->get('POST.characters'),
+			"tagIn"				=> $f3->get('PARAMS.tagIn')				?: $f3->get('POST.tagIn'),
+			"tagOut"			=> $f3->get('PARAMS.tagOut')			?: $f3->get('POST.tagOut'),
+			"library"			=> $f3->get('PARAMS.library')			?: $f3->get('POST.library'),
+			"chapters"		=> $f3->get('PARAMS.chapters')		?: $f3->get('POST.chapters'),
+			"rating"			=> $f3->get('PARAMS.rating')			?: $f3->get('POST.rating'),
+		]);
+		$searchForm = $params['searchForm']??FALSE;
 
 		// get the available ratings
 		if ( [] !== $ratings = $this->model->ratings() )

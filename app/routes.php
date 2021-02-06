@@ -38,10 +38,11 @@ if ( FALSE == $config->getPublic('maintenance') OR $_SESSION['groups'] & 64 )
 	  [ 'POST /story/@action' , 'POST /story/@action/*' ],
 		'Controller\Story->save' );
 
+	// browse and search stories
 	$f3->route(
-	  [ 'GET /story/search', 'GET /story/search/*', 'POST /story/search',
-		'GET /story/browse', 'GET /story/browse/*', 'POST /story/browse' ],
-		'Controller\Story->search' );
+	  [ 'GET /story/search', 'GET /story/search/*', 'POST /story/search' ], 'Controller\Story->search' );
+	$f3->route(
+	  [ 'GET /story/browse', 'GET /story/browse/*', 'POST /story/browse' ], 'Controller\Story->browse' );
 
 	$f3->route(
 	  [ 'GET /authors', 'GET /authors/*' ],
