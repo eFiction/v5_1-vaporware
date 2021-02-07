@@ -14,7 +14,7 @@ class AdminCP extends Base
 		\Base::instance()->set('systempage', TRUE);
 	}
 
-	public function beforeroute()
+	public function beforeroute(): void
 	{
 		$this->response = new \View\Backend();
 		\Registry::set('VIEW',$this->response);

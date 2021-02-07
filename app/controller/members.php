@@ -3,7 +3,7 @@
 namespace Controller;
 
 class Members extends Base {
-	
+
 	public function __construct()
 	{
 		$this->model = \Model\Members::instance();
@@ -11,7 +11,7 @@ class Members extends Base {
 		$this->f3 = \Base::instance();
 	}
 
-	public function beforeroute()
+	public function beforeroute(): void
 	{
 		parent::beforeroute();
 		$this->template->addTitle( \Base::instance()->get('LN__AS_Members') );
@@ -22,15 +22,15 @@ class Members extends Base {
 		if ( isset($_POST['form_data']) )
 		{
 			//*todo*
-			
+
 		}
-		
+
 		else
 			$data = $this->listing($params);
 
 		$this->buffer ($data);
 	}
-	
+
 	public function profile(\Base $f3, array $params)//: void
 	{
 		// load user
@@ -68,7 +68,7 @@ class Members extends Base {
 		}
 
 	}
-	
+
 	protected function memberBookFav( string $selection, array $user_data, array $params )
 	{
 		// get the page
@@ -90,7 +90,7 @@ class Members extends Base {
 
 		$this->buffer ( $this->template->listBookFav( $user_data, $data ) );
 	}
-	
+
 	protected function listing()
 	{
 		return "Listing";

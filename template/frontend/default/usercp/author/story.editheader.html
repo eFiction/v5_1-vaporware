@@ -198,7 +198,8 @@ $(document).ready(function() {
 
 $(document).ready(function() {
     $("#character-select").tokenInput(function(){
-		return "{{$BASE}}/userCP/ajax/stories/categories="+$("#category-select").val()
+	// include currently selected categories in every request
+		return "{{$BASE}}/userCP/ajax/stories/categories=" + $('#category-select').val();
 	},{
     	method: "post",
     	queryParam: "character",

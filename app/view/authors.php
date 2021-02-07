@@ -9,16 +9,16 @@ class Authors extends Base
 		$this->f3->set('header',  $header);
 		$this->f3->set('letters', $menu);
 		$this->f3->set('content', $content);
-		
+
 		return $this->render('authors/main.html');
 	}
-	
+
 	public function listing($list, $letter=NULL)
 	{
 		// common definitions
 		$this->javascript('body', TRUE, 'jquery.columnizer.js' );
 		$this->f3->set('listing',  $list);
-		
+
 		// List authors for a specific letter
 		if ( $letter )
 		{

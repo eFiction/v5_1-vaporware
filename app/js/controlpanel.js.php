@@ -102,12 +102,12 @@ $(document).ready (function () {
 		if ( confirm ("Are you sure you want to delete entry: \n\n" + $(this).attr ("title") + "?") )
 		{
 			$('<form action="'+href+'" method="POST"/>')
-        .append($('<input type="hidden" name="confirm_delete" value="'+id+'">'))
+        .append($('<input type="hidden" name="confirmed" value="'+id+'">'))
         .appendTo($(document.body)) //it has to be added somewhere into the <body>
         .submit();
 		}
 	})
-}) ; 
+});
 <?php
 }
 ?>
