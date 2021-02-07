@@ -204,6 +204,12 @@ class Story extends Base
 		return $this->render('story/outread.single.html');
 	}
 
+	public function outreadList(array $data): string
+	{
+		$this->f3->set('data', $data);
+		return $this->render('story/outread.list.html');
+	}
+
 	public function epubXMLtag()
 	{
 		return "<?xml version='1.0' encoding='utf-8'?>\n";

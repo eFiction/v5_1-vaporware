@@ -19,7 +19,7 @@ class Story extends Base
 	public function index(\Base $f3, array $params): void
 	{
 		if ( !empty(\Config::getPublic('optional_modules')['recommendations']) AND $f3->get('PARAMS.action')=="outread")
-			$data = $this->outread();
+			$data = $this->outread($f3);
 
 		else switch($f3->get('PARAMS.action'))
 		{
@@ -594,18 +594,21 @@ class Story extends Base
 	* Outread replaces the old recommendations
 	* 2021-02
 	*
+	* @param	\Base		$f3
+	*
 	* @return	string	HTML data
 	*/
-	protected function outread(): string
+	protected function outread(\Base $f3): string
 	{
-		if ( isset($this->params['id']) AND is_numeric($this->params['id']) AND ( NULL !== $data = $this->model->outreadLoad($this->params['id']) ) )
+		if ( NULL !== $id = $f3->get('PARAMS.id') AND is_numeric($id) AND ( NULL !== $data = $this->model->outreadLoad($id) ) )
 		{
 			return $this->template->outreadSingle($data);
 		}
 
 		$data = $this->model->outreadList();
+		return $this->template->outreadList($data);
 
-		return print_r($this->params,1);
+		return print_r($data,1);
 	}
 
 	protected function read(array $id)//: void

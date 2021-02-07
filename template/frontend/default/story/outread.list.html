@@ -1,0 +1,22 @@
+<check if="{{isset(@paginate.firstPage)}}"><include href="main/paginate.html" /></check>
+
+<repeat group="{{ @data }}" value="{{ @outread }}" counter="{{ @ctr }}">
+  <div class="column my-2 is-full has-border">
+    <div class="has-border-bottom is-size-5"><a href="{{@outread.url}}" target="_blank">{{@outread.title}}</a> {{@LN__by}} {{@outread.author}}</div>
+    <check if="{{!empty(@outread.cache_categories)}}">
+      <div class="tags"><repeat group="{{@outread.cache_categories}}" value="{{@category}}"><span class="tag">{ICON:folder}&nbsp;{{@category.1}}</span></repeat></div>
+    </check>
+    <div class="mt-3 mb-5 has-text-justified">{{@outread.summary |raw}}</div>
+    <div class="tags">
+      <check if="{{isset(@outread.cache_tags.0)}}">
+        <repeat group="{{@outread.cache_tags}}" value="{{@tag}}"><span class="tag">{ICON:tags}&nbsp;{{@tag.1}}</span></repeat>
+      </check>
+      <check if="{{isset(@outread.cache_characters.0)}}">
+        <repeat group="{{@outread.cache_characters}}" value="{{@chara}}"><span class="tag">{ICON:member}&nbsp;{{@chara.1}}</span></repeat>
+      </check>
+    </div>
+    <div class="has-text-centered is-size-7">*__recommendedBy {{@outread.username}} &bull; {{@LN__Published}}: {{@outread.published}} <check if="{{!empty(@outread.cache_rating.1)}}"> &bull; {{@LN__Rating}}: {{@outread.cache_rating.1}}</check></div>
+  </div>
+</repeat>
+
+<check if="{{isset(@paginate.firstPage) AND sizeof(@data)>2}}"><include href="main/paginate.html" /></check>

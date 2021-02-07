@@ -126,7 +126,6 @@ class Story extends Base
 			$join[] = "LEFT JOIN (SELECT sid FROM `tbl_stories_tags` WHERE tid IN (".implode(",",$terms['tagOut']).") AND `character`=0 GROUP BY sid ) iTo ON ( iTo.sid = S.sid )";
 			// and negate the results
 			$where[] = "AND iTo.sid IS NULL";
-
 		}
 
 		if ( isset($terms['category']) )
@@ -850,20 +849,31 @@ class Story extends Base
 														;",[":id"=>$id]) )
 			return NULL;
 
-		$this->dataProcess($data[0]);
-		return $data[0];
+		return array_map([$this,'dataProcess'], $data[0]);
 	}
 
-	public function outreadList(): ?string
+	public function outreadList(): ?array
 	{
-		$pos = (int)$this->f3->get('params.page') - 1;
-		return $pos;
+		$pos = (int)$this->f3->get('paginate.page') - 1;
+		$limit = 5;
+
+		$sql = "SELECT SQL_CALC_FOUND_ROWS
+							R.url, R.title, R.author, R.summary, IF(R.date IS NULL,NULL,UNIX_TIMESTAMP(R.date)) AS published,
+							R.cache_tags, R.cache_characters, R.cache_categories, R.cache_rating,
+							/*Ra.rating,*/
+							U.username
+							FROM `tbl_recommendations`R
+								LEFT JOIN `tbl_users`U ON ( R.uid = U.uid )
+							ORDER BY R.date desc
+							LIMIT ".(max(0,$pos*$limit)).",".$limit;
+		$data = $this->exec($sql);
+
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
-			"/home/news",
-			$items
+			"/story/outread",
+			$limit
 		);
-		return $data;
+		return array_map([$this,'dataProcess'], $data);
 	}
 
 	public function blockStats()

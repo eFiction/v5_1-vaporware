@@ -235,7 +235,7 @@ class Base extends \Prefab {
 		return str_replace(array_keys($replace), array_values($replace), $sql_StoryConstruct);
 	}
 
-	public function collectionsListBase(array $userData = [], bool $ordered = FALSE)
+	public function collectionsListBase(array $userData = [], bool $ordered = FALSE): array
 	{
 		$limit = 5;
 		$pos = (int)$this->f3->get('paginate.page') - 1;
@@ -497,13 +497,13 @@ class Base extends \Prefab {
 	/**
 	* Process SQL data fields
 	* rewrite 2021-02, moving from \View to \Model
+	*	for use with 'array_map([$this,'dataProcess'], $data);'
 	*
-	* @param	int		$storyID	Story ID
-	* @param	int		$chapterID	Chapter ID (changed from inorder)
-	* @param	bool	$counting	Are we counting this as a read or do we need the contents for an editing mask
+	* @param	array		$item			Array containing story data (or similar)
+	*
+	* @return	array							Array with processed content
 	*/
-	//protected function dataProcess(&$item, $key=NULL)
-	protected function dataProcess(array &$item)
+	protected function dataProcess(array $item): array
 	{
 		if (isset($item['modified']))		$item['modified']	= ($item['modified'] > ($item['published'] + (24*60*60) ) ) ?
 																			date(\Config::getPublic('date_format'),$item['modified']) :
@@ -523,10 +523,11 @@ class Base extends \Prefab {
 		// build a combined tag/character array
 		$item['all_tags'] 			= array_merge( $item['cache_tags']['simple']??[], $item['cache_characters']??[] );
 		//								$item['number']		= isset($item['inorder']) ? "{$item['inorder']}&nbsp;" : "";
+		return $item;
 	}
 
 	/**
-		This function refreshes the user`s cache for feedback and library count on demand
+	*	This function refreshes the user`s cache for feedback and library count on demand
 	**/
 	public function userCacheRecount($module="")
 	{
