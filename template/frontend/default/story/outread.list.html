@@ -15,7 +15,7 @@
         <repeat group="{{@outread.cache_characters}}" value="{{@chara}}"><span class="tag">{ICON:member}&nbsp;{{@chara.1}}</span></repeat>
       </check>
     </div>
-    <div class="has-text-centered is-size-7">*__recommendedBy {{@outread.username}} &bull; {{@LN__Published}}: {{@outread.published}} <check if="{{!empty(@outread.cache_rating.1)}}"> &bull; {{@LN__Rating}}: {{@outread.cache_rating.1}}</check></div>
+    <div class="has-text-centered is-size-7">{{@LN__RecommBy}} <a href="{{@BASE}}/members/{{@outread.username}}">{{@outread.username}}</a> &bull; {{@LN__Published}}: {{@outread.published}} <check if="{{!empty(@outread.cache_rating.1)}}"> &bull; {{@LN__Rating}}: {{@outread.cache_rating.1}}</check></div>
   </div>
 </repeat>
 
