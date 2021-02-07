@@ -11,13 +11,11 @@ class Blocks extends Base
 		$this->template = new \View\Blocks();
 	}
 
-	public function shoutbox(\Base $f3, array $params)//: void
+	public function shoutbox(\Base $f3, array $params): void
 	{
-		$params = $this->parametric( $params['*'] );
-
-		if ( $params[0] == "load" )
+		if ( !empty($f3->get('PARAMS.load')) )
 		{
-			$subs = explode(",",$params[1]);
+			$subs = explode(",",$f3->get('PARAMS.1'));
 			if ( isset($subs[1])  AND $subs[0]=="down" ) $offset = $subs[1] + $this->config['shoutbox_entries'];
 			elseif ( isset($subs[1])  AND $subs[0]=="up" )  $offset = max ( ($subs[1] - $this->config['shoutbox_entries']), 0);
 			else $offset = 0;
@@ -26,7 +24,7 @@ class Blocks extends Base
 			$tpl = \View\Blocks::shoutboxLines($data);
 			$this->jbuffer( array ( $tpl, "", $offset, 0 ) );
 		}
-		elseif ( $params[0] == "form" )
+		if ( !empty($f3->get('PARAMS.form')) )
 		{
 			if($_SESSION['userID']!=0 || $this->config['shoutbox_guest'] )
 			{
@@ -39,13 +37,12 @@ class Blocks extends Base
 				$this->jbuffer( array ( "", "Denied", 0, 0 ) );
 			}
 		}
-		elseif ( $params[0] == "shout" )
+		if ( !empty($f3->get('PARAMS.shout')) )
 		{
 			/*
-				note: even on error notes, the function has to return a non-FALSE value
-				otherwise, the jQuery counterpart will assume a technical error
+			*	note: even on error notes, the function has to return a non-FALSE value
+			*	otherwise, the jQuery counterpart will assume a technical error
 			*/
-
 			if($_SESSION['userID']!=0 || $this->config['shoutbox_guest'] )
 			{
 				// un-serialize the javascript serialized form data
