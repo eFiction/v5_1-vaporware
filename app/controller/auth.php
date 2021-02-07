@@ -12,15 +12,18 @@ class Auth extends Base {
 		\Base::instance()->set('AUTHPAGE', TRUE);
 	}
 
-    protected $response;
+  protected $response;
 
-    /**
-		 * rewrite 2020-12: switch to the f3 Session handler
-     * check login state
-     * @return bool
-     */
-    static public function isLoggedIn(\Base $f3): bool
+  /**
+	* rewrite 2020-12: switch to the f3 Session handler
+  * check login state
+  * @return bool
+  */
+  static public function isLoggedIn(\Base $f3): bool
 	{
+		// experimental session extender
+		$f3->TIMEOUT=7200;
+		ini_set('session.gc_maxlifetime',$f3->TIMEOUT);
 		/*
 		Session mask (bit-wise)
 
@@ -50,10 +53,10 @@ class Auth extends Base {
 		// define a fallback for the user preferences
 		$session_preferences =
 		[
-			'layout' 		=> $f3->get('CONFIG.layout_default'),
+			'layout' 			=> $f3->get('CONFIG.layout_default'),
 			'language' 		=> $f3->get('CONFIG.language_default'),
 			'ageconsent'	=> (int)(!$f3->get('CONFIG.agestatement')),
-			'showTOC'		=> 'toc',
+			'showTOC'			=> 'toc',
 		];
 
 		if ( $f3->get('AJAX') AND isset($session_id) AND $user = \Model\Auth::instance()->validateAJAXSession($session_id) AND $user['userID']>0 )
@@ -61,17 +64,17 @@ class Auth extends Base {
 			$_SESSION = array_merge (
 				$_SESSION,
 				[
-					'preferences'		=>	$session_preferences,
+					'preferences'			=>	$session_preferences,
 				],
 				[
-					'groups' 			=> 	$user['groups'],
-					'username'			=> 	$user['username'],
-					'mail'				=> 	[
-												(int)@$user['cache_messaging']['inbox']['sum'],
-												(int)@$user['cache_messaging']['unread']['sum']
-											],
+					'groups' 					=> 	$user['groups'],
+					'username'				=> 	$user['username'],
+					'mail'						=> 	[
+																	(int)@$user['cache_messaging']['inbox']['sum'],
+																	(int)@$user['cache_messaging']['unread']['sum']
+																],
 					'allowed_authors'	=> 	explode(",",$user['allowed_authors']),
-					'preferences'		=> 	$user['preferences'],
+					'preferences'			=> 	$user['preferences'],
 					//'tpl'				=> 	[ "default", 1],
 				]
 			);
@@ -83,17 +86,17 @@ class Auth extends Base {
 			$_SESSION = array_merge (
 				$_SESSION,
 				[
-					'preferences'		=>	$session_preferences,
+					'preferences'			=>	$session_preferences,
 				],
 				[
-					'groups' 			=> 	$user['groups'],
-					'username'			=> 	$user['username'],
-					'mail'				=> 	[
-												(int)@$user['cache_messaging']['inbox']['sum'],
-												(int)@$user['cache_messaging']['unread']['sum']
-											],
+					'groups' 					=> 	$user['groups'],
+					'username'				=> 	$user['username'],
+					'mail'						=> 	[
+																	(int)@$user['cache_messaging']['inbox']['sum'],
+																	(int)@$user['cache_messaging']['unread']['sum']
+																],
 					'allowed_authors'	=> 	explode(",",$user['allowed_authors']),
-					'preferences'		=> 	$user['preferences'],
+					'preferences'			=> 	$user['preferences'],
 					//'tpl'				=> 	[ "default", 1],
 				]
 			);
@@ -104,12 +107,12 @@ class Auth extends Base {
 			$_SESSION = array_merge (
 				$_SESSION,
 				[
-					'groups' 			=> 	bindec('0'),
-					'username'			=> 	$f3->get("LN__Guest"),
-					'userID'			=> 	0,
-					'mail'				=> 	FALSE,
+					'groups' 					=> 	bindec('0'),
+					'username'				=> 	$f3->get("LN__Guest"),
+					'userID'					=> 	0,
+					'mail'						=> 	FALSE,
 					'allowed_authors'	=>  [],
-					'preferences'		=>	$session_preferences,
+					'preferences'			=>	$session_preferences,
 					//'tpl'				=> 	[ "default", 1]
 				]
 			);
@@ -118,9 +121,8 @@ class Auth extends Base {
 		}
 	}
 
-	public function login(\Base $f3, array $params)//: void
+	public function login(\Base $f3, array $params): void
 	{
-		if ( isset($params['*']) ) $params = ($this->parametric($params['*']));
 		\Registry::get('VIEW')->addTitle( $f3->get('LN__Login') );
 
 		if( $f3->exists('POST.login') && $f3->exists('POST.password') )
@@ -130,30 +132,33 @@ class Auth extends Base {
 			if ( 0 < $userID = $this->model->userLoad($f3->get('POST.login'), $f3->get('POST.password') ) )
 			{
 				// return to where the login process occured
-				$f3->reroute($f3->get('POST')['returnpath'], false);
+				$f3->reroute($f3->get('POST.returnpath'), false);
 				exit;
 			}
 			// authentication failed, show a login form
 			$this->buffer( $this->template->loginForm($f3) );
 		}
-		elseif( ($f3->exists('POST.username') OR $f3->exists('POST.email')) AND $f3->get('POST.username').$f3->get('POST.email')>"" )
+		elseif( ($f3->exists('POST.username') OR $f3->exists('POST.email')) AND (!empty($f3->get('POST.username')) OR !empty($f3->get('POST.email')) ) )
 		{
 			$this->recoveryMail($f3);
 		}
-		elseif( isset($params['token']) )
+		elseif( !empty($f3->get('PARAMS.token')) )
 		{
-			if ( $f3->exists('POST.token') AND ""!=$f3->get('POST.token') ) $params['token'] = $f3->get('POST.token');
-			$this->recoveryForm($f3, $params['token']);
+			$token = $f3->get('POST.token') ?: $f3->get('PARAMS.token');
+			$this->recoveryForm($f3, $token);
 		}
-		elseif( isset($params['activate']) )
+		elseif( !empty($f3->get('PARAMS.activate')) )
 		{
-			if( empty($params['activate'][1]) )
+			if( empty($f3->get('PARAMS.activate.1')) )
 			{
 				// bad
 				$this->buffer( "Bad token" );
 			}
-			if ( TRUE === $this->model->newuserEmailLink($params['activate']) )
+			if ( TRUE === $this->model->newuserEmailLink($f3->get('PARAMS.activate')) )
+			{
+				// **todo: welcome screen, auto-login
 				$this->buffer( "Activating" );
+			}
 			else
 				$this->buffer( "Failing" );
 		}
@@ -210,16 +215,14 @@ class Auth extends Base {
 
 	public function logout(\Base $f3, array $params)//: void
 	{
-		$return = explode("returnpath=",@$params['*']);
-		$returnpath = ( isset($return[1]) AND $return[1]!="") ? $return[1] : "/";
-
+		// drop user session
 		$this->model->userSession(0);
-
-		$f3->reroute($returnpath, false);
+		// return to last known location
+		$f3->reroute($f3->get('PARAMS.returnpath')?:'/', false);
 		exit;
 	}
 
-	public function register(\Base $f3)//: void
+	public function register(\Base $f3): void
 	{
 		// check['next']	-	text the user will see on next page
 
@@ -319,7 +322,6 @@ class Auth extends Base {
 						\Logging::addEntry("RG", json_encode([ 'name'=>$formData['login'], 'uid'=>$userID, 'email'=>$formData['email'], 'reason'=>$check['reason'], 'admin'=>FALSE ]),$userID);
 					}
 					$formData = [];
-
 				}
 
 				$this->buffer( $this->template->register($formData, $check) );
@@ -327,7 +329,7 @@ class Auth extends Base {
 		}
 	}
 
-	public function captcha(\Base $f3)//: void
+	public function captcha(\Base $f3): void
 	{
 		unset($_SESSION['captcha']);
 

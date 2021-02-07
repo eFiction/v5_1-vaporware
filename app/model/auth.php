@@ -47,7 +47,6 @@ class Auth extends Base
 	public function setRecoveryToken($uid)
 	{
 		$token = md5(time());
-		$dbtoken = $token."//".sprintf('%u',ip2long($_SERVER["REMOTE_ADDR"]))."//".time();
 		// $uid and $token are safe
 		$this->exec("INSERT INTO `tbl_user_info` (uid,field,info) VALUES ({$uid},-1,CONCAT_WS( '//', :token , INET6_ATON('{$_SERVER['REMOTE_ADDR']}'), :time ) )
 						ON DUPLICATE KEY UPDATE info=CONCAT_WS( '//', :token , INET6_ATON('{$_SERVER['REMOTE_ADDR']}'), :time ) ",
