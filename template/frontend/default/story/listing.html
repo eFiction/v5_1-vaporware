@@ -51,6 +51,7 @@
 			<check if="{{isset(@story.cache_characters.0)}}">
 				<repeat group="{{@story.cache_characters}}" value="{{@chara}}"><span class="tag">{ICON:member}&nbsp;{{@chara.1}}</span></repeat>
 			</check>
+      &nbsp;
 		</div>
 		<div class="has-text-centered is-size-7">{{@LN__Published}}: {{@story.published}} &bull; <check if="{{@story.modified}}">{{@LN__Updated}}: {{@story.modified}} &bull; </check>{{@LN__Chapters}}: {{@story.chapters}} &bull; {{@LN__Words}}: {{@story.wordcount}} &bull; {{@LN__Status}}: {{@story.completed==9 ? @LN__Completed : @LN__WIP}} &bull; <check if="{{!empty(@story.cache_rating.1)}}">{{@LN__Rating}}: {{@story.cache_rating.1}} &bull; </check>{{@LN__Clicks}}: {{@story.count}}</div>
 	</div>
