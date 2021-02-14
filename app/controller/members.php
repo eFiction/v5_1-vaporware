@@ -31,7 +31,7 @@ class Members extends Base {
 		$this->buffer ($data);
 	}
 
-	public function profile(\Base $f3, array $params)//: void
+	public function profile(\Base $f3, array $params): void
 	{
 		// load user
 		$user_data = $this->model->memberData($params['user']);
@@ -43,10 +43,7 @@ class Members extends Base {
 			exit;
 		}
 
-		// still in the game, let's check for extra options
-		$options = ( isset($params['*']) ) ? $this->parametric($params['*']) : [];
 		// check what to do
-
 		switch ( @$params['selection'] )
 		{
 			case "profile":
@@ -54,22 +51,21 @@ class Members extends Base {
 				break;
 			case "bookmarks":
 			case "favourites":
-				$this->memberBookFav( $params['selection'], $user_data, $options );
+				$this->memberBookFav( $params['selection'], $user_data, $f3->get('PARAMS') );
 				break;
 			case "series":
 			case "collections":
-				$collections_data = $this->model->memberCollections($user_data, $params['selection'], $options);
+				$collections_data = $this->model->memberCollections($user_data, $params['selection'], $f3->get('PARAMS'));
 				$this->buffer ( $this->template->collections($user_data, $params['selection'], $collections_data) );
 				break;
 			case "stories":
 			default:
-				$story_data = $this->model->memberStories($user_data, $options);
+				$story_data = $this->model->memberStories($user_data, $f3->get('PARAMS'));
 				$this->buffer( $this->template->stories($user_data, $story_data) );
 		}
-
 	}
 
-	protected function memberBookFav( string $selection, array $user_data, array $params )
+	protected function memberBookFav( string $selection, array $user_data, array $params ): void
 	{
 		// get the page
 		$page = ( empty((int)@$params['page']) || (int)$params['page']<0 )  ?: (int)$params['page'];

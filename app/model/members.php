@@ -110,7 +110,7 @@ class Members extends Base
 			"LIMIT" => "LIMIT ".(max(0,$pos*$limit)).",".$limit,
 			"JOIN" => "INNER JOIN `tbl_stories_authors`rSA ON ( rSA.sid=S.sid AND rSA.aid=:aid )"
 		];
-		$data['stories'] = $this->storyData($replacements, ["aid" => $author['uid']]);
+		$data['stories'] = array_map([$this,'dataProcess'], $this->storyData($replacements, ["aid" => $author['uid']]) );
 
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
@@ -146,7 +146,7 @@ class Members extends Base
 			}
 		}
 
-		return $data;
+		return array_map([$this,'dataProcess'], $data);
 	}
 
 	protected function profileGetCount(int $uid, bool $full=FALSE) : array

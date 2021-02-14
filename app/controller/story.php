@@ -621,7 +621,7 @@ class Story extends Base
 			\Base::instance()->reroute("/story", false);
 			exit;
 		}
-		elseif($storyData = $this->model->getStory($story,empty($view)?1:$view))
+		elseif($storyData = $this->model->getStory( $story, (int)(empty($view)?1:$view)) )
 		{
 			if ( empty($view) AND $storyData['chapters']>1 )
 			{
@@ -668,9 +668,7 @@ class Story extends Base
 		if($storyData = $this->model->getStory($story,(int)$chapter))
 		{
 			$chapter = max ( 0, min ( $chapter, $storyData['chapters']) );
-			//$reviewData = $this->model->loadReviews($story,$selected,$storyData['chapid']);
 
-			//return $this->template->buildReviews($storyData, $reviewData, $chapter, $selected);
 			return $this->template->buildReviews($storyData);
 		}
 		else return "__Error, not found";

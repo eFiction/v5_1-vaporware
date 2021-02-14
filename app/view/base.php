@@ -1,16 +1,16 @@
 <?php
 namespace View;
 abstract class Base {
-	
-    public $data = array();
-    public $modules = [];
-	protected $title = [];
+
+  public 		$data 		= array();
+  public 		$modules 	= [];
+	protected $title 		= [];
 
 	public function __construct()
 	{
 		$this->config = \Config::getTree();
-		$this->f3 = \Base::instance();
-		$this->TPL = \Template::instance();
+		$this->f3 		= \Base::instance();
+		$this->TPL 		= \Template::instance();
 	}
 
 	public function javascript($location, $file=FALSE, $string)
@@ -23,18 +23,18 @@ abstract class Base {
 		}
 		else $this->f3->JS[$location][] = "<script type=\"text/javascript\">{$string}</script>";
 	}
-	
+
 	public function addTitle($string)
 	{
 		// Used by a controller, this writes the title to the main render view
 		 \Registry::get('VIEW')->addTitle($string);
 	}
-	
+
 	public static function render($file,$mime='text/html',array $hive=NULL,$ttl=0)
 	{
 		return "<!-- FILE: {$file} -->".\Template::instance()->render($file,$mime,$hive,$ttl)."<!-- END: {$file} -->";
 	}
-	
+
 	public static function directrender($file,$mime='text/html',array $hive=NULL,$ttl=0)
 	{
 		$content = \Template::instance()->render($file,$mime,$hive,$ttl);
@@ -55,7 +55,7 @@ abstract class Base {
 	{
 		return \Template::instance()->render('main/stub.html');
 	}
-
+/*
 	protected function dataProcess(&$item, $key=NULL)
 	{
 		if (isset($item['modified']))	$item['modified']	= ($item['modified'] > ($item['published'] + (24*60*60) ) ) ?
@@ -81,7 +81,7 @@ abstract class Base {
 												$item['all_tags'] 			= array_merge( $item['cache_tags']['simple']??[], $item['cache_characters']??[] );
 		if (isset($item['cache_stories']))		$item['cache_stories']		= json_decode($item['cache_stories'],TRUE);
 	}
-
+*/
 	public function commentFormBase($structure,$data)
 	{
 		// 'structure' formating, clearing and naming in child function call
@@ -90,5 +90,5 @@ abstract class Base {
 
 		return $this->render('main/feedback.html');
 	}
-	
+
 }

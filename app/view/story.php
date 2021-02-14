@@ -5,9 +5,6 @@ class Story extends Base
 {
 	public function viewList($data)
 	{
-		foreach ( $data as $key => $value )
-			$this->dataProcess($data[$key], $key);
-
 		$this->f3->set('stories', $data);
 
 		return $this->render( 'story/listing.html' );
@@ -71,7 +68,6 @@ class Story extends Base
 		$this->javascript('body', TRUE, 'chapter.js?' );
 		$this->javascript('body', FALSE, "var url='".\Base::instance()->get('BASE')."/story/read/{$storyData['sid']},'" );
 
-		$this->dataProcess($storyData);
 		// fix for <b> not showing with bulma, might have to find a better one for this
 		$content = str_replace(["<b>","</b>"], ["<strong>","</strong>"], $content);
 
@@ -91,9 +87,7 @@ class Story extends Base
 		$this->javascript('body', TRUE, 'jquery.comments.min.js' );
 		$this->javascript('body', TRUE, 'chapter.js?' );
 
-		$this->dataProcess($storyData);
 		$this->f3->set('story', $storyData);
-
 		$this->f3->set('returnpath', $this->f3->get('PATH') );
 
 		return $this->render('story/reviews.html');
@@ -120,9 +114,6 @@ class Story extends Base
 
 	public function contestList(array $data)
 	{
-		foreach ( $data as &$dat )
-			$this->dataProcess($dat);
-
 		$this->f3->set('contests', $data);
 
 		return $this->render('story/contests.list.html');
@@ -130,8 +121,6 @@ class Story extends Base
 
 	public function contestShow(array $data, string $returnpath)
 	{
-		$this->dataProcess($data);
-
 		$this->f3->set('data', $data);
 		$this->f3->set('returnpath', $returnpath=="" ? "/story/contests" : $returnpath );
 
@@ -140,10 +129,6 @@ class Story extends Base
 
 	public function contestEntries(array $contest, array $entries)
 	{
-		$this->dataProcess($contest);
-		foreach ( $entries as &$entry )
-			$this->dataProcess($entry);
-
 		$this->f3->set('contest', $contest);
 		$this->f3->set('entries', $entries);
 
@@ -152,9 +137,6 @@ class Story extends Base
 
 	public function collectionsList(array $data)
 	{
-		foreach ( $data as &$dat )
-			$this->dataProcess($dat);
-
 		$this->f3->set('type', "collections");
 		$this->f3->set('data', $data);
 
@@ -163,22 +145,15 @@ class Story extends Base
 
 	public function collectionsShow(array $collection)
 	{
-		foreach ( $collection['stories'] as $key => $value )
-			$this->dataProcess($collection['stories'][$key], $key);
-		$this->dataProcess($collection['data']);
-
 		$this->f3->set('type', 		"collections");
 		$this->f3->set('data', 		[$collection['data']]);
-		$this->f3->set('stories', 	$collection['stories']);
+		$this->f3->set('stories',	$collection['stories']);
 
 		return ($this->render('story/coll-ser.item.html').$this->render('story/listing.html'));
 	}
 
 	public function seriesList(array $data)
 	{
-		foreach ( $data as &$dat )
-			$this->dataProcess($dat);
-
 		$this->f3->set('type', "series");
 		$this->f3->set('data', $data);
 
@@ -187,13 +162,9 @@ class Story extends Base
 
 	public function seriesShow(array $series)
 	{
-		foreach ( $series['stories'] as $key => $value )
-			$this->dataProcess($series['stories'][$key], $key);
-		$this->dataProcess($series['data']);
-
 		$this->f3->set('type', 		"stories");
 		$this->f3->set('data', 		[$series['data']]);
-		$this->f3->set('stories', 	$series['stories']);
+		$this->f3->set('stories',	$series['stories']);
 
 		return ($this->render('story/coll-ser.item.html').$this->render('story/listing.html'));
 	}
@@ -328,23 +299,16 @@ class Story extends Base
 		}
 	}
 
-	public function archiveStats($stats)
+	public function archiveStats(array $stats): string
 	{
 		$this->f3->set('archiveStats', $stats);
 		return $this->render('blocks/stats.html');
 	}
 
-	public function blockStory($type, $stories=[], $extra=NULL)
+	public function blockStory(string $type, array $stories=[], $extra=NULL): ?string
 	{
-		$blocks = [ "recommended", "featured", "random", "new" ];
-
-		if ( in_array($type, $blocks) )
+		if ( in_array($type, [ "recommended", "featured", "random", "new" ]) )
 		{
-	//		if(sizeof($stories))
-	//		{
-				foreach(array_keys($stories) as $key)
-					$this->dataProcess($stories[$key]);
-	//		}
 			$this->f3->set('renderData', $stories);
 			$this->f3->set('extra', $extra);
 

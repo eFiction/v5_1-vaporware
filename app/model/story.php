@@ -23,7 +23,7 @@ class Story extends Base
 			$limit
 		);
 
-		return $data;
+		return array_map([$this,'dataProcess'], $data);
 	}
 
 	public function author(int $id)
@@ -76,7 +76,7 @@ class Story extends Base
 
 		$datax = json_decode(json_encode($data), true);
 		*/
-		return [$info, $data];
+		return [$info, array_map([$this,'dataProcess'], $data)];
 	}
 
 	public function search ($terms, $return, $searchForm=FALSE)
@@ -177,7 +177,7 @@ class Story extends Base
 			$limit
 		);
 
-		return $data;
+		return array_map([$this,'dataProcess'], $data);
 	}
 
 	public function ratings()
@@ -222,10 +222,10 @@ class Story extends Base
 			$limit
 		);
 
-		return $data;
+		return array_map([$this,'dataProcess'], $data);
 	}
 
-	public function collectionsList(bool $ordered = FALSE)
+	public function collectionsList(bool $ordered = FALSE): array
 	{
 		// common SQL creation for member profile and story view
 		list ( $sql, $limit ) = $this->collectionsListBase([], $ordered);
@@ -249,10 +249,10 @@ class Story extends Base
 			}
 		}
 
-		return $data;
+		return array_map([$this,'dataProcess'], $data);
 	}
 
-	public function collectionsLoad(int $collID, bool $ordered = FALSE)
+	public function collectionsLoad(int $collID, bool $ordered = FALSE): ?array
 	{
 		$sql = "SELECT SQL_CALC_FOUND_ROWS
 					C.collid, C.parent_collection, C.title, C.summary, C.open, C.max_rating,
@@ -267,12 +267,12 @@ class Story extends Base
 		$data = $this->exec($sql, [":collid" => $collID ]);
 		if ( sizeof($data)==1 )
 		{
-			return [ "data" => $data[0], "stories" => $this->collectionStories($collID, $ordered) ];
+			return [ "data" => array_map([$this,'dataProcess'], $data)[0], "stories" => $this->collectionStories($collID, $ordered) ];
 		}
 		return NULL;
 	}
 
-	private function collectionStories(int $collID, bool $ordered)
+	private function collectionStories(int $collID, bool $ordered): array
 	{
 		$bind = [ ":collid" => $collID ];
 		$join[] = "INNER JOIN `tbl_collection_stories`rCollS ON ( rCollS.sid = S.sid AND rCollS.collid = :collid )";
@@ -296,7 +296,7 @@ class Story extends Base
 			$limit
 		);
 
-		return $data;
+		return array_map([$this,'dataProcess'], $data);
 	}
 
 	// wrapper for collectionsList
@@ -326,7 +326,7 @@ class Story extends Base
 							(
 								($_SESSION['groups']&64)?
 								"":
-								"WHERE concealed = 0 AND ((active='date' AND date_open<=NOW()) OR active>2)"
+								"WHERE concealed = 0 AND ((active='date' AND date_open<=NOW()) OR activesetting>2)"
 							),
 							$sql);
 
@@ -337,15 +337,11 @@ class Story extends Base
 			"/story/contests",
 			$limit
 		);
-		/*
-		foreach ( $data as &$dat )
-		{
 
-		}*/
-		return $data;
+		return array_map([$this,'dataProcess'], $data);
 	}
 
-	public function contestLoad(int $conid)
+	public function contestLoad(int $conid): ?array
 	{
 		$sql = "SELECT C.conid as id, C.title, C.summary, C.description,
                     IF(C.active='date',IF(C.date_open<NOW(),IF(C.date_close>NOW() OR C.date_close IS NULL,'active','closed'),'prepare'),C.active) as active,
@@ -380,12 +376,12 @@ class Story extends Base
 				? $this->timeToUser("@".$data[0]['vote_close'], $this->config['date_format'])
 				: "";
 
-			return $data[0];
+			return array_map([$this,'dataProcess'], $data)[0];
 		}
 		return NULL;
 	}
 
-	public function contestEntries(int $conid): array
+	public function contestEntries(int $conid): ?array
 	{
 		$limit = 5;
 		$pos = (int)$this->f3->get('paginate.page') - 1;
@@ -412,7 +408,7 @@ class Story extends Base
 
 		$data = $this->exec($sql, [":conid" => $conid ]);
 
-		if ( 0==sizeof($data) ) return[];
+		if ( 0==sizeof($data) ) return NULL;
 
 		$this->paginate(
 			$this->exec("SELECT FOUND_ROWS() as found")[0]['found'],
@@ -420,7 +416,7 @@ class Story extends Base
 			$limit
 		);
 
-		return($data);
+		return array_map([$this,'dataProcess'], $data);
 	}
 
 	public function searchPrepopulate ($item, $id)
@@ -468,7 +464,7 @@ class Story extends Base
 		return NULL;
 	}
 
-	public function getStory($story, $chapter=0)
+	public function getStory(int $story, int $chapter=0): ?array
 	{
 		$replacements =
 		[
@@ -486,7 +482,7 @@ class Story extends Base
 		}
 
 		if ( sizeof($data)==1 )
-			return $data[0];
+			return array_map([$this,'dataProcess'], $data)[0];
 
 		else return FALSE;
 	}
@@ -849,7 +845,7 @@ class Story extends Base
 														;",[":id"=>$id]) )
 			return NULL;
 
-		return array_map([$this,'dataProcess'], $data[0]);
+		return array_map([$this,'dataProcess'], $data)[0];
 	}
 
 	public function outreadList(): ?array
@@ -909,17 +905,18 @@ class Story extends Base
 		return $stats;
 	}
 
-	public function blockNewStories($items)
+	public function blockNewStories(int $items): array
 	{
-		return $this->exec('SELECT S.sid, S.title, S.summary,
+		$data = $this->exec('SELECT S.sid, S.title, S.summary,
 											S.cache_authors
 										FROM `tbl_stories`S
 										WHERE (datediff(S.updated,S.date) = 0) AND S.completed >= 6 AND S.validated >= 30
 										ORDER BY S.updated DESC
 										LIMIT 0,'.(int)$items);
+		return array_map([$this,'dataProcess'], $data);
 	}
 
-	public function blockRandomStory($items=1)
+	public function blockRandomStory(int $items=1): array
 	{
 		if ( "" == $data = \Cache::instance()->get('randomStoryCache') )
 		{
@@ -931,10 +928,10 @@ class Story extends Base
 			// this cache is not deleted anywhere and has to expire
 			\Cache::instance()->set('randomStoryCache', $data, 60);
 		}
-		return $data;
+		return array_map([$this,'dataProcess'], $data);
 	}
 
-	public function blockTagcloud($items)
+	public function blockTagcloud(int $items): array
 	{
 		if ( "" == $data = \Cache::instance()->get('blockTagcloudCache') )
 		{
@@ -950,17 +947,18 @@ class Story extends Base
 		return $data;
 	}
 
-	public function blockRecommendedStory(int $items=1, $order=FALSE)
+	public function blockRecommendedStory(int $items=1, bool $order=FALSE): array
 	{
 		$limit = ($items) ? "LIMIT 0,".$items : "";
 		$sort = ( $order == "random" ) ? 'RAND()' : 'Rec.date DESC';
 
-		return $this->exec("SELECT Rec.recid, Rec.title, Rec.summary, Rec.author, Rec.url, Rec.cache_categories, Rec.cache_rating,
+		$data = $this->exec("SELECT Rec.recid, Rec.title, Rec.summary, Rec.author, Rec.url, Rec.cache_categories, Rec.cache_rating,
 					U.uid, U.username
 						FROM `tbl_recommendations`Rec
 							LEFT JOIN `tbl_users`U ON ( Rec.uid = U.uid)
 						WHERE Rec.public = 2
 						ORDER BY {$sort} {$limit}");
+		return array_map([$this,'dataProcess'], $data);
 	}
 
 	public function blockFeaturedStory(int $items=1, $order=FALSE): array
@@ -968,12 +966,13 @@ class Story extends Base
 		$limit = ($items) ? "LIMIT 0,".$items : "";
 		$sort = ( $order ) ? 'RAND()' : 'S.updated DESC';
 
-		return $this->exec("SELECT S.title, S.sid, S.summary, S.cache_authors, S.cache_rating, S.cache_categories
+		$data = $this->exec("SELECT S.title, S.sid, S.summary, S.cache_authors, S.cache_rating, S.cache_categories
 				FROM `tbl_featured`F
 					INNER JOIN `tbl_stories`S ON ( F.id = S.sid AND S.validated >= 30 )
 				WHERE F.type='ST' AND (F.status=1 OR ( F.status IS NULL AND F.start < NOW() AND F.end > NOW() ))
 			ORDER BY {$sort} {$limit}");
 		// 1 = aktuell, 2, ehemals
+		return array_map([$this,'dataProcess'], $data);
 	}
 
 	public function blockContests( $items=FALSE, $order=FALSE ): array

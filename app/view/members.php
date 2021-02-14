@@ -26,20 +26,15 @@ class Members extends Base
 		);
 	}
 
-	public function profile(array $data)
+	public function profile(array $data): string
 	{
 		$this->f3->set('userdata', $data);
 		return $this->render('members/profile.html');
-		//return "<pre>".print_r($data,TRUE)."</pre>";
 	}
 
-	public function stories(array $userdata, array $extradata)
+	public function stories(array $userdata, array $extradata): string
 	{
 		$this->f3->set('userdata', $userdata);
-
-		if ( sizeof(@$extradata['stories']) )
-			foreach ( $extradata['stories'] as $key => $value )
-				$this->dataProcess($extradata['stories'][$key], $key);
 
 		$this->f3->set('extradata', $extradata);
 		return $this->render('members/stories.html');
@@ -49,16 +44,11 @@ class Members extends Base
 	{
 		$this->f3->set('userdata', $userdata);
 
-		if ( sizeof($collections) )
-			//while ( list($key, $value) = each($collections) )
-			foreach ( $collections as $key => $value )
-				$this->dataProcess($collections[$key], $key);
-
 		$this->f3->set('type', $type);
 		$this->f3->set('collections', $collections);
 		return $this->render('members/collections.html');
 	}
-	
+
 	public function listBookFav(array $userdata, array $extradata)
 	{
 		$this->f3->set('userdata', $userdata);
