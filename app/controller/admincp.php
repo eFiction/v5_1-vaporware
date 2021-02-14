@@ -16,10 +16,37 @@ class AdminCP extends Base
 
 	public function beforeroute(): void
 	{
+		$f3 = \Base::instance();
+
+		list($params, $parsedParams['returnpath']) = array_pad(explode(";returnpath=",$f3->get('PARAMS.*')), 2, '');
+
+		if ( $pArray = explode(";", str_replace(["/","&"],";",$params) ) )
+		{
+			foreach ( $pArray as $pKey => $pElement )
+			{
+				$x = explode ( "=", $pElement );
+				if ( isset($x[1]) )
+				{
+					$parsedParams[$x[0]] = explode(",",$x[1]);
+					if ( sizeof($parsedParams[$x[0]])==1 ) $parsedParams[$x[0]] = $x[1];
+				}
+				else
+				{
+					$parsedParams[$x[0]] = TRUE;
+					$parsedParams[$pKey] = $x[0];
+				}
+			}
+		}
+
+		$parsedParams['action'] = $f3->get('PARAMS.action');
+		$parsedParams['currentpath'] = $f3->get('PARAMS.0');
+		$f3->set('paginate.page', max(1,$parsedParams['page']??0));
+		$f3->set('PARAMS',$parsedParams);
+
 		$this->response = new \View\Backend();
 		\Registry::set('VIEW',$this->response);
 
-		$this->response->addTitle( \Base::instance()->get('LN__AdminCP') );
+		$this->response->addTitle( $f3->get('LN__AdminCP') );
 	}
 
 	protected function menuShow($selected=FALSE, $module=""): void
@@ -149,7 +176,7 @@ class AdminCP extends Base
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Contests') );
 		$f3->set('wiki', 'Archive:Contests');
 
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		$params = $f3->get('PARAMS');
 
 		if ( isset($params['delete']) )
 		{
@@ -274,7 +301,7 @@ class AdminCP extends Base
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Characters') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Characters') );
 
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		$params = $f3->get('PARAMS');
 		$category = (int)($params['category']??-1);
 
 		if ( isset($params['delete']) )
@@ -342,7 +369,7 @@ class AdminCP extends Base
 
 		$allowedSubs = $this->menuShowUpper("archive/tags");
 
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		$params = $f3->get('PARAMS');
 
 		if ( isset($params['groups']) )
 			$this->archiveTagsGroups($f3, $params);
@@ -489,7 +516,7 @@ class AdminCP extends Base
 
 	protected function archiveCategories(\Base $f3, array $params): void
 	{
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		$params = $f3->get('PARAMS');
 
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Categories') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Categories') );
@@ -594,7 +621,7 @@ class AdminCP extends Base
 
 	protected function archiveRatings(\Base $f3, array $params): void
 	{
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		$params = $f3->get('PARAMS');
 
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Ratings') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Ratings') );
@@ -709,7 +736,7 @@ class AdminCP extends Base
 		$this->response->addTitle( $f3->get('LN__AdminMenu_CustomPages') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_CustomPages') );
 
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		$params = $f3->get('PARAMS');
 
 		if ( isset($params['delete']) )
 		{
@@ -793,7 +820,7 @@ class AdminCP extends Base
 
 		$menuCount = $this->model->logGetCount();
 
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		$params = $f3->get('PARAMS');
 		$sub = isset($params['type'])?$params['type']:FALSE;
 
 		// page will always be an integer > 0
@@ -829,7 +856,7 @@ class AdminCP extends Base
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Polls') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Polls') );
 
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		$params = $f3->get('PARAMS');
 
 		if ( isset($params['delete']) )
 		{
@@ -916,7 +943,7 @@ class AdminCP extends Base
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Shoutbox') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Shoutbox') );
 
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		$params = $f3->get('PARAMS');
 
 		// search/browse
 		$allow_order = array (
@@ -992,7 +1019,7 @@ class AdminCP extends Base
 		$this->response->addTitle( $f3->get('LN__AdminMenu_News') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_News') );
 
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		$params = $f3->get('PARAMS');
 
 		if ( isset($params['delete']) )
 		{
@@ -1148,7 +1175,7 @@ class AdminCP extends Base
 
 	protected function membersEdit(\Base $f3, array $params): string
 	{
-		if( isset($params['*']) ) $params = $this->parametric($params['*']);
+		$params = $f3->get('PARAMS');
 
 		if( empty($params['uid']) OR !is_numeric($params['uid']) )
 			return $this->membersEditSearchForm($f3, $params);
@@ -1241,7 +1268,7 @@ class AdminCP extends Base
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Profile') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Profile') );
 
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		$params = $f3->get('PARAMS');
 
 		if ( isset($params['edit']) AND is_numeric($params['edit']) )
 		{
@@ -1364,7 +1391,7 @@ class AdminCP extends Base
 	protected function settingsModules(\Base $f3, array $params, array $modules): void
 	{
 		// sweep params for a selected module
-		$params = $this->parametric($params['*']??"");
+		$params = $f3->get('PARAMS');
 		// get the active modules configuration
 		$activeModules = \Config::getPublic('optional_modules');
 
@@ -1503,7 +1530,7 @@ class AdminCP extends Base
 			$data = $this->model->ajax("storySearch", $post);
 
 		elseif ( $params['module']=="editMeta" )
-			$data = $this->model->ajax("editMeta", $post, $this->parametric($params['*']??""));
+			$data = $this->model->ajax("editMeta", $post, $f3->get('PARAMS'));
 
 		elseif ( $params['module']=="featured" )
 			$data = $this->model->ajax("storySearch", $post);
@@ -1522,7 +1549,7 @@ class AdminCP extends Base
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Stories_Pending') );
 		$f3->set('title_h3', $f3->get('LN__AdminMenu_Stories_Pending') );
 
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		$params = $f3->get('PARAMS');
 
 		if ( isset($params['validate']) )
 		{
@@ -1630,8 +1657,7 @@ class AdminCP extends Base
 
 	protected function storiesEdit(\Base $f3, array $params): void
 	{
-		if ( isset($params['*']) )
-			$params = $this->parametric($params['*']);
+		$params = $f3->get('PARAMS');
 
 		if ( empty($params['story']) )
 		{
@@ -1786,7 +1812,7 @@ class AdminCP extends Base
 		//$allowedSubs = $this->menuShowUpper("stories/featured");
 		$this->menuShowUpper("stories/featured");
 
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		$params = $f3->get('PARAMS');
 
 		if ( isset( $_POST['sid'] ) )
 			$params['sid'] = (int)$_POST['sid'];
@@ -1854,7 +1880,7 @@ class AdminCP extends Base
 			$module = "series";
 		}
 
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		$params = $f3->get('PARAMS');
 
 		// so we want to delete from inside the edit form
 		if( isset($params['delete']) )
@@ -1962,7 +1988,7 @@ class AdminCP extends Base
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Recommendations') );
 		$this->menuShowUpper("stories/recommendations");
 
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		$params = $f3->get('PARAMS');
 
 		// so we want to delete from inside the edit form
 		if( isset($params['delete']) )
@@ -2004,7 +2030,7 @@ class AdminCP extends Base
 
 		if( isset ($params['id']) )
 		{
-			if ( [] !== $data = $this->model->recommendationLoad($params['id']) )
+			if ( NULL !== $data = $this->model->recommendationLoad($params['id']) )
 			{
 				// despite 0 not being an official code, AO3 will reply this way when a story is no longer found.
 				if ( @$data['lookup']['http_code']===0 )

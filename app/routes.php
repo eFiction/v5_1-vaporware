@@ -80,7 +80,7 @@ if ($_SESSION['groups'] & 1)
 			maintenance
 		-------------------- */
 		$f3->route(
-			[ 'GET|POST /userCP', 'GET|POST /userCP/*' ],
+			[ 'GET|POST /userCP', 'GET|POST /userCP/@module', 'GET|POST /userCP/@module/*' ],
 			'Controller\UserCP->index' );
 
 		// Ajax routes

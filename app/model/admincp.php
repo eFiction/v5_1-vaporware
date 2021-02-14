@@ -792,7 +792,7 @@ class AdminCP extends Controlpanel {
 			$limit
 		);
 
-		return $data;
+		return array_map([$this,'dataProcess'], $data);
 	}
 
 	public function contestLoad(int $conid)

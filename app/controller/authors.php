@@ -12,12 +12,12 @@ class Authors extends Base {
 
 	public function index(\Base $f3, array $params): void
 	{
-		if ( isset($params['*']) ) $this->parametric($params['*']);
+		$params = $f3->get('PARAMS');
 
 		// set header
 		$header[] = $f3->get('LN__Authors');
 
-		if ( empty($params['*']) )
+		if ( empty($params[0]) )
 		{
 			// Build menu letters
 			$letters = $this->model->letters();
@@ -32,13 +32,13 @@ class Authors extends Base {
 			}
 			else $content = NULL;
 		}
-		elseif ( preg_match("/[a-zA-Z#].*/", $params['*'][0]) )
+		elseif ( preg_match("/[a-zA-Z#].*/", $params[0]) )
 		{
 			// Build menu letters
 			$letters = $this->model->letters();
 
 			// load list of authors starting with letter
-			$letter = $params['*'][0];
+			$letter = $params[0];
 			$data = $this->model->getAuthors($letter);
 
 			// build view

@@ -99,10 +99,6 @@ class AdminCP extends Base
 	{
 		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 
-		//while ( list($key, $value) = each($data) )
-		foreach ( $data as $key => $value )
-			$this->dataProcess($data[$key], $key);
-
 		if( isset($_SESSION['lastAction']) )
 		{
 			$this->f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
@@ -307,9 +303,6 @@ class AdminCP extends Base
 	{
 		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
 
-		foreach ( $data as $key => $value )
-			$this->dataProcess($data[$key], $key);
-
 		$this->f3->set('data', 		$data);
 		$this->f3->set('module', 	$module);
 		$this->f3->set('sort', $sort);
@@ -324,7 +317,6 @@ class AdminCP extends Base
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
 		}
-		$this->dataProcess($data);
 		$this->f3->set('module', 	$module);
 		$this->f3->set('prePop', 	$prePop);
 		$this->f3->set('data', 		$data);
@@ -379,7 +371,6 @@ class AdminCP extends Base
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
 		}
-		$this->dataProcess($data);
 		$this->f3->set('prePop', 	$prePop);
 		$this->f3->set('data', 		$data);
 		$this->f3->set('returnpath', $returnpath);

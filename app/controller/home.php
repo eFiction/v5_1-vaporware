@@ -33,10 +33,10 @@ class Home extends Base {
 
 	public function news(\Base $f3, array $params)//: void
 	{
-		$this->response->addTitle( \Base::instance()->get('LN__News') );
+		$this->response->addTitle( $f3->get('LN__News') );
 
 		$this->model->canAdmin('home/news');
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		$params = $f3->get('PARAMS');
 
 		if  ( isset($_POST) AND sizeof($_POST)>0 AND "" == $f3->get('formError') )
 		{
@@ -58,7 +58,6 @@ class Home extends Base {
 
 	public function newsSave(\Base $f3, array $params)//: void
 	{
-		//$params = $this->parametric($params['*']);
 		if($_SESSION['userID']!=0 OR \Config::getPublic('allow_guest_comment_news') )
 		{
 			$errors = [];
@@ -151,7 +150,7 @@ class Home extends Base {
 	{
 		if ($_SESSION['userID']==0) return "";
 		//\Cache::instance()->clear("pollMenuCount");
-		if ( isset($params['*']) ) $params = $this->parametric($params['*']);
+		$params = $f3->get('PARAMS');
 
 		$closed = isset($params['closed']);
 

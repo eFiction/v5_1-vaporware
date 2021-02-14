@@ -856,6 +856,7 @@ return array(
 'Poll_LoginToVote'	=> 'Log in to vote',
 
 // Archive News
+'News'	=> 'News',
 'News_Headline'	=> 'Headline',
 'News_DateTimeExplain' => 'News entries will become visible at the time above',
 'News_Article'	=> 'Article',

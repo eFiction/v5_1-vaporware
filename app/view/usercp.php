@@ -188,9 +188,6 @@ class UserCP extends Base
 
 	public function libraryCollectionsList(array $data, array $sort, string $module) : string
 	{
-		foreach ( $data as $key => $value )
-			$this->dataProcess($data[$key], $key);
-
 		$this->f3->set('data', 		$data);
 		$this->f3->set('module', 	$module);
 		$this->f3->set('sort', $sort);
@@ -205,7 +202,6 @@ class UserCP extends Base
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
 		}
-		$this->dataProcess($data);
 		$this->f3->set('module', 	$module);
 		$this->f3->set('prePop', 	$prePop);
 		$this->f3->set('data', 		$data);
@@ -274,7 +270,6 @@ class UserCP extends Base
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
 			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
 		}
-		$this->dataProcess($data);
 		$this->f3->set('prePop', 	$prePop);
 		$this->f3->set('data', 		$data);
 		$this->f3->set('returnpath', $returnpath);

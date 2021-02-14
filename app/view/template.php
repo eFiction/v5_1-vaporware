@@ -4,7 +4,7 @@ namespace View;
 class Template extends Base
 {
 	/*
-		class Template extends the base view, 
+		class Template extends the base view,
 		providing everything required to handle
 		the actual output.
 		This way, the view class remains slim
@@ -27,7 +27,7 @@ class Template extends Base
 			$tpl = $this->config["layout_default"];
 
 		if ( !file_exists( $UI_BASE.$tpl ) ) $tpl = "default";
-		
+
 		/*
 			This so needs to be reworked!
 		*/
@@ -39,10 +39,10 @@ class Template extends Base
 		else $this->f3->set('CSS_UI', "{$UI_BASE}default/");
 		$UI .= "{$UI_BASE}default/";
 		$this->f3->set('UI', $UI);
-		
+
 		$this->f3->set('SELF', rawurlencode($_SERVER["QUERY_STRING"]));
 /*
-		$this->f3->JS = [ 
+		$this->f3->JS = [
 							"head" => [],
 							"body" => []
 						];
@@ -51,14 +51,14 @@ class Template extends Base
 		\View\Base::javascript('body', FALSE, "var base='{$this->f3->get('BASE')}'" );
 	}
 
-	public function addTitle($string)
+	public function addTitle(string $string): void
 	{
 		 $this->title[] = $string;
 	}
 }
 
 class Iconset extends \DB\Jig\Mapper {
-	
+
 	public function __construct()
 	{
 		$db = new \DB\Jig('tmp/');
@@ -66,7 +66,7 @@ class Iconset extends \DB\Jig\Mapper {
 		//parent::__construct($db,"iconset.{$_SESSION['tpl'][1]}.json");
 		$this->load();
 	}
-	
+
 	static public function instance()
 	{
 		if (\Registry::exists('ICONSET'))
@@ -79,13 +79,13 @@ class Iconset extends \DB\Jig\Mapper {
 			return $icon;
 		}
 	}
-	
+
 	static public function parse($key)
 	{
 		//var_dump(self::instance());exit;
 		list(, $label, $visibility, $text) = $key;
 		if (empty($label)) return NULL;
-		
+
 		// Empty $text should not overwrite a title tag of a parent item
 		if ($text)
 		{
@@ -93,12 +93,12 @@ class Iconset extends \DB\Jig\Mapper {
 				return str_replace("@T@", " id='{$text}'", self::instance()->_data[$label]);
 			else
 				return str_replace("@T@", " title='{$text}'", self::instance()->_data[$label]);
-			
+
 		}
 		else
 			return str_replace("@T@", "", @self::instance()->_data[$label]);
 	}
-	
+
 	static protected function rebuild($icon)
 	{
 		//$set = $_SESSION['tpl'][1];

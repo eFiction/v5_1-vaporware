@@ -1454,7 +1454,7 @@ class Controlpanel extends Base {
 			$limit
 		);
 
-		return $data;
+		return array_map([$this,'dataProcess'], $data);
 	}
 
 	public function collectionLoad(int $collid, int $userID=0) : array
@@ -1854,9 +1854,9 @@ class Controlpanel extends Base {
 		return $data;
 	}
 
-	public function recommendationLoad( int $recID, int $userID = 0 ) : array
+	public function recommendationLoad( int $recID, int $userID = 0 ): ?array
 	{
-		$sql = "SELECT Rec.recid, Rec.uid, Rec.url, Rec.title, Rec.author, Rec.summary, Rec.comment, Rec.ratingid, Rec.public, Rec.completed,
+		$sql = "SELECT Rec.recid, Rec.url, Rec.title, Rec.author, Rec.summary, Rec.comment, Rec.ratingid, Rec.public, Rec.completed,
 					Rec.cache_tags, Rec.cache_characters, Rec.cache_categories,
 					U.uid, U.username
 				FROM `tbl_recommendations`Rec
@@ -1869,8 +1869,8 @@ class Controlpanel extends Base {
 		{
 			$data['maintainerblock'] = json_encode( [[ "id" => $data['uid'], "name" => $data['username'] ]] );
 			/**
-				Use cURL to get an idea of how good or bad the URL might be.
-				In the end, a closer look may be required, but it might give a hint
+			*	Use cURL to get an idea of how good or bad the URL might be.
+			*	In the end, a closer look may be required, but it might give a hint
 			*/
 			$handle = curl_init();
 			curl_setopt($handle, CURLOPT_URL, $data['url']);
@@ -1885,7 +1885,7 @@ class Controlpanel extends Base {
 
 			return $data;
 		}
-		return [];
+		return NULL;
 	}
 
 	/**

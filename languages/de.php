@@ -856,6 +856,7 @@ return array(
 'Poll_LoginToVote'	=> 'Log in to vote',
 
 // Archiv News'
+'News'	=> 'Neuigkeiten',
 'News_Headline'	=> 'Schlagzeile',
 'News_DateTimeExplain' => 'Artikel werden zur oben angegeben Zeit sichtbar',
 'News_Article'	=> 'Artikel',
