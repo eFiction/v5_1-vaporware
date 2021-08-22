@@ -3,22 +3,22 @@ namespace View;
 
 class Blocks extends Base
 {
-	
+
 	public static function pageMenu($main, $sub, $vertical = FALSE)
 	{
 		\Base::instance()->set('menuMain', $main);
 		\Base::instance()->set('menuSub', $sub);
-		
+
 		if ( $vertical )
 			return parent::render('blocks/menu.vert.html');
-		
+
 		else
 			return parent::render('blocks/menu.html');
 	}
 
 	public static function shoutboxInit()
 	{
-		\Registry::get('VIEW')->javascript( 'head', TRUE, "shoutbox.js" );
+		\Registry::get('VIEW')->javascript( 'head', "shoutbox.js", TRUE );
 		return parent::render('blocks/shoutbox.html');
 	}
 
@@ -34,15 +34,15 @@ class Blocks extends Base
 			\Base::instance()->set('shoutboxGuest', TRUE);
 		else
 			\Base::instance()->set('shoutboxMember', TRUE);
-		
+
 		return parent::render('blocks/shoutbox.inner.html');
 	}
-	
+
 	public static function calendarInit()
 	{
-		\Registry::get('VIEW')->javascript( 'body', TRUE, "calendar.js.php?base=".\Base::instance()->get('BASE') );
-		
-		$cell = array ( 
+		\Registry::get('VIEW')->javascript( 'body', "calendar.js.php?base=".\Base::instance()->get('BASE'), TRUE );
+
+		$cell = array (
 				"ID"		=> "sb_cell_calendar",
 				"TITLE"		=> "__Calendar",
 				"CONTENT"	=> "Loading ...",
@@ -59,11 +59,11 @@ class Blocks extends Base
 		echo $this->directrender('blocks/calendar.html');
 		exit;
 	}
-	
+
 	public static function categories($data)
 	{
-		
-		$cell = array ( 
+
+		$cell = array (
 				"ID"		=> "sb_cell_categories",
 				"TITLE"		=> \Base::instance()->get("LN__Categories"),
 				"CONTENT"	=> $data,

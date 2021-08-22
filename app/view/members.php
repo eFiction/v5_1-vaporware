@@ -15,7 +15,7 @@ class Members extends Base
 			unset($_SESSION['lastAction']);
 		}
 
-		$this->javascript( 'body', FALSE, 'document.addEventListener(\'DOMContentLoaded\', () => {
+		$this->javascript( 'body', 'document.addEventListener(\'DOMContentLoaded\', () => {
 								  (document.querySelectorAll(\'.notification .delete\') || []).forEach(($delete) => {
 									$notification = $delete.parentNode;
 									$delete.addEventListener(\'click\', () => {

@@ -23,8 +23,8 @@ class Story extends Base
 
 	public function buildTOC($tocData, $storyData)
 	{
-		$this->javascript('body', TRUE, 'jquery.columnizer.js' );
-		$this->javascript('body', FALSE, "$(function(){ $('.chapter-box').addClass(\"dontsplit\"); $('.columnize').columnize({ width: 400 }); });" );
+		$this->javascript('body', 'jquery.columnizer.js', TRUE );
+		$this->javascript('body', "$(function(){ $('.chapter-box').addClass(\"dontsplit\"); $('.columnize').columnize({ width: 400 }); });" );
 
 		$this->f3->set('tocData', $tocData);
 		$this->f3->set('storyID', $storyData['sid']);
@@ -65,8 +65,8 @@ class Story extends Base
 
 	public function readBody($storyData,$content,$dropdown,$view=1)
 	{
-		$this->javascript('body', TRUE, 'chapter.js?' );
-		$this->javascript('body', FALSE, "var url='".\Base::instance()->get('BASE')."/story/read/{$storyData['sid']},'" );
+		$this->javascript('body', 'chapter.js?', TRUE );
+		$this->javascript('body', "var url='".\Base::instance()->get('BASE')."/story/read/{$storyData['sid']},'" );
 
 		// fix for <b> not showing with bulma, might have to find a better one for this
 		$content = str_replace(["<b>","</b>"], ["<strong>","</strong>"], $content);
@@ -84,8 +84,8 @@ class Story extends Base
 
 	public function buildReviews($storyData)
 	{
-		$this->javascript('body', TRUE, 'jquery.comments.min.js' );
-		$this->javascript('body', TRUE, 'chapter.js?' );
+		$this->javascript('body', 'jquery.comments.min.js', TRUE );
+		$this->javascript('body', 'chapter.js?', TRUE );
 
 		$this->f3->set('story', $storyData);
 		$this->f3->set('returnpath', $this->f3->get('PATH') );

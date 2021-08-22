@@ -45,8 +45,6 @@ class UserCP extends Base
 
 	public function authorStoryList(array $data, array $sort, array $params)
 	{
-		//\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
-
 		$this->f3->set('storyEntries', $data);
 		$this->f3->set('sort', $sort);
 		$this->f3->set('author', $params['uid']);
@@ -84,8 +82,8 @@ class UserCP extends Base
 		if($chapterData['editor']=="visual")
 		{
 			// load TinyMCE and config
-			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
-			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
+			$this->javascript( 'head', "tinymce/tinymce.min.js", TRUE );
+			$this->javascript( 'head', "tinymce/tinymce.config.js", TRUE );
 			// replace \n breaks with html breaks
 			$chapterData['chaptertext'] = str_replace("\n", "<br/>", $chapterData['chaptertext']);
 		}
@@ -154,8 +152,6 @@ class UserCP extends Base
 
 	public function shoutboxList($data)
 	{
-		//\Registry::get('VIEW')->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
-
 		if( isset($_SESSION['lastAction']) )
 		{
 			$this->f3->set(key($_SESSION['lastAction']),current($_SESSION['lastAction']));
@@ -168,7 +164,7 @@ class UserCP extends Base
 
 	public function libraryBookFavList(array $data, array $sort, array $extra)
 	{
-		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+		$this->javascript( 'head', "controlpanel.js.php?sub=confirmDelete", TRUE );
 
 		$this->f3->set('libraryEntries', $data);
 		$this->f3->set('sort', $sort);
@@ -199,8 +195,8 @@ class UserCP extends Base
 	{
 		if($data['editor']=="visual" AND $this->config['advanced_editor']==TRUE )
 		{
-			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
-			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
+			$this->javascript( 'head', "tinymce/tinymce.min.js", TRUE );
+			$this->javascript( 'head', "tinymce/tinymce.config.js", TRUE );
 		}
 		$this->f3->set('module', 	$module);
 		$this->f3->set('prePop', 	$prePop);
@@ -221,7 +217,7 @@ class UserCP extends Base
 
 	public function feedbackHome(array $data)
 	{
-		$this->javascript( 'head', TRUE, "piechart.js" );
+		$this->javascript( 'head', "piechart.js", TRUE );
 
 		$this->f3->set('stats', $data);
 		return $this->render('usercp/feedback.home.html');
@@ -229,7 +225,7 @@ class UserCP extends Base
 
 	public function feedbackListReviews(array $data, array $sort, array $extra)
 	{
-		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+		$this->javascript( 'head', "controlpanel.js.php?sub=confirmDelete", TRUE );
 
 		$this->f3->set('feedbackEntries', $data);
 		$this->f3->set('sort', $sort);
@@ -256,7 +252,7 @@ class UserCP extends Base
 
 	public function recommendationList( array $data, array $sort ) : string
 	{
-		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+		$this->javascript( 'head', "controlpanel.js.php?sub=confirmDelete", TRUE );
 		$this->f3->set('data', $data);
 		$this->f3->set('sort', $sort);
 
@@ -267,8 +263,8 @@ class UserCP extends Base
 	{
 		if($data['editor']=="visual" AND $this->config['advanced_editor']==TRUE )
 		{
-			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
-			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
+			$this->javascript( 'head', "tinymce/tinymce.min.js", TRUE );
+			$this->javascript( 'head', "tinymce/tinymce.config.js", TRUE );
 		}
 		$this->f3->set('prePop', 	$prePop);
 		$this->f3->set('data', 		$data);

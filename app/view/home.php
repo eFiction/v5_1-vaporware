@@ -25,7 +25,7 @@ class Home extends Base
 	{
 		if ( $_SESSION['userID']==0 )
 		{
-			$this->javascript( 'body', FALSE, "$( document ).ready(function() {
+			$this->javascript( 'body', "$( document ).ready(function() {
 																	getCaptchaImage();
 																	$('#captchaBox').click(getCaptchaImage);
 																}); " );

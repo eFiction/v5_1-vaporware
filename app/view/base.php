@@ -13,7 +13,7 @@ abstract class Base {
 		$this->TPL 		= \Template::instance();
 	}
 
-	public function javascript(string $location, bool $file=FALSE, string $string): void
+	public function javascript(string $location, string $string, bool $file=FALSE): void
 	{
 		if($file)
 		{

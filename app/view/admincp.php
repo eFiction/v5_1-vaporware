@@ -43,7 +43,7 @@ class AdminCP extends Base
 
 	public function categoryList($data, $feedback)
 	{
-		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+		$this->javascript( 'head', "controlpanel.js.php?sub=confirmDelete", TRUE );
 
 		$this->f3->set('categories', $data);
 		$this->f3->set('feedback', $feedback);
@@ -72,7 +72,7 @@ class AdminCP extends Base
 
 	public function characterList(array $data, array $categories, int $category, array $sort)
 	{
-		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+		$this->javascript( 'head', "controlpanel.js.php?sub=confirmDelete", TRUE );
 
 		if( isset($_SESSION['lastAction']) )
 		{
@@ -97,7 +97,7 @@ class AdminCP extends Base
 
 	public function contestsList(array $data, array $sort)
 	{
-		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+		$this->javascript( 'head', "controlpanel.js.php?sub=confirmDelete", TRUE );
 
 		if( isset($_SESSION['lastAction']) )
 		{
@@ -115,11 +115,11 @@ class AdminCP extends Base
 	{
 		if($data['editor']=="visual" AND $this->config['advanced_editor']==TRUE )
 		{
-			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
-			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
+			$this->javascript( 'head', "tinymce/tinymce.min.js", TRUE );
+			$this->javascript( 'head', "tinymce/tinymce.config.js", TRUE );
 			$data['description'] = nl2br($data['description']);
 		}
-		$this->javascript( 'head', TRUE, "jquery.datetimepicker.js" );
+		$this->javascript( 'head', "jquery.datetimepicker.js", TRUE );
 
 		$this->f3->set('data', $data);
 		$this->f3->set('returnpath', $returnpath);
@@ -129,7 +129,7 @@ class AdminCP extends Base
 
 	public function contestEntries(array $data, array $sort, string $returnpath): string
 	{
-		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+		$this->javascript( 'head', "controlpanel.js.php?sub=confirmDelete", TRUE );
 
 		$this->f3->set('data', $data);
 		$this->f3->set('sort', $sort);
@@ -140,7 +140,7 @@ class AdminCP extends Base
 
 	public function custompageList(array $data, array $sort)
 	{
-		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+		$this->javascript( 'head', "controlpanel.js.php?sub=confirmDelete", TRUE );
 
 		$this->f3->set('pages', $data);
 		$this->f3->set('sort', $sort);
@@ -151,8 +151,8 @@ class AdminCP extends Base
 	{
 		if($data['editor']=="visual" AND $this->config['advanced_editor']==TRUE )
 		{
-			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
-			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
+			$this->javascript( 'head', "tinymce/tinymce.min.js", TRUE );
+			$this->javascript( 'head', "tinymce/tinymce.config.js", TRUE );
 		}
 
 		$this->f3->set('data', $data);
@@ -162,7 +162,7 @@ class AdminCP extends Base
 
 	public function featuredList(array $data, array $sort, string $select)
 	{
-		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+		$this->javascript( 'head', "controlpanel.js.php?sub=confirmDelete", TRUE );
 
 		if( isset($_SESSION['lastAction']) )
 		{
@@ -178,7 +178,7 @@ class AdminCP extends Base
 
 	public function featuredEdit(array $data, string $returnpath): string
 	{
-		$this->javascript( 'head', TRUE, "jquery.datetimepicker.js" );
+		$this->javascript( 'head', "jquery.datetimepicker.js", TRUE );
 
 		if( isset($_SESSION['lastAction']) )
 		{
@@ -228,7 +228,7 @@ class AdminCP extends Base
 
 	public function logList(array $data, array $menu, array $sort, $sub=FALSE)
 	{
-		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+		$this->javascript( 'head', "controlpanel.js.php?sub=confirmDelete", TRUE );
 
 		$this->f3->set('logEntries', $data);
 		$this->f3->set('logMenu', $menu);
@@ -246,10 +246,10 @@ class AdminCP extends Base
 	{
 		if($data['editor']=="visual" AND $this->config['advanced_editor']==TRUE )
 		{
-			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
-			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
+			$this->javascript( 'head', "tinymce/tinymce.min.js", TRUE );
+			$this->javascript( 'head', "tinymce/tinymce.config.js", TRUE );
 		}
-		$this->javascript( 'head', TRUE, "jquery.datetimepicker.js" );
+		$this->javascript( 'head', "jquery.datetimepicker.js", TRUE );
 
 		$this->f3->set('data', $data);
 		$this->f3->set('format', $this->config['date_preset']." ".$this->config['time_preset']);
@@ -260,7 +260,7 @@ class AdminCP extends Base
 
 	public function newsList(array $data, array $sort)
 	{
-		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+		$this->javascript( 'head', "controlpanel.js.php?sub=confirmDelete", TRUE );
 
 		$this->f3->set('newsEntries', $data);
 		$this->f3->set('sort', $sort);
@@ -301,7 +301,7 @@ class AdminCP extends Base
 
 	public function collectionsList(array $data, array $sort, string $module) : string
 	{
-		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+		$this->javascript( 'head', "controlpanel.js.php?sub=confirmDelete", TRUE );
 
 		$this->f3->set('data', 		$data);
 		$this->f3->set('module', 	$module);
@@ -314,8 +314,8 @@ class AdminCP extends Base
 	{
 		if($data['editor']=="visual" AND $this->config['advanced_editor']==TRUE )
 		{
-			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
-			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
+			$this->javascript( 'head', "tinymce/tinymce.min.js", TRUE );
+			$this->javascript( 'head', "tinymce/tinymce.config.js", TRUE );
 		}
 		$this->f3->set('module', 	$module);
 		$this->f3->set('prePop', 	$prePop);
@@ -336,7 +336,7 @@ class AdminCP extends Base
 
 	public function pollList(array $data, array $sort) : string
 	{
-		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+		$this->javascript( 'head', "controlpanel.js.php?sub=confirmDelete", TRUE );
 
 		$this->f3->set('data', $data);
 		$this->f3->set('sort', $sort);
@@ -346,7 +346,7 @@ class AdminCP extends Base
 
 	public function pollEdit(array $data, string $returnpath)
 	{
-		$this->javascript( 'head', TRUE, "jquery.datetimepicker.js" );
+		$this->javascript( 'head', "jquery.datetimepicker.js", TRUE );
 
 		$this->f3->set('data', 		 $data);
 		$this->f3->set('format', $this->config['date_preset']." ".$this->config['time_preset']);
@@ -357,7 +357,7 @@ class AdminCP extends Base
 
 	public function recommendationList( array $data, array $sort ) : string
 	{
-		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+		$this->javascript( 'head', "controlpanel.js.php?sub=confirmDelete", TRUE );
 		$this->f3->set('data', 		 $data);
 		$this->f3->set('sort', $sort);
 
@@ -368,8 +368,8 @@ class AdminCP extends Base
 	{
 		if($data['editor']=="visual" AND $this->config['advanced_editor']==TRUE )
 		{
-			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
-			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
+			$this->javascript( 'head', "tinymce/tinymce.min.js", TRUE );
+			$this->javascript( 'head', "tinymce/tinymce.config.js", TRUE );
 		}
 		$this->f3->set('prePop', 	$prePop);
 		$this->f3->set('data', 		$data);
@@ -389,7 +389,7 @@ class AdminCP extends Base
 
 	public function shoutList(array $data, array $sort)
 	{
-		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+		$this->javascript( 'head', "controlpanel.js.php?sub=confirmDelete", TRUE );
 
 		$this->f3->set('shoutEntries', $data);
 		$this->f3->set('sort', $sort);
@@ -434,8 +434,8 @@ class AdminCP extends Base
 		if($chapterData['editor']=="visual" AND $this->config['advanced_editor']==TRUE )
 		{
 			// load TinyMCE and config
-			$this->javascript( 'head', TRUE, "tinymce/tinymce.min.js" );
-			$this->javascript( 'head', TRUE, "tinymce/tinymce.config.js" );
+			$this->javascript( 'head', "tinymce/tinymce.min.js", TRUE );
+			$this->javascript( 'head', "tinymce/tinymce.config.js", TRUE );
 			// replace \n breaks with html breaks
 			$chapterData['chaptertext'] = str_replace("\n", "<br/>", $chapterData['chaptertext']);
 		}
@@ -478,7 +478,7 @@ class AdminCP extends Base
 
 	public function tagList($data, $sort)
 	{
-		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+		$this->javascript( 'head', "controlpanel.js.php?sub=confirmDelete", TRUE );
 
 		if( isset($_SESSION['deleteResult']) )
 		{
@@ -499,7 +499,7 @@ class AdminCP extends Base
 
 	public function tagGroupList(array $data, array $sort)
 	{
-		$this->javascript( 'head', TRUE, "controlpanel.js.php?sub=confirmDelete" );
+		$this->javascript( 'head', "controlpanel.js.php?sub=confirmDelete", TRUE );
 
 		if( isset($_SESSION['lastAction']) )
 		{
