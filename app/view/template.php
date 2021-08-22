@@ -47,8 +47,8 @@ class Template extends Base
 							"body" => []
 						];
 */
-		\View\Base::javascript('body', TRUE, 'global.js' );
-		\View\Base::javascript('body', FALSE, "var base='{$this->f3->get('BASE')}'" );
+		\View\Base::javascript('body', 'global.js', TRUE );
+		\View\Base::javascript('body', "var base='{$this->f3->get('BASE')}'" );
 	}
 
 	public function addTitle(string $string): void

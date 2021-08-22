@@ -11,6 +11,7 @@ abstract class Base {
 		$this->config = \Config::getTree();
 		$this->f3 		= \Base::instance();
 		$this->TPL 		= \Template::instance();
+    $this->f3->JS = [ 'head' => [], 'body' => [] ];
 	}
 
 	public function javascript(string $location, string $string, bool $file=FALSE): void

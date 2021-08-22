@@ -1165,7 +1165,7 @@ class AdminCP extends Controlpanel {
 		return $count;
 	}
 
-	public function logGetData($sub=FALSE, $page, array $sort)
+	public function logGetData($sub, int $page, array $sort)
 	{
 		$limit = 50;
 		$pos = $page - 1;
