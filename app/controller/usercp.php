@@ -691,13 +691,13 @@ class UserCP extends Base
 		if ( $params[0]=="collections" )
 		{
 			$this->response->addTitle( $f3->get('LN__AdminMenu_Collections') );
-			$f3->set('title_h3', $f3->get('LN__AdminMenu_Collections') );
+			$f3->set('title_sub', $f3->get('LN__AdminMenu_Collections') );
 			$module = "collections";
 		}
 		else
 		{
 			$this->response->addTitle( $f3->get('LN__AdminMenu_Series') );
-			$f3->set('title_h3', $f3->get('LN__AdminMenu_Series') );
+			$f3->set('title_sub', $f3->get('LN__AdminMenu_Series') );
 			$module = "series";
 		}
 
@@ -827,7 +827,7 @@ class UserCP extends Base
 	private function libraryRecommendations(\Base $f3, array $params) : void
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Recommendations') );
-		$f3->set('title_h3', $f3->get('LN__AdminMenu_Recommendations') );
+		$f3->set('title_sub', $f3->get('LN__AdminMenu_Recommendations') );
 
 		if( isset($params['delete']) )
 		{

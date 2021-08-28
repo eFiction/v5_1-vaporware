@@ -91,7 +91,7 @@ class AdminCP extends Base
 		$this->menuShow($this->moduleBase, @$params['module']);
 		// add module title
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Archive') );
-		$f3->set('title_h1', $f3->get('LN__AdminMenu_Archive') );
+		$f3->set('title_main', $f3->get('LN__AdminMenu_Archive') );
 
 		switch( $this->moduleInit([ "submit", "contests", "characters", "tags", "categories", "ratings" ], @$params['module']) )
 		{
@@ -173,7 +173,7 @@ class AdminCP extends Base
 	protected function archiveContests(\Base $f3, array $params): string
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Contests') );
-		$f3->set('title_h3', $f3->get('LN__AdminMenu_Contests') );
+		$f3->set('title_sub', $f3->get('LN__AdminMenu_Contests') );
 		$f3->set('wiki', 'Archive:Contests');
 
 		$params = $f3->get('PARAMS');
@@ -299,7 +299,7 @@ class AdminCP extends Base
 	protected function archiveCharacters(\Base $f3, array $params): string
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Characters') );
-		$f3->set('title_h3', $f3->get('LN__AdminMenu_Characters') );
+		$f3->set('title_sub', $f3->get('LN__AdminMenu_Characters') );
 
 		$params = $f3->get('PARAMS');
 		$category = (int)($params['category']??-1);
@@ -365,7 +365,7 @@ class AdminCP extends Base
 	protected function archiveTagsIndex(\Base $f3, array $params, $feedback): void
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Tags') );
-		$f3->set('title_h3', $f3->get('LN__AdminMenu_Tags') );
+		$f3->set('title_sub', $f3->get('LN__AdminMenu_Tags') );
 
 		$allowedSubs = $this->menuShowUpper("archive/tags");
 
@@ -519,7 +519,7 @@ class AdminCP extends Base
 		$params = $f3->get('PARAMS');
 
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Categories') );
-		$f3->set('title_h3', $f3->get('LN__AdminMenu_Categories') );
+		$f3->set('title_sub', $f3->get('LN__AdminMenu_Categories') );
 
 		if ( isset($params['move']) )
 		{
@@ -624,7 +624,7 @@ class AdminCP extends Base
 		$params = $f3->get('PARAMS');
 
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Ratings') );
-		$f3->set('title_h3', $f3->get('LN__AdminMenu_Ratings') );
+		$f3->set('title_sub', $f3->get('LN__AdminMenu_Ratings') );
 
 		if ( isset($params['delete']) )
 		{
@@ -672,7 +672,7 @@ class AdminCP extends Base
 		$this->menuShow($this->moduleBase, @$params['module']);
 		// add module title
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Home') );
-		$f3->set('title_h1', $f3->get('LN__AdminMenu_Home') );
+		$f3->set('title_main', $f3->get('LN__AdminMenu_Home') );
 
 		switch( $this->moduleInit([ "custompages", "logs", "manual", "news", "shoutbox", "polls", "maintenance" ], @$params['module']) )
 		{
@@ -734,7 +734,7 @@ class AdminCP extends Base
 	protected function homeCustompages(\Base $f3, array $params): void
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_CustomPages') );
-		$f3->set('title_h3', $f3->get('LN__AdminMenu_CustomPages') );
+		$f3->set('title_sub', $f3->get('LN__AdminMenu_CustomPages') );
 
 		$params = $f3->get('PARAMS');
 
@@ -816,7 +816,7 @@ class AdminCP extends Base
 			return;
 		}
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Logs') );
-		$f3->set('title_h3', $f3->get('LN__AdminMenu_Logs') );
+		$f3->set('title_sub', $f3->get('LN__AdminMenu_Logs') );
 
 		$menuCount = $this->model->logGetCount();
 
@@ -854,7 +854,7 @@ class AdminCP extends Base
 	protected function homePolls(\Base $f3, array $params): string
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Polls') );
-		$f3->set('title_h3', $f3->get('LN__AdminMenu_Polls') );
+		$f3->set('title_sub', $f3->get('LN__AdminMenu_Polls') );
 
 		$params = $f3->get('PARAMS');
 
@@ -941,7 +941,7 @@ class AdminCP extends Base
 	protected function homeShoutbox(\Base $f3, array $params): void
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Shoutbox') );
-		$f3->set('title_h3', $f3->get('LN__AdminMenu_Shoutbox') );
+		$f3->set('title_sub', $f3->get('LN__AdminMenu_Shoutbox') );
 
 		$params = $f3->get('PARAMS');
 
@@ -1017,7 +1017,7 @@ class AdminCP extends Base
 	protected function homeNews(\Base $f3, array $params): void
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_News') );
-		$f3->set('title_h3', $f3->get('LN__AdminMenu_News') );
+		$f3->set('title_sub', $f3->get('LN__AdminMenu_News') );
 
 		$params = $f3->get('PARAMS');
 
@@ -1266,7 +1266,7 @@ class AdminCP extends Base
 	protected function membersProfile(\Base $f3, array $params)
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Profile') );
-		$f3->set('title_h3', $f3->get('LN__AdminMenu_Profile') );
+		$f3->set('title_sub', $f3->get('LN__AdminMenu_Profile') );
 
 		$params = $f3->get('PARAMS');
 
@@ -1313,53 +1313,53 @@ class AdminCP extends Base
 		{
 			case "modules":
 				$this->response->addTitle( $f3->get('LN__AdminMenu_Modules') );
-				$f3->set('title_h3', $f3->get('LN__AdminMenu_Modules') );
+				$f3->set('title_sub', $f3->get('LN__AdminMenu_Modules') );
 				$modules['shoutbox'] = $this->model->settingsFields('modules_shoutbox');
 				$extra = $this->settingsModules( $f3, $params, $modules );
 				break;
 			case "datetime":
 				$this->response->addTitle( $f3->get('LN__AdminMenu_DateTime') );
-				$f3->set('title_h3', $f3->get('LN__AdminMenu_DateTime') );
+				$f3->set('title_sub', $f3->get('LN__AdminMenu_DateTime') );
 				$data['DateTime'] = $this->model->settingsFields('settings_datetime');
 				$extra = $this->settingsDateTime($f3, $params);
 				break;
 			case "server":
 				$this->response->addTitle( $f3->get('LN__AdminMenu_Server') );
-				$f3->set('title_h3', $f3->get('LN__AdminMenu_Server') );
+				$f3->set('title_sub', $f3->get('LN__AdminMenu_Server') );
 				$this->settingsServer($f3, $data);
 				break;
 			case "registration":
 				$this->response->addTitle( $f3->get('LN__AdminMenu_Registration') );
-				$f3->set('title_h3', $f3->get('LN__AdminMenu_Registration') );
+				$f3->set('title_sub', $f3->get('LN__AdminMenu_Registration') );
 				$data['Registration'] = $this->model->settingsFields('settings_registration');
 				$data['AntiSpam'] = $this->model->settingsFields('settings_registration_sfs');
 				break;
 			case "layout":
 				$this->response->addTitle( $f3->get('LN__AdminMenu_Layout') );
-				$f3->set('title_h3', $f3->get('LN__AdminMenu_Layout') );
+				$f3->set('title_sub', $f3->get('LN__AdminMenu_Layout') );
 				$data['Layout'] = $this->model->settingsFields('settings_layout');
 				$extra = $this->settingsLayout($f3, $params);
 				break;
 			case "security":
 				$this->response->addTitle( $f3->get('LN__AdminMenu_Security') );
-				$f3->set('title_h3', $f3->get('LN__AdminMenu_Security') );
+				$f3->set('title_sub', $f3->get('LN__AdminMenu_Security') );
 				break;
 			case "screening":
 				$this->response->addTitle( $f3->get('LN__AdminMenu_Screening') );
-				$f3->set('title_h3', $f3->get('LN__AdminMenu_Screening') );
+				$f3->set('title_sub', $f3->get('LN__AdminMenu_Screening') );
 				$data['BadBevaviour'] = $this->model->settingsFields('bad_behaviour');
 				$data['BadBevaviour_Ext'] = $this->model->settingsFields('bad_behaviour_ext');
 				$data['BadBevaviour_Rev'] = $this->model->settingsFields('bad_behaviour_rev');
 				break;
 			case "language":
 				$this->response->addTitle( $f3->get('LN__AdminMenu_Language') );
-				$f3->set('title_h3', $f3->get('LN__AdminMenu_Language') );
+				$f3->set('title_sub', $f3->get('LN__AdminMenu_Language') );
 				$data['Language'] = $this->model->settingsFields('settings_language');
 				$extra = $this->settingsLanguage($f3, $params);
 				break;
 			case "home":
 				$this->response->addTitle( $f3->get('LN__AdminMenu_General') );
-				$f3->set('title_h3', $f3->get('LN__AdminMenu_General') );
+				$f3->set('title_sub', $f3->get('LN__AdminMenu_General') );
 				$params['module'] = "home";
 				$data['General'] = $this->model->settingsFields('settings_general');
 				break;
@@ -1420,7 +1420,7 @@ class AdminCP extends Base
 
  	protected function settingsLanguage(\Base $f3, array $params) : string
 	{
-		$f3->set('title_h3', $f3->get('LN__AdminMenu_Language') );
+		$f3->set('title_sub', $f3->get('LN__AdminMenu_Language') );
 
 		$languageConfig = $this->model->getLanguageConfig();
 
@@ -1437,7 +1437,7 @@ class AdminCP extends Base
 
  	protected function settingsLayout(\Base $f3, array $params): string
 	{
-		$f3->set('title_h3', $f3->get('LN__AdminMenu_Layout') );
+		$f3->set('title_sub', $f3->get('LN__AdminMenu_Layout') );
 
 		$layoutConfig = $this->model->getLayoutConfig();
 
@@ -1547,7 +1547,7 @@ class AdminCP extends Base
 	protected function storiesPending(\Base $f3, array $params): string
 	{
 		$this->response->addTitle( $f3->get('LN__AdminMenu_Stories_Pending') );
-		$f3->set('title_h3', $f3->get('LN__AdminMenu_Stories_Pending') );
+		$f3->set('title_sub', $f3->get('LN__AdminMenu_Stories_Pending') );
 
 		$params = $f3->get('PARAMS');
 
@@ -1870,13 +1870,13 @@ class AdminCP extends Base
 		if ( $params['module']=="collections" )
 		{
 			$this->response->addTitle( $f3->get('LN__AdminMenu_Collections') );
-			$f3->set('title_h3', $f3->get('LN__AdminMenu_Collections') );
+			$f3->set('title_sub', $f3->get('LN__AdminMenu_Collections') );
 			$module = "collections";
 		}
 		else
 		{
 			$this->response->addTitle( $f3->get('LN__AdminMenu_Series') );
-			$f3->set('title_h3', $f3->get('LN__AdminMenu_Series') );
+			$f3->set('title_sub', $f3->get('LN__AdminMenu_Series') );
 			$module = "series";
 		}
 

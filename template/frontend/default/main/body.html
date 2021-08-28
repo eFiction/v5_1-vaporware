@@ -23,7 +23,7 @@
 		<a href="{{@BASE}}"><h1>{{@CONFIG.page_title}}</h1></a> {{@CONFIG.page_slogan}}
 
 		<p class="mt-6"></p>
-		
+
 		<!-- start columns -->
 		<div class="columns">
 		<check if="{{ @@systempage }}">
@@ -51,13 +51,30 @@
 			</false>
 		</check>
 
+		<nav class="breadcrumb has-succeeds-separator" aria-label="breadcrumbs">
+		  <ul>
+				<repeat group="{{ @BREADCRUMBS }}" value="{{ @crumb }}" counter="{{ @CC }}"">
+		    <li class="is-active">
+					<a>
+					<check if="{{ @CC==1 }}">
+						<span class="icon is-small">
+          		<i class="fas fa-home" aria-hidden="true"></i>
+						</span>
+					</check>
+					{{ @crumb }}
+					</a>
+				</li>
+				</repeat>
+		  </ul>
+		</nav>
+
 		<!-- show page title and subtitle if available -->
-		<check if="{{ isset(@title_h1) }}">
-				<h1>{{ @title_h1 }}</h1>
+		<check if="{{ isset(@title_main) }}">
+				<h1>{{ @title_main }}</h1>
 		</check>
 
-		<check if="{{ isset(@title_h3) }}">
-				<h3>{{ @title_h3 }}</h3>
+		<check if="{{ isset(@title_sub) }}">
+				<h2>{{ @title_sub }}</h2>
 		</check>
 
 			{{@BODY | raw }}

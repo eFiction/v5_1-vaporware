@@ -16,6 +16,7 @@ class Frontend extends Template
             $f3->mset($this->data);
 
 		$this->f3->set('SITENAME', $this->config['page_title']);
+    $this->f3->set('BREADCRUMBS', $this->title);
 		/*
 			3-step processing of the inner page content:
 			- render page

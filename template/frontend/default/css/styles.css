@@ -5,6 +5,7 @@
 /* load font definitions */
 @import url(typography.css);
 
+body { background-color: #efefef;}
 
 /* ------ rewrite/add bulma directives ------- */
 .hero.is-fullheight .hero-body.is-baseline {

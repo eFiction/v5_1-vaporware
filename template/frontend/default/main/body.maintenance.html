@@ -18,12 +18,12 @@
 		<div class="columns is-centered">
 
 			<div class="column is-8">
-				<check if="{{ isset(@title_h1) }}">
-					<h1>{{ @title_h1 }}</h1>
+				<check if="{{ isset(@title_main) }}">
+					<h1>{{ @title_main }}</h1>
 				</check>
-					
-				<check if="{{ isset(@title_h3) }}">
-					<h3>{{ @title_h3 }}</h3>
+
+				<check if="{{ isset(@title_sub) }}">
+					<h3>{{ @title_sub }}</h3>
 				</check>
 
 				{{@BODY | raw }}
