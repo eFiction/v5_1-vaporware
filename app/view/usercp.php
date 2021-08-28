@@ -21,12 +21,13 @@ class UserCP extends Base
 		return $this->render('usercp/menu.html');
 	}
 
-	public function upperMenu(array $menu, $counter, $path, $sub)
+	public function upperMenu(array $menu, $counter, $path, $sub, $selected=NULL)
 	{
 		$this->f3->set('menu_upper', $menu);
 		$this->f3->set('counter', $counter);
 		$this->f3->set('sub', $sub);
 		$this->f3->set('path', $path);
+		$this->f3->set('selected', $selected);
 
 		return $this->render('usercp/menu.upper.html');
 	}

@@ -334,6 +334,7 @@ return array(
 	'Authoring_Drafts'		=> 'Drafts ({0})',
 	'Authoring_Deleted'		=> 'Deleted ({0})',
 'UserMenu_MyLibrary' => 'My Library',
+	'Title_Library_Favourites'	=> 'Favourites',
 	'Library_Favourites'	=> 'Favourites ({0})',
 	'AddFavourite'			=> 'Add favourite',
 	'Library_Bookmarks'		=> 'Bookmarks ({0})',

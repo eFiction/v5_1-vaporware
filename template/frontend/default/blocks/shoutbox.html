@@ -1,4 +1,3 @@
-<div class="sbox sbarbox">
 	<h4>{{@LN__Shoutbox}}</h4>
 	<div id="sboxContent" data-offset=0>
 
@@ -24,13 +23,15 @@
 		</span>
 		</button>
 	</p>
+<check if="{{@_SESSION['userID']>0 OR TRUE==\Config::getPublic('shoutbox_guest')}}">
 	<p class="control">
 		<button class="button">
-		<check if="{{@_SESSION['userID']>0 OR TRUE==\Config::getPublic('shoutbox_guest')}}"><span class="shoutButton icon is-small" data-action="shout">
+		<span class="shoutButton icon is-small" data-action="shout">
 			{ICON:comment}
-		</span></check>
+		</span>
 		</button>
 	</p>
+	</check>
 	</div>
 
 		<span id="sboxError" style="display: none"></span>
@@ -43,4 +44,3 @@
 		</form>
 		<div id="sboxLines"></div>
 	</div>
-</div>

@@ -25,9 +25,10 @@
     You have <a href="{{ @BASE }}/userCP/messaging/inbox">{{ @SESSION['mail'][1] }} {{@LN__PM_unread}}</a> messages in your inbox.
   </div>
 </article>
-<fieldset>
-	<legend>{{ ${"LN__PM_".@WHICH} }}</legend>
-	<table class="pm-box" width="100%">
+
+
+	<h2>{{ ${"LN__PM_".@WHICH} }}</h2>
+	<table class="table is-hoverable is-fullwidth">
 		<colgroup>
 			<col width='10%'>
 			<col width='15%'>
@@ -35,14 +36,15 @@
 			<col width='20%'>
 			<col width='10%'>
 		</colgroup>
+<thead>
 		<tr>
-			<td>&nbsp;</td>
-			<td>{ICON:calendar} {{ ${"LN__PM_".@DATE_MEANS} }}</td>
-			<td>{ICON:text} {{@LN__PM_Subject}}</td>
-			<td>{ICON:member} {{ ${"LN__PM_".@PERSON_IS} }}</td>
-			<td>&nbsp;</td>
+			<th>&nbsp;</th>
+			<th>{ICON:calendar} {{ ${"LN__PM_".@DATE_MEANS} }}</th>
+			<th>{ICON:text} {{@LN__PM_Subject}}</th>
+			<th>{ICON:member} {{ ${"LN__PM_".@PERSON_IS} }}</th>
+			<th>&nbsp;</th>
 		</tr>
-
+</thead>
 <check if="{{ sizeof(@messages) > 0 }}">
 	<true>
 {* show all messages, line by line *}
@@ -77,7 +79,7 @@
 </check>
 
 	</table>
-</fieldset>
+
 
 <div id="delete-confirm" title="{{@LN__PM_question_Delete }}?" style="display:none">
   <p>{ICON:alert} {{@LN__PM_confirm_Delete }}</p>

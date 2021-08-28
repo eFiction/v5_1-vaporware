@@ -334,6 +334,7 @@ return array(
 	'Authoring_Drafts'		=> 'Entwürfe ({0})',
 	'Authoring_Deleted'		=> 'Gelöscht ({0})',
 'UserMenu_MyLibrary' => 'Meine Bibliothek',
+	'Title_Library_Favourites'	=> 'Favoriten',
 	'Library_Favourites'	=> 'Favoriten ({0})',
 	'AddFavourite'			=> 'Favorit hinzufügen',
 	'Library_Bookmarks'		=> 'Lesezeichen ({0})',

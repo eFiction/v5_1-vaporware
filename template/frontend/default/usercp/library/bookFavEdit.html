@@ -1,18 +1,22 @@
 <check if="{{isset(@saveError)}}"><div class="note alert-box-half error">Error: {{@saveError}}</div></check>
 <div class="form-wrapper">
 <form method="post" action="{{@BASE}}/userCP/library/{{@block}}/save/id={{@data.type}},{{@data.id}};returnpath={{@returnpath}}">
-<check if="{{@data.fid}}">
-	<span class="alert-box error">{{@LN__CheckToDelete}}: <input type="checkbox" name="delete" value="yes" /></span>
-	<br /><br />
-</check>
-<fieldset>
+
 	<check if="{{ @block=='bookmark' }}">
-		<true><legend>{{@LN__AddBookmark}}</legend></true>
-		<false><legend>{{@LN__AddFavourite}}</legend></false>
+		<true><h2>{{@LN__AddBookmark}}</h2></true>
+		<false><h2>{{@LN__AddFavourite}}</h2></false>
 	</check>
-	<table>
-		<tr><td colspan="2"><h6>{{@data.name}}:</h6></td></tr>
-		<tr><td colspan="2"><textarea class="textarea" name="comments">{{@data.comments}}</textarea></td></tr>
+
+	<table class="table">
+		<tr><td>{{@data.name}}</td></tr>
+		<tr><td>
+			<div class="field">
+				<div class="control">
+					<textarea class="textarea" placeholder="Lorem ipsum" rows="10" cols="100">{{@data.comments}}</textarea>
+				</div>
+			</div>
+			</td>
+		</tr>
 {*		<tr>
 			<check if="{{ @block=='bookmark' }}">
 				<true><td>{@LN__MakeFavourite}</td></true>
@@ -20,29 +24,46 @@
 			</check>
 			<td><input type="checkbox" name="change" value="yes" />
 		</tr> *}
-		<tr><td>{{@LN__Notification}}</td><td><input type="checkbox" name="notify" value="yes" <check if="{{@data.notify}}">checked="checked"</check> /></tr>
 		<tr>
-			<td rowspan=4>{{@LN__Visibility}}</td>
+			<td><input type="checkbox" name="notify" value="yes" <check if="{{@data.notify}}">checked="checked"</check> /> {{@LN__Notification}}</td>
+		</tr>
+		<tr>
+			<td>{{@LN__Visibility}} - Die Auswahlmöglichkeiten lieber in einem Pulldown?</td>
+		</tr>
+		<tr>
 			<td>
 				<input type="radio" name="visibility" id="v0" value='0' <check if="{{@data.visibility==0 OR @data.visibility==''}}">checked="checked" </check>/>
 				<label for="v0">{{@LN__VisPrivate}}</label>
 			</td>
 		</tr>
-		<tr><td>
+		<tr>
+			<td>
 			<input type="radio" name="visibility" id="v1" value='1' <check if="{{@data.visibility==1}}">checked="checked" </check>/>
 			<label for="v1">{{@LN__VisFriends}}</label>
-		</td></tr>
-		<tr><td>
+			</td>
+		</tr>
+		<tr>
+			<td>
 			<input type="radio" name="visibility" id="v2" value='2' <check if="{{@data.visibility==2}}">checked="checked" </check>/>
 			<label for="v2">{{@LN__VisMembers}}</label>
-		</td></tr>
-		<tr><td>
+			</td>
+		</tr>
+		<tr>
+			<td>
 			<input type="radio" name="visibility" id="v3" value='3' <check if="{{@data.visibility==3}}">checked="checked" </check>/>
 			<label for="v3">{{@LN__VisEverybody}}</label>
-		</td></tr>
-		<tr><td colspan="2"><input class="button" type="submit"></td></tr>
+			</td>
+		</tr>
+		<tr>
+			<td colspan="2"><input class="button" type="Submit">
+				<check if="{{@data.fid}}">
+					<span class="alert-box error">{{@LN__CheckToDelete}}: <input type="checkbox" name="delete" value="yes" /></span> - Hier einen Delete Button mit Sicherheitsabfrage, bitte!
+					<br /><br />
+				</check>
+			</td>
+		</tr>
 	</table>
-</fieldset>
+
 </form>
 </div>
 <script type="text/javascript">

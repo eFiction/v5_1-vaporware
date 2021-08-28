@@ -601,6 +601,8 @@ class UserCP extends Base
 
 	private function libraryBookFav(\Base $f3, array $params) : void
 	{
+		$this->response->addTitle( $f3->get('LN__Title_Library_Favourites') );
+
 		if( NULL != $post = $f3->get('POST') )
 		{
 			if ( array_key_exists("confirm_delete",$post) )
@@ -644,7 +646,7 @@ class UserCP extends Base
 				[ "link" => "ST", "label" => "Stories" ],
 			];
 		}
-		$this->buffer ( $this->template->upperMenu($menu_upper, $counter, "library/{$params[0]}", $params[0]) );
+		$this->buffer ( $this->template->upperMenu($menu_upper, $counter, "library/{$params[0]}", $params[0], $params[1]??NULL ) );
 		// End of menu
 
 		if(array_key_exists("edit",$params))

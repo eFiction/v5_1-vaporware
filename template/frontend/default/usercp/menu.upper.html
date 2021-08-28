@@ -1,14 +1,21 @@
 <check if="{{ !empty(@menu_upper) }}">
-<div class="columns is-desktop">
-<true>
-	<repeat group="{{ @menu_upper }}" value="{{ @menu_item }}">
-		<check if="{{ isset(@counter[@menu_item['link']]) }}"><div class="column is-narrow"><button class="button"><span>{ICON:{{@sub}}} <a class="is-active" href="{{@BASE}}/userCP/{{@path}}/{{ @menu_item['link'] }}">{{ ${'LN__'.@menu_item['label']} }}</a> ({{@counter[@menu_item['link']]}})</span></button></div></check>
-	</repeat>
-<br />
-<br />
-</true>
-</div>
-<false>
-{* {{@LN__NoElements}} *}
-</false>
+	<true>
+		<div class="tabs tabs is-toggle is-fullwidth">
+			<ul>
+			<repeat group="{{ @menu_upper }}" value="{{ @menu_item }}">
+				<check if="{{ isset(@counter[@menu_item['link']]) }}">
+					<li<check if="{{ @menu_item['link']==@selected}}"> class="is-active"</check>><a href="{{@BASE}}/userCP/{{@path}}/{{ @menu_item['link'] }}">
+						<span class="icon is-small">{ICON:{{@sub}}}</span>
+						<span>{{ ${'LN__'.@menu_item['label']} }} ({{@counter[@menu_item['link']]}})</span>
+					</a></li>
+				</check>
+			</repeat>
+			</ul>
+		</div>
+		<br />
+		<br />
+	</true>
+	<false>
+		<li>{* {{@LN__NoElements}} *}</li>
+	</false>
 </check>

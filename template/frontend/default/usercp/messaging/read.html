@@ -1,10 +1,8 @@
-<div class="form-wrapper">
-<fieldset>
-	<legend>{{@LN__PM_ReadPM}}</legend>
-	<table width="100%">
-		<tr><td><h6>{{@LN__PM_Sender}}:</h6></td><td>{{@message.sender}}</td><td>{{ date(@CONFIG.datetime_format,@message.date_sent) }}</td></tr>
+<h2>{{@LN__PM_ReadPM}}</h2>
+	<table class="table is-fullwidth">
+		<tr><td>{{@LN__PM_Sender}}:</td><td>{{@message.sender}}</td><td>{{ date(@CONFIG.datetime_format,@message.date_sent) }}</td></tr>
 		<tr>
-			<td><h6>{{@LN__PM_Recipient}}:</h6></td><td>{{@message.recipient}}</td>
+			<td>{{@LN__PM_Recipient}}:</td><td>{{@message.recipient}}</td>
 			<td>
 				<check if="{{@message.date_read}}">
 				<true>
@@ -16,12 +14,10 @@
 				</check>
 			</td>
 		</tr>
-		<tr><td><h6>{{@LN__PM_Subject}}:</h6></td><td colspan="2">{{@message.subject}}</td></tr>
+		<tr><td>{{@LN__PM_Subject}}:</td><td colspan="2">{{@message.subject}}</td></tr>
 		<tr><td colspan="3"><textarea class="textarea" readonly>{{@message.message}}</textarea></td></tr>
 		<tr><td><a class="button" href="{{@BASE}}/userCP/messaging/write/reply={{@message.mid}}"><check if="({{@forward}})"><true><set whichbox='outbox' />{{@LN__PM_Forward}}</true><false><set whichbox='inbox' />{{@LN__PM_Reply}}</false></check></a></td><td colspan="2"><input class="button delete" type="submit" value="delete" id="{{@message.mid}}"></td></tr>
 	</table>
-</fieldset>
-</div>
 
 <div id="delete-confirm" title="{{@LN__PM_question_Delete }}?" style="display:none">
   <p>{ICON:alert} {{@LN__PM_confirm_Delete }}</p>
