@@ -18,7 +18,7 @@
 
 	<div class="column is-one-quarter"><h6>{{@LN__TagsInclude}}</h6></div>
 	<div class="column is-three-quarters"><input type="text" id="tagIn-select" name="tagIn" /></div>
-	
+
 	<div class="column is-one-quarter"><h6>{{@LN__TagsExclude}}</h6></div>
 	<div class="column is-three-quarters"><input type="text" id="tagOut-select" name="tagOut" /></div>
 
@@ -32,7 +32,7 @@
 		</select>
 		</div>
 	</div>
-	
+
 	<div class="column is-half"><h6>{{@LN__StoryExtent}}</h6>
 		<div class="select">
 		<select class="search" name="chapters">
@@ -42,7 +42,7 @@
 		</select>
 		</div>
 	</div>
-	
+
 	<div class="column is-half"><h6>{{@LN__StoryExtent}}</h6>
 	<check if="{{isset(@searchRatings)}}">
 		<span class="text-alignment">{{@LN__Rating}} from <div class="select"><select class="search" name="rating[0]">
@@ -67,7 +67,9 @@
 
 <br /><br />
 
-<div class="buttons-alignment"><check if="{{!empty(@searchLink)}}"><a class="button is-light" href="{{@BASE}}/story/browse/{{@searchLink}}<check if="{{isset(@paginate.page)}}">/page={{@paginate.page}}</check>">{{@LN__HideSearchForm}}</a></check></div>
+<div class="buttons is-centered">
+	<check if="{{!empty(@searchLink)}}"><a class="button is-light" href="{{@BASE}}/story/browse/{{@searchLink}}<check if="{{isset(@paginate.page)}}">/page={{@paginate.page}}</check>">{{@LN__HideSearchForm}}</a></check>
+</div>
 
 </form><p class="mt-6"></p>
 <script type="text/javascript">

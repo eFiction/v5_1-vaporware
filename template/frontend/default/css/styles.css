@@ -16,7 +16,6 @@
 	padding: 0.4rem;
 }
 
-
 .has-border {
 	border: 1px solid #efefef;
 }
@@ -28,16 +27,6 @@
 
 /* --------------- sidebar --------------- */
 
-.sbarbox {
-	margin: 8px 0;
-}
-
-.sbox {
-	font-size: small;
-}
-.sbox-date {
-	font-size: 8pt;
-}
 .sboxMSG:nth-child(even) {
 	background-color: transparent;
 	border: 1px solid #efefef;
@@ -153,10 +142,6 @@ legend {
 }
 
 /* --------------- sitewide --------------- */
-
-.buttons-alignment {
-	text-align: center;
-}
 
 .text-alignment {
 	vertical-align: sub;
