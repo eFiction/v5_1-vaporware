@@ -475,7 +475,7 @@ class Story extends Base
 
 		$data = $this->storyData($replacements, [ ":sid" => $story, ":chapter" => $chapter ]);
 
-		if ( !@in_array($story, @$_SESSION['viewed']) )
+		if ( isset($_SESSION['viewed']) AND !in_array($story, $_SESSION['viewed']) )
 		{
 			$this->exec("UPDATE `tbl_stories` SET count = count + 1 WHERE sid = :sid", [ ":sid" => $story ] );
 			$_SESSION['viewed'][] = $story;
@@ -801,9 +801,9 @@ class Story extends Base
 		return FALSE;
 	}
 
-	public function getTOC($story)
+	public function getTOC(int $story)
 	{
-		return $this->exec( "SELECT UNIX_TIMESTAMP(T.last_read) as tracker_last_read, T.last_chapter, IF(T.last_chapter=Ch.inorder,1,0) as last,
+		return $this->exec( "SELECT UNIX_TIMESTAMP(T.last_read) as tracker_last_read, IF(T.last_chapter=Ch.chapid,1,0) as last,
 								Ch.title, Ch.notes, Ch.wordcount, Ch.inorder as chapter,
 								COUNT(DISTINCT F.fid) as reviews
 							FROM `tbl_chapters`Ch

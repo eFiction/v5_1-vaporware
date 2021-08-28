@@ -507,7 +507,7 @@ class Controlpanel extends Base {
 		if ( $i ) $this->rebuildStoryCache($story->sid);
 
 		// delete ePub cache file
-		if($ePubFile=realpath("tmp/epub/s{$chapter->sid}.zip"))
+		if($ePubFile=realpath("tmp/epub/s{$story->sid}.zip"))
 			unlink($ePubFile);
 
 		return $i;

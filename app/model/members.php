@@ -121,7 +121,7 @@ class Members extends Base
 		return $data;
 	}
 
-	public function memberCollections(array $userData = [], string $selection)
+	public function memberCollections(array $userData, string $selection)
 	{
 		$ordered = ($selection=="series");
 		// common SQL creation for member profile and story view

@@ -14,7 +14,7 @@ class Members extends Base {
 	public function beforeroute(): void
 	{
 		parent::beforeroute();
-		$this->template->addTitle( \Base::instance()->get('LN__AS_Members') );
+		$this->template->addTitle( \Base::instance()->get('LN__Authors') );
 	}
 
 	public function index(\Base $f3, array $params)//: void

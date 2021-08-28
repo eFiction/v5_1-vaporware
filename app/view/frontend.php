@@ -91,8 +91,8 @@ class Frontend extends Template
 
 	private function post_render($buffer)
 	{
-		$this->f3->set( 'JS_HEAD', @implode("\n", @$this->f3->JS['head']) );
-		$this->f3->set( 'JS_BODY', @implode("\n", @$this->f3->JS['body']) );
+		$this->f3->set( 'JS_HEAD', implode("\n", $this->f3->JS['head']) );
+		$this->f3->set( 'JS_BODY', implode("\n", $this->f3->JS['body']) );
 
 		if($this->config['page_title_add']=='slogan')
 		{

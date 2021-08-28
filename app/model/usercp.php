@@ -104,7 +104,9 @@ class UserCP extends Controlpanel
 		$sql = "SELECT M.label, M.link, M.icon, M.evaluate FROM `tbl_menu_userpanel`M WHERE M.child_of @WHERE@ ORDER BY M.order ASC";
 		$menu = [];
 
-		$menuItems = $this->exec(str_replace("@WHERE@", ($selected?"= :selected;":"IS NULL;"), $sql) , [":selected"=> $selected], 120);
+		$menuItems = ($selected) ?
+					$this->exec(str_replace("@WHERE@", "= :selected", $sql) , [":selected"=> $selected], 120) :
+					$this->exec(str_replace("@WHERE@", "IS NULL", $sql) , [], 120);
 
 		foreach ( $menuItems as $item )
 		{

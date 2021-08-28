@@ -17,7 +17,9 @@ class Authors extends Base
 					{$where} GROUP BY U.uid
   			HAVING counted > 0
 				ORDER BY U.username ASC";
-		$authors = $this->exec($sql,[ ":letter" => $letter."%"]);
+		$authors = ($letter)
+								? $this->exec($sql,[ ":letter" => $letter."%"])
+								: $this->exec($sql);
 		if(sizeof($authors)==0) return FALSE;
 
 		// Initialize empty list

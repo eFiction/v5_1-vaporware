@@ -1,8 +1,11 @@
 $( document ).ready(function() {
 	shoutbox_data ( 'load/top' );
-	
-	$('#captchaBox').click(getCaptchaImage);
-	
+
+
+if (typeof getCaptchaImage !== 'undefined') {
+		$('#captchaBox').click(getCaptchaImage);
+}
+
 	$('.emotic').click(function(e) {
 		e_code = ($(this).data("code"));
 		$('#shout').val(function(i, text) {
@@ -14,7 +17,7 @@ $( document ).ready(function() {
 		sb.preventDefault();
 		sb_dir = ($(this).data("direction"));
 		sb_act = ($(this).data("action"));
-		
+
 		if(sb_dir)
 		{
 			off = ($("#sboxContent").data("offset"));
@@ -32,13 +35,13 @@ $( document ).ready(function() {
 				$('#sboxInput').hide('slow');
 				$('#sboxForm').html("");
 			}
-			else if(sb_act=="shout") 
+			else if(sb_act=="shout")
 			{
 				if($('#sboxForm').html() == "")
 				{
 					shoutbox_data ( 'form/build' );
 					$('#sboxInput').delay( 200 ).show('slow');
-					
+
 				}
 				else
 				{
@@ -57,9 +60,9 @@ function shoutbox_data ( ajax_url, ajax_data )
 	$.ajax({
 		dataType: "json",
 		//async: false,
-		url: base + '/shoutbox/' + ajax_url, 
-		method: "POST", 
-		cache: false, 
+		url: base + '/shoutbox/' + ajax_url,
+		method: "POST",
+		cache: false,
 		data: { random: Date.now(), data: ajax_data },
 		success: function( json_data )
 		{
@@ -91,4 +94,3 @@ function shoutbox_data ( ajax_url, ajax_data )
 		}
 	});
 }
-
