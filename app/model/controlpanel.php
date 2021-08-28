@@ -1013,6 +1013,8 @@ class Controlpanel extends Base {
 
 		foreach ( $jobs as $catID )
 		{
+			// reset the sub-category buffer
+			unset($sub);
 			// set the cursor to the current category
 			$categories->load(['cid = ?', $catID]);
 
